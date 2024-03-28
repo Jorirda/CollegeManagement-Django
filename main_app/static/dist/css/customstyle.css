@@ -9,3 +9,25 @@
     justify-content: space-evenly;
     padding-bottom: 10px;
 }
+
+.cardcustom, .cardloginbodycustom, .formctrlcustom {
+    background-color: black;
+}
+
+.login-logo2,
+.register-logo2 {
+  font-size: 1.9rem;
+  font-weight: 300;
+  margin-bottom: .9rem;
+  text-align: center;
+}
+
+.login-logo2 a,
+.register-logo2 a {
+  color: aliceblue;
+}
+
+.custom{
+    background: #000;
+    color: #fff;
+}

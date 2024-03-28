@@ -23,20 +23,25 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <!-- Google Recaptcha     -->
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script type="text/javascript">
+        var RecaptchaOptions = {
+           theme : 'theme_name'
+        };
+        </script>
 </head>
 
 <body class="hold-transition login-page">
     <div class="login-box">
         <!-- /.login-logo -->
-        <div class="card">
-            <div class="login-logo">
+        <div class="card cardcustom">
+            <div class="login-logo2">
                 <!-- <a href=""><b>College</b> Management System</a> -->
-                <a href="">中之学校管理软件</a>
+                <a href="" class="logotext">中之学校管理软件</a>
             </div>
             <div class="img_container">
                 <img src="/media/logo.png" alt="Logo" class="iconimage">
             </div>
-            <div class="card-body login-card-body">
+            <div class="card-body login-card-body cardloginbodycustom">
                 <!-- <p class="login-box-msg">Sign in to start your session</p> -->
                 {% if messages %}
                 <div class="col-12">
@@ -52,7 +57,7 @@
                 <form action="doLogin/" method="post">
                     {% csrf_token %}
                     <div class="input-group mb-3">
-                        <input required type="email" name='email' class="form-control" placeholder="Email">
+                        <input required type="email" name='email' class="form-control formctrlcustom" placeholder="Email">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>
@@ -60,7 +65,7 @@
                         </div>
                     </div>
                     <div class="input-group mb-3">
-                        <input required type="password" name='password' class="form-control" placeholder="Password">
+                        <input required type="password" name='password' class="form-control formctrlcustom" placeholder="Password">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>
@@ -68,7 +73,7 @@
                         </div>
                     </div>
                     <div class="input-group mb-3">
-                        <div class="g-recaptcha" data-sitekey="6LfswtgZAAAAAJ7bhwqZZtDpBsc75ekH6FWA4Fnt"></div>
+                        <div class="g-recaptcha custom" data-sitekey="6LfswtgZAAAAAJ7bhwqZZtDpBsc75ekH6FWA4Fnt"></div>
 
                     </div>
                     <div class="row">

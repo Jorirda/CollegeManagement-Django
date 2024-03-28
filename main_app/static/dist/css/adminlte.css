@@ -205,6 +205,7 @@ figure {
 img {
   vertical-align: middle;
   border-style: none;
+  
 }
 
 svg {
@@ -19957,7 +19958,7 @@ html.maximized-card {
   color: #495057;
 }
 
-.login-page,
+.login-page, 
 .register-page {
   -ms-flex-align: center;
   align-items: center;

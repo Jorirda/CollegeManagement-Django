@@ -5,7 +5,8 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>C.M.S | Log In</title>
+    <title>中之学校管理软件</title>
+    <link rel="icon" type="image/png" href="/media/icon.png">
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Font Awesome -->
@@ -16,6 +17,8 @@
     <link rel="stylesheet" href="{% static 'plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
     <!-- Theme style -->
     <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="{% static 'dist/css/customstyle.css'%} ">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <!-- Google Recaptcha     -->
@@ -24,12 +27,15 @@
 
 <body class="hold-transition login-page">
     <div class="login-box">
-        <div class="login-logo">
-            <a href=""><b>College</b> Management System</a>
-
-        </div>
         <!-- /.login-logo -->
         <div class="card">
+            <div class="login-logo">
+                <!-- <a href=""><b>College</b> Management System</a> -->
+                <a href="">中之学校管理软件</a>
+            </div>
+            <div class="img_container">
+                <img src="/media/logo.png" alt="Logo" class="iconimage">
+            </div>
             <div class="card-body login-card-body">
                 <!-- <p class="login-box-msg">Sign in to start your session</p> -->
                 {% if messages %}

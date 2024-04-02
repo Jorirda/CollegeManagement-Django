@@ -31,10 +31,10 @@
         <div class="card cardcustom">
             <div class="login-logo2">
                 <!-- <a href=""><b>College</b> Management System</a> -->
-                <a href="" class="logotext">中之学校管理软件</a>
+                <h1 class="logotext">中之学校管理软件</h1>
             </div>
             <div class="img_container">
-                <img src="/media/logo.png" alt="Logo" class="iconimage">
+                <img src="https://i.ibb.co/mzCBFhB/logo.png" alt="Logo" class="iconimage">
             </div>
             <div class="card-body login-card-body cardloginbodycustom">
                 <!-- <p class="login-box-msg">Sign in to start your session</p> -->
@@ -63,10 +63,11 @@
                         <input required type="password" name='password' class="form-control" style="background-color: black;" placeholder="Password">
                         <div class="input-group-append">
                             <div class="input-group-text">
-                                <span class="fas fa-lock"></span>
+                                <span class="password-toggle fas fa-eye-slash" onclick="togglePasswordVisibility(this)"></span>
                             </div>
                         </div>
                     </div>
+                    
                     <!-- <div class="input-group mb-3">
                         <div class="g-recaptcha custom" data-sitekey="6LfswtgZAAAAAJ7bhwqZZtDpBsc75ekH6FWA4Fnt"></div>
 
@@ -88,10 +89,10 @@
                     </div>
                 </form>
 
-
+<!-- 
                 <p class="mb-1">
                     <a href="{% url 'password_reset' %}">Forgot Password?</a>
-                </p>
+                </p> -->
 
             </div>
             <!-- /.login-card-body -->
@@ -105,6 +106,8 @@
     <script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     <!-- AdminLTE App -->
     <script src="{% static 'dist/js/adminlte.min.js' %}"></script>
+     <!--customJQuery-->
+     <script src="{% static 'dist/js/customjs.js' %}"></script>
 
 </body>
 

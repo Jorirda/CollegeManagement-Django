@@ -21,13 +21,8 @@
     <link rel="stylesheet" href="{% static 'dist/css/customstyle.css'%} ">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-    <!-- Google Recaptcha     -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    <script type="text/javascript">
-        var RecaptchaOptions = {
-           theme : 'theme_name'
-        };
-        </script>
+    <!-- Google Recaptcha    
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script> -->
 </head>
 
 <body class="hold-transition login-page">
@@ -43,7 +38,7 @@
             </div>
             <div class="card-body login-card-body cardloginbodycustom">
                 <!-- <p class="login-box-msg">Sign in to start your session</p> -->
-                {% if messages %}
+                <!-- {% if messages %}
                 <div class="col-12">
                     {% for message in messages %}
                     {% if message.tags == 'error' %}
@@ -53,11 +48,11 @@
                     {% endif %}
                     {% endfor %}
                 </div>
-                {% endif %}
+                {% endif %} -->
                 <form action="doLogin/" method="post">
                     {% csrf_token %}
                     <div class="input-group mb-3">
-                        <input required type="email" name='email' class="form-control formctrlcustom" placeholder="Email">
+                        <input required type="email" name='email' class="form-control" style="background-color: black;" placeholder="Email">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>
@@ -65,17 +60,17 @@
                         </div>
                     </div>
                     <div class="input-group mb-3">
-                        <input required type="password" name='password' class="form-control formctrlcustom" placeholder="Password">
+                        <input required type="password" name='password' class="form-control" style="background-color: black;" placeholder="Password">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>
                             </div>
                         </div>
                     </div>
-                    <div class="input-group mb-3">
+                    <!-- <div class="input-group mb-3">
                         <div class="g-recaptcha custom" data-sitekey="6LfswtgZAAAAAJ7bhwqZZtDpBsc75ekH6FWA4Fnt"></div>
 
-                    </div>
+                    </div> -->
                     <div class="row">
                         <div class="col-8">
                             <div class="icheck-primary">
@@ -89,8 +84,6 @@
                         <div class="col-4">
                             <button type="submit" class="btn btn-success btn-block">Log In</button>
                         </div>
-
-
                         <!-- /.col -->
                     </div>
                 </form>

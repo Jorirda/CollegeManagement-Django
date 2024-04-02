@@ -1,33 +1,21 @@
-.iconimage{
-    height: 110px;
-    width: auto;
-
-    
-}
-.img_container{
-    display: flex;
-    justify-content: space-evenly;
-    padding-bottom: 10px;
+/* Update container background color */
+.cardcustom {
+  background-color: black;
 }
 
-.cardcustom, .cardloginbodycustom, .formctrlcustom {
-    background-color: black;
+/* Update login card body background color */
+.cardloginbodycustom {
+  background-color: black;
 }
 
-.login-logo2,
-.register-logo2 {
-  font-size: 1.9rem;
-  font-weight: 300;
-  margin-bottom: .9rem;
-  text-align: center;
+/* Optional: Update icon image and container styles */
+.iconimage {
+  height: 110px;
+  width: auto;
 }
 
-.login-logo2 a,
-.register-logo2 a {
-  color: aliceblue;
-}
-
-.custom{
-    background: #000;
-    color: #fff;
+.img_container {
+  display: flex;
+  justify-content: space-evenly;
+  padding-bottom: 10px;
 }

@@ -1,3 +1,7 @@
+.login-page{
+  background-color: #000;
+}
+
 .iconimage{
   height: 110px;
   width: auto;   
@@ -33,4 +37,13 @@
 
 h1 {
   font-size: 2.2rem;
+}
+
+.custom-border{
+  border: 1px solid green;
+}
+
+/* Define the custom checkbox style */
+.custom-checkbox[type="checkbox"]:checked+label::before {
+  border-color: green; /* Change the border color to green when checked */
 }

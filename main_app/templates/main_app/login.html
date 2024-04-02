@@ -52,17 +52,17 @@
                 <form action="doLogin/" method="post">
                     {% csrf_token %}
                     <div class="input-group mb-3">
-                        <input required type="email" name='email' class="form-control" style="background-color: black;" placeholder="Email">
+                        <input required type="email" name='email' class="form-control custom-border" style="background-color: black;" placeholder="Email">
                         <div class="input-group-append">
-                            <div class="input-group-text">
+                            <div class="input-group-text" style="border: 1px solid green;">
                                 <span class="fas fa-envelope"></span>
                             </div>
                         </div>
                     </div>
                     <div class="input-group mb-3">
-                        <input required type="password" name='password' class="form-control" style="background-color: black;" placeholder="Password">
+                        <input required type="password" name='password' class="form-control custom-border" style="background-color: black; " placeholder="Password">
                         <div class="input-group-append">
-                            <div class="input-group-text">
+                            <div class="input-group-text" style="border: 1px solid green;">
                                 <span class="password-toggle fas fa-eye-slash" onclick="togglePasswordVisibility(this)"></span>
                             </div>
                         </div>
@@ -73,9 +73,9 @@
 
                     </div> -->
                     <div class="row">
-                        <div class="col-8">
-                            <div class="icheck-primary">
-                                <input type="checkbox" id="remember">
+                        <div class="col-8" >
+                            <div class="icheck-primary" >
+                                <input type="checkbox" id="remember" >
                                 <label for="remember">
                                     Remember Me
                                 </label>

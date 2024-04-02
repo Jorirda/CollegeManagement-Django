@@ -43,7 +43,8 @@ h1 {
   border: 1px solid green;
 }
 
-/* Define the custom checkbox style */
-.custom-checkbox[type="checkbox"]:checked+label::before {
-  border-color: green; /* Change the border color to green when checked */
+
+.form-control:focus,
+.form-control:not(:placeholder-shown) {
+  border-color: green;
 }

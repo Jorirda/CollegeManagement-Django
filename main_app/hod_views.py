@@ -15,7 +15,7 @@ from .models import *
 
 
 def admin_home(request):
-    total_staff = Staff.objects.all().count()
+    total_teacher = Teacher.objects.all().count()
     total_students = Student.objects.all().count()
     subjects = Subject.objects.all()
     total_subject = subjects.count()
@@ -70,7 +70,7 @@ def admin_home(request):
     context = {
         'page_title': "Administrative Dashboard",
         'total_students': total_students,
-        'total_staff': total_staff,
+        'total_teacher': total_teacher,
         'total_course': total_course,
         'total_subject': total_subject,
         'subject_list': subject_list,
@@ -86,9 +86,9 @@ def admin_home(request):
     return render(request, 'hod_template/home_content.html', context)
 
 
-def add_staff(request):
-    form = StaffForm(request.POST or None, request.FILES or None)
-    context = {'form': form, 'page_title': 'Add Staff'}
+def add_teacher(request):
+    form = TeacherForm(request.POST or None, request.FILES or None)
+    context = {'form': form, 'page_title': 'Add teacher'}
     if request.method == 'POST':
         if form.is_valid():
             first_name = form.cleaned_data.get('first_name')
@@ -112,11 +112,11 @@ def add_staff(request):
                 user.address = address
                 user.contact_num = contact_num
                 user.remark = remark
-                user.staff.course = course
-                user.staff.work_type = work_type
+                user.teacher.course = course
+                user.teacher.work_type = work_type
                 user.save()
                 messages.success(request, "Successfully Added")
-                return redirect(reverse('add_staff'))
+                return redirect(reverse('add_teacher'))
 
 
             except Exception as e:
@@ -124,7 +124,20 @@ def add_staff(request):
         else:
             messages.error(request, "Please fulfil all requirements")
 
-    return render(request, 'hod_template/add_staff_template.html', context)
+    return render(request, 'hod_template/add_teacher_template.html', context)
+
+def view_teacher_query(request):
+    # Fetch all teacher queries from the database
+    teacher_queries = TeacherQuery.objects.all()
+
+    # Prepare the context to pass to the template
+    context = {
+        'page_title': "View Teacher Queries",
+        'teacher_queries': teacher_queries,
+    }
+
+    # Render the template with the context
+    return render(request, 'hod_template/view_teacher_query.html', context)
 
 
 def add_student(request):
@@ -173,6 +186,20 @@ def add_student(request):
     return render(request, 'hod_template/add_student_template.html', context)
 
 
+def view_student_query(request):
+    # Fetch all student queries from the database
+    student_queries = StudentQuery.objects.all()
+
+    # Prepare the context to pass to the template
+    context = {
+        'page_title': "View Student Queries",
+        'student_queries': student_queries,
+    }
+
+    # Render the template with the context
+    return render(request, 'hod_template/view_student_query.html', context)
+
+
 def add_course(request):
     form = CourseForm(request.POST or None)
     context = {
@@ -205,11 +232,11 @@ def add_subject(request):
         if form.is_valid():
             name = form.cleaned_data.get('name')
             course = form.cleaned_data.get('course')
-            staff = form.cleaned_data.get('staff')
+            teacher = form.cleaned_data.get('teacher')
             try:
                 subject = Subject()
                 subject.name = name
-                subject.staff = staff
+                subject.teacher = teacher
                 subject.course = course
                 subject.save()
                 messages.success(request, "Successfully Added")
@@ -223,13 +250,13 @@ def add_subject(request):
     return render(request, 'hod_template/add_subject_template.html', context)
 
 
-def manage_staff(request):
-    allStaff = CustomUser.objects.filter(user_type=2)
+def manage_teacher(request):
+    allteacher = CustomUser.objects.filter(user_type=2)
     context = {
-        'allStaff': allStaff,
-        'page_title': 'Manage Staff'
+        'allteacher': allteacher,
+        'page_title': 'Manage teacher'
     }
-    return render(request, "hod_template/manage_staff.html", context)
+    return render(request, "hod_template/manage_teacher.html", context)
 
 
 def manage_student(request):
@@ -239,6 +266,9 @@ def manage_student(request):
         'page_title': 'Manage Students'
     }
     return render(request, "hod_template/manage_student.html", context)
+
+
+
 
 
 def manage_course(request):
@@ -259,13 +289,13 @@ def manage_subject(request):
     return render(request, "hod_template/manage_subject.html", context)
 
 
-def edit_staff(request, staff_id):
-    staff = get_object_or_404(Staff, id=staff_id)
-    form = StaffForm(request.POST or None, instance=staff)
+def edit_teacher(request, teacher_id):
+    teacher = get_object_or_404(teacher, id=teacher_id)
+    form = teacherForm(request.POST or None, instance=teacher)
     context = {
         'form': form,
-        'staff_id': staff_id,
-        'page_title': 'Edit Staff'
+        'teacher_id': teacher_id,
+        'page_title': 'Edit teacher'
     }
     if request.method == 'POST':
         if form.is_valid():
@@ -282,7 +312,7 @@ def edit_staff(request, staff_id):
             remark = form.cleaned_data.get('remark')
             passport = request.FILES.get('profile_pic') or None
             try:
-                user = CustomUser.objects.get(id=staff.admin.id)
+                user = CustomUser.objects.get(id=teacher.admin.id)
                 user.username = username
                 user.email = email
                 if password != None:
@@ -298,20 +328,20 @@ def edit_staff(request, staff_id):
                 user.address = address
                 user.contact_num = contact_num
                 user.remark = remark
-                staff.course = course
-                staff.work_type = work_type
+                teacher.course = course
+                teacher.work_type = work_type
                 user.save()
-                staff.save()
+                teacher.save()
                 messages.success(request, "Successfully Updated")
-                return redirect(reverse('edit_staff', args=[staff_id]))
+                return redirect(reverse('edit_teacher', args=[teacher_id]))
             except Exception as e:
                 messages.error(request, "Could Not Update " + str(e))
         else:
             messages.error(request, "Please fil form properly")
     else:
-        user = CustomUser.objects.get(id=staff_id)
-        staff = Staff.objects.get(id=user.id)
-        return render(request, "hod_template/edit_staff_template.html", context)
+        user = CustomUser.objects.get(id=teacher_id)
+        teacher = teacher.objects.get(id=user.id)
+        return render(request, "hod_template/edit_teacher_template.html", context)
 
 
 def edit_student(request, student_id):
@@ -409,11 +439,11 @@ def edit_subject(request, subject_id):
         if form.is_valid():
             name = form.cleaned_data.get('name')
             course = form.cleaned_data.get('course')
-            staff = form.cleaned_data.get('staff')
+            teacher = form.cleaned_data.get('teacher')
             try:
                 subject = Subject.objects.get(id=subject_id)
                 subject.name = name
-                subject.staff = staff
+                subject.teacher = teacher
                 subject.course = course
                 subject.save()
                 messages.success(request, "Successfully Updated")
@@ -504,18 +534,18 @@ def student_feedback_message(request):
 
 
 @csrf_exempt
-def staff_feedback_message(request):
+def teacher_feedback_message(request):
     if request.method != 'POST':
-        feedbacks = FeedbackStaff.objects.all()
+        feedbacks = FeedbackTeacher.objects.all()
         context = {
             'feedbacks': feedbacks,
-            'page_title': 'Staff Feedback Messages'
+            'page_title': 'teacher Feedback Messages'
         }
-        return render(request, 'hod_template/staff_feedback_template.html', context)
+        return render(request, 'hod_template/teacher_feedback_template.html', context)
     else:
         feedback_id = request.POST.get('id')
         try:
-            feedback = get_object_or_404(FeedbackStaff, id=feedback_id)
+            feedback = get_object_or_404(Feedbackteacher, id=feedback_id)
             reply = request.POST.get('reply')
             feedback.reply = reply
             feedback.save()
@@ -525,14 +555,14 @@ def staff_feedback_message(request):
 
 
 @csrf_exempt
-def view_staff_leave(request):
+def view_teacher_leave(request):
     if request.method != 'POST':
-        allLeave = LeaveReportStaff.objects.all()
+        allLeave = LeaveReportTeacher.objects.all()
         context = {
             'allLeave': allLeave,
-            'page_title': 'Leave Applications From Staff'
+            'page_title': 'Leave Applications From teacher'
         }
-        return render(request, "hod_template/staff_leave_view.html", context)
+        return render(request, "hod_template/teacher_leave_view.html", context)
     else:
         id = request.POST.get('id')
         status = request.POST.get('status')
@@ -541,7 +571,7 @@ def view_staff_leave(request):
         else:
             status = -1
         try:
-            leave = get_object_or_404(LeaveReportStaff, id=id)
+            leave = get_object_or_404(LeaveReportTeacher, id=id)
             leave.status = status
             leave.save()
             return HttpResponse(True)
@@ -645,13 +675,13 @@ def admin_view_profile(request):
     return render(request, "hod_template/admin_view_profile.html", context)
 
 
-def admin_notify_staff(request):
-    staff = CustomUser.objects.filter(user_type=2)
+def admin_notify_teacher(request):
+    teacher = CustomUser.objects.filter(user_type=2)
     context = {
-        'page_title': "Send Notifications To Staff",
-        'allStaff': staff
+        'page_title': "Send Notifications To teacher",
+        'allteacher': teacher
     }
-    return render(request, "hod_template/staff_notification.html", context)
+    return render(request, "hod_template/teacher_notification.html", context)
 
 
 def admin_notify_student(request):
@@ -691,37 +721,37 @@ def send_student_notification(request):
 
 
 @csrf_exempt
-def send_staff_notification(request):
+def send_teacher_notification(request):
     id = request.POST.get('id')
     message = request.POST.get('message')
-    staff = get_object_or_404(Staff, admin_id=id)
+    teacher = get_object_or_404(teacher, admin_id=id)
     try:
         url = "https://fcm.googleapis.com/fcm/send"
         body = {
             'notification': {
                 'title': "Student Management System",
                 'body': message,
-                'click_action': reverse('staff_view_notification'),
+                'click_action': reverse('teacher_view_notification'),
                 'icon': static('dist/img/AdminLTELogo.png')
             },
-            'to': staff.admin.fcm_token
+            'to': teacher.admin.fcm_token
         }
         headers = {'Authorization':
                    'key=AAAA3Bm8j_M:APA91bElZlOLetwV696SoEtgzpJr2qbxBfxVBfDWFiopBWzfCfzQp2nRyC7_A2mlukZEHV4g1AmyC6P_HonvSkY2YyliKt5tT3fe_1lrKod2Daigzhb2xnYQMxUWjCAIQcUexAMPZePB',
                    'Content-Type': 'application/json'}
         data = requests.post(url, data=json.dumps(body), headers=headers)
-        notification = NotificationStaff(staff=staff, message=message)
+        notification = Notificationteacher(teacher=teacher, message=message)
         notification.save()
         return HttpResponse("True")
     except Exception as e:
         return HttpResponse("False")
 
 
-def delete_staff(request, staff_id):
-    staff = get_object_or_404(CustomUser, staff__id=staff_id)
-    staff.delete()
-    messages.success(request, "Staff deleted successfully!")
-    return redirect(reverse('manage_staff'))
+def delete_teacher(request, teacher_id):
+    teacher = get_object_or_404(CustomUser, teacher__id=teacher_id)
+    teacher.delete()
+    messages.success(request, "teacher deleted successfully!")
+    return redirect(reverse('manage_teacher'))
 
 
 def delete_student(request, student_id):

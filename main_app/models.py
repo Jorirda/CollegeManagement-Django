@@ -17,15 +17,15 @@ class CustomUserManager(UserManager):
         return user
 
     def create_user(self, email, password=None, **extra_fields):
-        extra_fields.setdefault("is_staff", False)
+        extra_fields.setdefault("is_teacher", False)
         extra_fields.setdefault("is_superuser", False)
         return self._create_user(email, password, **extra_fields)
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_teacher", True)
         extra_fields.setdefault("is_superuser", True)
 
-        assert extra_fields["is_staff"]
+        assert extra_fields["is_teacher"]
         assert extra_fields["is_superuser"]
         return self._create_user(email, password, **extra_fields)
 
@@ -39,7 +39,7 @@ class Session(models.Model):
 
 
 class CustomUser(AbstractUser):
-    USER_TYPE = ((1, "HOD"), (2, "Staff"), (3, "Student"))
+    USER_TYPE = ((1, "HOD"), (2, "Teacher"), (3, "Student"))
     GENDER = [("M", "Male"), ("F", "Female")]
     
     
@@ -88,7 +88,7 @@ class Student(models.Model):
         return self.admin.last_name + ", " + self.admin.first_name
 
 
-class Staff(models.Model):
+class Teacher(models.Model):
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     work_type = models.CharField(max_length = 30, blank = True) #Special/Temporary
@@ -99,7 +99,7 @@ class Staff(models.Model):
 
 class Subject(models.Model):
     name = models.CharField(max_length=120)
-    staff = models.ForeignKey(Staff,on_delete=models.CASCADE,)
+    teacher = models.ForeignKey(Teacher,on_delete=models.CASCADE,)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -133,8 +133,8 @@ class LeaveReportStudent(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class LeaveReportStaff(models.Model):
-    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+class LeaveReportTeacher(models.Model):
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     date = models.CharField(max_length=60)
     message = models.TextField()
     status = models.SmallIntegerField(default=0)
@@ -150,16 +150,16 @@ class FeedbackStudent(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class FeedbackStaff(models.Model):
-    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+class FeedbackTeacher(models.Model):
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     feedback = models.TextField()
     reply = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class NotificationStaff(models.Model):
-    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+class NotificationTeacher(models.Model):
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -180,26 +180,86 @@ class StudentResult(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-# class PaymentRecord(models.Model):
-#     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-#     id_number = models.CharField(max_length=100)
-#     date = models.DateField()
-#     course = models.CharField(max_length=255)
-#     lesson_unit_price = models.DecimalField(max_digits=10, decimal_places=2)
-#     class_name = models.CharField(max_length=100)
-#     discounted_price = models.DecimalField(max_digits=10, decimal_places=2)
-#     book_costs = models.DecimalField(max_digits=10, decimal_places=2)
-#     other_fee = models.DecimalField(max_digits=10, decimal_places=2)
-#     amount_due = models.DecimalField(max_digits=10, decimal_places=2)
-#     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
-#     payment_method = models.CharField(max_length=100)
-#     payee = models.CharField(max_length=255)
-#     remark = models.TextField()
 
-#     def __str__(self):
-#         return f"{self.student.name} - {self.id_number} - {self.date}"
+class PaymentRecord(models.Model):
+    # id_number = models.CharField(max_length=100, primary_key = True)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    date = models.DateField()
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    lesson_unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    class_name = models.CharField(max_length=100)
+    discounted_price = models.DecimalField(max_digits=10, decimal_places=2)
+    book_costs = models.DecimalField(max_digits=10, decimal_places=2)
+    other_fee = models.DecimalField(max_digits=10, decimal_places=2)
+    amount_due = models.DecimalField(max_digits=10, decimal_places=2)
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_method = models.CharField(max_length=100)
+    payee = models.CharField(max_length=255)
+    remark = models.TextField(default = "")
+    def __str__(self):
+        return f"{self.student.name} - {self.id_number} - {self.date}"
 
- 
+
+class LearningRecord(models.Model):
+    id = models.CharField(max_length=100, primary_key = True)
+    date = models.DateField()
+    name = models.CharField(max_length=255)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    instructor = models.CharField(max_length=255)#(This can be a string field of what instructor the student has, not in relation to the foreign key) 
+    starting_time = models.TimeField()
+    end_time = models.TimeField()
+    class_name = models.CharField(max_length=100)
+    remark = models.TextField(default="")
+
+    def __str__(self):
+        return f"{self.name} - {self.date}"
+
+
+class StudentQuery(models.Model):
+    GENDER_CHOICES = [
+        ('M', 'Male'),
+        ('F', 'Female'),
+        
+    ]
+
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    date_of_birth = models.DateField()
+    state = models.CharField(max_length=100)
+    payment_status = models.CharField(max_length=100)
+    refund_situation = models.CharField(max_length=100)
+    registration_date = models.DateField()
+    number_of_classes = models.IntegerField()
+    already_registered_for_courses = models.CharField(max_length=100)
+    course_hours_completed = models.IntegerField()
+    paid_class_hours = models.IntegerField()
+    remaining_class_hours = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.id} - {self.registration_date}"
+    
+class TeacherQuery(models.Model):
+    GENDER_CHOICES = [
+        ('M', 'Male'),
+        ('F', 'Female'),
+    ]
+
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    contact_number = models.CharField(max_length=100)
+    teaching_courses = models.CharField(max_length=100)
+    signing_form = models.CharField(max_length=100)
+    address = models.CharField(max_length=255)
+    course_hours_completed = models.IntegerField(default=0)
+    number_of_classes = models.IntegerField(default=0)
+    class_schedule_date = models.DateField()
+    class_schedule_course = models.CharField(max_length=100)
+    class_schedule_instructor = models.CharField(max_length=100)
+    class_schedule_starting_time = models.TimeField()
+    class_schedule_end_time = models.TimeField()
+    class_schedule_class = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.id} - {self.class_schedule_date}"
+
 
 
 
@@ -209,7 +269,7 @@ def create_user_profile(sender, instance, created, **kwargs):
         if instance.user_type == 1:
             Admin.objects.create(admin=instance)
         if instance.user_type == 2:
-            Staff.objects.create(admin=instance)
+            Teacher.objects.create(admin=instance)
         if instance.user_type == 3:
             Student.objects.create(admin=instance)
 
@@ -219,6 +279,6 @@ def save_user_profile(sender, instance, **kwargs):
     if instance.user_type == 1:
         instance.admin.save()
     if instance.user_type == 2:
-        instance.staff.save()
+        instance.teacher.save()
     if instance.user_type == 3:
         instance.student.save()

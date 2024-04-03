@@ -1,0 +1,72 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+{% block content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-dark">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ page_title }}</h3>
+                    </div>
+
+
+                    <!-- /.card-header -->
+                    <!-- form start -->
+                    <div class="card-body">
+
+                        <div class="form-group table">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>ID Number</th>
+                                        <th>Date</th>
+                                        <th>Course</th>
+                                        <th>Lesson Unit Price</th>
+                                        <th>Class</th>
+                                        <th>Discounted Price</th>
+                                        <th>Book Costs</th>
+                                        <th>Other Fee</th>
+                                        <th>Amount Due</th>
+                                        <th>Amount Paid</th>
+                                        <th>Payment Method</th>
+                                        <th>Payee</th>
+                                        <th>Remark</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment_record in payment_records %}
+                                        <tr>
+                                            <!-- <td>{{ payment_record.id_number }}</td> -->
+                                            <td>{{ payment_record.date }}</td>
+                                            <td>{{ payment_record.course }}</td>
+                                            <td>{{ payment_record.lesson_unit_price }}</td>
+                                            <td>{{ payment_record.class_name }}</td>
+                                            <td>{{ payment_record.discounted_price }}</td>
+                                            <td>{{ payment_record.book_costs }}</td>
+                                            <td>{{ payment_record.other_fee }}</td>
+                                            <td>{{ payment_record.amount_due }}</td>
+                                            <td>{{ payment_record.amount_paid }}</td>
+                                            <td>{{ payment_record.payment_method }}</td>
+                                            <td>{{ payment_record.payee }}</td>
+                                            <td>{{ payment_record.remark }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                    <!-- /.card-body -->
+
+                </div>
+                <!-- /.card -->
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

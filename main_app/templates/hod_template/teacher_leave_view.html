@@ -18,7 +18,7 @@
                         <table class="table table-bordered table-hover">
                             <tr>
                                 <th>#</th>
-                                <th>Staff</th>
+                                <th>Teacher</th>
                                 <th>Course</th>
                                 <th>Message</th>
                                 <th>Leave Date</th>
@@ -29,8 +29,8 @@
                             {% for leave in  allLeave %}
                               <tr>
                                   <td>{{forloop.counter}}</td>
-                                  <td>{{leave.staff}}</td>
-                                  <td>{{leave.staff.course}}</td>
+                                  <td>{{leave.teacher}}</td>
+                                  <td>{{leave.teacher.course}}</td>
                                   <td>{{leave.message}}</td>
                                   <td>{{leave.date}}</td>
                                   <td>{{leave.created_at}}</td>
@@ -117,7 +117,7 @@
                 if (status == '1' || status == '-1'){
 
     $.ajax({
-        url: "{% url 'view_staff_leave' %}",
+        url: "{% url 'view_teacher_leave' %}",
         type:'POST',
         data:{
               id:id,

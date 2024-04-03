@@ -18,7 +18,7 @@
                         <table class="table table-bordered table-hover">
                             <tr>
                                 <th>#</th>
-                                <th>Staff</th>
+                                <th>Teacher</th>
                                 <th>Course</th>
                                 <th>Message</th>
                                 <th>Sent On</th>
@@ -28,8 +28,8 @@
                             {% for feedback in  feedbacks %}
                               <tr>
                                   <td>{{forloop.counter}}</td>
-                                  <td>{{feedback.staff}}</td>
-                                  <td>{{feedback.staff.course}}</td>
+                                  <td>{{feedback.teacher}}</td>
+                                  <td>{{feedback.teacher.course}}</td>
                                   <td>{{feedback.feedback}}</td>
                                       
                                             
@@ -108,7 +108,7 @@
                 var reply = $("#reply_message").val()
 
                 $.ajax({
-                    url: "{% url 'staff_feedback_message' %}",
+                    url: "{% url 'teacher_feedback_message' %}",
                     type:'POST',
                     data:{
                           id:id,

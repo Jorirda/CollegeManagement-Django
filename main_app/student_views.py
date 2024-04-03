@@ -205,3 +205,18 @@ def student_view_result(request):
         'page_title': "View Results"
     }
     return render(request, "student_template/student_view_result.html", context)
+
+#this method is for payment_records.html, which will be a part of the views on the student side on the website(p.s if you read this, you're gay)
+def student_payment_records(request):
+    student = get_object_or_404(Student, admin_id=request.user.id)
+    payment_records = PaymentRecord.objects.filter(student=student)
+    return render(request, "student_template/student_payment_records.html", {'student': student, 'payment_records': payment_records})
+
+
+def learning_record_payment_records(request, record_id):
+    record = LearningRecord.objects.get(id=record_id)
+    payment_records = PaymentRecord.objects.filter(student=record)
+    return render(request, "student_template/learning_records.html", {'record': record, 'payment_records': payment_records})
+
+
+

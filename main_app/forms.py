@@ -83,15 +83,15 @@ class AdminForm(CustomUserForm):
         fields = CustomUserForm.Meta.fields
 
 
-class StaffForm(CustomUserForm):
+class TeacherForm(CustomUserForm):
     work_type = forms.ChoiceField(choices=[('Special Teacher','Special Teacher'), ('Temporary Contract','Temporary Contract')])
     
     def __init__(self, *args, **kwargs):
-        super(StaffForm, self).__init__(*args, **kwargs)
+        super(TeacherForm, self).__init__(*args, **kwargs)
         self.fields['remark'] = self.fields.pop('remark')
         
     class Meta(CustomUserForm.Meta):
-        model = Staff
+        model = Teacher
         fields =  CustomUserForm.Meta.fields + ['course','work_type']
 
 
@@ -111,7 +111,7 @@ class SubjectForm(FormSettings):
 
     class Meta:
         model = Subject
-        fields = ['name', 'staff', 'course']
+        fields = ['name', 'teacher', 'course']
 
 
 class SessionForm(FormSettings):
@@ -127,25 +127,25 @@ class SessionForm(FormSettings):
         }
 
 
-class LeaveReportStaffForm(FormSettings):
+class LeaveReportTeacherForm(FormSettings):
     def __init__(self, *args, **kwargs):
-        super(LeaveReportStaffForm, self).__init__(*args, **kwargs)
+        super(LeaveReportTeacherForm, self).__init__(*args, **kwargs)
 
     class Meta:
-        model = LeaveReportStaff
+        model = LeaveReportTeacher
         fields = ['date', 'message']
         widgets = {
             'date': DateInput(attrs={'type': 'date'}),
         }
 
 
-class FeedbackStaffForm(FormSettings):
+class FeedbackTeacherForm(FormSettings):
 
     def __init__(self, *args, **kwargs):
-        super(FeedbackStaffForm, self).__init__(*args, **kwargs)
+        super(FeedbackTeacherForm, self).__init__(*args, **kwargs)
 
     class Meta:
-        model = FeedbackStaff
+        model = FeedbackTeacher
         fields = ['feedback']
 
 
@@ -180,12 +180,12 @@ class StudentEditForm(CustomUserForm):
         fields = CustomUserForm.Meta.fields 
 
 
-class StaffEditForm(CustomUserForm):
+class TeacherEditForm(CustomUserForm):
     def __init__(self, *args, **kwargs):
-        super(StaffEditForm, self).__init__(*args, **kwargs)
+        super(TeacherEditForm, self).__init__(*args, **kwargs)
 
     class Meta(CustomUserForm.Meta):
-        model = Staff
+        model = Teacher
         fields = CustomUserForm.Meta.fields
 
 

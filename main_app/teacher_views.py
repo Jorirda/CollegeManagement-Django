@@ -11,11 +11,11 @@ from .forms import *
 from .models import *
 
 
-def staff_home(request):
-    staff = get_object_or_404(Staff, admin=request.user)
-    total_students = Student.objects.filter(course=staff.course).count()
-    total_leave = LeaveReportStaff.objects.filter(staff=staff).count()
-    subjects = Subject.objects.filter(staff=staff)
+def teacher_home(request):
+    teacher = get_object_or_404(Teacher, admin=request.user)
+    total_students = Student.objects.filter(course=teacher.course).count()
+    total_leave = LeaveReportTeacher.objects.filter(teacher=teacher).count()
+    subjects = Subject.objects.filter(teacher=teacher)
     total_subject = subjects.count()
     attendance_list = Attendance.objects.filter(subject__in=subjects)
     total_attendance = attendance_list.count()
@@ -26,7 +26,7 @@ def staff_home(request):
         subject_list.append(subject.name)
         attendance_list.append(attendance_count)
     context = {
-        'page_title': 'Staff Panel - ' + str(staff.admin.last_name) + ' (' + str(staff.course) + ')',
+        'page_title': 'Teacher Panel - ' + str(teacher.admin.last_name) + ' (' + str(teacher.course) + ')',
         'total_students': total_students,
         'total_attendance': total_attendance,
         'total_leave': total_leave,
@@ -34,12 +34,12 @@ def staff_home(request):
         'subject_list': subject_list,
         'attendance_list': attendance_list
     }
-    return render(request, 'staff_template/home_content.html', context)
+    return render(request, 'teacher_template/home_content.html', context)
 
 
-def staff_take_attendance(request):
-    staff = get_object_or_404(Staff, admin=request.user)
-    subjects = Subject.objects.filter(staff_id=staff)
+def teacher_take_attendance(request):
+    teacher = get_object_or_404(Teacher, admin=request.user)
+    subjects = Subject.objects.filter(teacher_id=teacher)
     sessions = Session.objects.all()
     context = {
         'subjects': subjects,
@@ -47,7 +47,7 @@ def staff_take_attendance(request):
         'page_title': 'Take Attendance'
     }
 
-    return render(request, 'staff_template/staff_take_attendance.html', context)
+    return render(request, 'teacher_template/teacher_take_attendance.html', context)
 
 
 @csrf_exempt
@@ -94,9 +94,9 @@ def save_attendance(request):
     return HttpResponse("OK")
 
 
-def staff_update_attendance(request):
-    staff = get_object_or_404(Staff, admin=request.user)
-    subjects = Subject.objects.filter(staff_id=staff)
+def teacher_update_attendance(request):
+    teacher = get_object_or_404(Teacher, admin=request.user)
+    subjects = Subject.objects.filter(teacher_id=teacher)
     sessions = Session.objects.all()
     context = {
         'subjects': subjects,
@@ -104,7 +104,7 @@ def staff_update_attendance(request):
         'page_title': 'Update Attendance'
     }
 
-    return render(request, 'staff_template/staff_update_attendance.html', context)
+    return render(request, 'teacher_template/teacher_update_attendance.html', context)
 
 
 @csrf_exempt
@@ -144,56 +144,56 @@ def update_attendance(request):
     return HttpResponse("OK")
 
 
-def staff_apply_leave(request):
-    form = LeaveReportStaffForm(request.POST or None)
-    staff = get_object_or_404(Staff, admin_id=request.user.id)
+def teacher_apply_leave(request):
+    form = LeaveReportTeacherForm(request.POST or None)
+    teacher = get_object_or_404(Teacher, admin_id=request.user.id)
     context = {
         'form': form,
-        'leave_history': LeaveReportStaff.objects.filter(staff=staff),
+        'leave_history': LeaveReportTeacher.objects.filter(teacher=teacher),
         'page_title': 'Apply for Leave'
     }
     if request.method == 'POST':
         if form.is_valid():
             try:
                 obj = form.save(commit=False)
-                obj.staff = staff
+                obj.teacher = teacher
                 obj.save()
                 messages.success(
                     request, "Application for leave has been submitted for review")
-                return redirect(reverse('staff_apply_leave'))
+                return redirect(reverse('teacher_apply_leave'))
             except Exception:
                 messages.error(request, "Could not apply!")
         else:
             messages.error(request, "Form has errors!")
-    return render(request, "staff_template/staff_apply_leave.html", context)
+    return render(request, "teacher_template/teacher_apply_leave.html", context)
 
 
-def staff_feedback(request):
-    form = FeedbackStaffForm(request.POST or None)
-    staff = get_object_or_404(Staff, admin_id=request.user.id)
+def teacher_feedback(request):
+    form = FeedbackTeacherForm(request.POST or None)
+    teacher = get_object_or_404(Teacher, admin_id=request.user.id)
     context = {
         'form': form,
-        'feedbacks': FeedbackStaff.objects.filter(staff=staff),
+        'feedbacks': FeedbackTeacher.objects.filter(teacher=teacher),
         'page_title': 'Add Feedback'
     }
     if request.method == 'POST':
         if form.is_valid():
             try:
                 obj = form.save(commit=False)
-                obj.staff = staff
+                obj.teacher = teacher
                 obj.save()
                 messages.success(request, "Feedback submitted for review")
-                return redirect(reverse('staff_feedback'))
+                return redirect(reverse('teacher_feedback'))
             except Exception:
                 messages.error(request, "Could not Submit!")
         else:
             messages.error(request, "Form has errors!")
-    return render(request, "staff_template/staff_feedback.html", context)
+    return render(request, "teacher_template/teacher_feedback.html", context)
 
 
-def staff_view_profile(request):
-    staff = get_object_or_404(Staff, admin=request.user)
-    form = StaffEditForm(request.POST or None, request.FILES or None,instance=staff)
+def teacher_view_profile(request):
+    teacher = get_object_or_404(Teacher, admin=request.user)
+    form = TeacherEditForm(request.POST or None, request.FILES or None,instance=teacher)
     context = {'form': form, 'page_title': 'View/Update Profile'}
     if request.method == 'POST':
         try:
@@ -204,7 +204,7 @@ def staff_view_profile(request):
                 address = form.cleaned_data.get('address')
                 gender = form.cleaned_data.get('gender')
                 passport = request.FILES.get('profile_pic') or None
-                admin = staff.admin
+                admin = teacher.admin
                 if password != None:
                     admin.set_password(password)
                 if passport != None:
@@ -217,45 +217,45 @@ def staff_view_profile(request):
                 admin.address = address
                 admin.gender = gender
                 admin.save()
-                staff.save()
+                teacher.save()
                 messages.success(request, "Profile Updated!")
-                return redirect(reverse('staff_view_profile'))
+                return redirect(reverse('teacher_view_profile'))
             else:
                 messages.error(request, "Invalid Data Provided")
-                return render(request, "staff_template/staff_view_profile.html", context)
+                return render(request, "teacher_template/teacher_view_profile.html", context)
         except Exception as e:
             messages.error(
                 request, "Error Occured While Updating Profile " + str(e))
-            return render(request, "staff_template/staff_view_profile.html", context)
+            return render(request, "teacher_template/teacher_view_profile.html", context)
 
-    return render(request, "staff_template/staff_view_profile.html", context)
+    return render(request, "teacher_template/teacher_view_profile.html", context)
 
 
 @csrf_exempt
-def staff_fcmtoken(request):
+def teacher_fcmtoken(request):
     token = request.POST.get('token')
     try:
-        staff_user = get_object_or_404(CustomUser, id=request.user.id)
-        staff_user.fcm_token = token
-        staff_user.save()
+        teacher_user = get_object_or_404(CustomUser, id=request.user.id)
+        teacher_user.fcm_token = token
+        teacher_user.save()
         return HttpResponse("True")
     except Exception as e:
         return HttpResponse("False")
 
 
-def staff_view_notification(request):
-    staff = get_object_or_404(Staff, admin=request.user)
-    notifications = NotificationStaff.objects.filter(staff=staff)
+def teacher_view_notification(request):
+    teacher = get_object_or_404(Teacher, admin=request.user)
+    notifications = NotificationTeacher.objects.filter(teacher=teacher)
     context = {
         'notifications': notifications,
         'page_title': "View Notifications"
     }
-    return render(request, "staff_template/staff_view_notification.html", context)
+    return render(request, "teacher_template/teacher_view_notification.html", context)
 
 
-def staff_add_result(request):
-    staff = get_object_or_404(Staff, admin=request.user)
-    subjects = Subject.objects.filter(staff=staff)
+def teacher_add_result(request):
+    teacher = get_object_or_404(Teacher, admin=request.user)
+    subjects = Subject.objects.filter(teacher=teacher)
     sessions = Session.objects.all()
     context = {
         'page_title': 'Result Upload',
@@ -283,7 +283,7 @@ def staff_add_result(request):
                 messages.success(request, "Scores Saved")
         except Exception as e:
             messages.warning(request, "Error Occured While Processing Form")
-    return render(request, "staff_template/staff_add_result.html", context)
+    return render(request, "teacher_template/teacher_add_result.html", context)
 
 
 @csrf_exempt

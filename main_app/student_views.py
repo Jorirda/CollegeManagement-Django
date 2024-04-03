@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from .forms import *
-from .models import *
+from .models import * 
 
 
 def student_home(request):

@@ -49,6 +49,8 @@ class CustomUser(AbstractUser):
     gender = models.CharField(max_length=1, choices=GENDER)
     profile_pic = models.ImageField()
     address = models.TextField()
+    contact_num = models.TextField(default="")
+    remark = models.TextField(default="")
     fcm_token = models.TextField(default="")  # For firebase notifications
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -78,7 +80,10 @@ class Student(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     session = models.ForeignKey(Session, on_delete=models.DO_NOTHING, null=True)
-
+    date_of_birth = models.DateField(blank=True, null=True)
+    reg_date = models.DateField(blank=True, null=True)
+    state = models.CharField(max_length = 30, blank = True) #learning/completed/pending refund
+    
     def __str__(self):
         return self.admin.last_name + ", " + self.admin.first_name
 
@@ -86,7 +91,8 @@ class Student(models.Model):
 class Staff(models.Model):
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-
+    work_type = models.CharField(max_length = 30, blank = True) #Special/Temporary
+    
     def __str__(self):
         return self.admin.last_name + " " + self.admin.first_name
 
@@ -173,6 +179,28 @@ class StudentResult(models.Model):
     exam = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+# class PaymentRecord(models.Model):
+#     student = models.ForeignKey(Student, on_delete=models.CASCADE)
+#     id_number = models.CharField(max_length=100)
+#     date = models.DateField()
+#     course = models.CharField(max_length=255)
+#     lesson_unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+#     class_name = models.CharField(max_length=100)
+#     discounted_price = models.DecimalField(max_digits=10, decimal_places=2)
+#     book_costs = models.DecimalField(max_digits=10, decimal_places=2)
+#     other_fee = models.DecimalField(max_digits=10, decimal_places=2)
+#     amount_due = models.DecimalField(max_digits=10, decimal_places=2)
+#     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
+#     payment_method = models.CharField(max_length=100)
+#     payee = models.CharField(max_length=255)
+#     remark = models.TextField()
+
+#     def __str__(self):
+#         return f"{self.student.name} - {self.id_number} - {self.date}"
+
+ 
+
 
 
 @receiver(post_save, sender=CustomUser)

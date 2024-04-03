@@ -94,10 +94,13 @@ def add_staff(request):
             first_name = form.cleaned_data.get('first_name')
             last_name = form.cleaned_data.get('last_name')
             address = form.cleaned_data.get('address')
+            contact_num = form.cleaned_data.get('contact_num')
+            remark = form.cleaned_data.get('remark')
             email = form.cleaned_data.get('email')
             gender = form.cleaned_data.get('gender')
             password = form.cleaned_data.get('password')
             course = form.cleaned_data.get('course')
+            work_type = form.cleaned_data.get('work_type')
             passport = request.FILES.get('profile_pic')
             fs = FileSystemStorage()
             filename = fs.save(passport.name, passport)
@@ -107,10 +110,14 @@ def add_staff(request):
                     email=email, password=password, user_type=2, first_name=first_name, last_name=last_name, profile_pic=passport_url)
                 user.gender = gender
                 user.address = address
+                user.contact_num = contact_num
+                user.remark = remark
                 user.staff.course = course
+                user.staff.work_type = work_type
                 user.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_staff'))
+
 
             except Exception as e:
                 messages.error(request, "Could Not Add " + str(e))
@@ -127,12 +134,19 @@ def add_student(request):
         if student_form.is_valid():
             first_name = student_form.cleaned_data.get('first_name')
             last_name = student_form.cleaned_data.get('last_name')
+            gender = student_form.cleaned_data.get('gender')
+            date_of_birth = student_form.cleaned_data.get('date_of_birth')
             address = student_form.cleaned_data.get('address')
             email = student_form.cleaned_data.get('email')
-            gender = student_form.cleaned_data.get('gender')
+            contact_num = student_form.cleaned_data.get('contact_num')
             password = student_form.cleaned_data.get('password')
+            reg_date = student_form.cleaned_data.get('reg_date')
+            state = student_form.cleaned_data.get('state')
+            
             course = student_form.cleaned_data.get('course')
             session = student_form.cleaned_data.get('session')
+            
+            remark = student_form.cleaned_data.get('remark')
             passport = request.FILES['profile_pic']
             fs = FileSystemStorage()
             filename = fs.save(passport.name, passport)
@@ -141,8 +155,13 @@ def add_student(request):
                 user = CustomUser.objects.create_user(
                     email=email, password=password, user_type=3, first_name=first_name, last_name=last_name, profile_pic=passport_url)
                 user.gender = gender
+                user.student.date_of_birth = date_of_birth
                 user.address = address
                 user.student.session = session
+                user.contact_num = contact_num
+                user.student.reg_date = reg_date
+                user.student.state = state
+                user.remark = remark
                 user.student.course = course
                 user.save()
                 messages.success(request, "Successfully Added")
@@ -253,11 +272,14 @@ def edit_staff(request, staff_id):
             first_name = form.cleaned_data.get('first_name')
             last_name = form.cleaned_data.get('last_name')
             address = form.cleaned_data.get('address')
+            contact_num = form.cleaned_data.get('contact_num')
             username = form.cleaned_data.get('username')
             email = form.cleaned_data.get('email')
             gender = form.cleaned_data.get('gender')
             password = form.cleaned_data.get('password') or None
             course = form.cleaned_data.get('course')
+            work_type = form.cleaned_data.get('work_type')
+            remark = form.cleaned_data.get('remark')
             passport = request.FILES.get('profile_pic') or None
             try:
                 user = CustomUser.objects.get(id=staff.admin.id)
@@ -274,7 +296,10 @@ def edit_staff(request, staff_id):
                 user.last_name = last_name
                 user.gender = gender
                 user.address = address
+                user.contact_num = contact_num
+                user.remark = remark
                 staff.course = course
+                staff.work_type = work_type
                 user.save()
                 staff.save()
                 messages.success(request, "Successfully Updated")
@@ -301,10 +326,15 @@ def edit_student(request, student_id):
         if form.is_valid():
             first_name = form.cleaned_data.get('first_name')
             last_name = form.cleaned_data.get('last_name')
+            gender = form.cleaned_data.get('gender')
+            date_of_birth = form.cleaned_data.get('date_of_birth')
             address = form.cleaned_data.get('address')
+            contact_num = form.cleaned_data.get('contact_num')
+            reg_date = form.cleaned_data.get('reg_date')
+            state= form.cleaned_data.get('state')
+            remark= form.cleaned_data.get('remark')
             username = form.cleaned_data.get('username')
             email = form.cleaned_data.get('email')
-            gender = form.cleaned_data.get('gender')
             password = form.cleaned_data.get('password') or None
             course = form.cleaned_data.get('course')
             session = form.cleaned_data.get('session')
@@ -322,9 +352,14 @@ def edit_student(request, student_id):
                     user.set_password(password)
                 user.first_name = first_name
                 user.last_name = last_name
-                student.session = session
                 user.gender = gender
+                student.session = session
+                student.date_of_birth = date_of_birth
                 user.address = address
+                user.contact_num = contact_num
+                student.reg_date = reg_date
+                student.state = state
+                user.remark = remark
                 student.course = course
                 user.save()
                 student.save()

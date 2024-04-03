@@ -17,23 +17,43 @@
                         <table id="example2" class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th>#</th>
+                                    {% comment %} <th>#</th>
                                     <th>Full Name</th>
                                     <th>Email</th>
                                     <th>Gender</th>
                                     <th>Course</th>
                                     <th>Avatar</th>
+                                    <th>Actions</th> {% endcomment %}
+                                    
+                                    <th>#</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Gender</th>
+                                    <th>Address</th>
+                                    <th>Contact #</th>
+                                    <th>Courses</th>
+                                    <th>Work Type</th>
+                                    <th>Avatar</th>
+                                    <th>Remark</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for staff in allStaff %}
                                 <tr>
+                                    {% comment %} <td>{{ forloop.counter }}</td>
+                                    <td>{{staff.last_name}}, {{staff.first_name}}</td>
+                                    <td>{{staff.email}}</td>
+                                    <td>{{staff.gender}}</td> {% endcomment %}
+
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{staff.last_name}}, {{staff.first_name}}</td>
                                     <td>{{staff.email}}</td>
                                     <td>{{staff.gender}}</td>
+                                    <td>{{staff.address}}</td>
+                                    <td>{{staff.contact_num}}</td>
                                     <td>{{staff.staff.course.name}}</td>
+                                    <td>{{staff.staff.work_type}}</td>
                                     <td>
                                         {% if staff.profile_pic == ""  %}
                                         No Image
@@ -42,6 +62,7 @@
                                             src="{{staff.profile_pic}}" alt="">
                                         {% endif %}
                                     </td>
+                                    <td>{{staff.remark}}</td>
                                     <td>
                                         <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> - 
                                         <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>

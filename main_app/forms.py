@@ -13,16 +13,20 @@ class FormSettings(forms.ModelForm):
 
 
 class CustomUserForm(FormSettings):
-    email = forms.EmailField(required=True)
-    gender = forms.ChoiceField(choices=[('M', 'Male'), ('F', 'Female')])
     first_name = forms.CharField(required=True)
     last_name = forms.CharField(required=True)
-    address = forms.CharField(widget=forms.Textarea)
+    email = forms.EmailField(required=True)
+    gender = forms.ChoiceField(choices=[('男', 'Male'), ('女', 'Female')])
     password = forms.CharField(widget=forms.PasswordInput)
     widget = {
         'password': forms.PasswordInput(),
     }
-    profile_pic = forms.ImageField()
+    profile_pic = forms.ImageField() 
+    address = forms.CharField(widget=forms.Textarea)
+    
+    
+    contact_num = forms.CharField(required=True) #student & teachers
+    remark = forms.CharField(required=True) #student & teachers
 
     def __init__(self, *args, **kwargs):
         super(CustomUserForm, self).__init__(*args, **kwargs)
@@ -52,17 +56,22 @@ class CustomUserForm(FormSettings):
 
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'email', 'gender',  'password','profile_pic', 'address' ]
+        fields = ['first_name', 'last_name', 'email', 'gender',  'password','profile_pic', 'address','contact_num','remark' ]
 
 
 class StudentForm(CustomUserForm):
+    date_of_birth = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    reg_date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    state = forms.ChoiceField(choices=[('Currently Learning','Currently Learning'), ('Completed','Completed'), ('Refund', 'Refund')])
+    
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
-
+        self.fields['remark'] = self.fields.pop('remark')
+        
     class Meta(CustomUserForm.Meta):
         model = Student
         fields = CustomUserForm.Meta.fields + \
-            ['course', 'session']
+            ['course', 'session','date_of_birth','reg_date','state']
 
 
 class AdminForm(CustomUserForm):
@@ -75,13 +84,15 @@ class AdminForm(CustomUserForm):
 
 
 class StaffForm(CustomUserForm):
+    work_type = forms.ChoiceField(choices=[('Special Teacher','Special Teacher'), ('Temporary Contract','Temporary Contract')])
+    
     def __init__(self, *args, **kwargs):
         super(StaffForm, self).__init__(*args, **kwargs)
-
+        self.fields['remark'] = self.fields.pop('remark')
+        
     class Meta(CustomUserForm.Meta):
         model = Staff
-        fields = CustomUserForm.Meta.fields + \
-            ['course' ]
+        fields =  CustomUserForm.Meta.fields + ['course','work_type']
 
 
 class CourseForm(FormSettings):

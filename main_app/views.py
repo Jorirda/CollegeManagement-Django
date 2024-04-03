@@ -7,8 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from .EmailBackend import EmailBackend
-from .models import Attendance, Session, Subject
-
+from .models import Attendance, Session, Subject 
 # Create your views here.
 
 

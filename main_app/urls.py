@@ -28,6 +28,8 @@ urlpatterns = [
     path("admin/home/", hod_views.admin_home, name='admin_home'),
     path("staff/add", hod_views.add_staff, name='add_staff'),
     path("course/add", hod_views.add_course, name='add_course'),
+    path("schedule/add", hod_views.add_class_schedule, name='add_class_schedule'),
+    path("payment/add", hod_views.add_payment_record, name='add_payment_record'),
     path("send_student_notification/", hod_views.send_student_notification,
          name='send_student_notification'),
     path("send_staff_notification/", hod_views.send_staff_notification,
@@ -61,7 +63,18 @@ urlpatterns = [
     path("student/manage/", hod_views.manage_student, name='manage_student'),
     path("course/manage/", hod_views.manage_course, name='manage_course'),
     path("subject/manage/", hod_views.manage_subject, name='manage_subject'),
+    
+    path("schedule/manage", hod_views.manage_class_schedule, name='manage_class_schedule'),
+    path("payment/manage", hod_views.manage_payment_record, name='manage_payment_record'),
+    
+    
+    path("student/edit/<int:student_id>",hod_views.edit_student, name='edit_student'),
+    path("course/edit/<int:course_id>",hod_views.edit_course, name='edit_course'),
+    path("subject/edit/<int:subject_id>",hod_views.edit_subject, name='edit_subject'),
     path("staff/edit/<int:staff_id>", hod_views.edit_staff, name='edit_staff'),
+#     path("payment/edit", hod_views.edit_payment_record, name='edit_payment_record'),
+    
+    
     path("staff/delete/<int:staff_id>",
          hod_views.delete_staff, name='delete_staff'),
 
@@ -76,12 +89,11 @@ urlpatterns = [
 
     path("student/delete/<int:student_id>",
          hod_views.delete_student, name='delete_student'),
-    path("student/edit/<int:student_id>",
-         hod_views.edit_student, name='edit_student'),
-    path("course/edit/<int:course_id>",
-         hod_views.edit_course, name='edit_course'),
-    path("subject/edit/<int:subject_id>",
-         hod_views.edit_subject, name='edit_subject'),
+    
+#     path("payment/delete",
+#          hod_views.delete_payment_record, name='delete_payment_record'),
+    
+    
 
 
     # Staff

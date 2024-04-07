@@ -1,0 +1,69 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{page_title}}</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example2" class="table table-bordered table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Date</th>
+                                    <th>Student</th>
+                                    <th>Course</th>
+                                    <th>Lesson Unit Price</th>
+                                    <th>Class</th>
+                                    <th>Discounted price</th>
+                                    <th>Book Costs</th>
+                                    <th>Other</th>
+                                    <th>Amount Due</th>
+                                    <th>Amount Paid</th>
+                                    <th>Payment Method</th>
+                                    <th>Payee</th>
+                                    <th>Remark</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{payment.date}}</td>
+                                    <td>{{payment.student}}</td>
+                                    <td>{{payment.course}}</td>
+                                    <td>{{payment.lesson_unit_price}}</td>
+                                    <td>{{payment.class_name}}</td>
+                                    <td>{{payment.discounted_price}}</td>
+                                    <td>{{payment.book_costs}}</td>
+                                    <td>{{payment.other_fee}}</td>
+                                    <td>{{payment.amount_due}}</td>
+                                    <td>{{payment.amount_paid}}</td>
+                                    <td>{{payment.payment_method}}</td>
+                                    <td>{{payment.payee}}</td>
+                                    <td>{{payment.remark}}</td>
+                                    {% comment %} <td>
+                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> | 
+                                        <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
+                                    
+                                    </td> {% endcomment %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

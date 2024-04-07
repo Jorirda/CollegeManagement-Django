@@ -114,6 +114,32 @@ class SubjectForm(FormSettings):
         fields = ['name', 'staff', 'course']
 
 
+class PaymentRecordForm(FormSettings):
+    date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    
+    def __init__(self, *args, **kwargs):
+        super(PaymentRecordForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = PaymentRecord
+        fields = ['date','student','course','lesson_unit_price','class_name','discounted_price',
+                  'book_costs','other_fee','amount_due','amount_paid','payment_method','payee','remark']
+
+
+
+class ClassScheduleForm(FormSettings):
+    
+    def __init__(self, *args, **kwargs):
+        super(ClassScheduleForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = ClassSchedule
+        fields = ['course','lesson_unit_price','staff','subject','class_time','remark']
+
+
+
+
+
 class SessionForm(FormSettings):
     def __init__(self, *args, **kwargs):
         super(SessionForm, self).__init__(*args, **kwargs)

@@ -62,12 +62,28 @@ class CustomUser(AbstractUser):
         return self.last_name + ", " + self.first_name
 
 
+#Institution
+class Institution(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+   
+    
+#Campus
+class Campus(models.Model):
+    id = models.AutoField(primary_key=True)
+    institution = models.ForeignKey('Institution', on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+   
+
+#Admin
 class Admin(models.Model):
+    id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
 
 
-
+#Course
 class Course(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=120)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -75,8 +91,9 @@ class Course(models.Model):
     def __str__(self):
         return self.name
 
-
+#Student
 class Student(models.Model):
+    id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     session = models.ForeignKey(Session, on_delete=models.DO_NOTHING, null=True)
@@ -88,7 +105,9 @@ class Student(models.Model):
         return self.admin.last_name + ", " + self.admin.first_name
 
 
+#Staff
 class Staff(models.Model):
+    id = models.AutoField(primary_key=True)
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     work_type = models.CharField(max_length = 30, blank = True) #Special/Temporary
@@ -96,8 +115,9 @@ class Staff(models.Model):
     def __str__(self):
         return self.admin.last_name + " " + self.admin.first_name
 
-
+#Subject
 class Subject(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=120)
     staff = models.ForeignKey(Staff,on_delete=models.CASCADE,)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -107,8 +127,51 @@ class Subject(models.Model):
     def __str__(self):
         return self.name
 
+#Payment Record
+class PaymentRecord(models.Model):
+    id = models.AutoField(primary_key=True)
+    date = models.DateField()
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course,on_delete=models.CASCADE)
+    lesson_unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    class_name = models.CharField(max_length=100)
+    discounted_price = models.DecimalField(max_digits=10, decimal_places=2)
+    book_costs = models.DecimalField(max_digits=10, decimal_places=2)
+    other_fee = models.DecimalField(max_digits=10, decimal_places=2)
+    amount_due = models.DecimalField(max_digits=10, decimal_places=2)
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_method = models.CharField(max_length=100)
+    payee = models.CharField(max_length=255)
+    remark = models.TextField(default="")
+    
+#Learning Record
+class LearningRecord(models.Model):
+    id = models.AutoField(primary_key=True)
+    date = models.DateField()
+    student = models.ForeignKey(Student, on_delete=models.DO_NOTHING)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    starting_time = models.TimeField()
+    end_time = models.TimeField()
+    class_name = models.CharField(max_length=100)
+    remark = models.TextField(default="")
 
+    def __str__(self):
+        return f"{self.name} - {self.date}"
+
+#Class Schedule
+class ClassSchedule(models.Model):
+    id = models.AutoField(primary_key=True)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    lesson_unit_price = models.CharField(max_length=100)
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.DO_NOTHING)
+    class_time = models.CharField(max_length=100)
+    remark = models.TextField(default="")
+
+#Attendance
 class Attendance(models.Model):
+    id = models.AutoField(primary_key=True)
     session = models.ForeignKey(Session, on_delete=models.DO_NOTHING)
     subject = models.ForeignKey(Subject, on_delete=models.DO_NOTHING)
     date = models.DateField()
@@ -117,6 +180,7 @@ class Attendance(models.Model):
 
 
 class AttendanceReport(models.Model):
+    id = models.AutoField(primary_key=True)
     student = models.ForeignKey(Student, on_delete=models.DO_NOTHING)
     attendance = models.ForeignKey(Attendance, on_delete=models.CASCADE)
     status = models.BooleanField(default=False)
@@ -125,6 +189,7 @@ class AttendanceReport(models.Model):
 
 
 class LeaveReportStudent(models.Model):
+    id = models.AutoField(primary_key=True)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     date = models.CharField(max_length=60)
     message = models.TextField()
@@ -134,6 +199,7 @@ class LeaveReportStudent(models.Model):
 
 
 class LeaveReportStaff(models.Model):
+    id = models.AutoField(primary_key=True)
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     date = models.CharField(max_length=60)
     message = models.TextField()
@@ -143,6 +209,7 @@ class LeaveReportStaff(models.Model):
 
 
 class FeedbackStudent(models.Model):
+    id = models.AutoField(primary_key=True)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     feedback = models.TextField()
     reply = models.TextField()
@@ -151,6 +218,7 @@ class FeedbackStudent(models.Model):
 
 
 class FeedbackStaff(models.Model):
+    id = models.AutoField(primary_key=True)
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     feedback = models.TextField()
     reply = models.TextField()
@@ -159,6 +227,7 @@ class FeedbackStaff(models.Model):
 
 
 class NotificationStaff(models.Model):
+    id = models.AutoField(primary_key=True)
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -166,6 +235,7 @@ class NotificationStaff(models.Model):
 
 
 class NotificationStudent(models.Model):
+    id = models.AutoField(primary_key=True)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -173,6 +243,7 @@ class NotificationStudent(models.Model):
 
 
 class StudentResult(models.Model):
+    id = models.AutoField(primary_key=True)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     test = models.FloatField(default=0)
@@ -180,26 +251,7 @@ class StudentResult(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-# class PaymentRecord(models.Model):
-#     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-#     id_number = models.CharField(max_length=100)
-#     date = models.DateField()
-#     course = models.CharField(max_length=255)
-#     lesson_unit_price = models.DecimalField(max_digits=10, decimal_places=2)
-#     class_name = models.CharField(max_length=100)
-#     discounted_price = models.DecimalField(max_digits=10, decimal_places=2)
-#     book_costs = models.DecimalField(max_digits=10, decimal_places=2)
-#     other_fee = models.DecimalField(max_digits=10, decimal_places=2)
-#     amount_due = models.DecimalField(max_digits=10, decimal_places=2)
-#     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
-#     payment_method = models.CharField(max_length=100)
-#     payee = models.CharField(max_length=255)
-#     remark = models.TextField()
 
-#     def __str__(self):
-#         return f"{self.student.name} - {self.id_number} - {self.date}"
-
- 
 
 
 

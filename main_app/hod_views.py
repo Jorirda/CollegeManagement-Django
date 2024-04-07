@@ -291,7 +291,7 @@ def manage_subject(request):
 
 def edit_teacher(request, teacher_id):
     teacher = get_object_or_404(teacher, id=teacher_id)
-    form = teacherForm(request.POST or None, instance=teacher)
+    form = TeacherEditForm(request.POST or None, instance=teacher)
     context = {
         'form': form,
         'teacher_id': teacher_id,

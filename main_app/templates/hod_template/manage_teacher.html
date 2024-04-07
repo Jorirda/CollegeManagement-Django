@@ -39,33 +39,33 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for staff in allStaff %}
+                                {% for teacher in allteacher %}
                                 <tr>
                                     {% comment %} <td>{{ forloop.counter }}</td>
-                                    <td>{{staff.last_name}}, {{staff.first_name}}</td>
-                                    <td>{{staff.email}}</td>
-                                    <td>{{staff.gender}}</td> {% endcomment %}
+                                    <td>{{teacher.last_name}}, {{teacher.first_name}}</td>
+                                    <td>{{teacher.email}}</td>
+                                    <td>{{teacher.gender}}</td> {% endcomment %}
 
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{staff.last_name}}, {{staff.first_name}}</td>
-                                    <td>{{staff.email}}</td>
-                                    <td>{{staff.gender}}</td>
-                                    <td>{{staff.address}}</td>
-                                    <td>{{staff.contact_num}}</td>
-                                    <td>{{staff.staff.course.name}}</td>
-                                    <td>{{staff.staff.work_type}}</td>
+                                    <td>{{teacher.last_name}}, {{teacher.first_name}}</td>
+                                    <td>{{teacher.email}}</td>
+                                    <td>{{teacher.gender}}</td>
+                                    <td>{{teacher.address}}</td>
+                                    <td>{{teacher.contact_num}}</td>
+                                    <td>{{teacher.teacher.course.name}}</td>
+                                    <td>{{teacher.teacher.work_type}}</td>
                                     <td>
-                                        {% if staff.profile_pic == ""  %}
+                                        {% if teacher.profile_pic == ""  %}
                                         No Image
                                         {% else %}
                                         <img class="img img-fluid mb-2" height="56" width="56"
-                                            src="{{staff.profile_pic}}" alt="">
+                                            src="{{teacher.profile_pic}}" alt="">
                                         {% endif %}
                                     </td>
-                                    <td>{{staff.remark}}</td>
+                                    <td>{{teacher.remark}}</td>
                                     <td>
-                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> - 
-                                        <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
+                                        <a href="{% url 'edit_teacher' teacher.teacher.id %}" class="btn btn-info">Edit</a> - 
+                                        <a href="{% url 'delete_teacher' teacher.teacher.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
                                     
                                     </td>
                                 </tr>

@@ -545,7 +545,7 @@ def teacher_feedback_message(request):
     else:
         feedback_id = request.POST.get('id')
         try:
-            feedback = get_object_or_404(Feedbackteacher, id=feedback_id)
+            feedback = get_object_or_404(FeedbackTeacher, id=feedback_id)
             reply = request.POST.get('reply')
             feedback.reply = reply
             feedback.save()
@@ -740,7 +740,7 @@ def send_teacher_notification(request):
                    'key=AAAA3Bm8j_M:APA91bElZlOLetwV696SoEtgzpJr2qbxBfxVBfDWFiopBWzfCfzQp2nRyC7_A2mlukZEHV4g1AmyC6P_HonvSkY2YyliKt5tT3fe_1lrKod2Daigzhb2xnYQMxUWjCAIQcUexAMPZePB',
                    'Content-Type': 'application/json'}
         data = requests.post(url, data=json.dumps(body), headers=headers)
-        notification = Notificationteacher(teacher=teacher, message=message)
+        notification = NotificationTeacher(teacher=teacher, message=message)
         notification.save()
         return HttpResponse("True")
     except Exception as e:

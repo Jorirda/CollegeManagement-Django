@@ -66,7 +66,7 @@
                             {% url 'add_course' as add_course %}
                             <a href="{{add_course}}"
                                 class="nav-link  {% if add_course == request.path %} active {% endif %}">
-                                <i class="far fa-circle nav-icon"></i>
+                                <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>
                                     Add Course
 
@@ -78,7 +78,7 @@
                             {% url 'edit_course' course_id as edit_course %}
                             <a href="{{manage_course}}"
                                 class="nav-link  {% if edit_course == request.path or manage_course == request.path %} active {% endif %}">
-                                <i class="far fa-circle nav-icon"></i>
+                                <i class="nav-icon fas fa-th"></i>
                                 <p>
                                     Manage Course
 
@@ -104,7 +104,7 @@
                             {% url 'add_subject' as add_subject %}
                             <a href="{{add_subject}}"
                                 class="nav-link  {% if add_subject == request.path %} active {% endif %}">
-                                <i class="far fa-circle nav-icon"></i>
+                                <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>
                                     Add Subject
 
@@ -116,7 +116,7 @@
                             {% url 'edit_subject' subject_id as edit_subject %}
                             <a href="{{manage_subject}}"
                                 class="nav-link  {% if edit_subject == request.path or manage_subject == request.path %} active {% endif %}">
-                                <i class="far fa-circle nav-icon"></i>
+                                <i class="nav-icon fas fa-th"></i>
                                 <p>
                                     Manage Subject
 
@@ -145,7 +145,7 @@
                             {% url 'add_session' as add_session %}
                             <a href="{{add_session}}"
                                 class="nav-link  {% if add_session == request.path %} active {% endif %}">
-                                <i class="far fa-circle nav-icon"></i>
+                                <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>
                                     Add Session
 
@@ -157,7 +157,7 @@
                             {% url 'edit_session' session_id as edit_session %}
                             <a href="{{manage_session}}"
                                 class="nav-link  {% if edit_session == request.path or manage_session == request.path %} active {% endif %}">
-                                <i class="far fa-circle nav-icon"></i>
+                                <i class="nav-icon fas fa-th"></i>
                                 <p>
                                     Manage Session
 
@@ -177,20 +177,11 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            {% url 'view_teacher_query' as view_teacher_query%}
-                            <a href="{{view_teacher_query}}" class="nav-link  {% if view_teacher_query == request.path %} active {% endif %}">
-                                <i class="nav-icon fas fa-question"></i>
-                                <p>
-                                    View Teacher Query
-                                </p>
-                            </a>
-                        </li>
 
                         <li class="nav-item">
                             {% url 'add_teacher' as add_teacher %}
                             <a href="{{add_teacher}}" class="nav-link {% if add_teacher == request.path %} active {% endif %}">
-                                <i class="nav-icon fas fa-user-plus"></i>
+                                <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>
                                     Add Teacher
         
@@ -206,6 +197,16 @@
                                 <p>
                                     Manage Teacher
         
+                                </p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            {% url 'view_teacher_query' as view_teacher_query%}
+                            <a href="{{view_teacher_query}}" class="nav-link  {% if view_teacher_query == request.path %} active {% endif %}">
+                                <i class="nav-icon fas fa-question"></i>
+                                <p>
+                                    View Teacher Query
                                 </p>
                             </a>
                         </li>
@@ -227,19 +228,10 @@
                         <li class="nav-item">
                             {% url 'add_student' as add_student%}
                             <a href="{{add_student}}" class="nav-link  {% if add_student == request.path %} active {% endif %}">
-                                <i class="nav-icon fas fa-user-plus"></i>
+                                <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>
                                     Add Student
         
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            {% url 'view_student_query' as view_student_query%}
-                            <a href="{{view_student_query}}" class="nav-link  {% if view_student_query == request.path %} active {% endif %}">
-                                <i class="nav-icon fas fa-question"></i>
-                                <p>
-                                    View Student Query
                                 </p>
                             </a>
                         </li>
@@ -257,10 +249,57 @@
                                 </p>
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            {% url 'view_student_query' as view_student_query%}
+                            <a href="{{view_student_query}}" class="nav-link  {% if view_student_query == request.path %} active {% endif %}">
+                                <i class="nav-icon fas fa-question"></i>
+                                <p>
+                                    View Student Query
+                                </p>
+                            </a>
+                        </li>
                        
                     </ul>
                 </li>
                 
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-yen-sign"></i>
+                        <p>
+                            Payment Record
+                            <i class="fas fa-angle-right right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+
+                        <li class="nav-item">
+                            {% url 'add_payment_record' as add_payment_record%}
+                            <a href="{{add_payment_record}}" class="nav-link  {% if add_payment_recordt == request.path %} active {% endif %}">
+                                <i class="nav-icon fas fa-plus-circle"></i>
+                                <p>
+                                    Add Payment
+        
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            {% url 'manage_payment_record' as manage_payment_record %}
+                            
+        
+                            <a href="{{manage_payment_record}}"
+                                class="nav-link  {% if manage_payment_record == request.path %} active {% endif %}">
+                                <i class="nav-icon fas fa-receipt"></i>
+                                <p>
+                                    Manage Payment
+        
+                                </p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-bullhorn"></i>
@@ -297,22 +336,95 @@
                     </ul>
                 </li>
 
-                
-
-                <li class="nav-item">
-                    {% url 'admin_view_attendance' as admin_view_attendance %}
-
-                <li class="nav-item">
-                    <a href="{{admin_view_attendance}}"
-                        class="nav-link  {% if admin_view_attendance == request.path %} active {% endif %}">
-                        <i class="nav-icon fas fa-calendar-alt"></i>
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-pencil-ruler"></i>
                         <p>
-                            View Attendance
+                            Learning Record
+                            <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
+                    <ul class="nav nav-treeview">
+
+                        <li class="nav-item">
+                            {% url 'add_learning_record' as add_learning_record %}
+                            <a href="{{add_learning_record}}"
+                                class="nav-link {% if add_learning_record == request.path %} active {% endif %}">
+                                <i class="nav-icon fas fa-plus-circle"></i>
+                                <p>
+                                    Add Learning Record
+        
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            {% url 'manage_learning_record' as manage_learning_record %}
+                            <a href="{{manage_learning_record}}"
+                                class="nav-link {% if manage_learning_record == request.path %} active {% endif %}">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>
+                                    Manage Learning Record
+        
+                                </p>
+                            </a>
+                        </li>
+
+                    </ul>
                 </li>
 
+             
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-calendar-alt"></i>
+                        <p>
+                            Schedule
+                            <i class="fas fa-angle-right right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            {% url 'add_class_schedule' as add_class_schedule %}
+        
+                        <li class="nav-item">
+                                <a href="{{add_class_schedule}}"
+                                    class="nav-link  {% if add_class_schedule == request.path %} active {% endif %}">
+                                <i class="nav-icon fas fa-plus-circle"></i>
+                                <p>
+                                    Add Schedule
+                                </p>
+                            </a>
+                        </li>
+                       
+                        
+                        <li class="nav-item">
+                            {% url 'manage_class_schedule' as manage_class_schedule %}
+        
+                        <li class="nav-item">
+                            <a href="{{manage_class_schedule}}"
+                                class="nav-link  {% if manage_class_schedule == request.path %} active {% endif %}">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>
+                                    Manage Schedule
+                                </p>
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            {% url 'admin_view_attendance' as admin_view_attendance %}
+        
+                        <li class="nav-item">
+                            <a href="{{admin_view_attendance}}"
+                                class="nav-link  {% if admin_view_attendance == request.path %} active {% endif %}">
+                                <i class="nav-icon fas fa-calendar-alt"></i>
+                                <p>
+                                    View Attendance
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
 
+                
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-comment-alt"></i>
@@ -353,7 +465,7 @@
 
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-check-double"></i>
+                        <i class="nav-icon fas fa-door-open "></i>
                         <p>
                             Ask for Leave
                             <i class="fas fa-angle-right right"></i>

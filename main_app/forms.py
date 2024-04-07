@@ -112,6 +112,39 @@ class SubjectForm(FormSettings):
     class Meta:
         model = Subject
         fields = ['name', 'teacher', 'course']
+        
+
+class PaymentRecordForm(FormSettings):
+    date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    
+    def __init__(self, *args, **kwargs):
+        super(PaymentRecordForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = PaymentRecord
+        fields = ['date','student','course','lesson_unit_price','class_name','discounted_price',
+                  'book_costs','other_fee','amount_due','amount_paid','payment_method','payee','remark']
+
+class LearningRecordForm(FormSettings):
+    date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    starting_time= forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time'}))
+    end_time = forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time'}))
+    
+    def __init__(self, *args, **kwargs):
+        super(LearningRecordForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = LearningRecord
+        fields = ['date','student','course','teacher','starting_time','end_time', 'class_name','remark']
+
+class ClassScheduleForm(FormSettings):
+    
+    def __init__(self, *args, **kwargs):
+        super(ClassScheduleForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = ClassSchedule
+        fields = ['course','lesson_unit_price','teacher','subject','class_time','remark']
 
 
 class SessionForm(FormSettings):

@@ -1,0 +1,60 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{page_title}}</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                       
+                        <table id="example2" class="table table-bordered table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Date</th>
+                                    <th>Student</th>
+                                    <th>Course</th>
+                                    <th>Teacher</th>
+                                    <th>Starting Time</th>
+                                    <th>End Time</th>
+                                    <th>Class</th>
+                                    <th>Remark</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for learn in learning %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{learn.date}}</td>
+                                    <td>{{learn.student}}</td>
+                                    <td>{{learn.course}}</td>
+                                    <td>{{learn.teacher}}</td>
+                                    <td>{{learn.starting_time}}</td>
+                                    <td>{{learn.end_time}}</td>
+                                    <td>{{learn.class_name}}</td>
+                                    <td>{{payment.remark}}</td>
+                                    {% comment %} <td>
+                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> | 
+                                        <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
+                                    
+                                    </td> {% endcomment %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

@@ -259,7 +259,7 @@
   
           function sendToServer(token){
             $.ajax({
-              url: "{% url 'staff_fcmtoken' %}",
+              url: "{% url 'teacher_fcmtoken' %}",
               type: 'POST',
               data: {
                   token: token,

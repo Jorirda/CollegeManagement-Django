@@ -250,6 +250,145 @@ def add_subject(request):
     return render(request, 'hod_template/add_subject_template.html', context)
 
 
+def add_payment_record(request):
+    form = PaymentRecordForm(request.POST or None)
+    context = {
+        'form': form,
+        'page_title': 'Add Payment Record'
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            date = form.cleaned_data.get('date')
+            student = form.cleaned_data.get('student')
+            course = form.cleaned_data.get('course')
+            lesson_unit_price = form.cleaned_data.get('lesson_unit_price')
+            class_name = form.cleaned_data.get('class_name')
+            discounted_price = form.cleaned_data.get('discounted_price')
+            book_costs = form.cleaned_data.get('book_costs')
+            other_fee = form.cleaned_data.get('other_fee')
+            amount_due =form.cleaned_data.get('amount_due')
+            amount_paid = form.cleaned_data.get('amount_paid')
+            payment_method = form.cleaned_data.get('payment_method')
+            payee = form.cleaned_data.get('payee')
+            remark = form.cleaned_data.get('remark')
+            
+            
+            try:
+                payment=PaymentRecord()
+                payment.date = date
+                payment.student = student
+                payment.course = course
+                payment.lesson_unit_price = lesson_unit_price
+                payment.class_name = class_name
+                payment.discounted_price = discounted_price
+                payment.book_costs = book_costs
+                payment.other_fee = other_fee
+                payment.amount_due = amount_due
+                payment.amount_paid = amount_paid
+                payment.payment_method = payment_method
+                payment.payee = payee
+                payment.remark= remark
+                payment.save()
+                messages.success(request, "Successfully Added")
+                return redirect(reverse('add_payment_record'))
+
+            except Exception as e:
+                messages.error(request, "Could Not Add " + str(e))
+        else:
+            messages.error(request, "Fill Form Properly")
+
+    # Calculate total amount of courses
+            total_amount = PaymentRecord.objects.aggregate(sum('lesson_unit_price'))['lesson_unit_price__sum']
+
+            # Add total amount to the context
+        context['total_amount'] = total_amount    
+    
+
+    return render(request, 'hod_template/add_payment_record_template.html', context)
+
+def add_learning_record(request):
+    form = LearningRecordForm(request.POST or None)
+    context = {
+        'form': form,
+        'page_title': 'Add Learning Record'
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            date = form.cleaned_data.get('date')
+            student = form.cleaned_data.get('student')
+            course = form.cleaned_data.get('course')
+            teacher = form.cleaned_data.get('teacher')
+            starting_time = form.cleaned_data.get('starting_time')
+            end_time = form.cleaned_data.get('end_time')
+            class_name = form.cleaned_data.get('class_name')
+            remark = form.cleaned_data.get('remark')
+            
+            
+            try:
+                
+                learn = LearningRecord()
+                learn.date = date
+                learn.student = student
+                learn.course = course
+                learn.teacher = teacher
+                learn.starting_time = starting_time
+                learn.end_time = end_time
+                learn.class_name = class_name
+                learn.remark= remark
+                learn.save()
+                messages.success(request, "Successfully Added")
+                return redirect(reverse('add_learning_record'))
+
+            except Exception as e:
+                messages.error(request, "Could Not Add " + str(e))
+        else:
+            messages.error(request, "Fill Form Properly")
+
+    return render(request, 'hod_template/add_learning_record_template.html', context)
+
+def add_class_schedule(request):
+    form = ClassScheduleForm(request.POST or None)
+    context = {
+        'form': form,
+        'page_title': 'Add Class Schedule'
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            course = form.cleaned_data.get('course')
+            lesson_unit_price = form.cleaned_data.get('lesson_unit_price')
+            teacher = form.cleaned_data.get('teacher')
+            subject = form.cleaned_data.get('subject')
+            class_time = form.cleaned_data.get('class_time')
+            remark = form.cleaned_data.get('remark')
+            
+            
+            try:
+                
+                # # Fetch related PaymentRecord instance
+                # payment_record = PaymentRecord.objects.get(course=course)
+                
+                class_schedule = ClassSchedule()
+                class_schedule.course = course
+                class_schedule.lesson_unit_price = lesson_unit_price
+                class_schedule.teacher = teacher
+                class_schedule.subject = subject
+                class_schedule.class_time = class_time
+                class_schedule.remark= remark
+                
+                # # Assign lesson_unit_price from PaymentRecord to ClassSchedule
+                # class_schedule.lesson_unit_price = payment_record.lesson_unit_price
+                
+                class_schedule.save()
+                messages.success(request, "Successfully Added")
+                return redirect(reverse('add_class_schedule'))
+
+            except Exception as e:
+                messages.error(request, "Could Not Add " + str(e))
+        else:
+            messages.error(request, "Fill Form Properly")
+
+    return render(request, 'hod_template/add_class_schedule_template.html', context)
+
 def manage_teacher(request):
     allteacher = CustomUser.objects.filter(user_type=2)
     context = {
@@ -288,6 +427,29 @@ def manage_subject(request):
     }
     return render(request, "hod_template/manage_subject.html", context)
 
+def manage_payment_record(request):
+    payments = PaymentRecord.objects.all()
+    context = {
+        'payments': payments,
+        'page_title': 'Manage Payment Records'
+    }
+    return render(request, "hod_template/manage_payment_record.html", context)
+
+def manage_learning_record(request):
+    learning = LearningRecord.objects.all()
+    context = {
+        'learning': learning,
+        'page_title': 'Manage Learning Records'
+    }
+    return render(request, "hod_template/manage_learning_record.html", context)
+
+def manage_class_schedule(request):
+    class_schedules = ClassSchedule.objects.all()
+    context = {
+        'class_schedules': class_schedules,
+        'page_title': 'Manage Class Schedule'
+    }
+    return render(request, "hod_template/manage_class_schedule.html", context)
 
 def edit_teacher(request, teacher_id):
     teacher = get_object_or_404(teacher, id=teacher_id)

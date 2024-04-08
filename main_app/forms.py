@@ -113,17 +113,35 @@ class SubjectForm(FormSettings):
         model = Subject
         fields = ['name', 'teacher', 'course']
         
+class MoneyInput(forms.TextInput):
+    def __init__(self, attrs=None):
+        if attrs is None:
+            attrs = {}
+        attrs['placeholder'] = '¥'
+        super().__init__(attrs=attrs)
 
+    def render(self, name, value, attrs=None, renderer=None):
+        value_with_symbol = f'¥ {value}' if value else ''
+        return super().render(name, value_with_symbol, attrs)
+    
 class PaymentRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    payment_method = forms.ChoiceField(choices=[('WeChat','WeChat'), ('AliPay','AliPay'), ('Bank Card', 'Bank Card'),('Other', 'Other')])
+    
+    lesson_unit_price = forms.DecimalField(widget=MoneyInput())
+    discounted_price = forms.DecimalField(widget=MoneyInput())
+    book_costs = forms.DecimalField(widget=MoneyInput())
+    other_fee = forms.DecimalField(widget=MoneyInput())
+    amount_due = forms.DecimalField(widget=MoneyInput())
+    amount_paid = forms.DecimalField(widget=MoneyInput())
     
     def __init__(self, *args, **kwargs):
         super(PaymentRecordForm, self).__init__(*args, **kwargs)
-
+     
     class Meta:
         model = PaymentRecord
         fields = ['date','student','course','lesson_unit_price','class_name','discounted_price',
-                  'book_costs','other_fee','amount_due','amount_paid','payment_method','payee','remark']
+                'book_costs','other_fee','amount_due','amount_paid','payment_method','payee','remark']
 
 class LearningRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))

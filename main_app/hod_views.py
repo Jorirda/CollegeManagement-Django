@@ -452,7 +452,7 @@ def manage_class_schedule(request):
     return render(request, "hod_template/manage_class_schedule.html", context)
 
 def edit_teacher(request, teacher_id):
-    teacher = get_object_or_404(teacher, id=teacher_id)
+    teacher = get_object_or_404(Teacher, id=teacher_id)
     form = TeacherEditForm(request.POST or None, instance=teacher)
     context = {
         'form': form,
@@ -502,7 +502,7 @@ def edit_teacher(request, teacher_id):
             messages.error(request, "Please fil form properly")
     else:
         user = CustomUser.objects.get(id=teacher_id)
-        teacher = teacher.objects.get(id=user.id)
+        teacher = Teacher.objects.get(id=user.id)
         return render(request, "hod_template/edit_teacher_template.html", context)
 
 

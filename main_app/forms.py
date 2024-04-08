@@ -114,16 +114,25 @@ class SubjectForm(FormSettings):
         fields = ['name', 'teacher', 'course']
         
 
+    
 class PaymentRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    payment_method = forms.ChoiceField(choices=[('WeChat','WeChat'), ('AliPay','AliPay'), ('Bank Card', 'Bank Card'),('Other', 'Other')])
+    state = forms.ChoiceField(choices=[('Completed','Completed'), ('Pending','Pending'), ('Refund', 'Refund')])
+    lesson_unit_price = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': '¥'}))
+    discounted_price = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': '¥'}))
+    book_costs = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': '¥'}))
+    other_fee = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': '¥'}))
+    amount_due = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': '¥'}))
+    amount_paid = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': '¥'}))
     
     def __init__(self, *args, **kwargs):
         super(PaymentRecordForm, self).__init__(*args, **kwargs)
-
+     
     class Meta:
         model = PaymentRecord
         fields = ['date','student','course','lesson_unit_price','class_name','discounted_price',
-                  'book_costs','other_fee','amount_due','amount_paid','payment_method','payee','remark']
+                'book_costs','other_fee','amount_due','amount_paid','payment_method','state','payee','remark']
 
 class LearningRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
@@ -138,6 +147,8 @@ class LearningRecordForm(FormSettings):
         fields = ['date','student','course','teacher','starting_time','end_time', 'class_name','remark']
 
 class ClassScheduleForm(FormSettings):
+    lesson_unit_price = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': '¥'}))
+   
     
     def __init__(self, *args, **kwargs):
         super(ClassScheduleForm, self).__init__(*args, **kwargs)

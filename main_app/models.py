@@ -207,6 +207,7 @@ class PaymentRecord(models.Model):
     amount_due = models.DecimalField(max_digits=10, decimal_places=2)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
     payment_method = models.CharField(max_length=100)
+    status = models.CharField(max_length=100)
     payee = models.CharField(max_length=255)
     remark = models.TextField(default="")
 

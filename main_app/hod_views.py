@@ -9,7 +9,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import UpdateView
-
+from django.db.models import Sum
 from .forms import *
 from .models import *
 
@@ -221,10 +221,13 @@ def add_subject(request):
 
 def add_payment_record(request):
     form = PaymentRecordForm(request.POST or None)
+    
     context = {
         'form': form,
-        'page_title': 'Add Payment Record'
+        'page_title': 'Add Payment Record',
+       
     }
+    
     if request.method == 'POST':
         if form.is_valid():
             date = form.cleaned_data.get('date')
@@ -238,6 +241,7 @@ def add_payment_record(request):
             amount_due =form.cleaned_data.get('amount_due')
             amount_paid = form.cleaned_data.get('amount_paid')
             payment_method = form.cleaned_data.get('payment_method')
+            status = form.cleaned_data.get('status')
             payee = form.cleaned_data.get('payee')
             remark = form.cleaned_data.get('remark')
             
@@ -255,6 +259,7 @@ def add_payment_record(request):
                 payment.amount_due = amount_due
                 payment.amount_paid = amount_paid
                 payment.payment_method = payment_method
+                status.payee = status
                 payment.payee = payee
                 payment.remark= remark
                 payment.save()
@@ -265,14 +270,7 @@ def add_payment_record(request):
                 messages.error(request, "Could Not Add " + str(e))
         else:
             messages.error(request, "Fill Form Properly")
-
-    # Calculate total amount of courses
-            total_amount = PaymentRecord.objects.aggregate(sum('lesson_unit_price'))['lesson_unit_price__sum']
-
-            # Add total amount to the context
-        context['total_amount'] = total_amount    
-    
-
+            
     return render(request, 'hod_template/add_payment_record_template.html', context)
 
 def add_learning_record(request):
@@ -333,9 +331,6 @@ def add_class_schedule(request):
             
             try:
                 
-                # # Fetch related PaymentRecord instance
-                # payment_record = PaymentRecord.objects.get(course=course)
-                
                 class_schedule = ClassSchedule()
                 class_schedule.course = course
                 class_schedule.lesson_unit_price = lesson_unit_price
@@ -343,10 +338,7 @@ def add_class_schedule(request):
                 class_schedule.subject = subject
                 class_schedule.class_time = class_time
                 class_schedule.remark= remark
-                
-                # # Assign lesson_unit_price from PaymentRecord to ClassSchedule
-                # class_schedule.lesson_unit_price = payment_record.lesson_unit_price
-                
+                        
                 class_schedule.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_class_schedule'))
@@ -456,9 +448,12 @@ def manage_subject(request):
 
 def manage_payment_record(request):
     payments = PaymentRecord.objects.all()
+    
+    total_amount_paid = PaymentRecord.objects.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
     context = {
         'payments': payments,
-        'page_title': 'Manage Payment Records'
+        'page_title': 'Manage Payment Records',
+        'total_amount_paid': total_amount_paid,
     }
     return render(request, "hod_template/manage_payment_record.html", context)
 
@@ -489,7 +484,7 @@ def manage_student_query(request):
     return render(request, 'hod_template/manage_student_query.html', context)
 
 def edit_teacher(request, teacher_id):
-    teacher = get_object_or_404(teacher, id=teacher_id)
+    teacher = get_object_or_404(Teacher, id=teacher_id)
     form = TeacherEditForm(request.POST or None, instance=teacher)
     context = {
         'form': form,
@@ -539,7 +534,7 @@ def edit_teacher(request, teacher_id):
             messages.error(request, "Please fil form properly")
     else:
         user = CustomUser.objects.get(id=teacher_id)
-        teacher = teacher.objects.get(id=user.id)
+        teacher = Teacher.objects.get(id=user.id)
         return render(request, "hod_template/edit_teacher_template.html", context)
 
 def edit_student(request, student_id):
@@ -650,6 +645,85 @@ def edit_subject(request, subject_id):
             messages.error(request, "Fill Form Properly")
     return render(request, 'hod_template/edit_subject_template.html', context)
 
+<<<<<<< HEAD
+=======
+def edit_learn(request, learn_id):
+    instance = get_object_or_404(LearningRecord, id=learn_id)
+    form = LearningRecordForm(request.POST or None, instance=instance)
+    context = {
+        'form': form,
+        'learn_id': learn_id,
+        'page_title': 'Edit Learning Record'
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            date = form.cleaned_data.get('date')
+            student = form.cleaned_data.get('student')
+            course = form.cleaned_data.get('course')
+            teacher = form.cleaned_data.get('teacher')
+            starting_time = form.cleaned_data.get('starting_time')
+            end_time = form.cleaned_data.get('end_time')
+            class_name = form.cleaned_data.get('class_name')
+            remark = form.cleaned_data.get('remark')
+            
+            try:
+                
+                learn = LearningRecord.objects.get(id=learn_id)
+                learn.date = date
+                learn.student = student
+                learn.course = course
+                learn.teacher = teacher
+                learn.starting_time = starting_time
+                learn.end_time = end_time
+                learn.class_name = class_name
+                learn.remark= remark
+                learn.save()
+                messages.success(request, "Successfully Updated")
+                return redirect(reverse('edit_learn', args=[learn_id]))
+            except Exception as e:
+                messages.error(request, "Could Not Add " + str(e))
+        else:
+            messages.error(request, "Fill Form Properly")
+    return render(request, 'hod_template/edit_learning_record_template.html', context)
+
+def edit_class_schedule(request, schedule_id):
+    instance = get_object_or_404(ClassSchedule, id=schedule_id)
+    form = ClassScheduleForm(request.POST or None, instance=instance)
+    context = {
+        'form': form,
+        'schedule_id': schedule_id,
+        'page_title': 'Edit Class Schedule'
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            course = form.cleaned_data.get('course')
+            lesson_unit_price = form.cleaned_data.get('lesson_unit_price')
+            teacher = form.cleaned_data.get('teacher')
+            subject = form.cleaned_data.get('subject')
+            class_time = form.cleaned_data.get('class_time')
+            remark = form.cleaned_data.get('remark')
+            
+            
+            try:
+                
+                class_schedule = ClassSchedule.objects.get(id=schedule_id)
+                class_schedule.course = course
+                class_schedule.lesson_unit_price = lesson_unit_price
+                class_schedule.teacher = teacher
+                class_schedule.subject = subject
+                class_schedule.class_time = class_time
+                class_schedule.remark= remark
+                class_schedule.save()
+
+                messages.success(request, "Successfully Updated")
+                return redirect(reverse('edit_schedule', args=[schedule_id]))
+            except Exception as e:
+                messages.error(request, "Could Not Add " + str(e))
+        else:
+            messages.error(request, "Fill Form Properly")
+    return render(request, 'hod_template/edit_class_schedule_template.html', context)
+
+>>>>>>> 5bfd206047a89231f8865f323cabcc25376ad745
 def add_session(request):
     form = SessionForm(request.POST or None)
     context = {'form': form, 'page_title': 'Add Session'}
@@ -971,6 +1045,17 @@ def delete_subject(request, subject_id):
     messages.success(request, "Subject deleted successfully!")
     return redirect(reverse('manage_subject'))
 
+def delete_learning_record(request, learn_id):
+    learn = get_object_or_404(LearningRecord, id=learn_id)
+    learn.delete()
+    messages.success(request, "Subject deleted successfully!")
+    return redirect(reverse('manage_learning_record'))
+
+def delete_class_schedule(request, schedule_id):
+    schedule = get_object_or_404(ClassSchedule, id=schedule_id)
+    schedule.delete()
+    messages.success(request, "Class Schedule deleted successfully!")
+    return redirect(reverse('manage_class_schedule'))
 
 def delete_session(request, session_id):
     session = get_object_or_404(Session, id=session_id)

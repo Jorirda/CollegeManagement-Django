@@ -72,7 +72,8 @@ urlpatterns = [
     path("student/edit/<int:student_id>", hod_views.edit_student, name='edit_student'),
     path("course/edit/<int:course_id>",hod_views.edit_course, name='edit_course'),
     path("subject/edit/<int:subject_id>",hod_views.edit_subject, name='edit_subject'),
-    
+    path("learn/edit/<int:learn_id>",hod_views.edit_learn, name='edit_learn'),
+    path("schedule/edit/<int:schedule_id>",hod_views.edit_class_schedule, name='edit_class_schedule'),
     
     #delete
     path("teacher/delete/<int:teacher_id>",hod_views.delete_teacher, name='delete_teacher'),
@@ -80,8 +81,8 @@ urlpatterns = [
     path("subject/delete/<int:subject_id>",hod_views.delete_subject, name='delete_subject'),
     path("session/delete/<int:session_id>",hod_views.delete_session, name='delete_session'),
     path("student/delete/<int:student_id>",hod_views.delete_student, name='delete_student'),
-  
-
+    path("learn/delete/<int:learn_id>",hod_views.delete_learning_record, name='delete_learning_record'),
+    path("schedule/delete/<int:schedule_id>",hod_views.delete_class_schedule, name='delete_class_schedule'),
 
     # teacher
     path("teacher/home/", teacher_views.teacher_home, name='teacher_home'),

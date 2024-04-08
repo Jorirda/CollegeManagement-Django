@@ -1,0 +1,131 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{page_title}}</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example2" class="table table-bordered table-hover">
+                            <p>Basic Information</p>
+                            <thead class="thead-dark">
+                                <tr>
+                                    {% comment %} <th>#</th>
+                                    <th>Gender</th>
+                                    <th>Date of Birth</th>
+                                    <th>Contact Information</th>
+                                    <th>State</th>
+                                    <th>Refund</th>
+                                    <th>Registration Date</th>
+                                    <th>Number of Classes</th>
+                                    <th>Registered Courses</th>
+                                    <th>Completed Hours</th>
+                                    <th>Paid Class Hours</th>
+                                    <th>Remaining Class Hours</th>
+                                 {% endcomment %}
+
+                                 <th>Gender</th>
+                                 <th>Date of Birth</th>
+                                 <th>Contact Information</th>
+                                 <th>State</th>
+                                 <th>Refund</th>
+                                 <th>Registration Date</th>
+                                 <th>Number of Classes</th>
+                                 <th>Registered Courses</th>
+                                 <th>Completed Hours</th>
+                                 <th>Paid Class Hours</th>
+                                 <th>Remaining Class Hours</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for studentquery in studentqueries %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{studentquery.gender}}</td>
+                                    <td>{{studentquery.date_of_birth}}</td>
+                                    <td>{{studentquery.contact_num}}</td>
+                                    <td>{{studentquery.state}}</td>
+                                    <td>{{studentquery.payment_status}}</td>
+                                    <td>{{studentquery.refunded}}</td>
+                                    <td>{{studentquery.reg_date}}</td>
+                                    <td>{{studentquery.num_of_classes}}</td>
+                                    <td>{{studentquery.registered_courses}}</td>
+                                    <td>{{studentquery.completed_hours}}</td>
+                                    <td>{{studentquery.paid_class_hours}}</td>
+                                    {% comment %} <td>
+                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> | 
+                                        <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
+                                    
+                                    </td> {% endcomment %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <!-- <div class="card-header">
+                        <h3 class="card-title">{{page_title}}</h3>
+                    </div> -->
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="example2" class="table table-bordered table-hover">
+                            <p>Learning Schedule</p>
+                            <thead class="thead-dark">
+                                <tr>
+                                    {% comment %} <th>#</th>
+                                    <th>Date</th>
+                                    <th>Course</th>
+                                    <th>Instructor</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Class</th>
+                                    {% endcomment %}
+
+                                    <th>Date</th>
+                                    <th>Course</th>
+                                    <th>Instructor</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Class</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for studentquery in studentqueries %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{studentquery.date}}</td>
+                                    <td>{{studentquery.course}}</td>
+                                    <td>{{studentquery.instructor}}</td>
+                                    <td>{{studentquery.class_starting_time}}</td>
+                                    <td>{{studentquery.class_ending_time}}</td>
+                                    <td>{{studentquery.class_name}}</td>
+                                    {% comment %} <td>
+                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> | 
+                                        <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
+                                    
+                                    </td> {% endcomment %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

@@ -39,6 +39,7 @@
                         </p>
                     </a>
                 </li>
+
                 <li class="nav-item">
                     {% url 'admin_view_profile' as admin_view_profile %}
                     <a href="{{admin_view_profile}}"
@@ -51,8 +52,6 @@
                     </a>
                 </li>
                 
-
-
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-bookmark"></i>
@@ -127,10 +126,6 @@
                     </ul>
                 </li>
 
-
-
-
-
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-clock"></i>
@@ -200,17 +195,6 @@
                                 </p>
                             </a>
                         </li>
-
-                        <li class="nav-item">
-                            {% url 'view_teacher_query' as view_teacher_query%}
-                            <a href="{{view_teacher_query}}" class="nav-link  {% if view_teacher_query == request.path %} active {% endif %}">
-                                <i class="nav-icon fas fa-question"></i>
-                                <p>
-                                    View Teacher Query
-                                </p>
-                            </a>
-                        </li>
-
                     </ul>
                 </li>
 
@@ -418,6 +402,31 @@
                                 <i class="nav-icon fas fa-calendar-alt"></i>
                                 <p>
                                     View Attendance
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-question"></i>
+                        <p>
+                            Student Query
+                            <i class="fas fa-angle-right right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            {% url 'manage_student_query' as manage_student_query %}
+        
+                        <li class="nav-item">
+                            <a href="{{manage_student_query}}"
+                                class="nav-link  {% if manage_student_query == request.path %} active {% endif %}">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>
+                                    Manage Student Queries
                                 </p>
                             </a>
                         </li>

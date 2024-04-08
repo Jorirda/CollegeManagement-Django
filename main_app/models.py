@@ -235,53 +235,35 @@ class ClassSchedule(models.Model):
     class_time = models.CharField(max_length=100)
     remark = models.TextField(default="")
 
+#Student Query
 class StudentQuery(models.Model):
     GENDER_CHOICES = [
         ('M', 'Male'),
         ('F', 'Female'),
-        
     ]
 
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     date_of_birth = models.DateField()
+    contact_num = models.CharField(max_length=20, null=True)
     state = models.CharField(max_length=100)
     payment_status = models.CharField(max_length=100)
-    refund_situation = models.CharField(max_length=100)
-    registration_date = models.DateField()
-    number_of_classes = models.IntegerField()
-    already_registered_for_courses = models.CharField(max_length=100)
-    course_hours_completed = models.IntegerField()
+    refunded = models.CharField(max_length=100)
+    reg_date = models.DateField()
+    num_of_classes = models.IntegerField()
+    registered_courses = models.CharField(max_length=100, null=True)
+    completed_hours = models.IntegerField()
     paid_class_hours = models.IntegerField()
-    remaining_class_hours = models.IntegerField()
+    remaining_hours = models.IntegerField()
+    session = models.CharField(max_length=100, null=True)
 
-    def __str__(self):
-        return f"{self.id} - {self.registration_date}"
-    
-class TeacherQuery(models.Model):
-    GENDER_CHOICES = [
-        ('M', 'Male'),
-        ('F', 'Female'),
-    ]
+    date = models.DateField(null=True)
+    course = models.CharField(max_length=100)
+    instructor = models.CharField(max_length=100, default='')
+    class_starting_time = models.TimeField(null=True)
+    class_ending_time = models.TimeField(null=True)
+    class_name = models.CharField(max_length=100, null=True)
 
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    contact_number = models.CharField(max_length=100)
-    teaching_courses = models.CharField(max_length=100)
-    signing_form = models.CharField(max_length=100)
-    address = models.CharField(max_length=255)
-    course_hours_completed = models.IntegerField(default=0)
-    number_of_classes = models.IntegerField(default=0)
-    class_schedule_date = models.DateField()
-    class_schedule_course = models.CharField(max_length=100)
-    class_schedule_instructor = models.CharField(max_length=100)
-    class_schedule_starting_time = models.TimeField()
-    class_schedule_end_time = models.TimeField()
-    class_schedule_class = models.CharField(max_length=100)
-
-    def __str__(self):
-        return f"{self.id} - {self.class_schedule_date}"
-
-
-
+ 
 
 @receiver(post_save, sender=CustomUser)
 def create_user_profile(sender, instance, created, **kwargs):

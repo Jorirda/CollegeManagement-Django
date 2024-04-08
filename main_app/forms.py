@@ -146,6 +146,39 @@ class ClassScheduleForm(FormSettings):
         model = ClassSchedule
         fields = ['course','lesson_unit_price','teacher','subject','class_time','remark']
 
+from django import forms
+from .models import StudentQuery
+
+class StudentQueryForm(forms.ModelForm):
+    gender = forms.ChoiceField(choices=[('Male', 'Male'), ('Female', 'Female')])
+    date_of_birth = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    contact_num = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Contact Number'}))
+    state = forms.ChoiceField(choices=[('Currently Learning', 'Currently Learning'), ('Completed', 'Completed'), ('Refund', 'Refund')])
+    payment_status = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Payment Status'}))
+    refunded = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Refunded'}))
+    reg_date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
+    num_of_classes = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Number of Classes'}))
+    registered_courses = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Already Registered for Courses'}))
+    completed_hours = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Course Hours Completed'}))
+    paid_class_hours = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Paid Class Hours'}))
+    remaining_hours = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Remaining Class Hours'}))
+    course = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Course'}))
+    session = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Session'}))
+    
+    date = forms.DateField(required=True, widget=forms.DateInput(attrs={'type': 'date'}))
+    instructor = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Instructor'}))
+    class_starting_time = forms.TimeField(required=True, widget=forms.TimeInput(attrs={'type': 'time'}))
+    class_ending_time = forms.TimeField(required=True, widget=forms.TimeInput(attrs={'type': 'time'}))
+    class_name = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Class'}))
+
+    class Meta:
+        model = StudentQuery
+        fields = ['gender', 'date_of_birth', 'contact_num', 'state', 'payment_status', 
+                    'refunded', 'reg_date', 'num_of_classes', 'registered_courses', 'completed_hours', 
+                    'paid_class_hours', 'remaining_hours', 'course', 'session',
+                    'date', 'instructor', 'class_starting_time', 'class_ending_time', 'class_name']
+
+
 
 class SessionForm(FormSettings):
     def __init__(self, *args, **kwargs):

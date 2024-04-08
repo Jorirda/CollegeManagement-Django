@@ -126,20 +126,6 @@ def add_teacher(request):
 
     return render(request, 'hod_template/add_teacher_template.html', context)
 
-def view_teacher_query(request):
-    # Fetch all teacher queries from the database
-    teacher_queries = TeacherQuery.objects.all()
-
-    # Prepare the context to pass to the template
-    context = {
-        'page_title': "View Teacher Queries",
-        'teacher_queries': teacher_queries,
-    }
-
-    # Render the template with the context
-    return render(request, 'hod_template/view_teacher_query.html', context)
-
-
 def add_student(request):
     student_form = StudentForm(request.POST or None, request.FILES or None)
     context = {'form': student_form, 'page_title': 'Add Student'}
@@ -185,21 +171,6 @@ def add_student(request):
             messages.error(request, "Could Not Add: ")
     return render(request, 'hod_template/add_student_template.html', context)
 
-
-def view_student_query(request):
-    # Fetch all student queries from the database
-    student_queries = StudentQuery.objects.all()
-
-    # Prepare the context to pass to the template
-    context = {
-        'page_title': "View Student Queries",
-        'student_queries': student_queries,
-    }
-
-    # Render the template with the context
-    return render(request, 'hod_template/view_student_query.html', context)
-
-
 def add_course(request):
     form = CourseForm(request.POST or None)
     context = {
@@ -220,7 +191,6 @@ def add_course(request):
         else:
             messages.error(request, "Could Not Add")
     return render(request, 'hod_template/add_course_template.html', context)
-
 
 def add_subject(request):
     form = SubjectForm(request.POST or None)
@@ -248,7 +218,6 @@ def add_subject(request):
             messages.error(request, "Fill Form Properly")
 
     return render(request, 'hod_template/add_subject_template.html', context)
-
 
 def add_payment_record(request):
     form = PaymentRecordForm(request.POST or None)
@@ -389,6 +358,70 @@ def add_class_schedule(request):
 
     return render(request, 'hod_template/add_class_schedule_template.html', context)
 
+from .forms import StudentQueryForm  # Import the StudentQueryForm
+
+def add_student_query(request):
+    form = StudentQueryForm(request.POST or None)  # Pass request.POST to the form
+    context = {'form': form, 'page_title': 'Add Student Query'}
+    if request.method == 'POST':
+        if form.is_valid():
+            # Retrieve cleaned data from the form
+            gender = form.cleaned_data.get('gender')
+            date_of_birth = form.cleaned_data.get('date_of_birth')
+            contact_num = form.cleaned_data.get('contact_num')
+            state = form.cleaned_data.get('state')
+            payment_status = form.cleaned_data.get('payment_status')
+            refunded = form.cleaned_data.get('refunded')
+            reg_date = form.cleaned_data.get('reg_date')
+            num_of_classes = form.cleaned_data.get('num_of_classes')
+            registered_courses = form.cleaned_data.get('registered_courses')
+            completed_hours = form.cleaned_data.get('completed_hours')
+            paid_class_hours = form.cleaned_data.get('paid_class_hours')
+            remaining_hours = form.cleaned_data.get('remaining_hours')
+            session = form.cleaned_data.get('session')
+            date = form.cleaned_data.get('date') 
+            course = form.cleaned_data.get('course')
+            instructor = form.cleaned_data.get('instructor')
+            class_starting_time = form.cleaned_data.get('class_starting_time')
+            class_ending_time = form.cleaned_data.get('class_ending_time')
+            class_name = form.cleaned_data.get('class_name')
+             
+
+            try:
+                # Create a new instance of StudentQuery model and assign cleaned data
+                studentquery = StudentQuery()
+                studentquery.gender = gender
+                studentquery.date_of_birth = date_of_birth
+                studentquery.contact_num = contact_num
+                studentquery.state = state
+                studentquery.payment_status = payment_status
+                studentquery.refunded = refunded
+                studentquery.reg_date = reg_date
+                studentquery.num_of_classes = num_of_classes
+                studentquery.registered_courses = registered_courses
+                studentquery.completed_hours = completed_hours
+                studentquery.paid_class_hours = paid_class_hours
+                studentquery.remaining_hours = remaining_hours
+                studentquery.session = session
+                studentquery.date = date  
+                studentquery.course = course
+                studentquery.instructor = instructor
+                studentquery.class_starting_time = class_starting_time
+                studentquery.class_ending_time = class_ending_time
+                studentquery.class_name = class_name
+                
+                studentquery.save()  # Save the instance to the database
+                messages.success(request, "Successfully Added")
+                return redirect(reverse('add_student_query'))  # Redirect after successful addition
+
+            except Exception as e:
+                messages.error(request, "Could Not Add " + str(e))  # Display error message if something goes wrong
+        else:
+            messages.error(request, "Fill Form Properly")  # Display error message if form is not valid
+
+    return render(request, 'hod_template/add_student_query_template.html', context)
+
+
 def manage_teacher(request):
     allteacher = CustomUser.objects.filter(user_type=2)
     context = {
@@ -396,7 +429,6 @@ def manage_teacher(request):
         'page_title': 'Manage teacher'
     }
     return render(request, "hod_template/manage_teacher.html", context)
-
 
 def manage_student(request):
     students = CustomUser.objects.filter(user_type=3)
@@ -406,10 +438,6 @@ def manage_student(request):
     }
     return render(request, "hod_template/manage_student.html", context)
 
-
-
-
-
 def manage_course(request):
     courses = Course.objects.all()
     context = {
@@ -417,7 +445,6 @@ def manage_course(request):
         'page_title': 'Manage Courses'
     }
     return render(request, "hod_template/manage_course.html", context)
-
 
 def manage_subject(request):
     subjects = Subject.objects.all()
@@ -450,6 +477,16 @@ def manage_class_schedule(request):
         'page_title': 'Manage Class Schedule'
     }
     return render(request, "hod_template/manage_class_schedule.html", context)
+
+def manage_student_query(request):
+    studentqueries = StudentQuery.objects.all()
+    context = {
+        'studentqueries': studentqueries,
+        'page_title': 'Manage Student Queries'
+    }
+   
+    # Render the template with the context
+    return render(request, 'hod_template/manage_student_query.html', context)
 
 def edit_teacher(request, teacher_id):
     teacher = get_object_or_404(teacher, id=teacher_id)
@@ -504,7 +541,6 @@ def edit_teacher(request, teacher_id):
         user = CustomUser.objects.get(id=teacher_id)
         teacher = teacher.objects.get(id=user.id)
         return render(request, "hod_template/edit_teacher_template.html", context)
-
 
 def edit_student(request, student_id):
     student = get_object_or_404(Student, id=student_id)
@@ -564,7 +600,6 @@ def edit_student(request, student_id):
     else:
         return render(request, "hod_template/edit_student_template.html", context)
 
-
 def edit_course(request, course_id):
     instance = get_object_or_404(Course, id=course_id)
     form = CourseForm(request.POST or None, instance=instance)
@@ -587,7 +622,6 @@ def edit_course(request, course_id):
             messages.error(request, "Could Not Update")
 
     return render(request, 'hod_template/edit_course_template.html', context)
-
 
 def edit_subject(request, subject_id):
     instance = get_object_or_404(Subject, id=subject_id)
@@ -616,7 +650,6 @@ def edit_subject(request, subject_id):
             messages.error(request, "Fill Form Properly")
     return render(request, 'hod_template/edit_subject_template.html', context)
 
-
 def add_session(request):
     form = SessionForm(request.POST or None)
     context = {'form': form, 'page_title': 'Add Session'}
@@ -632,12 +665,10 @@ def add_session(request):
             messages.error(request, 'Fill Form Properly ')
     return render(request, "hod_template/add_session_template.html", context)
 
-
 def manage_session(request):
     sessions = Session.objects.all()
     context = {'sessions': sessions, 'page_title': 'Manage Sessions'}
     return render(request, "hod_template/manage_session.html", context)
-
 
 def edit_session(request, session_id):
     instance = get_object_or_404(Session, id=session_id)

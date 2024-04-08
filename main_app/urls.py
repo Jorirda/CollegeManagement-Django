@@ -28,7 +28,6 @@ urlpatterns = [
     path("doLogin/", views.doLogin, name='user_login'),
     path("logout_user/", views.logout_user, name='user_logout'),
     path("admin/home/", hod_views.admin_home, name='admin_home'),
-    path("teacher/query", hod_views.view_teacher_query, name='view_teacher_query'),
     path("send_student_notification/", hod_views.send_student_notification,name='send_student_notification'),
     path("send_teacher_notification/", hod_views.send_teacher_notification,name='send_teacher_notification'),
     
@@ -41,6 +40,7 @@ urlpatterns = [
     path("payment/add", hod_views.add_payment_record, name='add_payment_record'),
     path("learn/add", hod_views.add_learning_record, name='add_learning_record'),
     path("schedule/add", hod_views.add_class_schedule, name='add_class_schedule'),
+    path("studentquery/add", hod_views.add_student_query, name='add_student_query'),
     
     path("admin_notify_student", hod_views.admin_notify_student,name='admin_notify_student'),
     path("admin_notify_teacher", hod_views.admin_notify_teacher,name='admin_notify_teacher'),
@@ -54,9 +54,9 @@ urlpatterns = [
     path("teacher/view/leave/", hod_views.view_teacher_leave, name="view_teacher_leave",),
     path("attendance/view/", hod_views.admin_view_attendance,name="admin_view_attendance",),
     path("attendance/fetch/", hod_views.get_admin_attendance,name='get_admin_attendance'),
-    path("student/query/", hod_views.view_student_query, name = "view_student_query"),
+   
      
-     #manage
+    #manage
     path("teacher/manage/", hod_views.manage_teacher, name='manage_teacher'),
     path("student/manage/", hod_views.manage_student, name='manage_student'),
     path("course/manage/", hod_views.manage_course, name='manage_course'),
@@ -64,6 +64,8 @@ urlpatterns = [
     path("payment/manage", hod_views.manage_payment_record, name='manage_payment_record'),
     path("learn/manage", hod_views.manage_learning_record, name='manage_learning_record'),
     path("schedule/manage", hod_views.manage_class_schedule, name='manage_class_schedule'),
+    path("studentquery/manage", hod_views.manage_student_query, name = "manage_student_query"),
+
     
     #edit
     path("teacher/edit/<int:teacher_id>", hod_views.edit_teacher, name='edit_teacher'),

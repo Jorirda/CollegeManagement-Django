@@ -1,20 +1,24 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+{% block page_title %}<i class="nav-icon fas fa-yen-sign"></i> {{ page_title }}{% endblock page_title %}
 
 {% block content %}
 
 <section class="content">
+    
     <div class="container-fluid">
+        
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header">
+                    
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <h3 class="card-title">{{page_title}}</h3>
+                        <h3 class="card-title">Total Income: ¥{{ total_amount_paid }}</h3>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <p>Total Amount of Courses: {{ total_amount }}  </p>
+                        {% comment %} <h2>Total Income: ¥{{ total_amount_paid }}</h2> {% endcomment %}
                         <table id="example2" class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
@@ -30,9 +34,10 @@
                                     <th>Amount Due</th>
                                     <th>Amount Paid</th>
                                     <th>Payment Method</th>
+                                    <th>State</th>
                                     <th>Payee</th>
                                     <th>Remark</th>
-                                    <th>Actions</th>
+                                    {% comment %} <th>Actions</th> {% endcomment %}
                                 </tr>
                             </thead>
                             <tbody>
@@ -50,13 +55,9 @@
                                     <td>¥{{payment.amount_due}}</td>
                                     <td>¥{{payment.amount_paid}}</td>
                                     <td>{{payment.payment_method}}</td>
+                                    <td>{{payment.state}}</td>
                                     <td>{{payment.payee}}</td>
                                     <td>{{payment.remark}}</td>
-                                    {% comment %} <td>
-                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> | 
-                                        <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
-                                    
-                                    </td> {% endcomment %}
                                 </tr>
                                 {% endfor %}
                             </tbody>

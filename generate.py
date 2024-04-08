@@ -1,6 +1,7 @@
 import os
+import random
+import string
 import django
-from main_app.models import CustomUser
 
 # Set up Django settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'college_management_system.settings')
@@ -9,48 +10,67 @@ django.setup()
 # Now you can import Django settings safely
 from django.contrib.auth.hashers import make_password
 from django.utils.crypto import get_random_string
+from main_app.models import CustomUser, Teacher
+from django.contrib.auth import get_user_model
 
-def generate_fake_data(num_users):
-    fake_users = []
-    for i in range(1, num_users + 1):
-        # Generate fake user data
-        if i <= 26:
-            # Teachers from A to Z
-            username = f"Teacher {chr(64 + i)}"
-        else:
-            # Students from 1 to 1000
-            username = f"Student {i - 26}"
-        email = f"{username.lower().replace(' ', '_')}@qq.com"
-        password = get_random_string(12)  # Generate a random password
-        hashed_password = make_password(password)  # Hash the password
-        fake_users.append({
-            'username': username,
-            'email': email,
-            'password': password
-        })
-    return fake_users
+CustomUser = get_user_model()
 
-def write_fake_data_to_file(fake_users, filename):
-    with open(filename, 'w') as file:
-        for user in fake_users:
-            file.write(f"Username: {user['username']}\n")
-            file.write(f"Email: {user['email']}\n")
-            file.write(f"Password: {user['password']}\n")
-            file.write("\n")  # Add a newline to separate users
+def generate_fake_teachers(num_teachers):
+    fake_teachers = []
+    with open('fake_users.txt', 'w') as file:
+        for i in range(num_teachers):
+            # Generate fake first name and last name
+            unique_id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
+            first_name = "Teacher"
+            last_name = generate_last_name()
+            email = f"{first_name.lower()}.{last_name.lower()}{unique_id}@qq.com"
+            password = get_random_string(12)  # Generate a random password
+            hashed_password = make_password(password)  # Hash the password
+            # Write email and password to file
+            file.write(f"Email: {email}, Password: {password}\n")
+            
+            fake_teachers.append({
+                'first_name': first_name,
+                'last_name': last_name,
+                'email': email,
+                'password': hashed_password,  # Include the password in the dictionary
+                'gender': random.choice(['M', 'F']),
+                'profile_pic': '/media/default.jpg',  # Provide a default profile picture path
+                'address': 'Sample Address',
+                'contact_num': '1234567890',  # Provide a default contact number
+                'remark': 'Sample Remark',
+                'fcm_token': ''  # Provide a default FCM token if applicable
+            })
+    return fake_teachers
+def generate_last_name():
+    # Generate a random last name
+    syllables = ['bo', 'cha', 'da', 'fe', 'ga', 'hi', 'jo', 'ka', 'la', 'ma', 'na', 'pa', 'ra', 'sa', 'ta', 'va']
+    last_name = ''.join(random.choices(syllables, k=random.randint(2, 3))).title()
+    return last_name
 
+# Generate fake teachers
 def write_fake_data_to_database(fake_users):
-    for user_data in fake_users:
+    for teacher_data in fake_teachers:
         user = CustomUser.objects.create(
-            username=user_data['username'],
-            email=user_data['email']
+            first_name=teacher_data['first_name'],
+            last_name=teacher_data['last_name'],
+            email=teacher_data['email'],  # Use the provided password
+            user_type=2,  # Assuming 2 represents the user type for teachers
+            gender=teacher_data['gender'],
+            profile_pic=teacher_data['profile_pic'],
+            address=teacher_data['address'],
+            contact_num=teacher_data['contact_num'],
+            remark=teacher_data['remark'],
+            fcm_token=teacher_data['fcm_token']
         )
-        user.set_password(get_random_string(12))  # Generate a random password and hash it
+        user.set_password(teacher_data['password'])  # Generate a random password and hash it
         user.save()
-        
-# Generate fake data
-fake_users = generate_fake_data(10)  # Generate 1000 fake users
+        teacher = Teacher.objects.create(
+            course=None,  # Set the course if applicable
+            admin=user,
+            work_type="Special Teacher"  # Set the work type if applicable
+        )
 
-# Write fake data to a text file
-write_fake_data_to_file(fake_users, 'fake_users.txt')
-
-print("Fake data has been written to 'fake_users.txt'.")
+# Write fake teachers to the database
+fake_teachers = generate_fake_teachers(1)
+write_fake_data_to_database(fake_teachers)

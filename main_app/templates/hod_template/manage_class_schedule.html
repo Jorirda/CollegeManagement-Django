@@ -37,11 +37,11 @@
                                     <td>{{class.subject}}</td>
                                     <td>{{class.class_time}}</td>
                                     <td>{{class.remark}}</td>
-                                    {% comment %} <td>
-                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> - 
-                                        <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
+                                    <td>
+                                        <a href="{% url 'edit_class_schedule' class.id %}" class="btn btn-info">Edit</a> - 
+                                        <a href="{% url 'delete_class_schedule' class.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
                                     
-                                    </td> {% endcomment %}
+                                    </td> 
                                 </tr>
                                 {% endfor %}
                             </tbody>

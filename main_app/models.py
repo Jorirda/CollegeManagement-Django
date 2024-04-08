@@ -41,8 +41,8 @@ class Session(models.Model):
 class CustomUser(AbstractUser):
     USER_TYPE = ((1, "HOD"), (2, "Teacher"), (3, "Student"))
     GENDER = [("M", "Male"), ("F", "Female")]
-    
-    
+
+
     username = None  # Removed username, using email instead
     email = models.EmailField(unique=True)
     user_type = models.CharField(default=1, choices=USER_TYPE, max_length=1)
@@ -66,17 +66,17 @@ class CustomUser(AbstractUser):
 class Institution(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
-   
-    
+
+
 #Campus
 class Campus(models.Model):
     id = models.AutoField(primary_key=True)
     institution = models.ForeignKey('Institution', on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-   
+    
+
 class Admin(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-
 
 
 class Course(models.Model):
@@ -95,7 +95,7 @@ class Student(models.Model):
     date_of_birth = models.DateField(blank=True, null=True)
     reg_date = models.DateField(blank=True, null=True)
     state = models.CharField(max_length = 30, blank = True) #learning/completed/pending refund
-    
+
     def __str__(self):
         return self.admin.last_name + ", " + self.admin.first_name
 
@@ -104,11 +104,16 @@ class Teacher(models.Model):
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     work_type = models.CharField(max_length = 30, blank = True) #Special/Temporary
-    
+
     def __str__(self):
         return self.admin.last_name + " " + self.admin.first_name
 
-
+#Class
+# class Class(models.Model):
+#     name = models.CharField(max_length=100)
+#     student = models.ManyToManyField(Student)
+    
+    
 class Subject(models.Model):
     name = models.CharField(max_length=120)
     teacher = models.ForeignKey(Teacher,on_delete=models.CASCADE,)
@@ -195,7 +200,6 @@ class StudentResult(models.Model):
 
 #Payment Record
 class PaymentRecord(models.Model):
-    id = models.AutoField(primary_key=True)
     date = models.DateField()
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     course = models.ForeignKey(Course,on_delete=models.CASCADE)
@@ -214,28 +218,33 @@ class PaymentRecord(models.Model):
 
 #Learning Record
 class LearningRecord(models.Model):
-    id = models.AutoField(primary_key=True)
     date = models.DateField()
-    student = models.ForeignKey(Student, on_delete=models.DO_NOTHING)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    starting_time = models.TimeField()
-    end_time = models.TimeField()
-    class_name = models.CharField(max_length=100)
-    remark = models.TextField(default="")
-
-    
+    student = models.ForeignKey(Student, null=True,on_delete=models.DO_NOTHING)
+    course = models.ForeignKey(Course,null=True, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(Teacher,null=True, on_delete=models.CASCADE)
+    starting_time = models.TimeField(null=True,)
+    end_time = models.TimeField(null=True,)
+    class_name = models.CharField(max_length=100, null=True,)
+    remark = models.TextField(null=True,)
 
 #Class Schedule
 class ClassSchedule(models.Model):
-    id = models.AutoField(primary_key=True)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    lesson_unit_price = models.CharField(max_length=100)
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    subject = models.ForeignKey(Subject, on_delete=models.DO_NOTHING)
+    course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)
+    lesson_unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    teacher = models.ForeignKey(Teacher,null=True, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject,null=True, on_delete=models.DO_NOTHING)
     class_time = models.CharField(max_length=100)
     remark = models.TextField(default="")
 
+    
+    def lesson_unit_price(self):
+        # Fetch the related PaymentRecord for this ClassSchedule
+        payment_record = PaymentRecord.objects.filter(course=self.course).first()
+
+        # Return the lesson_unit_price if PaymentRecord exists, otherwise return
+        # 
+        # None
+        return payment_record.lesson_unit_price if payment_record else None
 #Student Query
 class StudentQuery(models.Model):
     GENDER_CHOICES = [
@@ -243,28 +252,37 @@ class StudentQuery(models.Model):
         ('F', 'Female'),
     ]
 
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    date_of_birth = models.DateField()
-    contact_num = models.CharField(max_length=20, null=True)
-    state = models.CharField(max_length=100)
-    payment_status = models.CharField(max_length=100)
-    refunded = models.CharField(max_length=100)
-    reg_date = models.DateField()
-    num_of_classes = models.IntegerField()
+    admin = models.OneToOneField(CustomUser,null = True, on_delete=models.CASCADE)
+    student_records = models.ForeignKey(Student, null=True,on_delete=models.CASCADE)
+    payment_records = models.ForeignKey(PaymentRecord, null=True,on_delete=models.CASCADE)
+    refund = models.CharField(max_length=100, null = True)
+    num_of_classes = models.IntegerField(null = True)
     registered_courses = models.CharField(max_length=100, null=True)
-    completed_hours = models.IntegerField()
-    paid_class_hours = models.IntegerField()
-    remaining_hours = models.IntegerField()
-    session = models.CharField(max_length=100, null=True)
+    completed_hours = models.IntegerField(null = True)
+    paid_class_hours = models.IntegerField(null = True)
+    remaining_hours = models.IntegerField(null = True)
+    
+    learning_records = models.ForeignKey(LearningRecord, null=True,on_delete=models.CASCADE)
 
-    date = models.DateField(null=True)
-    course = models.CharField(max_length=100)
-    instructor = models.CharField(max_length=100, default='')
-    class_starting_time = models.TimeField(null=True)
-    class_ending_time = models.TimeField(null=True)
-    class_name = models.CharField(max_length=100, null=True)
+# TeacherQuery here
+# class TeacherQuery(models.Model):
+#     GENDER_CHOICES = [
+#         ('M', 'Male'),
+#         ('F', 'Female'),
+#     ]
 
- 
+#     admin = models.OneToOneField(CustomUser,null = True, on_delete=models.CASCADE)
+#     num_of_classes = models.IntegerField(null = True)
+#     registered_courses = models.CharField(max_length=100, null=True)
+#     completed_hours = models.IntegerField(null = True)
+#     paid_class_hours = models.IntegerField(null = True)
+#     remaining_hours = models.IntegerField(null = True)
+    
+#     learning_records = models.ForeignKey(LearningRecord, null=True,on_delete=models.CASCADE)
+    
+    
+
+
 
 @receiver(post_save, sender=CustomUser)
 def create_user_profile(sender, instance, created, **kwargs):

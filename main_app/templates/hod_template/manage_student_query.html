@@ -9,9 +9,20 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
+                    
+                    <div class="row">
+                        <div class="col-md-6"></div> <!-- Empty column to push the dropdown to the right -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="id_work_type">Name:</label>
+                                <select name="work_type" class="form-control-sm" id="id_work_type">
+                                    <option value="Special Teacher">Student 1</option>
+                                    <option value="Temporary Contract">Student 2</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
+                    
                     <!-- /.card-header -->
                     <div class="card-body">
                         <table id="example2" class="table table-bordered table-hover">
@@ -72,6 +83,7 @@
                     </div>
                 </div>
             </div>
+            
         </div>
 
         <div class="row">

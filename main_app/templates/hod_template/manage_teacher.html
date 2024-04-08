@@ -1,6 +1,6 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+{% block page_title %}<i class="nav-icon fas fa-user"></i>  {{page_title}}{% endblock page_title %}
 
 {% block content %}
 
@@ -34,11 +34,6 @@
                             <tbody>
                                 {% for teacher in allteacher %}
                                 <tr>
-                                    {% comment %} <td>{{ forloop.counter }}</td>
-                                    <td>{{teacher.last_name}}, {{teacher.first_name}}</td>
-                                    <td>{{teacher.email}}</td>
-                                    <td>{{teacher.gender}}</td> {% endcomment %}
-
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{teacher.last_name}}, {{teacher.first_name}}</td>
                                     <td>{{teacher.email}}</td>

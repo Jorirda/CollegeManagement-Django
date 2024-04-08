@@ -118,7 +118,7 @@ class SubjectForm(FormSettings):
 class PaymentRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
     payment_method = forms.ChoiceField(choices=[('WeChat','WeChat'), ('AliPay','AliPay'), ('Bank Card', 'Bank Card'),('Other', 'Other')])
-    state = forms.ChoiceField(choices=[('Completed','Completed'), ('Pending','Pending'), ('Refund', 'Refund')])
+    status = forms.ChoiceField(choices=[('Completed','Completed'), ('Pending','Pending'), ('Refund', 'Refund')])
     lesson_unit_price = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': '¥'}))
     discounted_price = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': '¥'}))
     book_costs = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': '¥'}))
@@ -126,13 +126,14 @@ class PaymentRecordForm(FormSettings):
     amount_due = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': '¥'}))
     amount_paid = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': '¥'}))
     
+    
     def __init__(self, *args, **kwargs):
         super(PaymentRecordForm, self).__init__(*args, **kwargs)
      
     class Meta:
         model = PaymentRecord
         fields = ['date','student','course','lesson_unit_price','class_name','discounted_price',
-                'book_costs','other_fee','amount_due','amount_paid','payment_method','state','payee','remark']
+                'book_costs','other_fee','amount_due','amount_paid','payment_method','status','payee','remark']
 
 class LearningRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
@@ -146,10 +147,10 @@ class LearningRecordForm(FormSettings):
         model = LearningRecord
         fields = ['date','student','course','teacher','starting_time','end_time', 'class_name','remark']
 
+
 class ClassScheduleForm(FormSettings):
     lesson_unit_price = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': '¥'}))
    
-    
     def __init__(self, *args, **kwargs):
         super(ClassScheduleForm, self).__init__(*args, **kwargs)
 
@@ -157,37 +158,32 @@ class ClassScheduleForm(FormSettings):
         model = ClassSchedule
         fields = ['course','lesson_unit_price','teacher','subject','class_time','remark']
 
-from django import forms
-from .models import StudentQuery
 
-class StudentQueryForm(forms.ModelForm):
+class StudentQueryForm(FormSettings):
     gender = forms.ChoiceField(choices=[('Male', 'Male'), ('Female', 'Female')])
     date_of_birth = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
     contact_num = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Contact Number'}))
     state = forms.ChoiceField(choices=[('Currently Learning', 'Currently Learning'), ('Completed', 'Completed'), ('Refund', 'Refund')])
     payment_status = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Payment Status'}))
-    refunded = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Refunded'}))
+    refund_situation = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Refund Situation'}))
     reg_date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
-    num_of_classes = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Number of Classes'}))
+    num_classes = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Number of Classes'}))
     registered_courses = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Already Registered for Courses'}))
     completed_hours = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Course Hours Completed'}))
-    paid_class_hours = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Paid Class Hours'}))
+    paid_hours = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Paid Class Hours'}))
     remaining_hours = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Remaining Class Hours'}))
     course = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Course'}))
     session = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Session'}))
-    
-    date = forms.DateField(required=True, widget=forms.DateInput(attrs={'type': 'date'}))
-    instructor = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Instructor'}))
-    class_starting_time = forms.TimeField(required=True, widget=forms.TimeInput(attrs={'type': 'time'}))
-    class_ending_time = forms.TimeField(required=True, widget=forms.TimeInput(attrs={'type': 'time'}))
-    class_name = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Class'}))
 
-    class Meta:
+    def __init__(self, *args, **kwargs):
+        super(StudentQueryForm, self).__init__(*args, **kwargs)
+        self.fields['remark'] = self.fields.pop('remark')
+
+    class Meta(CustomUserForm.Meta):
         model = StudentQuery
         fields = ['gender', 'date_of_birth', 'contact_num', 'state', 'payment_status', 
-                    'refunded', 'reg_date', 'num_of_classes', 'registered_courses', 'completed_hours', 
-                    'paid_class_hours', 'remaining_hours', 'course', 'session',
-                    'date', 'instructor', 'class_starting_time', 'class_ending_time', 'class_name']
+                                               'refund_situation', 'reg_date', 'num_classes', 'registered_courses', 'completed_hours', 
+                                               'paid_hours', 'remaining_hours', 'course', 'session']
 
 
 

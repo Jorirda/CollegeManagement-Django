@@ -179,7 +179,7 @@ class StudentQueryForm(FormSettings):
         super(StudentQueryForm, self).__init__(*args, **kwargs)
         self.fields['remark'] = self.fields.pop('remark')
 
-    class Meta(CustomUserForm.Meta):
+    class Meta(CustomUserForm.Meta):  
         model = StudentQuery
         fields = ['gender', 'date_of_birth', 'contact_num', 'state', 'payment_status', 
                                                'refund_situation', 'reg_date', 'num_classes', 'registered_courses', 'completed_hours', 

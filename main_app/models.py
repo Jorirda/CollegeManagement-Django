@@ -284,15 +284,22 @@ def create_or_update_student_query(sender, instance, created, **kwargs):
         print("Already Exists")
         if student_query:
             # Update existing StudentQuery instance for the updated Student
-            print(student_query.admin.pk)
-            student_query.refund = 'True'
-            # student_query.admin = instance.admin
-            # student_query.num_of_classes = instance.class_set.count()  # Example: Count of related classes
-            # student_query.registered_courses = ", ".join([str(course) for course in instance.course_set.all()])
-            # # Example: Concatenating names of related courses
-            # student_query.completed_hours = instance.learningrecord_set.aggregate(sum('hours'))['hours__sum']  # Example: Sum of hours from related learning records
-            # student_query.paid_class_hours = instance.paymentrecord_set.aggregate(sum('class_hours'))['class_hours__sum']  # Example: Sum of class hours from related payment records
-            # student_query.remaining_hours = instance.completed_hours - instance.paid_class_hours  # Example: Calculating remaining hours
+            student_query.admin = instance.admin
+            student_query.refund = instance.state
+            related_learning_records = instance.learningrecord_set.all()
+            related_payment_records = instance.paymentrecord_set.all()
+            learning_record_instance = related_learning_records.first()
+            student_query.learning_records = learning_record_instance
+
+            payment_record_instance = related_payment_records.first()
+            student_query.payment_records = payment_record_instance
+
+            num_of_courses = instance.learningrecord_set.values('course').distinct().count()
+            student_query.registered_courses = num_of_courses
+            
+            num_of_subjects = instance.learningrecord_set.values('class_name').distinct().count()
+            student_query.num_of_classes = num_of_subjects
+
             student_query.save()
 
 # Register signal handlers

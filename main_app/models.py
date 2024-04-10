@@ -263,6 +263,40 @@ class StudentQuery(models.Model):
     remaining_hours = models.IntegerField(null = True)
     learning_records = models.ForeignKey(LearningRecord, null=True,on_delete=models.CASCADE)
 
+@receiver(post_save, sender=Student)
+def create_or_update_student_query(sender, instance, created, **kwargs):
+    """
+    Signal handler for creating or updating StudentQuery instance when a Student instance is created or updated.
+    """
+    try:
+        print("Does exist?")
+        # print(instance.admin_id)
+        student_query = StudentQuery.objects.get(student_records=instance)
+    except StudentQuery.DoesNotExist:
+        print("Does not exist")
+        student_query = None
+
+    if created:
+        print("Now Exists")
+        # Create a new StudentQuery instance for the newly created Student
+        StudentQuery.objects.create(student_records=instance)
+    else:
+        print("Already Exists")
+        if student_query:
+            # Update existing StudentQuery instance for the updated Student
+            print(student_query.admin.pk)
+            student_query.refund = 'True'
+            # student_query.admin = instance.admin
+            # student_query.num_of_classes = instance.class_set.count()  # Example: Count of related classes
+            # student_query.registered_courses = ", ".join([str(course) for course in instance.course_set.all()])
+            # # Example: Concatenating names of related courses
+            # student_query.completed_hours = instance.learningrecord_set.aggregate(sum('hours'))['hours__sum']  # Example: Sum of hours from related learning records
+            # student_query.paid_class_hours = instance.paymentrecord_set.aggregate(sum('class_hours'))['class_hours__sum']  # Example: Sum of class hours from related payment records
+            # student_query.remaining_hours = instance.completed_hours - instance.paid_class_hours  # Example: Calculating remaining hours
+            student_query.save()
+
+# Register signal handlers
+post_save.connect(create_or_update_student_query, sender=Student)
 
 # TeacherQuery here
 # class TeacherQuery(models.Model):

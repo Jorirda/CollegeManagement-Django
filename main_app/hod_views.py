@@ -423,6 +423,7 @@ def add_class_schedule(request):
 #     return render(request, 'hod_template/add_student_query_template.html', context)
 
 
+
 def manage_teacher(request):
     allteacher = CustomUser.objects.filter(user_type=2)
     total_teacher_count = allteacher.count()
@@ -588,53 +589,33 @@ def edit_student(request, student_id):
     }
     if request.method == 'POST':
         if form.is_valid():
-            first_name = form.cleaned_data.get('first_name')
-            last_name = form.cleaned_data.get('last_name')
-            gender = form.cleaned_data.get('gender')
-            date_of_birth = form.cleaned_data.get('date_of_birth')
-            address = form.cleaned_data.get('address')
-            contact_num = form.cleaned_data.get('contact_num')
-            reg_date = form.cleaned_data.get('reg_date')
-            state= form.cleaned_data.get('state')
-            remark= form.cleaned_data.get('remark')
-            username = form.cleaned_data.get('username')
-            email = form.cleaned_data.get('email')
-            password = form.cleaned_data.get('password') or None
-            course = form.cleaned_data.get('course')
-            session = form.cleaned_data.get('session')
-            passport = request.FILES.get('profile_pic') or None
             try:
-                user = CustomUser.objects.get(id=student.admin.id)
-                if passport != None:
-                    fs = FileSystemStorage()
-                    filename = fs.save(passport.name, passport)
-                    passport_url = fs.url(filename)
-                    user.profile_pic = passport_url
-                user.username = username
-                user.email = email
-                if password != None:
+                # Retrieve the related Student instance
+                student = form.save(commit=False)
+                user = student.admin
+                # Update the related CustomUser instance
+                user.username = form.cleaned_data.get('username')
+                user.email = form.cleaned_data.get('email')
+                password = form.cleaned_data.get('password')
+                if password:
                     user.set_password(password)
-                user.first_name = first_name
-                user.last_name = last_name
-                user.gender = gender
-                student.session = session
-                student.date_of_birth = date_of_birth
-                user.address = address
-                user.contact_num = contact_num
-                student.reg_date = reg_date
-                student.state = state
-                user.remark = remark
-                student.course = course
+                user.first_name = form.cleaned_data.get('first_name')
+                user.last_name = form.cleaned_data.get('last_name')
+                user.gender = form.cleaned_data.get('gender')
+                user.address = form.cleaned_data.get('address')
+                user.contact_num = form.cleaned_data.get('contact_num')
+                user.remark = form.cleaned_data.get('remark')
+                if request.FILES.get('profile_pic'):
+                    user.profile_pic = request.FILES.get('profile_pic')
                 user.save()
                 student.save()
                 messages.success(request, "Successfully Updated")
                 return redirect(reverse('edit_student', args=[student_id]))
             except Exception as e:
-                messages.error(request, "Could Not Update " + str(e))
+                messages.error(request, f"Could Not Update: {str(e)}")
         else:
             messages.error(request, "Please Fill Form Properly!")
-    else:
-        return render(request, "hod_template/edit_student_template.html", context)
+    return render(request, "hod_template/edit_student_template.html", context)
 
 def edit_course(request, course_id):
     instance = get_object_or_404(Course, id=course_id)

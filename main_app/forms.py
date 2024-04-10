@@ -162,7 +162,7 @@ class ClassScheduleForm(FormSettings):
 class StudentQueryForm(FormSettings):
     gender = forms.ChoiceField(choices=[('Male', 'Male'), ('Female', 'Female')])
     date_of_birth = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
-    contact_num = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Contact Number'}))
+    contact_num = forms.CharField(required=True, widget=forms.TextInput(attrs={'placeholder': 'Contact '}))
     state = forms.ChoiceField(choices=[('Currently Learning', 'Currently Learning'), ('Completed', 'Completed'), ('Refund', 'Refund')])
     payment_status = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Payment Status'}))
     refund_situation = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Refund Situation'}))

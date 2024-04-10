@@ -65,7 +65,8 @@ urlpatterns = [
     path("payment/manage", hod_views.manage_payment_record, name='manage_payment_record'),
     path("learn/manage", hod_views.manage_learning_record, name='manage_learning_record'),
     path("schedule/manage", hod_views.manage_class_schedule, name='manage_class_schedule'),
-    path("student/query/", hod_views.manage_student_query, name = "manage_student_query"),
+    
+    path("student/query", hod_views.manage_student_query, name = "manage_student_query"),
 
     #edit
     path("teacher/edit/<int:teacher_id>", hod_views.edit_teacher, name='edit_teacher'),

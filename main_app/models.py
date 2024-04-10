@@ -242,10 +242,10 @@ class ClassSchedule(models.Model):
         payment_record = PaymentRecord.objects.filter(course=self.course).first()
 
         # Return the lesson_unit_price if PaymentRecord exists, otherwise return
-        # 
+        #
         # None
         return payment_record.lesson_unit_price if payment_record else None
-    
+
 class StudentQuery(models.Model):
     GENDER_CHOICES = [
         ('M', 'Male'),
@@ -261,8 +261,8 @@ class StudentQuery(models.Model):
     completed_hours = models.IntegerField(null = True)
     paid_class_hours = models.IntegerField(null = True)
     remaining_hours = models.IntegerField(null = True)
-    
     learning_records = models.ForeignKey(LearningRecord, null=True,on_delete=models.CASCADE)
+
 
 # TeacherQuery here
 # class TeacherQuery(models.Model):
@@ -277,10 +277,10 @@ class StudentQuery(models.Model):
 #     completed_hours = models.IntegerField(null = True)
 #     paid_class_hours = models.IntegerField(null = True)
 #     remaining_hours = models.IntegerField(null = True)
-    
+
 #     learning_records = models.ForeignKey(LearningRecord, null=True,on_delete=models.CASCADE)
-    
-    
+
+
 
 
 

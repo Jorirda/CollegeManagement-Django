@@ -425,16 +425,20 @@ def add_class_schedule(request):
 
 def manage_teacher(request):
     allteacher = CustomUser.objects.filter(user_type=2)
+    total_teacher_count = allteacher.count()
     context = {
         'allteacher': allteacher,
-        'page_title': 'Manage teacher'
+        'total_teacher_count': total_teacher_count,
+        'page_title': 'Manage Teachers'
     }
     return render(request, "hod_template/manage_teacher.html", context)
 
 def manage_student(request):
     students = CustomUser.objects.filter(user_type=3)
+    total_student_count = students.count()
     context = {
         'students': students,
+        'total_student_count':total_student_count,
         'page_title': 'Manage Students'
     }
     return render(request, "hod_template/manage_student.html", context)
@@ -457,7 +461,7 @@ def manage_subject(request):
 
 def manage_payment_record(request):
     payments = PaymentRecord.objects.all()
-    
+
     total_amount_paid = PaymentRecord.objects.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
     context = {
         'payments': payments,
@@ -465,6 +469,32 @@ def manage_payment_record(request):
         'total_amount_paid': total_amount_paid,
     }
     return render(request, "hod_template/manage_payment_record.html", context)
+
+# def manage_student_query(request):
+   
+#     if request.method == 'GET' and request.is_ajax():
+#         student_id = request.GET.get('student_id')
+#         student_queries = StudentQuery.objects.filter(admin_id=student_id)
+#         data = []
+#         for query in student_queries:
+#             data.append({
+#                 'gender': query.admin.gender,
+#                 'date_of_birth': query.student.date_of_birth,
+#                 'contact_num': query.admin.contact_num,
+#                 'state': query.student.state,
+#                 'refund': query.refund,
+#                 'reg_date': query.student.reg_date,
+#                 'num_of_classes': query.num_of_classes,
+#                 'registered_courses': query.registered_courses,
+#                 'completed_hours': query.completed_hours,
+#                 'paid_class_hours': query.paid_class_hours,
+#                 'remaining_hours': query.remaining_hours
+#             })
+#         return JsonResponse(data, safe=False)
+#     else:
+#         students = Student.objects.all()
+#         context = {'students': students}
+#         return render(request, 'manage_student_query.html', context)
 
 def manage_learning_record(request):
     learning = LearningRecord.objects.all()
@@ -483,8 +513,10 @@ def manage_class_schedule(request):
     return render(request, "hod_template/manage_class_schedule.html", context)
 
 def manage_student_query(request):
+    students = CustomUser.objects.filter(user_type=3)
     studentqueries = StudentQuery.objects.all()
     context = {
+        'students': students,
         'studentqueries': studentqueries,
         'page_title': 'Manage Student Queries'
     }
@@ -724,7 +756,7 @@ def edit_class_schedule(request, schedule_id):
                 class_schedule.save()
 
                 messages.success(request, "Successfully Updated")
-                return redirect(reverse('edit_schedule', args=[schedule_id]))
+                return redirect(reverse('edit_class_schedule', args=[schedule_id]))
             except Exception as e:
                 messages.error(request, "Could Not Add " + str(e))
         else:

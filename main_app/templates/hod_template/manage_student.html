@@ -1,6 +1,6 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}<i class="nav-icon fas fa-user"></i>  {{page_title}}{% endblock page_title %}
+{% block page_title %}<i class="nav-icon fas fa-graduation-cap"></i>  {{page_title}}{% endblock page_title %}
 
 {% block content %}
 
@@ -9,16 +9,22 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="card-header">
                         <h3 class="card-title">{{page_title}}</h3>
-                        <h3  class="card-title">Total Students: {{ total_student_count }}</h3>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
                         <table id="example2" class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
-                                   
+                                    {% comment %} <th>#</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Gender</th>
+                                    <th>Course</th>
+                                    <th>Avatar</th>
+                                    <th>Actions</th> {% endcomment %}
+
                                     <th>#</th>
                                     <th>Full Name</th>
                                     <th>Email</th>
@@ -37,6 +43,12 @@
                             <tbody>
                                 {% for student in students %}
                                 <tr>
+                                    {% comment %} <td>{{ forloop.counter }}</td>
+                                    <td>{{student.last_name}}, {{student.first_name}}</td>
+                                    <td>{{student.email}}</td>
+                                    <td>{{student.gender}}</td>
+                                    <td>{{student.student.course.name}}</td> {% endcomment %}
+
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{student.last_name}}, {{student.first_name}}</td>
                                     <td>{{student.email}}</td>

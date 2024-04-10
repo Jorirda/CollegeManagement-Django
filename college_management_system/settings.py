@@ -97,7 +97,6 @@ DATABASES = {
     #     'NAME': 'db',
     #     'USER': 'root',
     #     'PASSWORD': '1234',
-    #     'HOST': '127.0.0.1' ,
     #     'HOST': '127.0.0.1',
     #     'PORT': '3306'
     # }
@@ -159,7 +158,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 
-EMAIL_HOST_USER = os.environ.get('EMAIL_ADDRESS')
+EMAIL_HOST_USER = os.environ.get('EMAIL_ADDRESS') 
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 EMAIL_USE_TLS = True
 # DEFAULT_FROM_EMAIL = "School Management System <admin@admin.com>"

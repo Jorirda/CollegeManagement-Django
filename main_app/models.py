@@ -243,7 +243,7 @@ class ClassSchedule(models.Model):
         payment_record = PaymentRecord.objects.filter(course=self.course).first()
 
         # Return the lesson_unit_price if PaymentRecord exists, otherwise return
-        # 
+        #
         # None
         return payment_record.lesson_unit_price if payment_record else None
 

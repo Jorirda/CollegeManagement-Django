@@ -57,25 +57,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for studentquery in studentqueries %}
+                                {% for query in studentqueries %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{studentquery.gender}}</td>
-                                    <td>{{studentquery.date_of_birth}}</td>
-                                    <td>{{studentquery.contact_num}}</td>
-                                    <td>{{studentquery.state}}</td>
-                                    <td>{{studentquery.payment_status}}</td>
-                                    <td>{{studentquery.refunded}}</td>
-                                    <td>{{studentquery.reg_date}}</td>
-                                    <td>{{studentquery.num_of_classes}}</td>
-                                    <td>{{studentquery.registered_courses}}</td>
-                                    <td>{{studentquery.completed_hours}}</td>
-                                    <td>{{studentquery.paid_class_hours}}</td>
-                                    {% comment %} <td>
+                                    <td>{{query.gender}}</td>
+                                    <td>{{query.date_of_birth}}</td>
+                                    <td>{{query.contact_num}}</td>
+                                    <td>{{query.state}}</td>
+                                    <td>{{query.payment_status}}</td>
+                                    <td>{{query.refunded}}</td>
+                                    <td>{{query.reg_date}}</td>
+                                    <td>{{query.num_of_classes}}</td>
+                                    <td>{{query.registered_courses}}</td>
+                                    <td>{{query.completed_hours}}</td>
+                                    <td>{{query.paid_class_hours}}</td>
+                                    <!-- {% comment %} <td>
                                         <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> | 
                                         <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
                                     
-                                    </td> {% endcomment %}
+                                    </td> {% endcomment %} -->
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -116,12 +116,13 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for studentquery in studentqueries %}
+                                {% for query in studentqueries %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{studentquery.date}}</td>
-                                    <td>{{studentquery.course}}</td>
-                                    <td>{{studentquery.instructor}}</td>
+
+                                    <td>{{query.date}}</td>
+                                    <td>{{query.course}}</td>
+                                    <!-- <td>{{studentquery.instructor}}</td>
                                     <td>{{studentquery.class_starting_time}}</td>
                                     <td>{{studentquery.class_ending_time}}</td>
                                     <td>{{studentquery.class_name}}</td>
@@ -129,7 +130,7 @@
                                         <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> | 
                                         <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
                                     
-                                    </td> {% endcomment %}
+                                    </td> {% endcomment %} -->
                                 </tr>
                                 {% endfor %}
                             </tbody>

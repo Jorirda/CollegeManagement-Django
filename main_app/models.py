@@ -245,7 +245,7 @@ class ClassSchedule(models.Model):
         # 
         # None
         return payment_record.lesson_unit_price if payment_record else None
-#Student Query
+    
 class StudentQuery(models.Model):
     GENDER_CHOICES = [
         ('M', 'Male'),

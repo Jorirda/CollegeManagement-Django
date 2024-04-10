@@ -17,7 +17,7 @@
                                     <select name="student" class="form-control" id="studentSelect">
                                         <option value="">Select Student</option>
                                         {% for student in students %}
-                                            <option value="{{ student.id }}">{student.first_name}} {{ student.admin.last_name }}</option>
+                                        <option value="{{ student.id }}">{{ student.first_name }} {{ student.last_name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -63,8 +63,8 @@
                                     <td>{{query.paid_class_hours}}</td>
                                   
                                     <!-- {% comment %} <td>
-                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> | 
-                                        <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
+                                        <a href="{% url 'edit_teacher' teacher.teacher.id %}" class="btn btn-info">Edit</a> | 
+                                        <a href="{% url 'delete_teacher' teacher.teacher.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
 
                                     </td> {% endcomment %} -->
                                 </tr>
@@ -102,8 +102,8 @@
                                 <tr>
                                    
                                     {% comment %} <td>
-                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> |
-                                        <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
+                                        <a href="{% url 'edit_teacher' teacher.teacher.id %}" class="btn btn-info">Edit</a> |
+                                        <a href="{% url 'delete_teacher' teacher.teacher.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
 
                                     </td> {% endcomment %}
                                 </tr>

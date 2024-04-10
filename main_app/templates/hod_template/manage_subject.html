@@ -19,7 +19,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Subject</th>
-                                    <th>Staff</th>
+                                    <th>teacher</th>
                                     <th>Course</th>
                                     <th>Actions</th>
                                 </tr>
@@ -29,7 +29,7 @@
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{subject.name}}</td>
-                                    <td>{{subject.staff.admin}}</td>
+                                    <td>{{subject.teacher.admin}}</td>
                                     <td>{{subject.course.name}}</td>
                                     <td>
                                         <a href="{% url 'edit_subject' subject.id %}" class="btn btn-info">Edit</a> -

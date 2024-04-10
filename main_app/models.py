@@ -73,7 +73,7 @@ class Campus(models.Model):
     id = models.AutoField(primary_key=True)
     institution = models.ForeignKey('Institution', on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    
+
 
 class Admin(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
@@ -112,8 +112,8 @@ class Teacher(models.Model):
 # class Class(models.Model):
 #     name = models.CharField(max_length=100)
 #     student = models.ManyToManyField(Student)
-    
-    
+
+
 class Subject(models.Model):
     name = models.CharField(max_length=120)
     teacher = models.ForeignKey(Teacher,on_delete=models.CASCADE,)
@@ -230,21 +230,12 @@ class LearningRecord(models.Model):
 #Class Schedule
 class ClassSchedule(models.Model):
     course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)
-    lesson_unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    lesson_unit_price = models.DecimalField(max_digits=10, decimal_places=2,null=True)
     teacher = models.ForeignKey(Teacher,null=True, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject,null=True, on_delete=models.DO_NOTHING)
     class_time = models.CharField(max_length=100)
     remark = models.TextField(default="")
 
-    
-    def lesson_unit_price(self):
-        # Fetch the related PaymentRecord for this ClassSchedule
-        payment_record = PaymentRecord.objects.filter(course=self.course).first()
-
-        # Return the lesson_unit_price if PaymentRecord exists, otherwise return
-        # 
-        # None
-        return payment_record.lesson_unit_price if payment_record else None
 #Student Query
 class StudentQuery(models.Model):
     GENDER_CHOICES = [
@@ -252,6 +243,7 @@ class StudentQuery(models.Model):
         ('F', 'Female'),
     ]
 
+    date = models.DateField(null=True)
     admin = models.OneToOneField(CustomUser,null = True, on_delete=models.CASCADE)
     student_records = models.ForeignKey(Student, null=True,on_delete=models.CASCADE)
     payment_records = models.ForeignKey(PaymentRecord, null=True,on_delete=models.CASCADE)
@@ -261,8 +253,9 @@ class StudentQuery(models.Model):
     completed_hours = models.IntegerField(null = True)
     paid_class_hours = models.IntegerField(null = True)
     remaining_hours = models.IntegerField(null = True)
-    
+
     learning_records = models.ForeignKey(LearningRecord, null=True,on_delete=models.CASCADE)
+
 
 # TeacherQuery here
 # class TeacherQuery(models.Model):
@@ -277,10 +270,10 @@ class StudentQuery(models.Model):
 #     completed_hours = models.IntegerField(null = True)
 #     paid_class_hours = models.IntegerField(null = True)
 #     remaining_hours = models.IntegerField(null = True)
-    
+
 #     learning_records = models.ForeignKey(LearningRecord, null=True,on_delete=models.CASCADE)
-    
-    
+
+
 
 
 

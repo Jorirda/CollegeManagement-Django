@@ -9,27 +9,30 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    
+
                     <div class="row">
                         <div class="col-md-6"></div> <!-- Empty column to push the dropdown to the right -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="id_work_type">Name:</label>
-                                <select name="work_type" class="form-control-sm" id="id_work_type">
-                                    <option value="Special Teacher">Student 1</option>
-                                    <option value="Temporary Contract">Student 2</option>
-                                </select>
-                            </div>
+                                <div class="form-group">
+                                    <label for="studentSelect">Select Student:</label>
+                                    <select name="student" class="form-control" id="studentSelect">
+                                        <option value="">Select Student</option>
+                                        {% for student in students %}
+                                            <option value="{{ student.id }}">{{ student.admin.first_name }} {{ student.admin.last_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                         </div>
                     </div>
-                    
+
                     <!-- /.card-header -->
                     <div class="card-body">
                         <table id="example2" class="table table-bordered table-hover">
                             <p>Basic Information</p>
                             <thead class="thead-dark">
                                 <tr>
-                                    {% comment %} <th>#</th>
+                                    
+                                    <th>#</th>
+                                    <th>Date</th>
                                     <th>Gender</th>
                                     <th>Date of Birth</th>
                                     <th>Contact Information</th>
@@ -41,41 +44,28 @@
                                     <th>Completed Hours</th>
                                     <th>Paid Class Hours</th>
                                     <th>Remaining Class Hours</th>
-                                 {% endcomment %}
-
-                                 <th>Gender</th>
-                                 <th>Date of Birth</th>
-                                 <th>Contact Information</th>
-                                 <th>State</th>
-                                 <th>Refund</th>
-                                 <th>Registration Date</th>
-                                 <th>Number of Classes</th>
-                                 <th>Registered Courses</th>
-                                 <th>Completed Hours</th>
-                                 <th>Paid Class Hours</th>
-                                 <th>Remaining Class Hours</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for studentquery in studentqueries %}
+                                {% for studentquery in student_queries %}
                                 <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{studentquery.gender}}</td>
-                                    <td>{{studentquery.date_of_birth}}</td>
-                                    <td>{{studentquery.contact_num}}</td>
-                                    <td>{{studentquery.state}}</td>
-                                    <td>{{studentquery.payment_status}}</td>
-                                    <td>{{studentquery.refunded}}</td>
-                                    <td>{{studentquery.reg_date}}</td>
-                                    <td>{{studentquery.num_of_classes}}</td>
-                                    <td>{{studentquery.registered_courses}}</td>
-                                    <td>{{studentquery.completed_hours}}</td>
-                                    <td>{{studentquery.paid_class_hours}}</td>
-                                    {% comment %} <td>
+                                    <td>{{ studentquery.gender }}</td>
+                                    <td>{{ studentquery.date_of_birth }}</td>
+                                    <td>{{ studentquery.contact_num }}</td>
+                                    <td>{{ studentquery.state }}</td>
+                                    <td>{{ studentquery.refund }}</td>
+                                    <td>{{ studentquery.reg_date }}</td>
+                                    <td>{{ studentquery.num_of_classes }}</td>
+                                    <td>{{ studentquery.registered_courses }}</td>
+                                    <td>{{ studentquery.completed_hours }}</td>
+                                    <td>{{ studentquery.paid_class_hours }}</td>
+                                    <td>{{ studentuery.remaining_hours }}</td>
+                                  
+                                    <!-- {% comment %} <td>
                                         <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> | 
                                         <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
-                                    
-                                    </td> {% endcomment %}
+
+                                    </td> {% endcomment %} -->
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -83,7 +73,7 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
 
         <div class="row">
@@ -94,19 +84,10 @@
                     </div> -->
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="example2" class="table table-bordered table-hover">
+                        <table id="studentQueryTable" class="table table-bordered table-hover">
                             <p>Learning Schedule</p>
                             <thead class="thead-dark">
                                 <tr>
-                                    {% comment %} <th>#</th>
-                                    <th>Date</th>
-                                    <th>Course</th>
-                                    <th>Instructor</th>
-                                    <th>Start Time</th>
-                                    <th>End Time</th>
-                                    <th>Class</th>
-                                    {% endcomment %}
-
                                     <th>Date</th>
                                     <th>Course</th>
                                     <th>Instructor</th>
@@ -116,19 +97,13 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for studentquery in studentqueries %}
+                                {% for studentquery in student_queries %}
                                 <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{studentquery.date}}</td>
-                                    <td>{{studentquery.course}}</td>
-                                    <td>{{studentquery.instructor}}</td>
-                                    <td>{{studentquery.class_starting_time}}</td>
-                                    <td>{{studentquery.class_ending_time}}</td>
-                                    <td>{{studentquery.class_name}}</td>
+                                   
                                     {% comment %} <td>
-                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> | 
+                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> |
                                         <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
-                                    
+
                                     </td> {% endcomment %}
                                 </tr>
                                 {% endfor %}
@@ -140,4 +115,40 @@
         </div>
     </div>
 </section>
+{% block custom_js %}
+<script>
+    $(document).ready(function () {
+        $('#studentSelect').change(function () {
+            var studentId = $(this).val();
+            $.ajax({
+                url: '{% url "manage_student_query" %}',
+                type: 'GET',
+                data: {
+                    'student_id': studentId
+                },
+                success: function (data) {
+                    // Clear previous table rows
+                    $('#studentQueryTable').empty();
+                    // Populate table with new data
+                    $.each(data, function (index, item) {
+                        $('#studentQueryTable').append('<tr>' +
+                            '<td>' + item.gender + '</td>' +
+                            '<td>' + item.date_of_birth + '</td>' +
+                            '<td>' + item.contact_num + '</td>' +
+                            '<td>' + item.state + '</td>' +
+                            '<td>' + item.refund + '</td>' +
+                            '<td>' + item.reg_date + '</td>' +
+                            '<td>' + item.num_of_classes + '</td>' +
+                            '<td>' + item.registered_courses + '</td>' +
+                            '<td>' + item.completed_hours + '</td>' +
+                            '<td>' + item.paid_class_hours + '</td>' +
+                            '<td>' + item.remaining_hours + '</td>' +
+                            '</tr>');
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock custom_js %} 
 {% endblock content %}

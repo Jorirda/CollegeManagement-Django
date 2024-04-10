@@ -10,7 +10,7 @@ django.setup()
 # Now you can import Django settings safely
 from django.contrib.auth.hashers import make_password
 from django.utils.crypto import get_random_string
-from main_app.models import CustomUser
+from main_app.models import CustomUser, StudentQuery,Student
 from django.db import IntegrityError
 
 
@@ -73,8 +73,32 @@ def write_fake_data_to_database(fake_data):
             print("Error")
             pass
 
+def generate_student_query(num_data):
+    fake_data = []
+
+
+    return fake_data
+def write_database_studentquery(fake_data): #ahh meishir
+    for student_data in fake_data:
+        try:
+            print("work")
+            studentQ = StudentQuery.add(
+            admin="",
+            refund="",
+            num_of_classes=random.randint(1, 10),
+            registered_courses="",
+            completed_hours=random.randint(0, 100),
+            paid_class_hours=random.randint(0, 100),
+            remaining_hours=random.randint(0, 100)
+                ) #Function goes here
+            studentA = Student.objects.create
+        except IntegrityError:
+            # Handle integrity errors, e.g., by generating a new admin_id
+            print("Error")
+            pass
+
 # Generate fake data
 fake_data = generate_fake_data(5)
 
 # Write fake data to the database
-write_fake_data_to_database(fake_data)
+# write_fake_data_to_database(fake_data)

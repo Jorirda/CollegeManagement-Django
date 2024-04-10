@@ -1,6 +1,6 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
 
 {% block content %}
 
@@ -9,34 +9,28 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-
-                    <div class="row">
-                        <div class="col-md-6"></div> <!-- Empty column to push the dropdown to the right -->
-                                <div class="form-group">
-                                    <label for="studentSelect">Select Student:</label>
-                                    <select name="student" class="form-control" id="studentSelect">
-                                        <option value="">Select Student</option>
-                                        {% for student in students %}
-                                        <option value="{{ student.id }}">{{ student.first_name }} {{ student.last_name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                        </div>
-                    </div>
-
                     <!-- /.card-header -->
                     <div class="card-body">
+                        <div class="row"> <!-- Empty column to push the dropdown to the right -->
+                            
+                        </div>
+                        
                         <table id="example2" class="table table-bordered table-hover">
-                            <p>Basic Information</p>
+                            <div class="col-md-6">
+                                <p>Basic Information</p>
+                                <form method="GET" action="">
+                                    {% csrf_token %}
+                                    {{ student_select_form.as_p }}
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </form>
+                            </div>
                             <thead class="thead-dark">
                                 <tr>
-                                    
-                                    <th>#</th>
-                                    <th>Date</th>
                                     <th>Gender</th>
                                     <th>Date of Birth</th>
                                     <th>Contact Information</th>
                                     <th>State</th>
+                                    <th>Payment Status</th>
                                     <th>Refund</th>
                                     <th>Registration Date</th>
                                     <th>Number of Classes</th>
@@ -47,26 +41,20 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for query in student_queries %}
+                                {% for record in payment_records %}
                                 <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{query.gender}}</td>
-                                    <td>{{query.date_of_birth}}</td>
-                                    <td>{{query.contact_num}}</td>
-                                    <td>{{query.state}}</td>
-                                    <td>{{query.payment_status}}</td>
-                                    <td>{{query.refunded}}</td>
-                                    <td>{{query.reg_date}}</td>
-                                    <td>{{query.num_of_classes}}</td>
-                                    <td>{{query.registered_courses}}</td>
-                                    <td>{{query.completed_hours}}</td>
-                                    <td>{{query.paid_class_hours}}</td>
-                                  
-                                    <!-- {% comment %} <td>
-                                        <a href="{% url 'edit_teacher' teacher.teacher.id %}" class="btn btn-info">Edit</a> | 
-                                        <a href="{% url 'delete_teacher' teacher.teacher.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
-
-                                    </td> {% endcomment %} -->
+                                    <td>{{selected_student.admin.gender}}</td>
+                                    <td>{{selected_student.date_of_birth}}</td>
+                                    <td>{{selected_student.admin.contact_num}}</td>
+                                    <td>{{selected_student.state}}</td>
+                                    <td>¥{{record.amount_paid}}</td>   
+                                    <td>{{selected_student.refunded}}</td>
+                                    <td>{{selected_student.reg_date}}</td>
+                                    <td>{{selected_student.num_of_classes}}</td>
+                                    <td>{{selected_student.registered_courses}}</td>
+                                    <td>{{selected_student.completed_hours}}</td>
+                                    <td>{{selected_student.paid_class_hours}}</td>
+                                    <!-- Add remaining columns as needed -->
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -74,18 +62,14 @@
                     </div>
                 </div>
             </div>
-
+            
         </div>
 
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <!-- <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
-                    </div> -->
-                    <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="studentQueryTable" class="table table-bordered table-hover">
+                        <table id="example2" class="table table-bordered table-hover">
                             <p>Learning Schedule</p>
                             <thead class="thead-dark">
                                 <tr>
@@ -98,14 +82,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for studentquery in student_queries %}
+                                {% for record in learning_records %}
                                 <tr>
-                                   
-                                    {% comment %} <td>
-                                        <a href="{% url 'edit_teacher' teacher.teacher.id %}" class="btn btn-info">Edit</a> |
-                                        <a href="{% url 'delete_teacher' teacher.teacher.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
-
-                                    </td> {% endcomment %}
+                                    <td>{{record.date}}</td>
+                                    <td>{{record.course}}</td>
+                                    <td>{{record.teacher}}</td>
+                                    <td>{{record.starting_time}}</td>
+                                    <td>{{record.end_time}}</td>
+                                    <td>{{record.class_name}}</td>
+                                    <!-- Add remaining columns as needed -->
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -116,40 +101,4 @@
         </div>
     </div>
 </section>
-{% block custom_js %}
-<script>
-    $(document).ready(function () {
-        $('#studentSelect').change(function () {
-            var studentId = $(this).val();
-            $.ajax({
-                url: '{% url "manage_student_query" %}',
-                type: 'GET',
-                data: {
-                    'student_id': studentId
-                },
-                success: function (data) {
-                    // Clear previous table rows
-                    $('#studentQueryTable').empty();
-                    // Populate table with new data
-                    $.each(data, function (index, item) {
-                        $('#studentQueryTable').append('<tr>' +
-                            '<td>' + item.gender + '</td>' +
-                            '<td>' + item.date_of_birth + '</td>' +
-                            '<td>' + item.contact_num + '</td>' +
-                            '<td>' + item.state + '</td>' +
-                            '<td>' + item.refund + '</td>' +
-                            '<td>' + item.reg_date + '</td>' +
-                            '<td>' + item.num_of_classes + '</td>' +
-                            '<td>' + item.registered_courses + '</td>' +
-                            '<td>' + item.completed_hours + '</td>' +
-                            '<td>' + item.paid_class_hours + '</td>' +
-                            '<td>' + item.remaining_hours + '</td>' +
-                            '</tr>');
-                    });
-                }
-            });
-        });
-    });
-</script>
-{% endblock custom_js %} 
 {% endblock content %}

@@ -47,6 +47,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+<<<<<<< HEAD
                                 {% for studentquery in student_queries %}
                                 <tr>
                                     <td>{{ studentquery.gender }}</td>
@@ -65,6 +66,26 @@
                                         <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> | 
                                         <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
 
+=======
+                                {% for query in studentqueries %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{query.gender}}</td>
+                                    <td>{{query.date_of_birth}}</td>
+                                    <td>{{query.contact_num}}</td>
+                                    <td>{{query.state}}</td>
+                                    <td>{{query.payment_status}}</td>
+                                    <td>{{query.refunded}}</td>
+                                    <td>{{query.reg_date}}</td>
+                                    <td>{{query.num_of_classes}}</td>
+                                    <td>{{query.registered_courses}}</td>
+                                    <td>{{query.completed_hours}}</td>
+                                    <td>{{query.paid_class_hours}}</td>
+                                    <!-- {% comment %} <td>
+                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> | 
+                                        <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
+                                    
+>>>>>>> 15114dd9d25b3955f8cf71298a2fa786505c2861
                                     </td> {% endcomment %} -->
                                 </tr>
                                 {% endfor %}
@@ -97,14 +118,32 @@
                                 </tr>
                             </thead>
                             <tbody>
+<<<<<<< HEAD
                                 {% for studentquery in student_queries %}
                                 <tr>
                                    
+=======
+                                {% for query in studentqueries %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+
+                                    <td>{{query.date}}</td>
+                                    <td>{{query.course}}</td>
+                                    <!-- <td>{{studentquery.instructor}}</td>
+                                    <td>{{studentquery.class_starting_time}}</td>
+                                    <td>{{studentquery.class_ending_time}}</td>
+                                    <td>{{studentquery.class_name}}</td>
+>>>>>>> 15114dd9d25b3955f8cf71298a2fa786505c2861
                                     {% comment %} <td>
                                         <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> |
                                         <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
+<<<<<<< HEAD
 
                                     </td> {% endcomment %}
+=======
+                                    
+                                    </td> {% endcomment %} -->
+>>>>>>> 15114dd9d25b3955f8cf71298a2fa786505c2861
                                 </tr>
                                 {% endfor %}
                             </tbody>

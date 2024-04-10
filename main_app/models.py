@@ -236,7 +236,20 @@ class ClassSchedule(models.Model):
     class_time = models.CharField(max_length=100)
     remark = models.TextField(default="")
 
+<<<<<<< HEAD
 #Student Query
+=======
+    
+    def lesson_unit_price(self):
+        # Fetch the related PaymentRecord for this ClassSchedule
+        payment_record = PaymentRecord.objects.filter(course=self.course).first()
+
+        # Return the lesson_unit_price if PaymentRecord exists, otherwise return
+        # 
+        # None
+        return payment_record.lesson_unit_price if payment_record else None
+    
+>>>>>>> 15114dd9d25b3955f8cf71298a2fa786505c2861
 class StudentQuery(models.Model):
     GENDER_CHOICES = [
         ('M', 'Male'),

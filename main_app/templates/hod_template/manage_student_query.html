@@ -1,152 +1,107 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block page_title %}
+  {{ page_title }}
+{% endblock page_title %}
 
 {% block content %}
-
 <section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    
-                    <div class="row">
-                        <div class="col-md-6"></div> <!-- Empty column to push the dropdown to the right -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="id_work_type">Name:</label>
-                                <select name="work_type" class="form-control-sm" id="id_work_type">
-                                    <option value="Special Teacher">Student 1</option>
-                                    <option value="Temporary Contract">Student 2</option>
-                                </select>
-                            </div>
-                        </div>
-                        <!-- <div class="col-md-6">
-                            <div class="form-group" style="padding-top: 20px;">
-                                <form method="post">
-                                    {% csrf_token %}
-                                    <div class="form-group">
-                                        <label for="id_work_type">Name:</label>
-                                        <select name="work_type" class="form-control-sm" id="id_work_type">
-                                            {% for student in students %}
-                                                <option value="{{ student.admin.gender }}">{{ student.admin.first_name }} {{ student.admin.last_name }}</option>
-                                            {% endfor %}
-                                        </select>
-                                        <button type="submit" class="btn btn-primary">Submit</button>
-                                    </div>
-                                </form> 
-                            </div>
-                        </div> -->
-                    </div>
-                    
-                    <!-- /.card-header -->
-                    <div class="card-body">
-                        <table id="example2" class="table table-bordered table-hover">
-                            <p>Basic Information</p>
-                            <thead class="thead-dark">
-                                <tr>
-                                    {% comment %} <th>#</th>
-                                    <th>Gender</th>
-                                    <th>Date of Birth</th>
-                                    <th>Contact Information</th>
-                                    <th>State</th>
-                                    <th>Refund</th>
-                                    <th>Registration Date</th>
-                                    <th>Number of Classes</th>
-                                    <th>Registered Courses</th>
-                                    <th>Completed Hours</th>
-                                    <th>Paid Class Hours</th>
-                                    <th>Remaining Class Hours</th>
-                                 {% endcomment %}
-
-                                 <th>Gender</th>
-                                 <th>Date of Birth</th>
-                                 <th>Contact Information</th>
-                                 <th>State</th>
-                                 <th>Refund</th>
-                                 <th>Registration Date</th>
-                                 <th>Number of Classes</th>
-                                 <th>Registered Courses</th>
-                                 <th>Completed Hours</th>
-                                 <th>Paid Class Hours</th>
-                                 <th>Remaining Class Hours</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for user in users_info %}
-                                <tr>
-                                    <td>{{ user.gender }}</td>
-                                    <td>{{ user.date_of_birth }}</td>
-                                    <td>{{ user.contact_num }}</td>
-                                    <td>{{ user.state }}</td>
-                                    <!-- {% comment %} <td>
-                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> | 
-                                        <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
-                                    
-                                    </td> {% endcomment %} -->
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <form method="GET" class="student-selector-form">
+              <div class="form-group d-flex align-items-center mb-0">
+                <label for="student_selector" class="mr-3">Select Student:</label>
+                <select id="student_selector" name="student_id" class="form-control mr-3">
+                  <option value="">All Students</option>
+                  {% for student in students %}
+                    <option value="{{ student.id }}">{{ student.first_name }} {{ student.last_name }}</option>
+                  {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary">Filter</button>
+              </div>
+            </form>
+          </div>
         </div>
-
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <!-- <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
-                    </div> -->
-                    <!-- /.card-header -->
-                    <div class="card-body">
-                        <table id="example2" class="table table-bordered table-hover">
-                            <p>Learning Schedule</p>
-                            <thead class="thead-dark">
-                                <tr>
-                                    {% comment %} <th>#</th>
-                                    <th>Date</th>
-                                    <th>Course</th>
-                                    <th>Instructor</th>
-                                    <th>Start Time</th>
-                                    <th>End Time</th>
-                                    <th>Class</th>
-                                    {% endcomment %}
-
-                                    <th>Date</th>
-                                    <th>Course</th>
-                                    <th>Instructor</th>
-                                    <th>Start Time</th>
-                                    <th>End Time</th>
-                                    <th>Class</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for query in Student_info %}
-                                <tr>
-                                    <td>{{ forloop.counter }}</td>
-
-                                    <td>{{query.date}}</td>
-                                    <td>{{query.course}}</td>
-                                    <!-- <td>{{studentquery.instructor}}</td>
-                                    <td>{{studentquery.class_starting_time}}</td>
-                                    <td>{{studentquery.class_ending_time}}</td>
-                                    <td>{{studentquery.class_name}}</td>
-                                    {% comment %} <td>
-                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-info">Edit</a> | 
-                                        <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
-                                    
-                                    </td> {% endcomment %} -->
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <!-- First Table -->
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Gender</th>
+                  <th>Date of Birth</th>
+                  <th>Contact Number</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for query in student_query_info %}
+                  <tr>
+                    <td>{{ query.student_name }}</td>
+                    <td>{{ query.gender }}</td>
+                    <td>{{ query.date_of_birth }}</td>
+                    <td>{{ query.contact_num }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <!-- Second Table -->
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>State</th>
+                  <th>Payment Status</th>
+                  <th>Refunded</th>
+                  <th>Registration Date</th>
+                  <th>Number of Classes</th>
+                  <th>Registered Courses</th>
+                  <th>Completed Hours</th>
+                  <th>Paid Class Hours</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for query in student_query_info %}
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ query.state }}</td>
+                    <td>{{ query.payment_status }}</td>
+                    <td>{{ query.refunded }}</td>
+                    <td>{{ query.reg_date }}</td>
+                    <td>{{ query.num_of_classes }}</td>
+                    <td>{{ query.registered_courses }}</td>
+                    <td>{{ query.completed_hours }}</td>
+                    <td>{{ query.paid_class_hours }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
+
+{% block custom_js %}
+<script>
+  // Your custom JavaScript here
+</script>
+{% endblock custom_js %}
 {% endblock content %}

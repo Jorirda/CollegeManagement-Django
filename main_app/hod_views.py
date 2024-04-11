@@ -514,11 +514,64 @@ def manage_class_schedule(request):
     return render(request, "hod_template/manage_class_schedule.html", context)
 
 def manage_student_query(request):
+    # Get all students
     students = CustomUser.objects.filter(user_type=3)
-    studentqueries = StudentQuery.objects.all()
+
+    # Get the selected student ID from the form submission
+    selected_student_id = request.GET.get('student_id')
+
+    # If a student is selected, filter student queries by that student
+    if selected_student_id:
+        student_query_info = []
+        # Retrieve the selected student's queries
+        student_queries = StudentQuery.objects.filter(admin_id=selected_student_id)
+
+        # Iterate over each student query
+        for student_query in student_queries:
+            # Get related student information
+            student_info = {
+            'student_name': student_query.admin.get_full_name(),
+            'gender': student_query.admin.gender,
+            'date_of_birth': student_query.student_records.date_of_birth,
+            'contact_num': student_query.student_records.admin.contact_num,
+            'state': student_query.student_records.state,
+            'payment_status': student_query.payment_records.status,
+            'refunded': student_query.refund,
+            'reg_date': student_query.student_records.reg_date,
+            'num_of_classes': student_query.num_of_classes,
+            'registered_courses': student_query.registered_courses,
+            'completed_hours': student_query.completed_hours,
+            'paid_class_hours': student_query.paid_class_hours,
+        }
+            # Append student query information to the list
+            student_query_info.append(student_info)
+    else:
+        # If no student is selected, retrieve all student queries
+        student_query_info = []
+        # Iterate over each student query
+        for student_query in StudentQuery.objects.all():
+            # Get related student information
+            student_info = {
+            'student_name': student_query.admin.get_full_name(),
+            'gender': student_query.admin.gender,
+            'date_of_birth': student_query.student_records.date_of_birth,
+            'contact_num': student_query.student_records.admin.contact_num,
+            'state': student_query.student_records.state,
+            'payment_status': student_query.payment_records.status,
+            'refunded': student_query.refund,
+            'reg_date': student_query.student_records.reg_date,
+            'num_of_classes': student_query.num_of_classes,
+            'registered_courses': student_query.registered_courses,
+            'completed_hours': student_query.completed_hours,
+            'paid_class_hours': student_query.paid_class_hours,
+        }
+            # Append student query information to the list
+            student_query_info.append(student_info)
+
+    # Prepare the context to pass to the template
     context = {
         'students': students,
-        'studentqueries': studentqueries,
+        'student_query_info': student_query_info,
         'page_title': 'Manage Student Queries'
     }
    

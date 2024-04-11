@@ -4,6 +4,8 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from datetime import datetime, timedelta
+
 
 
 
@@ -252,55 +254,92 @@ class StudentQuery(models.Model):
         ('F', 'Female'),
     ]
 
-    admin = models.OneToOneField(CustomUser,null = True, on_delete=models.CASCADE)
-    student_records = models.ForeignKey(Student, null=True,on_delete=models.CASCADE)
-    payment_records = models.ForeignKey(PaymentRecord, null=True,on_delete=models.CASCADE)
-    refund = models.CharField(max_length=100, null = True)
-    num_of_classes = models.IntegerField(null = True)
-    registered_courses = models.CharField(max_length=100, null=True)
-    completed_hours = models.IntegerField(null = True)
-    paid_class_hours = models.IntegerField(null = True)
-    remaining_hours = models.IntegerField(null = True)
-    learning_records = models.ForeignKey(LearningRecord, null=True,on_delete=models.CASCADE)
+    admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
+    student_records = models.ForeignKey(Student, null=True, on_delete=models.CASCADE)
+    payment_records = models.ForeignKey(PaymentRecord, null=True, on_delete=models.CASCADE)
+    refund = models.CharField(max_length=100, null=True, default='Pending')  # Default value for refund
+    num_of_classes = models.IntegerField(null=True, default=0)  # Default value for num_of_classes
+    registered_courses = models.CharField(max_length=100, null=True, default='')  # Default value for registered_courses
+    completed_hours = models.IntegerField(null=True, default=0)  # Default value for completed_hours
+    paid_class_hours = models.IntegerField(null=True, default=0)  # Default value for paid_class_hours
+    remaining_hours = models.IntegerField(null=True, default=0)  # Default value for remaining_hours
+    learning_records = models.ForeignKey(LearningRecord, null=True, on_delete=models.CASCADE)
 
 @receiver(post_save, sender=Student)
+@receiver(post_save, sender=LearningRecord)
+@receiver(post_save, sender=PaymentRecord)
 def create_or_update_student_query(sender, instance, created, **kwargs):
     """
     Signal handler for creating or updating StudentQuery instance when a Student instance is created or updated.
     """
-    try:
-        print("Does exist?")
-        # print(instance.admin_id)
-        student_query = StudentQuery.objects.get(student_records=instance)
-    except StudentQuery.DoesNotExist:
-        print("Does not exist")
-        student_query = None
+    student = None
+    if isinstance(instance, Student):
+        student = instance
+        print("Student")
+    elif isinstance(instance, LearningRecord):
+        student = instance.student
+        print("Learning")
+    elif isinstance(instance, PaymentRecord):
+        student = instance.student
+        print(instance.student.admin)
 
-    if created:
-        print("Now Exists")
-        # Create a new StudentQuery instance for the newly created Student
-        StudentQuery.objects.create(student_records=instance)
-    else:
-        print("Already Exists")
-        if student_query:
-            # Update existing StudentQuery instance for the updated Student
-            student_query.admin = instance.admin
-            student_query.refund = instance.state
-            related_learning_records = instance.learningrecord_set.all()
-            related_payment_records = instance.paymentrecord_set.all()
-            learning_record_instance = related_learning_records.first()
+    if student:
+        try:
+            # Attempt to retrieve the existing StudentQuery instance related to the student
+            student_query = StudentQuery.objects.get(student_records=student)
+        except StudentQuery.DoesNotExist:
+            # If StudentQuery instance does not exist, create a new one
+            student_query = StudentQuery.objects.create(student_records=student)
+
+    # Update the fields of the StudentQuery instance
+        student_query.admin = student.admin
+        student_query.refund = student.state
+
+        # Get related learning records and payment records
+        related_learning_records = student.learningrecord_set.all()
+        related_payment_records = student.paymentrecord_set.all()
+
+        # Update learning records and payment records fields in StudentQuery
+        learning_record_instance = related_learning_records.first()
+        payment_record_instance = related_payment_records.first()
+
+        if learning_record_instance:
             student_query.learning_records = learning_record_instance
 
-            payment_record_instance = related_payment_records.first()
+        if payment_record_instance:
             student_query.payment_records = payment_record_instance
 
-            num_of_courses = instance.learningrecord_set.values('course').distinct().count()
-            student_query.registered_courses = num_of_courses
-            
-            num_of_subjects = instance.learningrecord_set.values('class_name').distinct().count()
-            student_query.num_of_classes = num_of_subjects
+        # Set payment record id and learning record id
+        student_query.payment_record_id = payment_record_instance.id if payment_record_instance else None
+        student_query.learning_record_id = learning_record_instance.id if learning_record_instance else None
 
-            student_query.save()
+        # Calculate class duration for learning records
+        total_class_duration = timedelta()  # Initialize total class duration as timedelta object
+        for record in related_learning_records:
+            class_duration = datetime.combine(datetime.today(), record.end_time) - datetime.combine(datetime.today(), record.starting_time)
+            total_class_duration += class_duration
+
+        # Count the number of courses and subjects
+        num_of_courses = student.learningrecord_set.values('course').distinct().count()
+        num_of_subjects = student.learningrecord_set.values('class_name').distinct().count()
+
+        # Update the fields in StudentQuery instance
+        student_query.registered_courses = num_of_courses
+        student_query.num_of_classes = num_of_subjects
+
+        # Update the completed hours and remaining hours fields in StudentQuery
+        student_query.completed_hours = total_class_duration.total_seconds() // 3600  # Convert seconds to hours
+        student_query.remaining_hours = (num_of_subjects * 2) - student_query.completed_hours  # Assuming each class is 30 hours
+
+        # Calculate paid hours
+        total_paid_hours = 0
+        for payment_record in related_payment_records:
+            total_paid_hours += payment_record.amount_paid / payment_record.lesson_unit_price
+
+        student_query.paid_class_hours = total_paid_hours  # Update the paid_class_hours field
+
+        # Save the updated StudentQuery instance
+        student_query.save()
 
 # Register signal handlers
 post_save.connect(create_or_update_student_query, sender=Student)

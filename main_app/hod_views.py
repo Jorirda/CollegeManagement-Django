@@ -574,7 +574,7 @@ def manage_student_query(request):
         'student_query_info': student_query_info,
         'page_title': 'Manage Student Queries'
     }
-   
+
     # Render the template with the context
     return render(request, 'hod_template/manage_student_query.html', context)
 

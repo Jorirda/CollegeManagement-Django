@@ -21,7 +21,7 @@
                     <option value="{{ student.id }}">{{ student.first_name }} {{ student.last_name }}</option>
                   {% endfor %}
                 </select>
-                <button type="submit" class="btn btn-primary">Filter</button>
+                <button type="submit" class="btn btn-primary">Search</button>
               </div>
             </form>
           </div>
@@ -34,7 +34,7 @@
           <div class="card-body">
             <!-- First Table -->
             <table class="table table-bordered table-hover">
-              <thead>
+              <thead class="thead-dark">
                 <tr>
                   <th>Name</th>
                   <th>Gender</th>
@@ -63,7 +63,7 @@
           <div class="card-body">
             <!-- Second Table -->
             <table class="table table-bordered table-hover">
-              <thead>
+              <thead class="thead-dark">
                 <tr>
                   <th>#</th>
                   <th>State</th>

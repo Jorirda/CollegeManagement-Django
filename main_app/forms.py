@@ -256,10 +256,11 @@ class StudentEditForm(CustomUserForm):
 class TeacherEditForm(CustomUserForm):
     def __init__(self, *args, **kwargs):
         super(TeacherEditForm, self).__init__(*args, **kwargs)
+        self.fields['work_type'].required = False  # Make 'work_type' field optional
 
     class Meta(CustomUserForm.Meta):
         model = Teacher
-        fields = CustomUserForm.Meta.fields
+        fields = CustomUserForm.Meta.fields + ['work_type']  # Add 'work_type' to the fields list
 
 
 class EditResultForm(FormSettings):

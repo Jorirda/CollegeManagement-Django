@@ -85,7 +85,6 @@ def admin_home(request):
     }
     return render(request, 'hod_template/home_content.html', context)
 
-
 def add_teacher(request):
     form = TeacherForm(request.POST or None, request.FILES or None)
     context = {'form': form, 'page_title': 'Add teacher'}
@@ -350,80 +349,6 @@ def add_class_schedule(request):
 
     return render(request, 'hod_template/add_class_schedule_template.html', context)
 
-# def add_student_query(request):
-#     form = StudentQueryForm(request.POST or None)  # Pass request.POST to the form
-#     context = {'form': form, 'page_title': 'Add Student Query'}
-#     if request.method == 'POST':
-#         if form.is_valid():
-#             # Retrieve cleaned data from the form
-#             gender = form.cleaned_data.get('gender')
-#             date_of_birth = form.cleaned_data.get('date_of_birth')
-#             contact_num = form.cleaned_data.get('contact_num')
-#             state = form.cleaned_data.get('state')
-#             status = form.cleaned_data.get('status')
-#             refund = form.cleaned_data.get('refunded')
-#             reg_date = form.cleaned_data.get('reg_date')
-#             num_of_classes = form.cleaned_data.get('num_of_classes')
-#             registered_courses = form.cleaned_data.get('registered_courses')
-#             completed_hours = form.cleaned_data.get('completed_hours')
-#             paid_class_hours = form.cleaned_data.get('paid_class_hours')
-#             remaining_hours = form.cleaned_data.get('remaining_hours')
-#             session = form.cleaned_data.get('session')
-#             date = form.cleaned_data.get('date') 
-#             course = form.cleaned_data.get('course')
-#             teacher = form.cleaned_data.get('teacher')
-#             class_starting_time = form.cleaned_data.get('class_starting_time')
-#             class_ending_time = form.cleaned_data.get('class_ending_time')
-#             class_name = form.cleaned_data.get('class_name')
-
-#             try:
-#                 user = CustomUser.objects.create_user(
-#                     email=email, password=password, user_type=2, first_name=first_name, last_name=last_name, profile_pic=passport_url)
-#                 user.gender = gender
-#                 user.contact_num = contact_num
-#                 user.remark = remark
-#                 user.teacher.course = course
-#                 user.teacher.work_type = work_type
-#                 user.save()
-#                 messages.success(request, "Successfully Added")
-#                 return redirect(reverse('add_teacher'))
-            
-
-#                 # Create a new instance of StudentQuery model and assign cleaned data
-#                 # studentquery = StudentQuery()
-#                 # studentquery.gender = gender
-#                 # studentquery.date_of_birth = date_of_birth
-#                 # studentquery.contact_num = contact_num
-#                 # studentquery.state = state
-#                 # studentquery.status = status
-#                 # studentquery.refunded = refund
-#                 # studentquery.reg_date = reg_date
-#                 # studentquery.num_of_classes = num_of_classes
-#                 # studentquery.registered_courses = registered_courses
-#                 # studentquery.completed_hours = completed_hours
-#                 # studentquery.paid_class_hours = paid_class_hours
-#                 # studentquery.remaining_hours = remaining_hours
-#                 # studentquery.session = session
-#                 # studentquery.date = date
-#                 # studentquery.course = course
-#                 # studentquery.teacher = teacher
-#                 # studentquery.class_starting_time = class_starting_time
-#                 # studentquery.class_ending_time = class_ending_time
-#                 # studentquery.class_name = class_name
-
-#                 # studentquery.save()  # Save the instance to the database
-#                 # messages.success(request, "Successfully Added")
-#                 # return redirect(reverse('add_student_query'))  # Redirect after successful addition
-
-#             except Exception as e:
-#                 messages.error(request, "Could Not Add " + str(e))  # Display error message if something goes wrong
-#         else:
-#             messages.error(request, "Fill Form Properly")  # Display error message if form is not valid
-
-#     return render(request, 'hod_template/add_student_query_template.html', context)
-
-
-
 def manage_teacher(request):
     allteacher = CustomUser.objects.filter(user_type=2)
     total_teacher_count = allteacher.count()
@@ -471,32 +396,6 @@ def manage_payment_record(request):
     }
     return render(request, "hod_template/manage_payment_record.html", context)
 
-# def manage_student_query(request):
-   
-#     if request.method == 'GET' and request.is_ajax():
-#         student_id = request.GET.get('student_id')
-#         student_queries = StudentQuery.objects.filter(admin_id=student_id)
-#         data = []
-#         for query in student_queries:
-#             data.append({
-#                 'gender': query.admin.gender,
-#                 'date_of_birth': query.student.date_of_birth,
-#                 'contact_num': query.admin.contact_num,
-#                 'state': query.student.state,
-#                 'refund': query.refund,
-#                 'reg_date': query.student.reg_date,
-#                 'num_of_classes': query.num_of_classes,
-#                 'registered_courses': query.registered_courses,
-#                 'completed_hours': query.completed_hours,
-#                 'paid_class_hours': query.paid_class_hours,
-#                 'remaining_hours': query.remaining_hours
-#             })
-#         return JsonResponse(data, safe=False)
-#     else:
-#         students = Student.objects.all()
-#         context = {'students': students}
-#         return render(request, 'manage_student_query.html', context)
-
 def manage_learning_record(request):
     learning = LearningRecord.objects.all()
     context = {
@@ -520,62 +419,71 @@ def manage_student_query(request):
     # Get the selected student ID from the form submission
     selected_student_id = request.GET.get('student_id')
 
+    # Initialize the student_query_info list outside the if block
+    student_query_info = []
+
     # If a student is selected, filter student queries by that student
     if selected_student_id:
-        student_query_info = []
         # Retrieve the selected student's queries
         student_queries = StudentQuery.objects.filter(admin_id=selected_student_id)
 
         # Iterate over each student query
         for student_query in student_queries:
-            # Get related student information
-            student_info = {
-            'student_name': student_query.admin.get_full_name(),
-            'gender': student_query.admin.gender,
-            'date_of_birth': student_query.student_records.date_of_birth,
-            'contact_num': student_query.student_records.admin.contact_num,
-            'state': student_query.student_records.state,
-            'payment_status': student_query.payment_records.status,
-            'refunded': student_query.refund,
-            'reg_date': student_query.student_records.reg_date,
-            'num_of_classes': student_query.num_of_classes,
-            'registered_courses': student_query.registered_courses,
-            'completed_hours': student_query.completed_hours,
-            'remaining_hours':student_query.remaining_hours,
-            'paid_class_hours': student_query.paid_class_hours,
-        }
-            # Append student query information to the list
-            student_query_info.append(student_info)
+            # Check if the student_query has an associated payment_records object
+            if student_query.payment_records:
+                # Get related student information
+                student_info = {
+                    'student_name': student_query.admin.get_full_name(),
+                    'gender': student_query.admin.gender,
+                    'date_of_birth': student_query.student_records.date_of_birth,
+                    'contact_num': student_query.student_records.admin.contact_num,
+                    'state': student_query.student_records.state,
+                    'payment_status': student_query.payment_records.status,
+                    'refunded': student_query.refund,
+                    'reg_date': student_query.student_records.reg_date,
+                    'num_of_classes': student_query.num_of_classes,
+                    'registered_courses': student_query.registered_courses,
+                    'completed_hours': student_query.completed_hours,
+                    'remaining_hours': student_query.remaining_hours,
+                    'date': student_query.learning_records.date,
+                    'course': student_query.learning_records.course,
+                    'instructor': student_query.learning_records.teacher,
+                    'start_time': student_query.learning_records.starting_time,
+                    'end_time': student_query.learning_records.end_time,
+                    'class': student_query.learning_records.class_name,
+                }
+                # Append student query information to the list
+                student_query_info.append(student_info)
+
     else:
         # If no student is selected, retrieve all student queries
-        student_query_info = []
         # Iterate over each student query
         for student_query in StudentQuery.objects.all():
-            # Get related student information
-            student_info = {
-            'student_name': student_query.admin.get_full_name(),
-            'gender': student_query.admin.gender,
-            'date_of_birth': student_query.student_records.date_of_birth,
-            'contact_num': student_query.student_records.admin.contact_num,
-            'state': student_query.student_records.state,
-            'payment_status': student_query.payment_records.status,
-            'refunded': student_query.refund,
-            'reg_date': student_query.student_records.reg_date,
-            'num_of_classes': student_query.num_of_classes,
-            'registered_courses': student_query.registered_courses,
-            'completed_hours': student_query.completed_hours,
-            'remaining_hours':student_query.remaining_hours,
-            'paid_class_hours': student_query.paid_class_hours,
-            'date' : student_query.learning_records.date,
-            'course' : student_query.learning_records.course,
-            'instructor' : student_query.learning_records.teacher,
-            'start_time' : student_query.learning_records.starting_time,
-            'end_time' : student_query.learning_records.end_time,
-            'class' : student_query.learning_records.class_name,
-
-        }
-            # Append student query information to the list
-            student_query_info.append(student_info)
+            # Check if the student_query has an associated payment_records object
+            if student_query.payment_records:
+                # Get related student information
+                student_info = {
+                    'student_name': student_query.admin.get_full_name(),
+                    'gender': student_query.admin.gender,
+                    'date_of_birth': student_query.student_records.date_of_birth,
+                    'contact_num': student_query.student_records.admin.contact_num,
+                    'state': student_query.student_records.state,
+                    'payment_status': student_query.payment_records.status,
+                    'refunded': student_query.refund,
+                    'reg_date': student_query.student_records.reg_date,
+                    'num_of_classes': student_query.num_of_classes,
+                    'registered_courses': student_query.registered_courses,
+                    'completed_hours': student_query.completed_hours,
+                    'remaining_hours': student_query.remaining_hours,
+                    'date': student_query.learning_records.date,
+                    'course': student_query.learning_records.course,
+                    'instructor': student_query.learning_records.teacher,
+                    'start_time': student_query.learning_records.starting_time,
+                    'end_time': student_query.learning_records.end_time,
+                    'class': student_query.learning_records.class_name,
+                }
+                # Append student query information to the list
+                student_query_info.append(student_info)
 
     # Prepare the context to pass to the template
     context = {
@@ -586,6 +494,76 @@ def manage_student_query(request):
 
     # Render the template with the context
     return render(request, 'hod_template/manage_student_query.html', context)
+
+def manage_teacher_query(request):
+    # Get all teachers
+    teachers = CustomUser.objects.filter(user_type=2)
+
+    # Get the selected teacher ID from the form submission
+    selected_teacher_id = request.GET.get('teacher_id')
+
+    # Initialize teacher_query_info list
+    teacher_query_info = []
+
+    # If a teacher is selected, filter teacher queries by that teacher
+    if selected_teacher_id:
+        # Retrieve the selected teacher's queries
+        teacher_queries = TeacherQuery.objects.filter(admin_id=selected_teacher_id)
+
+        # Iterate over each teacher query
+        for teacher_query in teacher_queries:
+            # Get related teacher information
+            teacher_info = {
+                'teacher_name': teacher_query.admin.get_full_name(),
+                'gender': teacher_query.admin.gender,
+                'contact_num': teacher_query.teacher_records.admin.contact_num,
+                'address': teacher_query.teacher_records.admin.address,
+                'num_of_classes': teacher_query.num_of_classes,
+                'contract': teacher_query.teacher_records.work_type,
+                'completed_hours': teacher_query.completed_hours,
+                'remaining_hours': teacher_query.remaining_hours,
+                'date': teacher_query.learning_records.date,
+                'course': teacher_query.learning_records.course,
+                'instructor': teacher_query.learning_records.teacher,
+                'start_time': teacher_query.learning_records.starting_time,
+                'end_time': teacher_query.learning_records.end_time,
+                'class': teacher_query.learning_records.class_name,
+            }
+            # Append teacher query information to the list
+            teacher_query_info.append(teacher_info)
+    else:
+        # If no teacher is selected, retrieve all teacher queries
+        # Iterate over each teacher query
+        for teacher_query in TeacherQuery.objects.all():
+            # Get related teacher information
+            teacher_info = {
+                'teacher_name': teacher_query.admin.get_full_name(),
+                'gender': teacher_query.admin.gender,
+                'contact_num': teacher_query.teacher_records.admin.contact_num,
+                'address': teacher_query.teacher_records.admin.address,
+                'num_of_classes': teacher_query.num_of_classes,
+                'contract': teacher_query.teacher_records.work_type,
+                'completed_hours': teacher_query.completed_hours,
+                'remaining_hours': teacher_query.remaining_hours,
+                'date': teacher_query.learning_records.date,
+                'course': teacher_query.learning_records.course,
+                'instructor': teacher_query.learning_records.teacher,
+                'start_time': teacher_query.learning_records.starting_time,
+                'end_time': teacher_query.learning_records.end_time,
+                'class': teacher_query.learning_records.class_name,
+            }
+            # Append teacher query information to the list
+            teacher_query_info.append(teacher_info)
+
+    # Prepare the context to pass to the template
+    context = {
+        'teachers': teachers,
+        'teacher_query_info': teacher_query_info,
+        'page_title': 'Manage Teacher Queries'
+    }
+
+    # Render the template with the context
+    return render(request, 'hod_template/manage_teacher_query.html', context)
 
 def edit_teacher(request, teacher_id):
     teacher = get_object_or_404(Teacher, id=teacher_id)
@@ -610,12 +588,13 @@ def edit_teacher(request, teacher_id):
             remark = form.cleaned_data.get('remark')
             passport = request.FILES.get('profile_pic') or None
             try:
-                user = CustomUser.objects.get(id=teacher.admin.id)
+                # Get the related CustomUser object directly from the teacher's admin attribute
+                user = teacher.admin
                 user.username = username
                 user.email = email
-                if password != None:
+                if password is not None:
                     user.set_password(password)
-                if passport != None:
+                if passport is not None:
                     fs = FileSystemStorage()
                     filename = fs.save(passport.name, passport)
                     passport_url = fs.url(filename)
@@ -635,11 +614,16 @@ def edit_teacher(request, teacher_id):
             except Exception as e:
                 messages.error(request, "Could Not Update " + str(e))
         else:
-            messages.error(request, "Please fil form properly")
+            messages.error(request, "Please fill the form properly")
     else:
-        user = CustomUser.objects.get(id=teacher_id)
-        teacher = Teacher.objects.get(id=user.id)
+        # Handle GET request
+        # Since we're using teacher.admin, we don't need to fetch the CustomUser separately
+        # No need to fetch Teacher object using the user's id either
         return render(request, "hod_template/edit_teacher_template.html", context)
+
+    # This return statement is outside of the else block,
+    # ensuring that it's always reached, regardless of the request method
+    return render(request, "hod_template/edit_teacher_template.html", context)
 
 def edit_student(request, student_id):
     student = get_object_or_404(Student, id=student_id)
@@ -728,7 +712,6 @@ def edit_subject(request, subject_id):
         else:
             messages.error(request, "Fill Form Properly")
     return render(request, 'hod_template/edit_subject_template.html', context)
-
 
 def edit_learn(request, learn_id):
     instance = get_object_or_404(LearningRecord, id=learn_id)
@@ -848,7 +831,6 @@ def edit_session(request, session_id):
     else:
         return render(request, "hod_template/edit_session_template.html", context)
 
-
 @csrf_exempt
 def check_email_availability(request):
     email = request.POST.get("email")
@@ -859,7 +841,6 @@ def check_email_availability(request):
         return HttpResponse(False)
     except Exception as e:
         return HttpResponse(False)
-
 
 @csrf_exempt
 def student_feedback_message(request):
@@ -881,7 +862,6 @@ def student_feedback_message(request):
         except Exception as e:
             return HttpResponse(False)
 
-
 @csrf_exempt
 def teacher_feedback_message(request):
     if request.method != 'POST':
@@ -901,7 +881,6 @@ def teacher_feedback_message(request):
             return HttpResponse(True)
         except Exception as e:
             return HttpResponse(False)
-
 
 @csrf_exempt
 def view_teacher_leave(request):
@@ -927,7 +906,6 @@ def view_teacher_leave(request):
         except Exception as e:
             return False
 
-
 @csrf_exempt
 def view_student_leave(request):
     if request.method != 'POST':
@@ -952,7 +930,6 @@ def view_student_leave(request):
         except Exception as e:
             return False
 
-
 def admin_view_attendance(request):
     subjects = Subject.objects.all()
     sessions = Session.objects.all()
@@ -963,7 +940,6 @@ def admin_view_attendance(request):
     }
 
     return render(request, "hod_template/admin_view_attendance.html", context)
-
 
 @csrf_exempt
 def get_admin_attendance(request):
@@ -987,7 +963,6 @@ def get_admin_attendance(request):
         return JsonResponse(json.dumps(json_data), safe=False)
     except Exception as e:
         return None
-
 
 def admin_view_profile(request):
     admin = get_object_or_404(Admin, admin=request.user)
@@ -1023,7 +998,6 @@ def admin_view_profile(request):
                 request, "Error Occured While Updating Profile " + str(e))
     return render(request, "hod_template/admin_view_profile.html", context)
 
-
 def admin_notify_teacher(request):
     teacher = CustomUser.objects.filter(user_type=2)
     context = {
@@ -1032,7 +1006,6 @@ def admin_notify_teacher(request):
     }
     return render(request, "hod_template/teacher_notification.html", context)
 
-
 def admin_notify_student(request):
     student = CustomUser.objects.filter(user_type=3)
     context = {
@@ -1040,7 +1013,6 @@ def admin_notify_student(request):
         'students': student
     }
     return render(request, "hod_template/student_notification.html", context)
-
 
 @csrf_exempt
 def send_student_notification(request):
@@ -1068,7 +1040,6 @@ def send_student_notification(request):
     except Exception as e:
         return HttpResponse("False")
 
-
 @csrf_exempt
 def send_teacher_notification(request):
     id = request.POST.get('id')
@@ -1095,20 +1066,17 @@ def send_teacher_notification(request):
     except Exception as e:
         return HttpResponse("False")
 
-
 def delete_teacher(request, teacher_id):
     teacher = get_object_or_404(CustomUser, teacher__id=teacher_id)
     teacher.delete()
     messages.success(request, "teacher deleted successfully!")
     return redirect(reverse('manage_teacher'))
 
-
 def delete_student(request, student_id):
     student = get_object_or_404(CustomUser, student__id=student_id)
     student.delete()
     messages.success(request, "Student deleted successfully!")
     return redirect(reverse('manage_student'))
-
 
 def delete_course(request, course_id):
     course = get_object_or_404(Course, id=course_id)
@@ -1119,7 +1087,6 @@ def delete_course(request, course_id):
         messages.error(
             request, "Sorry, some students are assigned to this course already. Kindly change the affected student course and try again")
     return redirect(reverse('manage_course'))
-
 
 def delete_subject(request, subject_id):
     subject = get_object_or_404(Subject, id=subject_id)

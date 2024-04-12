@@ -36,6 +36,7 @@
             <table class="table table-bordered table-hover">
               <thead class="thead-dark">
                 <tr>
+                  <th>Name</th>
                   <th>Gender</th>
                   <th>Date of Birth</th>
                   <th>Contact Number</th>
@@ -47,6 +48,7 @@
               <tbody>
                 {% for query in student_query_info %}
                   <tr>
+                    <td>{{ query.student_name }}</td>
                     <td>{{ query.gender }}</td>
                     <td>{{ query.date_of_birth }}</td>
                     <td>{{ query.contact_num }}</td>

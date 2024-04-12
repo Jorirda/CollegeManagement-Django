@@ -67,6 +67,7 @@ urlpatterns = [
     path("schedule/manage", hod_views.manage_class_schedule, name='manage_class_schedule'),
     
     path("student/query", hod_views.manage_student_query, name = "manage_student_query"),
+    path("teacher/query", hod_views.manage_teacher_query, name = "manage_teacher_query"),
 
     #edit
     path("teacher/edit/<int:teacher_id>", hod_views.edit_teacher, name='edit_teacher'),

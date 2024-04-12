@@ -541,6 +541,7 @@ def manage_student_query(request):
             'num_of_classes': student_query.num_of_classes,
             'registered_courses': student_query.registered_courses,
             'completed_hours': student_query.completed_hours,
+            'remaining_hours':student_query.remaining_hours,
             'paid_class_hours': student_query.paid_class_hours,
         }
             # Append student query information to the list
@@ -563,7 +564,15 @@ def manage_student_query(request):
             'num_of_classes': student_query.num_of_classes,
             'registered_courses': student_query.registered_courses,
             'completed_hours': student_query.completed_hours,
+            'remaining_hours':student_query.remaining_hours,
             'paid_class_hours': student_query.paid_class_hours,
+            'date' : student_query.learning_records.date,
+            'course' : student_query.learning_records.course,
+            'instructor' : student_query.learning_records.teacher,
+            'start_time' : student_query.learning_records.starting_time,
+            'end_time' : student_query.learning_records.end_time,
+            'class' : student_query.learning_records.class_name,
+
         }
             # Append student query information to the list
             student_query_info.append(student_info)

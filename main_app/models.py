@@ -44,7 +44,6 @@ class CustomUser(AbstractUser):
     USER_TYPE = ((1, "HOD"), (2, "Teacher"), (3, "Student"))
     GENDER = [("M", "Male"), ("F", "Female")]
 
-
     username = None  # Removed username, using email instead
     email = models.EmailField(unique=True)
     user_type = models.CharField(default=1, choices=USER_TYPE, max_length=1)
@@ -52,6 +51,10 @@ class CustomUser(AbstractUser):
     profile_pic = models.ImageField()
     address = models.TextField()
     contact_num = models.TextField(default="")
+    home_number = models.TextField(default="")
+    cell_number = models.TextField(default="")
+    school = models.CharField(max_length=100, blank=True)
+    grade = models.CharField(max_length=10, blank=True)
     remark = models.TextField(default="")
     fcm_token = models.TextField(default="")  # For firebase notifications
     created_at = models.DateTimeField(auto_now_add=True)

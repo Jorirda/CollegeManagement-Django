@@ -62,8 +62,14 @@ class CustomUserForm(FormSettings):
 class StudentForm(CustomUserForm):
     date_of_birth = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
     reg_date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
-    state = forms.ChoiceField(choices=[('Currently Learning','Currently Learning'), ('Completed','Completed'), ('Refund', 'Refund')])
+    state = forms.ChoiceField(choices=[('Currently Learning', 'Currently Learning'), ('Completed', 'Completed'), ('Refund', 'Refund')])
     
+    # Include new fields: school, grade, home_number, cell_number
+    school = forms.CharField(max_length=100, required=False)
+    grade = forms.CharField(max_length=10, required=False)
+    home_number = forms.CharField(max_length=20, required=False)
+    cell_number = forms.CharField(max_length=20, required=False)
+
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
         self.fields['remark'] = self.fields.pop('remark')
@@ -71,7 +77,7 @@ class StudentForm(CustomUserForm):
     class Meta(CustomUserForm.Meta):
         model = Student
         fields = CustomUserForm.Meta.fields + \
-            ['course', 'session','date_of_birth','reg_date','state']
+            ['course', 'session', 'date_of_birth', 'reg_date', 'state', 'school', 'grade', 'home_number', 'cell_number']
 
 
 class AdminForm(CustomUserForm):

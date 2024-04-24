@@ -2,6 +2,8 @@ import os
 import random
 import string
 import django
+import csv
+import pandas as pd
 
 # Set up Django settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'college_management_system.settings')
@@ -77,4 +79,31 @@ def write_fake_data_to_database(fake_data):
 fake_data = generate_fake_data(5)
 
 # Write fake data to the database
-write_fake_data_to_database(fake_data)
+# write_fake_data_to_database(fake_data)
+
+def excel_to_csv(excel_file, csv_file):
+    # Read the Excel file into a pandas DataFrame
+    df = pd.read_excel(excel_file)
+
+    # Write the DataFrame to a CSV file
+    df.to_csv(csv_file, index=False)  # Set index=False to exclude row numbers from the CSV
+
+# Specify the paths for your Excel and CSV files
+excel_file = 'C:/Users/total/Desktop/开发计划.xlsx'  # Change this to the path of your Excel file
+csv_file = 'output.csv'    # Change this to the desired path for your CSV file
+
+# Convert Excel to CSV
+excel_to_csv(excel_file, csv_file)
+
+def read_csv_and_display_fields(csv_file):
+    with open(csv_file, 'r', encoding='utf-8') as file:
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            print("Row:")
+            for field, value in row.items():
+                print(f"{field}: {value}")
+            print()  # Add a newline between rows
+
+
+# Assuming your CSV file is named 'data.csv', you can call the function like this:
+read_csv_and_display_fields('output.csv')

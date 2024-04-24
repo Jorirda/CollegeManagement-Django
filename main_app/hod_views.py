@@ -567,62 +567,80 @@ def manage_teacher_query(request):
 
 def edit_teacher(request, teacher_id):
     teacher = get_object_or_404(Teacher, id=teacher_id)
-    form = TeacherEditForm(request.POST or None, instance=teacher)
+    form = TeacherForm(request.POST or None, instance=teacher)
     context = {
         'form': form,
         'teacher_id': teacher_id,
         'page_title': 'Edit teacher'
     }
+
     if request.method == 'POST':
         if form.is_valid():
-            first_name = form.cleaned_data.get('first_name')
-            last_name = form.cleaned_data.get('last_name')
-            address = form.cleaned_data.get('address')
-            contact_num = form.cleaned_data.get('contact_num')
-            username = form.cleaned_data.get('username')
-            email = form.cleaned_data.get('email')
-            gender = form.cleaned_data.get('gender')
-            password = form.cleaned_data.get('password') or None
-            course = form.cleaned_data.get('course')
-            work_type = form.cleaned_data.get('work_type')
-            remark = form.cleaned_data.get('remark')
-            passport = request.FILES.get('profile_pic') or None
+            # Extract cleaned data from the form
+            cleaned_data = form.cleaned_data
+
+            # Extract required data
+            first_name = cleaned_data.get('first_name')
+            last_name = cleaned_data.get('last_name')
+            home_number = cleaned_data.get('home_number')
+            cell_number = cleaned_data.get('cell_number')
+            school = cleaned_data.get('school')
+            address = cleaned_data.get('address')
+            username = cleaned_data.get('username')
+            email = cleaned_data.get('email')
+            gender = cleaned_data.get('gender')
+            password = cleaned_data.get('password') or None
+            course = cleaned_data.get('course')
+            work_type = cleaned_data.get('work_type')
+            remark = cleaned_data.get('remark')
+            passport = request.FILES.get('profile_pic')
+
             try:
                 # Get the related CustomUser object directly from the teacher's admin attribute
                 user = teacher.admin
                 user.username = username
                 user.email = email
+
+                # If password is provided, set it
                 if password is not None:
                     user.set_password(password)
+
+                # If profile pic is provided, save it
                 if passport is not None:
                     fs = FileSystemStorage()
                     filename = fs.save(passport.name, passport)
                     passport_url = fs.url(filename)
                     user.profile_pic = passport_url
+
+                # Update other user details
                 user.first_name = first_name
                 user.last_name = last_name
+                user.home_number = home_number
+                user.cell_number = cell_number
+                user.school = school
                 user.gender = gender
                 user.address = address
-                user.contact_num = contact_num
                 user.remark = remark
+
+                # Update teacher details
                 teacher.course = course
                 teacher.work_type = work_type
+
+                # Save changes
                 user.save()
                 teacher.save()
+
                 messages.success(request, "Successfully Updated")
                 return redirect(reverse('edit_teacher', args=[teacher_id]))
             except Exception as e:
-                messages.error(request, "Could Not Update " + str(e))
+                messages.error(request, "Could Not Update: " + str(e))
         else:
             messages.error(request, "Please fill the form properly")
     else:
-        # Handle GET request
-        # Since we're using teacher.admin, we don't need to fetch the CustomUser separately
-        # No need to fetch Teacher object using the user's id either
+        # For GET request, render the form template
         return render(request, "hod_template/edit_teacher_template.html", context)
 
-    # This return statement is outside of the else block,
-    # ensuring that it's always reached, regardless of the request method
+    # If the request is POST or if there's an error, render the form template with errors
     return render(request, "hod_template/edit_teacher_template.html", context)
 
 def edit_student(request, student_id):
@@ -636,20 +654,21 @@ def edit_student(request, student_id):
     if request.method == 'POST':
         if form.is_valid():
             try:
-                # Retrieve the related Student instance
                 student = form.save(commit=False)
                 user = student.admin
-                # Update the related CustomUser instance
-                user.username = form.cleaned_data.get('username')
                 user.email = form.cleaned_data.get('email')
                 password = form.cleaned_data.get('password')
                 if password:
                     user.set_password(password)
                 user.first_name = form.cleaned_data.get('first_name')
                 user.last_name = form.cleaned_data.get('last_name')
-                user.gender = form.cleaned_data.get('gender')
+                user.gender = form.cleaned_data.get('gender')  # Update gender here
                 user.address = form.cleaned_data.get('address')
-                user.contact_num = form.cleaned_data.get('contact_num')
+                # user.contact_num = form.cleaned_data.get('contact_num')
+                user.home_number = form.cleaned_data.get('home_number')
+                user.cell_number = form.cleaned_data.get('cell_number')
+                user.school = form.cleaned_data.get('school')
+                user.grade = form.cleaned_data.get('grade')
                 user.remark = form.cleaned_data.get('remark')
                 if request.FILES.get('profile_pic'):
                     user.profile_pic = request.FILES.get('profile_pic')

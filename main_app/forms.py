@@ -60,20 +60,31 @@ class CustomUserForm(FormSettings):
 
 
 class StudentForm(CustomUserForm):
-    date_of_birth = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
-    reg_date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
-    state = forms.ChoiceField(choices=[('Currently Learning', 'Currently Learning'), ('Completed', 'Completed'), ('Refund', 'Refund')])
+    date_of_birth = forms.DateField(required=False, label="Date of Birth", widget=forms.DateInput(attrs={'type': 'date'}))
+    reg_date = forms.DateField(required=False, label="Registration Date", widget=forms.DateInput(attrs={'type': 'date'}))
+    state = forms.ChoiceField(choices=[('Currently Learning', 'Currently Learning'), ('Completed', 'Completed'), ('Refund', 'Refund')], label="State")
     
     # Include new fields: school, grade, home_number, cell_number
-    school = forms.CharField(max_length=100, required=False)
-    grade = forms.CharField(max_length=10, required=False)
-    home_number = forms.CharField(max_length=20, required=False)
-    cell_number = forms.CharField(max_length=20, required=False)
+    school = forms.CharField(max_length=100, required=False, label="School")
+    grade = forms.CharField(max_length=10, required=False, label="Grade")
+    home_number = forms.CharField(max_length=20, required=False, label="Home Number")
+    cell_number = forms.CharField(max_length=20, required=False, label="Cell Number")
 
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
         self.fields['remark'] = self.fields.pop('remark')
+        # Hide the contact num field
+        self.fields.pop('contact_num')
         
+        # Reorder fields as requested
+        field_order = ['first_name', 'last_name', 'email', 'home_number', 'cell_number', 
+                       'gender', 'password', 'profile_pic', 'address', 'school', 
+                       'course', 'grade', 'session', 'date_of_birth', 'reg_date', 
+                       'state', 'remark']
+        
+        # Set the field order
+        self.fields = {k: self.fields[k] for k in field_order}
+
     class Meta(CustomUserForm.Meta):
         model = Student
         fields = CustomUserForm.Meta.fields + \
@@ -90,15 +101,31 @@ class AdminForm(CustomUserForm):
 
 
 class TeacherForm(CustomUserForm):
-    work_type = forms.ChoiceField(choices=[('Special Teacher','Special Teacher'), ('Temporary Contract','Temporary Contract')])
-    
+    work_type = forms.ChoiceField(choices=[('Special Teacher', 'Special Teacher'), ('Temporary Contract', 'Temporary Contract')])
+    home_number = forms.CharField(max_length=20, required=False)
+    cell_number = forms.CharField(max_length=20, required=False)
+    school = forms.CharField(max_length=100, required=False)
+
     def __init__(self, *args, **kwargs):
         super(TeacherForm, self).__init__(*args, **kwargs)
         self.fields['remark'] = self.fields.pop('remark')
+        # Hide the contact num field
+        self.fields.pop('contact_num')
         
+        # Reorder fields as requested
+        field_order = ['first_name', 'last_name', 'email', 'home_number', 'cell_number', 
+                       'gender', 'password', 'profile_pic', 'address', 
+                       'work_type', 'remark', 'course', 'school']
+
+        # Set the field order
+        self.fields = {k: self.fields[k] for k in field_order}
+
     class Meta(CustomUserForm.Meta):
         model = Teacher
-        fields =  CustomUserForm.Meta.fields + ['course','work_type']
+        fields = CustomUserForm.Meta.fields + ['course', 'work_type', 'home_number', 'cell_number', 'school']
+
+
+
 
 
 class CourseForm(FormSettings):

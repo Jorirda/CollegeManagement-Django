@@ -92,12 +92,22 @@ class StudentForm(CustomUserForm):
 
 
 class AdminForm(CustomUserForm):
+    contact_num = forms.CharField(max_length=20, required=False)
+    remark = forms.CharField(widget=forms.Textarea, required=False)
+
     def __init__(self, *args, **kwargs):
         super(AdminForm, self).__init__(*args, **kwargs)
 
+        # Reorder fields as requested
+        field_order = ['first_name', 'last_name', 'email', 'gender', 'password', 'profile_pic', 'address', 'contact_num', 'remark']
+
+        # Set the field order
+        self.fields = {k: self.fields[k] for k in field_order}
+
     class Meta(CustomUserForm.Meta):
         model = Admin
-        fields = CustomUserForm.Meta.fields
+        fields = CustomUserForm.Meta.fields + ['contact_num', 'remark']
+
 
 
 class TeacherForm(CustomUserForm):
@@ -123,9 +133,6 @@ class TeacherForm(CustomUserForm):
     class Meta(CustomUserForm.Meta):
         model = Teacher
         fields = CustomUserForm.Meta.fields + ['course', 'work_type', 'home_number', 'cell_number', 'school']
-
-
-
 
 
 class CourseForm(FormSettings):

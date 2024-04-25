@@ -436,7 +436,11 @@ def manage_student_query(request):
                     'student_name': student_query.admin.get_full_name(),
                     'gender': student_query.admin.gender,
                     'date_of_birth': student_query.student_records.date_of_birth,
-                    'contact_num': student_query.student_records.admin.contact_num,
+                    'home_number': student_query.student_records.admin.home_number,
+                    'cell_number': student_query.student_records.admin.cell_number,
+                    'school': student_query.student_records.admin.school,
+                    'grade': student_query.student_records.admin.grade,
+                    # 'contact_num': student_query.student_records.admin.contact_num,
                     'state': student_query.student_records.state,
                     'payment_status': student_query.payment_records.status,
                     'refunded': student_query.refund,
@@ -466,7 +470,11 @@ def manage_student_query(request):
                     'student_name': student_query.admin.get_full_name(),
                     'gender': student_query.admin.gender,
                     'date_of_birth': student_query.student_records.date_of_birth,
-                    'contact_num': student_query.student_records.admin.contact_num,
+                    'home_number': student_query.student_records.admin.home_number,
+                    'cell_number': student_query.student_records.admin.cell_number,
+                    'school': student_query.student_records.admin.school,
+                    'grade': student_query.student_records.admin.grade,
+                    # 'contact_num': student_query.student_records.admin.contact_num,
                     'state': student_query.student_records.state,
                     'payment_status': student_query.payment_records.status,
                     'refunded': student_query.refund,
@@ -564,6 +572,46 @@ def manage_teacher_query(request):
 
     # Render the template with the context
     return render(request, 'hod_template/manage_teacher_query.html', context)
+
+def edit_admin_profile(request):
+    admin = get_object_or_404(Admin, admin=request.user)
+    form = AdminForm(request.POST or None, request.FILES or None, instance=admin)
+    context = {'form': form, 'page_title': 'View/Edit Profile'}
+
+    if request.method == 'POST':
+        if form.is_valid():
+            try:
+                # Save form data
+                admin = form.save(commit=False)
+                admin.admin.email = form.cleaned_data.get('email')
+                admin.admin.first_name = form.cleaned_data.get('first_name')
+                admin.admin.last_name = form.cleaned_data.get('last_name')
+                admin.admin.gender = form.cleaned_data.get('gender')
+                admin.admin.address = form.cleaned_data.get('address')
+                admin.admin.contact_num = form.cleaned_data.get('contact_num')
+                password = form.cleaned_data.get('password')
+                
+                # If password is provided, set it
+                if password:
+                    admin.admin.set_password(password)
+                
+                # Save the CustomUser instance
+                admin.admin.save()
+
+                # Save the Admin instance
+                admin.save()
+
+                # Display success message
+                messages.success(request, "Profile Updated!")
+
+                # Redirect to the profile view page
+                return redirect(reverse('admin_view_profile'))
+            except Exception as e:
+                messages.error(request, f"Error Occurred While Updating Profile: {str(e)}")
+        else:
+            messages.error(request, "Invalid Data Provided")
+
+    return render(request, "hod_template/admin_view_profile.html", context)
 
 def edit_teacher(request, teacher_id):
     teacher = get_object_or_404(Teacher, id=teacher_id)
@@ -674,8 +722,9 @@ def edit_student(request, student_id):
                     user.profile_pic = request.FILES.get('profile_pic')
                 user.save()
                 student.save()
-                messages.success(request, "Successfully Updated")
-                return redirect(reverse('edit_student', args=[student_id]))
+                return redirect(reverse('manage_student'))
+                # messages.success(request, "Successfully Updated")
+                # return redirect(reverse('edit_student', args=[student_id]))
             except Exception as e:
                 messages.error(request, f"Could Not Update: {str(e)}")
         else:
@@ -1016,6 +1065,47 @@ def admin_view_profile(request):
             messages.error(
                 request, "Error Occured While Updating Profile " + str(e))
     return render(request, "hod_template/admin_view_profile.html", context)
+
+# def admin_view_profile(request):
+#     admin = get_object_or_404(Admin, admin=request.user)
+#     form = AdminForm(request.POST or None, request.FILES or None, instance=admin)
+#     context = {'form': form, 'page_title': 'View/Edit Profile'}
+
+#     if request.method == 'POST':
+#         if form.is_valid():
+#             try:
+#                 # Save form data
+#                 admin = form.save(commit=False)
+#                 admin.admin.email = form.cleaned_data.get('email')
+#                 admin.admin.first_name = form.cleaned_data.get('first_name')
+#                 admin.admin.last_name = form.cleaned_data.get('last_name')
+#                 admin.admin.gender = form.cleaned_data.get('gender')
+#                 admin.admin.address = form.cleaned_data.get('address')
+#                 admin.admin.contact_num = form.cleaned_data.get('contact_num')
+#                 password = form.cleaned_data.get('password')
+                
+#                 # If password is provided, set it
+#                 if password:
+#                     admin.admin.set_password(password)
+                
+#                 # Save the CustomUser instance
+#                 admin.admin.save()
+
+#                 # Save the Admin instance
+#                 admin.save()
+
+#                 # Display success message
+#                 messages.success(request, "Profile Updated!")
+
+#                 # Redirect to the profile view page
+#                 return redirect(reverse('admin_view_profile'))
+#             except Exception as e:
+#                 messages.error(request, f"Error Occurred While Updating Profile: {str(e)}")
+#         else:
+#             messages.error(request, "Invalid Data Provided")
+
+#     return render(request, "hod_template/admin_view_profile.html", context)
+
 
 def admin_notify_teacher(request):
     teacher = CustomUser.objects.filter(user_type=2)

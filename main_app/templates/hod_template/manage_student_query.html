@@ -39,7 +39,8 @@
                   <th>Name</th>
                   <th>Gender</th>
                   <th>Date of Birth</th>
-                  <th>Contact Number</th>
+                  <th>Home Number</th>
+                  <th>Cell Number</th>
                   <th>State</th>
                   <th>Payment Status</th>
                   <th>Refunded</th>
@@ -51,7 +52,9 @@
                     <td>{{ query.student_name }}</td>
                     <td>{{ query.gender }}</td>
                     <td>{{ query.date_of_birth }}</td>
-                    <td>{{ query.contact_num }}</td>
+                    <td>{{ query.home_number }}</td>
+                    <td>{{ query.cell_number }}</td>
+                    <!-- <td>{{ query.contact_num }}</td> -->
                     <td>{{ query.state }}</td>
                     <td>{{ query.payment_status }}</td>
                     <td>{{ query.refunded }}</td>
@@ -108,6 +111,8 @@
               <thead class="thead-dark">
                 <tr>
                   <th>Date</th>
+                  <th>School</th>
+                  <th>Grade</th>
                   <th>Course</th>
                   <th>Intructor</th>
                   <th>Start Time</th>
@@ -119,6 +124,8 @@
                 {% for query in student_query_info %}
                   <tr>
                     <td>{{ query.date }}</td>
+                    <td>{{ query.school }}</td>
+                    <td>{{ query.grade }}</td>
                     <td>{{ query.course }}</td>
                     <td>{{ query.instructor }}</td>
                     <td>{{ query.start_time }}</td>

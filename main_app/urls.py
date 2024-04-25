@@ -76,6 +76,7 @@ urlpatterns = [
     path("subject/edit/<int:subject_id>",hod_views.edit_subject, name='edit_subject'),
     path("learn/edit/<int:learn_id>",hod_views.edit_learn, name='edit_learn'),
     path("schedule/edit/<int:schedule_id>",hod_views.edit_class_schedule, name='edit_class_schedule'),
+    path("admin/editprofile", hod_views.edit_admin_profile, name='edit_admin_profile'),
 
     #delete
     path("teacher/delete/<int:teacher_id>",hod_views.delete_teacher, name='delete_teacher'),

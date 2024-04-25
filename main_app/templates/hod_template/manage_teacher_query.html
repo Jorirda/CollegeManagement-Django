@@ -38,11 +38,13 @@
                 <tr>
                     <th>Name</th>
                     <th>Gender</th>
-                    <th>Contact Number</th>
+                    <th>Home Number</th>
+                    <th>Cell Number</th>
+                    <th>Campus</th>
                     <th>Assigned Course</th>
                     <th>Contract</th>
                     <th>Address</th>
-                    <th>Completed Hours</th>
+                   
                 </tr>
               </thead>
               <tbody>
@@ -50,11 +52,13 @@
                   <tr>
                     <td>{{ query.teacher_name }}</td>
                     <td>{{ query.gender }}</td>
-                    <td>{{ query.contact_num }}</td>
+                    <td>{{ query.home_number }}</td>
+                    <td>{{ query.cell_number }}</td>
+                    <td>{{ query.school}}</td>
                     <td>{{ query.course }}</td>
                     <td>{{ query.contract }}</td>
                     <td>{{ query.address }}</td>
-                    <td>{{ query.completed_hours }}</td>
+                   
 
                   </tr>
                 {% endfor %}
@@ -72,6 +76,7 @@
             <table class="table table-bordered table-hover">
               <thead class="thead-dark">
                 <tr>
+                    <th>Completed Hours</th>
                     <th>Number of Classes</th>
                     <th>Date</th>
                     <th>Lecturer</th>
@@ -83,6 +88,7 @@
               <tbody>
                 {% for query in teacher_query_info %}
                   <tr>
+                    <td>{{ query.completed_hours }}</td>
                     <td>{{ query.num_of_classes}}</td>
                     <td>{{ query.date }}</td>
                     <td>{{ query.teacher_name }}</td>

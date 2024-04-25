@@ -53,7 +53,7 @@ class CustomUser(AbstractUser):
     contact_num = models.TextField(default="")
     home_number = models.TextField(default="")
     cell_number = models.TextField(default="")
-    school = models.CharField(max_length=100, blank=True)
+    campus = models.CharField(max_length=100, blank=True)
     grade = models.CharField(max_length=10, blank=True)
     remark = models.TextField(default="")
     fcm_token = models.TextField(default="")  # For firebase notifications

@@ -64,8 +64,8 @@ class StudentForm(CustomUserForm):
     reg_date = forms.DateField(required=False, label="Registration Date", widget=forms.DateInput(attrs={'type': 'date'}))
     state = forms.ChoiceField(choices=[('Currently Learning', 'Currently Learning'), ('Completed', 'Completed'), ('Refund', 'Refund')], label="State")
     
-    # Include new fields: school, grade, home_number, cell_number
-    school = forms.CharField(max_length=100, required=False, label="School")
+    # Include new fields: campus, grade, home_number, cell_number
+    campus = forms.CharField(max_length=100, required=False, label="Campus")
     grade = forms.CharField(max_length=10, required=False, label="Grade")
     home_number = forms.CharField(max_length=20, required=False, label="Home Number")
     cell_number = forms.CharField(max_length=20, required=False, label="Cell Number")
@@ -78,7 +78,7 @@ class StudentForm(CustomUserForm):
         
         # Reorder fields as requested
         field_order = ['first_name', 'last_name', 'email', 'home_number', 'cell_number', 
-                       'gender', 'password', 'profile_pic', 'address', 'school', 
+                       'gender', 'password', 'profile_pic', 'address', 'campus', 
                        'course', 'grade', 'session', 'date_of_birth', 'reg_date', 
                        'state', 'remark']
         
@@ -88,7 +88,7 @@ class StudentForm(CustomUserForm):
     class Meta(CustomUserForm.Meta):
         model = Student
         fields = CustomUserForm.Meta.fields + \
-            ['course', 'session', 'date_of_birth', 'reg_date', 'state', 'school', 'grade', 'home_number', 'cell_number']
+            ['course', 'session', 'date_of_birth', 'reg_date', 'state', 'campus', 'grade', 'home_number', 'cell_number']
 
 
 class AdminForm(CustomUserForm):
@@ -108,13 +108,11 @@ class AdminForm(CustomUserForm):
         model = Admin
         fields = CustomUserForm.Meta.fields + ['contact_num', 'remark']
 
-
-
 class TeacherForm(CustomUserForm):
     work_type = forms.ChoiceField(choices=[('Special Teacher', 'Special Teacher'), ('Temporary Contract', 'Temporary Contract')])
     home_number = forms.CharField(max_length=20, required=False)
     cell_number = forms.CharField(max_length=20, required=False)
-    school = forms.CharField(max_length=100, required=False)
+    campus = forms.CharField(max_length=100, required=False)
 
     def __init__(self, *args, **kwargs):
         super(TeacherForm, self).__init__(*args, **kwargs)
@@ -125,14 +123,14 @@ class TeacherForm(CustomUserForm):
         # Reorder fields as requested
         field_order = ['first_name', 'last_name', 'email', 'home_number', 'cell_number', 
                        'gender', 'password', 'profile_pic', 'address', 
-                       'work_type', 'remark', 'course', 'school']
+                       'work_type', 'remark', 'course', 'campus']
 
         # Set the field order
         self.fields = {k: self.fields[k] for k in field_order}
 
     class Meta(CustomUserForm.Meta):
         model = Teacher
-        fields = CustomUserForm.Meta.fields + ['course', 'work_type', 'home_number', 'cell_number', 'school']
+        fields = CustomUserForm.Meta.fields + ['course', 'work_type', 'home_number', 'cell_number', 'campus']
 
 
 class CourseForm(FormSettings):
@@ -152,9 +150,7 @@ class SubjectForm(FormSettings):
     class Meta:
         model = Subject
         fields = ['name', 'teacher', 'course']
-        
-
-    
+            
 class PaymentRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
     payment_method = forms.ChoiceField(choices=[('WeChat','WeChat'), ('AliPay','AliPay'), ('Bank Card', 'Bank Card'),('Other', 'Other')])
@@ -224,7 +220,6 @@ class StudentQueryForm(FormSettings):
         fields = ['gender', 'date_of_birth', 'contact_num', 'state', 'payment_status', 
                                                'refund_situation', 'reg_date', 'num_classes', 'registered_courses', 'completed_hours', 
                                                'paid_hours', 'remaining_hours', 'course', 'session']
-
 
 
 class SessionForm(FormSettings):

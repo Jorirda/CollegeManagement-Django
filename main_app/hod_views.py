@@ -409,7 +409,7 @@ def manage_subject(request):
 def manage_institution(request):
     institutions = Institution.objects.all()
     context = {
-        'instituions': institutions,
+        'institutions': institutions,
         'page_title': 'Manage Institutions'
     }
     return render(request, "hod_template/manage_institution.html", context)
@@ -788,14 +788,15 @@ def edit_institution(request, institution_id):
         if form.is_valid():
             name = form.cleaned_data.get('name')
             try:
-                institution = Institution()
+                institution = Institution.objects.get(id=institution_id)
                 institution.name = name
                 institution.save()
-                messages.success(request, "Successfully Added")
+                messages.success(request, "Successfully Updated")
             except:
                 messages.error(request, "Could Not Update")
         else:
-             messages.error(request, "Could Not Update")
+            messages.error(request, "Could Not Update")
+
     return render(request, 'hod_template/edit_institution_template.html', context)
 
 def edit_learn(request, learn_id):
@@ -1178,6 +1179,16 @@ def delete_subject(request, subject_id):
     subject.delete()
     messages.success(request, "Subject deleted successfully!")
     return redirect(reverse('manage_subject'))
+
+def delete_institution(request, institution_id):
+    institution = get_object_or_404(Institution, id=institution_id)
+    try:
+        institution.delete()
+        messages.success(request, "Institution deleted successfully!")
+    except Exception:
+        messages.error(
+            request, "Sorry, some records are associated with this institution. Kindly resolve them and try again.")
+    return redirect(reverse('manage_institution'))   
 
 def delete_learning_record(request, learn_id):
     learn = get_object_or_404(LearningRecord, id=learn_id)

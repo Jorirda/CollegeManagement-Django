@@ -151,6 +151,9 @@ class SubjectForm(FormSettings):
         fields = ['name', 'teacher', 'course']
 
 class InstitutionForm(FormSettings):
+    def __init__(self, *args, **kwargs):
+        super(InstitutionForm, self).__init__(*args, **kwargs)
+
     class Meta:
         model = Institution
         fields = ['name']

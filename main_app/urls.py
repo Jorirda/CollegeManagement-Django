@@ -87,6 +87,7 @@ urlpatterns = [
     path("subject/delete/<int:subject_id>",hod_views.delete_subject, name='delete_subject'),
     path("session/delete/<int:session_id>",hod_views.delete_session, name='delete_session'),
     path("student/delete/<int:student_id>",hod_views.delete_student, name='delete_student'),
+    path("institution/delete/<int:institution_id>", hod_views.delete_institution, name='delete_institution'),
     path("learn/delete/<int:learn_id>",hod_views.delete_learning_record, name='delete_learning_record'),
     path("schedule/delete/<int:schedule_id>",hod_views.delete_class_schedule, name='delete_class_schedule'),
 

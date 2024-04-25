@@ -7,9 +7,6 @@ from django.contrib.auth.models import AbstractUser
 from datetime import datetime, timedelta
 
 
-
-
-
 class CustomUserManager(UserManager):
     def _create_user(self, email, password, **extra_fields):
         email = self.normalize_email(email)
@@ -66,7 +63,6 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.last_name + ", " + self.first_name
 
-
 #Institution
 class Institution(models.Model):
     name = models.CharField(max_length=100)
@@ -75,21 +71,12 @@ class Institution(models.Model):
         return self.name
 
 
-class Campus(models.Model):
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-    
-
 class Admin(models.Model):
     admin = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     remark = models.TextField(default="")
 
     def __str__(self):
         return str(self.admin)
-
 
 
 class Course(models.Model):
@@ -103,29 +90,26 @@ class Course(models.Model):
 
 class Student(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='student_institutions')
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     session = models.ForeignKey(Session, on_delete=models.DO_NOTHING, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
     reg_date = models.DateField(blank=True, null=True)
-    state = models.CharField(max_length = 30, blank = True) #learning/completed/pending refund
+    state = models.CharField(max_length=30, blank=True)  # learning/completed/pending refund
 
     def __str__(self):
         return self.admin.last_name + ", " + self.admin.first_name
 
 
 class Teacher(models.Model):
+    institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='teacher_institutions')
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    work_type = models.CharField(max_length = 30, blank = True) #Special/Temporary
+    work_type = models.CharField(max_length=30, blank=True)  # Special/Temporary
 
     def __str__(self):
         return self.admin.last_name + " " + self.admin.first_name
 
-#Class
-# class Class(models.Model):
-#     name = models.CharField(max_length=100)
-#     student = models.ManyToManyField(Student)
-    
     
 class Subject(models.Model):
     name = models.CharField(max_length=120)
@@ -136,8 +120,16 @@ class Subject(models.Model):
 
     def __str__(self):
         return self.name
-
-
+    
+class Campus(models.Model):
+    name = models.CharField(max_length=100)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='campuses')
+    teachers = models.ManyToManyField(Teacher, related_name='campuses')  # Changed to ManyToManyField
+    students = models.ManyToManyField(Student, related_name='campuses')
+    
+    def __str__(self):
+        return self.name
+    
 class Attendance(models.Model):
     session = models.ForeignKey(Session, on_delete=models.DO_NOTHING)
     subject = models.ForeignKey(Subject, on_delete=models.DO_NOTHING)

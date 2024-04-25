@@ -157,6 +157,15 @@ class InstitutionForm(FormSettings):
     class Meta:
         model = Institution
         fields = ['name']
+
+class CampusForm(FormSettings):
+    def __init__(self, *args, **kwargs):
+        super(InstitutionForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = Campus
+        fields = ['name', 'institution', 'teacher']
+
             
 class PaymentRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))

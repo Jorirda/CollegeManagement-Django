@@ -122,10 +122,10 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            {% url 'manage_institution' as manage_institution %}
+                            {% url 'manage_campus' as manage_campus %}
                             {% url 'edit_institution' course_id as edit_institution %}
-                            <a href="{{manage_institution}}"
-                                class="nav-link  {% if edit_course == request.path or manage_institution == request.path %} active {% endif %}">
+                            <a href="{{manage_campus}}"
+                                class="nav-link  {% if edit_course == request.path or manage_campus == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>
                                     Manage Campus

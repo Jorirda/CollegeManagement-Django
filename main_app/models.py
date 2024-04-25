@@ -124,8 +124,7 @@ class Subject(models.Model):
 class Campus(models.Model):
     name = models.CharField(max_length=100)
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='campuses')
-    teachers = models.ManyToManyField(Teacher, related_name='campuses')  # Changed to ManyToManyField
-    students = models.ManyToManyField(Student, related_name='campuses')
+    teacher = models.ForeignKey(Teacher,on_delete=models.CASCADE, related_name='campuses', default="")
     
     def __str__(self):
         return self.name

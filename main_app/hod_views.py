@@ -85,6 +85,21 @@ def admin_home(request):
     }
     return render(request, 'hod_template/home_content.html', context)
 
+def add_session(request):
+    form = SessionForm(request.POST or None)
+    context = {'form': form, 'page_title': 'Add Session'}
+    if request.method == 'POST':
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, "Session Created")
+                return redirect(reverse('add_session'))
+            except Exception as e:
+                messages.error(request, 'Could Not Add ' + str(e))
+        else:
+            messages.error(request, 'Fill Form Properly ')
+    return render(request, "hod_template/add_session_template.html", context)
+
 def add_teacher(request):
     form = TeacherForm(request.POST or None, request.FILES or None)
     context = {'form': form, 'page_title': 'Add teacher'}
@@ -370,6 +385,11 @@ def add_class_schedule(request):
 
     return render(request, 'hod_template/add_class_schedule_template.html', context)
 
+def manage_session(request):
+    sessions = Session.objects.all()
+    context = {'sessions': sessions, 'page_title': 'Manage Sessions'}
+    return render(request, "hod_template/manage_session.html", context)
+
 def manage_teacher(request):
     allteacher = CustomUser.objects.filter(user_type=2)
     total_teacher_count = allteacher.count()
@@ -413,6 +433,15 @@ def manage_institution(request):
         'page_title': 'Manage Institutions'
     }
     return render(request, "hod_template/manage_institution.html", context)
+
+def manage_campus(request):
+    campuses = Campus.objects.all()
+    context = {
+        'campuses': campuses,
+        'page_title': 'Manage Campuses'
+    }
+    return render(request, "hod_template/manage_campus.html", context)
+
 
 def manage_payment_record(request):
     payments = PaymentRecord.objects.all()
@@ -607,6 +636,28 @@ def manage_teacher_query(request):
 
     # Render the template with the context
     return render(request, 'hod_template/manage_teacher_query.html', context)
+
+def edit_session(request, session_id):
+    instance = get_object_or_404(Session, id=session_id)
+    form = SessionForm(request.POST or None, instance=instance)
+    context = {'form': form, 'session_id': session_id,
+               'page_title': 'Edit Session'}
+    if request.method == 'POST':
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, "Session Updated")
+                return redirect(reverse('edit_session', args=[session_id]))
+            except Exception as e:
+                messages.error(
+                    request, "Session Could Not Be Updated " + str(e))
+                return render(request, "hod_template/edit_session_template.html", context)
+        else:
+            messages.error(request, "Invalid Form Submitted ")
+            return render(request, "hod_template/edit_session_template.html", context)
+
+    else:
+        return render(request, "hod_template/edit_session_template.html", context)
 
 def edit_teacher(request, teacher_id):
     teacher = get_object_or_404(Teacher, id=teacher_id)
@@ -874,48 +925,6 @@ def edit_class_schedule(request, schedule_id):
         else:
             messages.error(request, "Fill Form Properly")
     return render(request, 'hod_template/edit_class_schedule_template.html', context)
-
-def add_session(request):
-    form = SessionForm(request.POST or None)
-    context = {'form': form, 'page_title': 'Add Session'}
-    if request.method == 'POST':
-        if form.is_valid():
-            try:
-                form.save()
-                messages.success(request, "Session Created")
-                return redirect(reverse('add_session'))
-            except Exception as e:
-                messages.error(request, 'Could Not Add ' + str(e))
-        else:
-            messages.error(request, 'Fill Form Properly ')
-    return render(request, "hod_template/add_session_template.html", context)
-
-def manage_session(request):
-    sessions = Session.objects.all()
-    context = {'sessions': sessions, 'page_title': 'Manage Sessions'}
-    return render(request, "hod_template/manage_session.html", context)
-
-def edit_session(request, session_id):
-    instance = get_object_or_404(Session, id=session_id)
-    form = SessionForm(request.POST or None, instance=instance)
-    context = {'form': form, 'session_id': session_id,
-               'page_title': 'Edit Session'}
-    if request.method == 'POST':
-        if form.is_valid():
-            try:
-                form.save()
-                messages.success(request, "Session Updated")
-                return redirect(reverse('edit_session', args=[session_id]))
-            except Exception as e:
-                messages.error(
-                    request, "Session Could Not Be Updated " + str(e))
-                return render(request, "hod_template/edit_session_template.html", context)
-        else:
-            messages.error(request, "Invalid Form Submitted ")
-            return render(request, "hod_template/edit_session_template.html", context)
-
-    else:
-        return render(request, "hod_template/edit_session_template.html", context)
 
 @csrf_exempt
 def check_email_availability(request):

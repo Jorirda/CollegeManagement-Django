@@ -1,3 +1,4 @@
+from gettext import translation
 import json
 import requests
 from django.contrib import messages
@@ -5,11 +6,20 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.decorators.csrf import csrf_exempt
-
 from .EmailBackend import EmailBackend
-from .models import Attendance, Session, Subject 
+from .models import Attendance, Session, Subject
+from django.utils.translation import activate
+from gettext import translation
 # Create your views here.
 
+def set_language(request):
+    language = request.GET.get('language')
+    if language:
+        activate(language)
+        # Optionally, you can store the selected language in the session
+        request.session['django_language'] = language
+    # Redirect back to the previous page or any desired page
+    return redirect(request.GET.get('next', '/'))
 
 def login_page(request):
     if request.user.is_authenticated:

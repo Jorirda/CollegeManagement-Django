@@ -3,6 +3,8 @@ from django.forms.widgets import DateInput, TextInput
 
 from .models import *
 
+class ExcelUploadForm(forms.Form):
+    excel_file = forms.FileField()
 
 class FormSettings(forms.ModelForm):
     def __init__(self, *args, **kwargs):

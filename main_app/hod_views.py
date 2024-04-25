@@ -1,5 +1,7 @@
+import io
 import json
 import requests
+import pandas as pd
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse, JsonResponse
@@ -12,6 +14,34 @@ from django.views.generic import UpdateView
 from django.db.models import Sum
 from .forms import *
 from .models import *
+from .forms import ExcelUploadForm
+
+
+
+
+def get_result(excel_file):
+    # Read the Excel file into a pandas DataFrame
+    df = pd.read_excel(excel_file)
+
+    # Convert DataFrame to CSV string
+    csv_data = df.to_csv(index=False)
+
+    return csv_data
+
+
+
+def get_upload(request):
+    if request.method == 'POST':
+        form = ExcelUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            excel_file = request.FILES['excel_file']
+            # Process the Excel file using the get_result function
+            csv_data = get_result(excel_file)
+            # Render the result
+            return render(request, 'hod_template/result.html', {'csv_data': csv_data})
+    else:
+        form = ExcelUploadForm()
+    return render(request, 'hod_template/upload.html', {'form': form})
 
 
 def admin_home(request):

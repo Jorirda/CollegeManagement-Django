@@ -61,6 +61,9 @@ MIDDLEWARE = [
 
     # My Middleware
     'main_app.middleware.LoginCheckMiddleWare',
+    
+    #locale middlware
+    'django.middleware.locale.LocaleMiddleware'
 ]
 
 ROOT_URLCONF = 'college_management_system.urls'
@@ -137,6 +140,15 @@ USE_L10N = True
 
 USE_TZ = True
 
+LANGUAGES = [
+    ('en', 'English'),
+    ('es', 'Spanish'),
+    ('zn', 'Chinese'),
+]
+
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale'),  # Path to your locale files
+]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/

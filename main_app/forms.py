@@ -141,7 +141,6 @@ class CourseForm(FormSettings):
         fields = ['name']
         model = Course
 
-
 class SubjectForm(FormSettings):
 
     def __init__(self, *args, **kwargs):
@@ -150,6 +149,11 @@ class SubjectForm(FormSettings):
     class Meta:
         model = Subject
         fields = ['name', 'teacher', 'course']
+
+class InstitutionForm(FormSettings):
+    class Meta:
+        model = Institution
+        fields = ['name']
             
 class PaymentRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))

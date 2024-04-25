@@ -69,15 +69,18 @@ class CustomUser(AbstractUser):
 
 #Institution
 class Institution(models.Model):
-    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
 
-#Campus
+
 class Campus(models.Model):
-    id = models.AutoField(primary_key=True)
-    institution = models.ForeignKey('Institution', on_delete=models.CASCADE)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
     
 
 class Admin(models.Model):

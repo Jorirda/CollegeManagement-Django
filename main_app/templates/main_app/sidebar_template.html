@@ -12,8 +12,8 @@
     <a href="{% url 'admin_view_profile' %}" class="brand-link">
         <!-- <img src="{% static 'dist/img/cmsl.png' %} " alt="AdminLTE Logo"
             class="brand-image img-circle elevation-3" > -->
-        <img src="/media/6dbf7e8c2d3882fbf24375a09fa2540c.jpg" alt="Brand Logo"
-            class="brand-image img-circle elevation-3" >
+        <img src="/media/6dbf7e8c2d3882fbf24375a09fa2540c.jpg" alt="User Image"
+            class="brand-image img-circle elevation-3 d-block" >
         <span class="brand-text font-weight-dark">
             {% if user.is_authenticated %}
                 {{ user.first_name }} {{ user.last_name }}
@@ -65,7 +65,42 @@
                         </p>
                     </a>
                 </li> -->
-                
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-university"></i>
+                        <p>
+                            Institution
+                            <i class="fas fa-angle-right right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            {% url 'add_course' as add_course %}
+                            <a href="{{add_course}}"
+                                class="nav-link  {% if add_course == request.path %} active {% endif %}">
+                                <i class="nav-icon fas fa-plus-circle"></i>
+                                <p>
+                                    Add institution
+
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            {% url 'manage_institution' as manage_institution %}
+                            {% url 'edit_course' course_id as edit_course %}
+                            <a href="{{manage_institution}}"
+                                class="nav-link  {% if edit_course == request.path or manage_institution == request.path %} active {% endif %}">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>
+                                    Manage Institution
+
+                                </p>
+                            </a>
+                        </li>
+
+
+                    </ul>
+                </li>
 
 
                 <li class="nav-item has-treeview">

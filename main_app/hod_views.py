@@ -218,6 +218,17 @@ def add_subject(request):
 
     return render(request, 'hod_template/add_subject_template.html', context)
 
+def add_institution(request):
+    form = InstitutionForm(request.POST or None)
+    context = {
+        'form': form,
+        'page_title': 'Add Institution'
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            name = form.cleaned_data.get('name')
+            
+
 def add_payment_record(request):
     form = PaymentRecordForm(request.POST or None)
     
@@ -384,6 +395,14 @@ def manage_subject(request):
         'page_title': 'Manage Subjects'
     }
     return render(request, "hod_template/manage_subject.html", context)
+
+def manage_institution(request):
+    institutions = Institution.objects.all()
+    context = {
+        'instituions': institutions,
+        'page_title': 'Manage Institutions'
+    }
+    return render(request, "hod_template/manage_institution.html", context)
 
 def manage_payment_record(request):
     payments = PaymentRecord.objects.all()

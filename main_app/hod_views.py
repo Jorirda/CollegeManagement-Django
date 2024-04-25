@@ -227,7 +227,17 @@ def add_institution(request):
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
-            
+            try:
+                institution = Institution()
+                institution.name = name
+                institution.save()
+                messages.success(request, "Successfully Added")
+                return redirect(reverse('add_institution'))
+            except:
+                messages.error(request, "Could Not Add")
+        else:
+            messages.error(request, "Could Not Add")
+    return render(request, 'hod_template/add_institution_template.html', context)
 
 def add_payment_record(request):
     form = PaymentRecordForm(request.POST or None)
@@ -765,6 +775,28 @@ def edit_subject(request, subject_id):
         else:
             messages.error(request, "Fill Form Properly")
     return render(request, 'hod_template/edit_subject_template.html', context)
+
+def edit_institution(request, institution_id):
+    instance = get_object_or_404(Institution, id=institution_id)
+    form = InstitutionForm(request.POST or None, instance=instance)
+    context = {
+        'form': form,
+        'institution_id': institution_id,
+        'page_title': 'Edit Institution'
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            name = form.cleaned_data.get('name')
+            try:
+                institution = Institution()
+                institution.name = name
+                institution.save()
+                messages.success(request, "Successfully Added")
+            except:
+                messages.error(request, "Could Not Update")
+        else:
+             messages.error(request, "Could Not Update")
+    return render(request, 'hod_template/edit_institution_template.html', context)
 
 def edit_learn(request, learn_id):
     instance = get_object_or_404(LearningRecord, id=learn_id)

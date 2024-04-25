@@ -75,9 +75,9 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            {% url 'add_course' as add_course %}
-                            <a href="{{add_course}}"
-                                class="nav-link  {% if add_course == request.path %} active {% endif %}">
+                            {% url 'add_institution' as add_institution %}
+                            <a href="{{add_institution}}"
+                                class="nav-link  {% if add_institution == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>
                                     Add institution

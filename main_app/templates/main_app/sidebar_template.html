@@ -111,8 +111,8 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            {% url 'add_institution' as add_institution %}
-                            <a href="{{add_institution}}"
+                            {% url 'add_campus' as add_campus %}
+                            <a href="{{add_campus}}"
                                 class="nav-link  {% if add_institution == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>

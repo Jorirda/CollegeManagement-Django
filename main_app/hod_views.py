@@ -254,6 +254,37 @@ def add_institution(request):
             messages.error(request, "Could Not Add")
     return render(request, 'hod_template/add_institution_template.html', context)
 
+def add_campus(request):
+    form = CampusForm(request.POST or None)
+    context = {
+        'form': form,
+        'page_title': 'Add Campus'
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            name = form.cleaned_data.get('name')
+            institution = form.cleaned_data.get('institution')
+            teacher = form.cleaned_data.get('teacher')
+            student = form.cleaned_data.get('student')
+            try:
+                campus = Campus()
+                campus.name = name
+                campus.institution = institution
+                campus.teacher = teacher
+                campus.student = student
+                campus.save()
+                messages.success(request, "Successfully Added")
+                return redirect(reverse('add_campus'))
+
+            except Exception as e:
+                messages.error(request, "Could Not Add " + str(e))
+        else:
+            messages.error(request, "Fill Form Properly")
+
+    return render(request, 'hod_template/add_campus_template.html', context)
+
+
+
 def add_payment_record(request):
     form = PaymentRecordForm(request.POST or None)
     

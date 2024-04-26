@@ -160,11 +160,11 @@ class InstitutionForm(FormSettings):
 
 class CampusForm(FormSettings):
     def __init__(self, *args, **kwargs):
-        super(InstitutionForm, self).__init__(*args, **kwargs)
+        super(CampusForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = Campus
-        fields = ['name', 'institution', 'teacher']
+        fields = ['name', 'institution', 'teacher', 'student']
 
             
 class PaymentRecordForm(FormSettings):

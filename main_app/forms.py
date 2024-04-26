@@ -7,9 +7,11 @@ from .models import *
 class FormSettings(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(FormSettings, self).__init__(*args, **kwargs)
-        # Here make some changes such as:
         for field in self.visible_fields():
-            field.field.widget.attrs['class'] = 'form-control'
+            if isinstance(field.field.widget, forms.CheckboxSelectMultiple):
+                field.field.widget.attrs['class'] = 'form-check-input'
+            else:
+                field.field.widget.attrs['class'] = 'form-control'
 
 
 class CustomUserForm(FormSettings):
@@ -158,13 +160,13 @@ class InstitutionForm(FormSettings):
         model = Institution
         fields = ['name']
 
-class CampusForm(FormSettings):
-    def __init__(self, *args, **kwargs):
-        super(CampusForm, self).__init__(*args, **kwargs)
-
+class CampusForm(forms.ModelForm):
     class Meta:
         model = Campus
-        fields = ['name', 'institution', 'teacher', 'student', 'courses']
+        fields = ['name', 'institution', 'teacher', 'student']
+        widgets = {
+            'teacher': forms.CheckboxSelectMultiple()
+        }
 
             
 class PaymentRecordForm(FormSettings):

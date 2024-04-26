@@ -124,12 +124,12 @@ class Subject(models.Model):
 class Campus(models.Model):
     name = models.CharField(max_length=100)
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='campuses')
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='campuses', default="")
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='campuses', default="")
-    courses = models.ManyToManyField(Course, related_name='campuses', default="")
+    teacher = models.ManyToManyField(Teacher, related_name='campuses')
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='campuses', null=True, blank=True)
 
     def __str__(self):
         return self.name
+
     
 class Attendance(models.Model):
     session = models.ForeignKey(Session, on_delete=models.DO_NOTHING)

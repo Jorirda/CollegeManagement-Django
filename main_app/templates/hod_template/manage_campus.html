@@ -31,12 +31,8 @@
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ campus.name }}</td>
                                     <td>{{ campus.institution.name }}</td>
-                                    <td>{% for teacher in campus.teachers.all %}
-                                            {{ teacher.admin }}
-                                            {% if not forloop.last %}, {% endif %}
-                                        {% endfor %}
-                                    </td>
-                                    <td>{{ campus.student.admin }}</td>
+                                    <td>{{ campus.teacher.admin }} </td>
+                                    <td>{{ campus.student.admin }} </td>
                                    
                                     <td>
                                         <a href="{% url 'edit_campus' campus.id %}" class="btn btn-info">Edit</a> -

@@ -86,21 +86,19 @@ class StudentForm(CustomUserForm):
 
 
 class AdminForm(CustomUserForm):
-    contact_num = forms.CharField(max_length=20, required=False)
-    remark = forms.CharField(widget=forms.Textarea, required=False)
-
     def __init__(self, *args, **kwargs):
         super(AdminForm, self).__init__(*args, **kwargs)
 
         # Reorder fields as requested
-        field_order = ['first_name', 'last_name', 'email', 'gender', 'password', 'profile_pic', 'address', 'contact_num', 'remark']
+        field_order = ['first_name', 'last_name', 'email', 'gender', 'password', 'profile_pic']
 
         # Set the field order
         self.fields = {k: self.fields[k] for k in field_order}
 
     class Meta(CustomUserForm.Meta):
         model = Admin
-        fields = CustomUserForm.Meta.fields + ['contact_num', 'remark']
+        fields = CustomUserForm.Meta.fields
+
 
 class TeacherForm(CustomUserForm):
     work_type = forms.ChoiceField(choices=[('Special Teacher', 'Special Teacher'), ('Temporary Contract', 'Temporary Contract')])

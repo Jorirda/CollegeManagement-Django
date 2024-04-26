@@ -1,6 +1,7 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+{% load i18n %}
+{% block page_title %}{% trans page_title %}{% endblock page_title %}
 
 {% block content %}
 
@@ -10,7 +11,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
+                        <h3 class="card-title">{% trans page_title %}</h3>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
@@ -18,29 +19,28 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th>#</th>
-                                    <th>Course Title</th>
-                                    <th>Lesson Unit Price</th>
-                                    <th>Teacher</th>
-                                    <th>Subject</th>
-                                    <th>Class Time</th>
-                                    <th>Remark</th>
-                                    <th>Actions</th>
+                                    <th>{% trans 'Course Title' %}</th>
+                                    <th>{% trans 'Lesson Unit Price' %}</th>
+                                    <th>{% trans 'Teacher' %}</th>
+                                    <th>{% trans 'Subject' %}</th>
+                                    <th>{% trans 'Class Time' %}</th>
+                                    <th>{% trans 'Remark' %}</th>
+                                    <th>{% trans 'Actions' %}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for class in class_schedules %}
+                                {% for class_schedule in class_schedules %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{class.course}}</td>
-                                    <td>¥{{class.lesson_unit_price}}</td>
-                                    <td>{{class.teacher}}</td>
-                                    <td>{{class.subject}}</td>
-                                    <td>{{class.class_time}}</td>
-                                    <td>{{class.remark}}</td>
+                                    <td>{{ class_schedule.course }}</td>
+                                    <td>¥{{ class_schedule.lesson_unit_price }}</td>
+                                    <td>{{ class_schedule.teacher }}</td>
+                                    <td>{{ class_schedule.subject }}</td>
+                                    <td>{{ class_schedule.class_time }}</td>
+                                    <td>{{ class_schedule.remark }}</td>
                                     <td>
-                                        <a href="{% url 'edit_class_schedule' class.id %}" class="btn btn-info">Edit</a> - 
-                                        <a href="{% url 'delete_class_schedule' class.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
-                                    
+                                        <a href="{% url 'edit_class_schedule' class_schedule.id %}" class="btn btn-info">{% trans 'Edit' %}</a> - 
+                                        <a href="{% url 'delete_class_schedule' class_schedule.id %}" class="btn btn-danger" onclick="return confirm('{% trans 'Are you sure about this?' %}')">{% trans 'Delete' %}</a>
                                     </td> 
                                 </tr>
                                 {% endfor %}

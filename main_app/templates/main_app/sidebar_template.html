@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <aside class="main-sidebar sidebar-dark-info elevation-4">
     {% if request.user.user_type == '1' %}
     <!-- Brand Logo -->
@@ -34,8 +35,7 @@
                     <a href="{{admin_home}}" class="nav-link {% if admin_home == request.path %} active {% endif %}">
                         <i class="nav-icon fas fa-home"></i>
                         <p>
-                            Home
-
+                            {% trans "Home" %}
                         </p>
                     </a>
                 </li>
@@ -45,8 +45,7 @@
                         class="nav-link {% if admin_view_profile == request.path %} active {% endif %}">
                         <i class="nav-icon fas fa-address-card"></i>
                         <p>
-                            Update Profile
-
+                            {% trans "Update Profile" %}
                         </p>
                     </a>
                 </li>
@@ -57,7 +56,7 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-bookmark"></i>
                         <p>
-                            Course
+                            {% trans "Course" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
@@ -68,7 +67,7 @@
                                 class="nav-link  {% if add_course == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>
-                                    Add Course
+                                    {% trans "Add Course" %}
 
                                 </p>
                             </a>
@@ -80,7 +79,7 @@
                                 class="nav-link  {% if edit_course == request.path or manage_course == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>
-                                    Manage Course
+                                    {% trans "Manage Course" %}
 
                                 </p>
                             </a>
@@ -95,7 +94,7 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-book"></i>
                         <p>
-                            Subject
+                            {% trans "Subject" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
@@ -106,7 +105,7 @@
                                 class="nav-link  {% if add_subject == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>
-                                    Add Subject
+                                    {% trans "Add Subject" %}
 
                                 </p>
                             </a>
@@ -118,7 +117,7 @@
                                 class="nav-link  {% if edit_subject == request.path or manage_subject == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>
-                                    Manage Subject
+                                    {% trans "Manage Subject" %}
 
                                 </p>
                             </a>
@@ -135,7 +134,7 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-clock"></i>
                         <p>
-                            Session
+                            {% trans "Session" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
@@ -147,7 +146,7 @@
                                 class="nav-link  {% if add_session == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>
-                                    Add Session
+                                    {% trans "Add Session" %}
 
                                 </p>
                             </a>
@@ -159,7 +158,7 @@
                                 class="nav-link  {% if edit_session == request.path or manage_session == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>
-                                    Manage Session
+                                    {% trans "Manage Session" %}
 
                                 </p>
                             </a>
@@ -172,7 +171,7 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
                         <p>
-                            Teacher
+                            {% trans "Teacher" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
@@ -183,7 +182,7 @@
                             <a href="{{add_teacher}}" class="nav-link {% if add_teacher == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>
-                                    Add Teacher
+                                    {% trans "Add Teacher" %}
         
                                 </p>
                             </a>
@@ -195,7 +194,7 @@
                                 class="nav-link {% if manage_teacher == request.path or request.path == edit_teacher %} active {% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>
-                                    Manage Teacher
+                                    {% trans "Manage Teacher" %}
         
                                 </p>
                             </a>
@@ -208,7 +207,7 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-user"></i>
                         <p>
-                            Student
+                            {% trans "Student" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
@@ -219,7 +218,7 @@
                             <a href="{{add_student}}" class="nav-link  {% if add_student == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>
-                                    Add Student
+                                    {% trans "Add Student" %}
         
                                 </p>
                             </a>
@@ -233,7 +232,7 @@
                                 class="nav-link  {% if edit_student == request.path or manage_student == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>
-                                    Manage Student
+                                    {% trans "Manage Student" %}
         
                                 </p>
                             </a>
@@ -245,7 +244,7 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-yen-sign"></i>
                         <p>
-                            Payment Record
+                            {% trans "Payment Record" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
@@ -256,7 +255,7 @@
                             <a href="{{add_payment_record}}" class="nav-link  {% if add_payment_recordt == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>
-                                    Add Payment
+                                    {% trans "Add Payment" %}
         
                                 </p>
                             </a>
@@ -269,7 +268,7 @@
                                 class="nav-link  {% if manage_payment_record == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-receipt"></i>
                                 <p>
-                                    Manage Payment
+                                    {% trans "Manage Payment" %}
         
                                 </p>
                             </a>
@@ -282,7 +281,7 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-bullhorn"></i>
                         <p>
-                            Notify
+                            {% trans "Notify" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
@@ -294,7 +293,7 @@
                                 class="nav-link {% if admin_notify_teacher == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-bullhorn"></i>
                                 <p>
-                                    Notify Teacher
+                                    {% trans "Notify Teacher" %}
 
                                 </p>
                             </a>
@@ -305,7 +304,7 @@
                                 class="nav-link {% if admin_notify_student == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-bullhorn"></i>
                                 <p>
-                                    Notify Student
+                                    {% trans "Notify Student" %}
 
                                 </p>
                             </a>
@@ -318,7 +317,7 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-pencil-ruler"></i>
                         <p>
-                            Learning Record
+                            {% trans "Learning Record" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
@@ -330,7 +329,7 @@
                                 class="nav-link {% if add_learning_record == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>
-                                    Add Learning Record
+                                    {% trans "Add Learning Record" %}
 
                                 </p>
                             </a>
@@ -341,7 +340,7 @@
                                 class="nav-link {% if manage_learning_record == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>
-                                    Manage Learning Record
+                                    {% trans "Manage Learning Record" %}
 
                                 </p>
                             </a>
@@ -355,7 +354,7 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-calendar-alt"></i>
                         <p>
-                            Schedule
+                            {% trans "Schedule" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
@@ -368,7 +367,7 @@
                                     class="nav-link  {% if add_class_schedule == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>
-                                    Add Schedule
+                                    {% trans "Add Schedule" %}
                                 </p>
                             </a>
                         </li>
@@ -382,7 +381,7 @@
                                 class="nav-link  {% if manage_class_schedule == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>
-                                    Manage Schedule
+                                    {% trans "Manage Schedule" %}
                                 </p>
                             </a>
                         </li>
@@ -395,7 +394,7 @@
                                 class="nav-link  {% if admin_view_attendance == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-calendar-alt"></i>
                                 <p>
-                                    View Attendance
+                                    {% trans "View Attendance" %}
                                 </p>
                             </a>
                         </li>
@@ -406,7 +405,7 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-question"></i>
                         <p>
-                            Queries
+                            {% trans "Queries" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
@@ -421,7 +420,7 @@
                                     class="nav-link  {% if manage_student_query == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-address-card"></i>
                                 <p>
-                                    Student Queries
+                                    {% trans "Student Queries" %}
                                 </p>
                             </a>
                         </li>
@@ -435,7 +434,7 @@
                                 class="nav-link  {% if manage_class_schedule == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-address-card"></i>
                                 <p>
-                                    Teacher Queries
+                                    {% trans "Teacher Queries" %}
                                 </p>
                             </a>
                         </li>
@@ -447,7 +446,7 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-comment-alt"></i>
                         <p>
-                            Feedback
+                            {% trans "Feedback" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
@@ -460,7 +459,7 @@
                                 class="nav-link  {% if student_feedback_message == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-comment-alt"></i>
                                 <p>
-                                    Student Feedback
+                                    {% trans "Student Feedback" %}
 
                                 </p>
                             </a>
@@ -472,7 +471,7 @@
                                 class="nav-link   {% if teacher_feedback_message == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-comment"></i>
                                 <p>
-                                    Teacher Feedback
+                                    {% trans "Teacher Feedback" %}
 
                                 </p>
                             </a>
@@ -485,7 +484,7 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-door-open "></i>
                         <p>
-                            Ask for Leave
+                            {% trans "Ask for Leave" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
@@ -498,7 +497,7 @@
                                 class="nav-link  {% if view_teacher_leave == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-check-double"></i>
                                 <p>
-                                    Teacher Leave
+                                    {% trans "Teacher Leave" %}
         
                                 </p>
                             </a>
@@ -510,7 +509,7 @@
                                 class="nav-link  {% if view_student_leave == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-check-double"></i>
                                 <p>
-                                    Student Leave
+                                    {% trans "Student Leave" %}
         
                                 </p>
                             </a>
@@ -551,7 +550,7 @@
                                     class="nav-link {% if teacher_home == request.path %} active {% endif %}">
                                     <i class="nav-icon fas fa-home"></i>
                                     <p>
-                                        Home
+                                        {% trans "Home" %}
 
                                     </p>
                                 </a>
@@ -563,7 +562,7 @@
                                     class="nav-link {% if teacher_view_profile == request.path %} active {% endif %}">
                                     <i class="nav-icon fas fa-address-card"></i>
                                     <p>
-                                        Update Profile
+                                        {% trans "Update Profile" %}
 
                                     </p>
                                 </a>
@@ -575,7 +574,7 @@
                                     class="nav-link {% if teacher_add_result == request.path %} active {% endif %}">
                                     <i class="nav-icon fas fa-poll"></i>
                                     <p>
-                                        Add Result
+                                        {% trans "Add Result" %}
 
                                     </p>
                                 </a>
@@ -586,7 +585,7 @@
                                     class="nav-link {% if edit_student_result == request.path %} active {% endif %}">
                                     <i class="nav-icon fas fa-th"></i>
                                     <p>
-                                        Edit Result
+                                        {% trans "Edit Result" %}
 
                                     </p>
                                 </a>
@@ -597,7 +596,7 @@
                                     class="nav-link {% if teacher_take_attendance == request.path %} active {% endif %}">
                                     <i class="nav-icon fas fa-calendar-alt"></i>
                                     <p>
-                                        Take Attendance
+                                        {% trans "Take Attendance" %}
 
                                     </p>
                                 </a>
@@ -608,7 +607,7 @@
                                     class="nav-link {% if teacher_update_attendance == request.path %} active {% endif %}">
                                     <i class="nav-icon fas fa-th"></i>
                                     <p>
-                                        View/Update Attendance
+                                        {% trans "View/Update Attendance" %}
 
                                     </p>
                                 </a>
@@ -619,7 +618,7 @@
                                     class="nav-link {% if teacher_view_notification == request.path %} active {% endif %}">
                                     <i class="nav-icon fas fa-bell"></i>
                                     <p>
-                                        View Notifications
+                                        {% trans "View Notifications" %}
 
                                     </p>
                                 </a>
@@ -631,7 +630,7 @@
                                     class="nav-link {% if teacher_apply_leave == request.path %} active {% endif %}">
                                     <i class="nav-icon fas fa-check"></i>
                                     <p>
-                                        Apply For Leave
+                                        {% trans "Apply For Leave" %}
 
                                     </p>
                                 </a>
@@ -643,7 +642,7 @@
                                     class="nav-link {% if teacher_feedback == request.path %} active {% endif %}">
                                     <i class="nav-icon fas fa-comment-alt"></i>
                                     <p>
-                                        Feedback
+                                        {% trans "Feedback" %}
 
                                     </p>
                                 </a>
@@ -682,7 +681,7 @@
                                                 class="nav-link {% if student_home == request.path %} active {% endif %}">
                                                 <i class="nav-icon fas fa-home"></i>
                                                 <p>
-                                                    Home
+                                                    {% trans "Home" %}
 
                                                 </p>
                                             </a>
@@ -694,7 +693,7 @@
                                                 class="nav-link {% if student_view_profile == request.path %} active {% endif %}">
                                                 <i class="nav-icon fas fa-address-card"></i>
                                                 <p>
-                                                    Update Profile
+                                                    {% trans "Update Profile" %}
 
                                                 </p>
                                             </a>
@@ -705,7 +704,7 @@
                                             <a href="{{student_view_attendance}}"
                                                 class="nav-link {% if student_view_attendance == request.path %} active {% endif %}">
                                                 <i class="nav-icon fas fa-calendar-alt"></i>
-                                                <p>View Attendance</p>
+                                                <p>{% trans "View Attendance" %}</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -713,7 +712,7 @@
                                             <a href="{{student_view_attendance}}"
                                                 class="nav-link {% if student_payment_records == request.path %} active {% endif %}">
                                                 <i class="nav-icon fas fa-calendar-alt"></i>
-                                                <p>Payment Records</p>
+                                                <p>{% trans "Payment Records" %}</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
@@ -722,7 +721,7 @@
                                                 class="nav-link {% if student_view_notification == request.path %} active {% endif %}">
                                                 <i class="nav-icon fas fa-bell"></i>
                                                 <p>
-                                                    View Notifications
+                                                    {% trans "View Notifications" %}
 
                                                 </p>
                                             </a>
@@ -734,7 +733,7 @@
                                                 class="nav-link {% if student_apply_leave == request.path %} active {% endif %}">
                                                 <i class="nav-icon fas fa-check"></i>
                                                 <p>
-                                                    Apply For Leave
+                                                    {% trans "Apply For Leave" %}
 
                                                 </p>
                                             </a>
@@ -746,7 +745,7 @@
                                                 class="nav-link {% if student_feedback == request.path %} active {% endif %}">
                                                 <i class="nav-icon fas fa-comment-alt"></i>
                                                 <p>
-                                                    Feedback
+                                                    {% trans "Feedback" %}
 
                                                 </p>
                                             </a>
@@ -762,7 +761,7 @@
                                                 class="nav-link">
                                                 <i class="nav-icon fas fa-power-off"></i>
                                                 <p>
-                                                    Logout
+                                                    {% trans "Logout" %}
                                                 </p>
                                             </a>
                                         </li>

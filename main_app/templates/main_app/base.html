@@ -1,11 +1,12 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>中之学校管理软件</title>
+    <title>{% trans "School Management Software" %}</title>
     <link rel="icon" type="image/png" href="/media/icon.png">
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,6 +22,9 @@
     
     <!-- Theme style -->
     <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css'%} ">
+
+     <!-- Custom Style -->
+     <link rel="stylesheet" href="{% static 'dist/css/customstyle.css'%} ">
 
     <!-- overlayScrollbars -->
     <link rel="stylesheet" href="{% static 'plugins/overlayScrollbars/css/OverlayScrollbars.min.css'%} ">
@@ -38,21 +42,39 @@
     <div class="wrapper">
 
         <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-            <!-- Left navbar links -->
-            <ul class="nav justify-content-end ">
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
-                </li>
-                <li class="nav-item">
-                    <li class="breadcrumb-item nav-link"><a href="/admin/home/">Home</a></li>
-                    <li class="m-0 text-dark breadcrumb-item active nav-link">{{ page_title }}</li>
-                </li>
+<nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/admin/home/">{% trans "Home" %}</a>
+        </li>
+        
+        <li class="nav-item">
+            <span class="nav-link active">{% trans page_title %}</span>
+        </li>
+    </ul>
 
-            </ul>
+    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+    
+    <!-- Locale Switcher -->
+    <div class="ml-auto">
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="localeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% trans "Select Language" %}
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="localeDropdown">
+                <a class="dropdown-item" href="#" onclick="switchLanguage('en')">{% trans "English" %}</a>
+                <a class="dropdown-item" href="#" onclick="switchLanguage('zh')">{% trans "Chinese" %}</a>
+                <!-- Add more language options as needed -->
+            </div>
+        </div>
+    </div>
+    <!-- End Locale Switcher -->
+</nav>
 
-
-        </nav>
         <!-- /.navbar -->
 
         <!-- Main Sidebar Container -->
@@ -152,6 +174,31 @@
     {% block custom_js %}
 
     {% endblock custom_js %}
+
+    <!-- JavaScript for Locale Switcher -->
+    <script>
+        function switchLanguage(languageCode) {
+            // Get the current URL
+            var currentUrl = window.location.href;
+            
+            // Remove any existing language prefix
+            var urlWithoutLanguage = currentUrl.replace(/\/[a-zA-Z]{2}\//, '/');
+            
+            // Check if the current URL already contains the language prefix
+            if (currentUrl.includes('/' + languageCode + '/')) {
+                // Language prefix already exists, replace it with the new one
+                var newUrl = urlWithoutLanguage.replace(/^https?:\/\/[^\/]+/, '$&/' + languageCode);
+            } else {
+                // Language prefix doesn't exist, add it before any existing path
+                var newUrl = urlWithoutLanguage.replace(/^https?:\/\/[^\/]+/, '$&/' + languageCode);
+            }
+            
+            // Redirect to the new URL
+            window.location.href = newUrl;
+        }
+    </script>
+    
+    
 </body>
 
 </html>

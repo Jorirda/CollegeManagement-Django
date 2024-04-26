@@ -1,0 +1,659 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-04-26 11:59+0800\n"
+"PO-Revision-Date: 2024-04-26 12:01+0800\n"
+"Last-Translator: Farhaan Muhammad <farhaanp36@gmail.com>\n"
+"Language-Team: \n"
+"Language: zh\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4.2\n"
+
+#: .\college_management_system\settings.py:137
+#: .\main_app\templates\main_app\base.html:69
+msgid "English"
+msgstr "英文"
+
+#: .\college_management_system\settings.py:138
+#: .\main_app\templates\main_app\base.html:70
+msgid "Chinese"
+msgstr "中文"
+
+#: .\main_app\forms.py:8
+msgid "Upload Excel File"
+msgstr "上传 Excel 文件"
+
+#: .\main_app\forms.py:19
+msgid "First Name"
+msgstr "名"
+
+#: .\main_app\forms.py:20
+msgid "Last Name"
+msgstr "姓"
+
+#: .\main_app\forms.py:21
+msgid "Email"
+msgstr "邮箱"
+
+#: .\main_app\forms.py:22 .\main_app\forms.py:171
+msgid "Male"
+msgstr "男"
+
+#: .\main_app\forms.py:22 .\main_app\forms.py:172
+msgid "Female"
+msgstr "女"
+
+#: .\main_app\forms.py:22 .\main_app\forms.py:173
+msgid "Gender"
+msgstr "性别"
+
+#: .\main_app\forms.py:23
+msgid "Password"
+msgstr "密码"
+
+#: .\main_app\forms.py:24
+msgid "Profile Picture"
+msgstr "个人图片"
+
+#: .\main_app\forms.py:25
+msgid "Address"
+msgstr "地址"
+
+#: .\main_app\forms.py:26 .\main_app\forms.py:175
+msgid "Contact Number"
+msgstr "联系电话"
+
+#: .\main_app\forms.py:27
+#: .\main_app\templates\hod_template\manage_class_schedule.html:27
+msgid "Remark"
+msgstr "备注"
+
+#: .\main_app\forms.py:41
+msgid "Fill this only if you wish to update password"
+msgstr "仅在您希望更新密码时填写"
+
+#: .\main_app\forms.py:47 .\main_app\forms.py:52
+msgid "The given email is already registered"
+msgstr "该电子邮件已注册"
+
+#: .\main_app\forms.py:57 .\main_app\forms.py:174
+msgid "Date of Birth"
+msgstr "出生日期"
+
+#: .\main_app\forms.py:58 .\main_app\forms.py:183
+msgid "Registration Date"
+msgstr "注册日期"
+
+#: .\main_app\forms.py:59 .\main_app\forms.py:177
+msgid "Currently Learning"
+msgstr "当前学习"
+
+#: .\main_app\forms.py:59 .\main_app\forms.py:123 .\main_app\forms.py:178
+msgid "Completed"
+msgstr "已完成"
+
+#: .\main_app\forms.py:59 .\main_app\forms.py:125 .\main_app\forms.py:179
+msgid "Refund"
+msgstr "退款"
+
+#: .\main_app\forms.py:59 .\main_app\forms.py:180
+msgid "State"
+msgstr "州/省"
+
+#: .\main_app\forms.py:80
+msgid "Special Teacher"
+msgstr "特别教师"
+
+#: .\main_app\forms.py:80
+msgid "Temporary Contract"
+msgstr "临时合同"
+
+#: .\main_app\forms.py:80
+msgid "Work Type"
+msgstr "工作类型"
+
+#: .\main_app\forms.py:92
+msgid "Course Name"
+msgstr "课程名称"
+
+#: .\main_app\forms.py:102
+msgid "Subject Name"
+msgstr "科目名称"
+
+#: .\main_app\forms.py:103
+#: .\main_app\templates\hod_template\manage_class_schedule.html:24
+#: .\main_app\templates\main_app\sidebar_template.html:174
+msgid "Teacher"
+msgstr "教师"
+
+#: .\main_app\forms.py:104 .\main_app\forms.py:189
+#: .\main_app\templates\main_app\sidebar_template.html:59
+msgid "Course"
+msgstr "课程"
+
+#: .\main_app\forms.py:115 .\main_app\forms.py:146 .\main_app\forms.py:218
+#: .\main_app\forms.py:242
+msgid "Date"
+msgstr "日期"
+
+#: .\main_app\forms.py:117
+msgid "WeChat"
+msgstr "微信"
+
+#: .\main_app\forms.py:118
+msgid "AliPay"
+msgstr "支付宝"
+
+#: .\main_app\forms.py:119
+msgid "Bank Card"
+msgstr "银行卡"
+
+#: .\main_app\forms.py:120
+msgid "Other"
+msgstr "其他"
+
+#: .\main_app\forms.py:121
+msgid "Payment Method"
+msgstr "支付方式"
+
+#: .\main_app\forms.py:124
+msgid "Pending"
+msgstr "待定"
+
+#: .\main_app\forms.py:126
+msgid "Status"
+msgstr "状态"
+
+#: .\main_app\forms.py:127 .\main_app\forms.py:128 .\main_app\forms.py:129
+#: .\main_app\forms.py:130 .\main_app\forms.py:131 .\main_app\forms.py:132
+#: .\main_app\forms.py:159
+msgid "¥"
+msgstr "元"
+
+#: .\main_app\forms.py:127 .\main_app\forms.py:159
+#: .\main_app\templates\hod_template\manage_class_schedule.html:23
+msgid "Lesson Unit Price"
+msgstr "课时单价"
+
+#: .\main_app\forms.py:128
+msgid "Discounted Price"
+msgstr "折扣价"
+
+#: .\main_app\forms.py:129
+msgid "Book Costs"
+msgstr "书籍费用"
+
+#: .\main_app\forms.py:130
+msgid "Other Fee"
+msgstr "其他费用"
+
+#: .\main_app\forms.py:131
+msgid "Amount Due"
+msgstr "应付金额"
+
+#: .\main_app\forms.py:132
+msgid "Amount Paid"
+msgstr "已付金额"
+
+#: .\main_app\forms.py:140
+msgid "date"
+msgstr "日期"
+
+#: .\main_app\forms.py:140
+msgid "student"
+msgstr "学生"
+
+#: .\main_app\forms.py:140
+msgid "course"
+msgstr "课程"
+
+#: .\main_app\forms.py:140
+msgid "lesson_unit_price"
+msgstr "课时单价"
+
+#: .\main_app\forms.py:140
+msgid "class_name"
+msgstr "上课时间"
+
+#: .\main_app\forms.py:141
+msgid "discounted_price"
+msgstr "折扣价"
+
+#: .\main_app\forms.py:141
+msgid "book_costs"
+msgstr "书籍费用"
+
+#: .\main_app\forms.py:141
+msgid "other_fee"
+msgstr "其他费用"
+
+#: .\main_app\forms.py:141
+msgid "amount_due"
+msgstr "应付金额"
+
+#: .\main_app\forms.py:141
+msgid "amount_paid"
+msgstr "已付金额"
+
+#: .\main_app\forms.py:142
+msgid "payment_method"
+msgstr "支付方式"
+
+#: .\main_app\forms.py:142
+msgid "status"
+msgstr "状态"
+
+#: .\main_app\forms.py:142
+msgid "payee"
+msgstr "收款人"
+
+#: .\main_app\forms.py:142
+msgid "remark"
+msgstr "备注"
+
+#: .\main_app\forms.py:147
+msgid "Starting Time"
+msgstr "开始时间"
+
+#: .\main_app\forms.py:148
+msgid "End Time"
+msgstr "结束时间"
+
+#: .\main_app\forms.py:181
+msgid "Payment Status"
+msgstr "支付状态"
+
+#: .\main_app\forms.py:182
+msgid "Refund Situation"
+msgstr "退款情况"
+
+#: .\main_app\forms.py:184
+msgid "Number of Classes"
+msgstr "课程数量"
+
+#: .\main_app\forms.py:185
+msgid "Already Registered for Courses"
+msgstr "已注册课程"
+
+#: .\main_app\forms.py:185
+msgid "Registered Courses"
+msgstr "注册的课程"
+
+#: .\main_app\forms.py:186
+msgid "Course Hours Completed"
+msgstr "已完成的课时"
+
+#: .\main_app\forms.py:186
+msgid "Completed Hours"
+msgstr "已完成的小时"
+
+#: .\main_app\forms.py:187
+msgid "Paid Class Hours"
+msgstr "已付课时"
+
+#: .\main_app\forms.py:187
+msgid "Paid Hours"
+msgstr "已付小时"
+
+#: .\main_app\forms.py:188
+msgid "Remaining Class Hours"
+msgstr "剩余课时"
+
+#: .\main_app\forms.py:188
+msgid "Remaining Hours"
+msgstr "剩余小时"
+
+#: .\main_app\forms.py:190
+#: .\main_app\templates\main_app\sidebar_template.html:137
+msgid "Session"
+msgstr "会议"
+
+#: .\main_app\forms.py:219 .\main_app\forms.py:243
+msgid "Message"
+msgstr "信息"
+
+#: .\main_app\forms.py:232 .\main_app\forms.py:256
+#: .\main_app\templates\main_app\sidebar_template.html:449
+#: .\main_app\templates\main_app\sidebar_template.html:645
+#: .\main_app\templates\main_app\sidebar_template.html:748
+msgid "Feedback"
+msgstr "反馈"
+
+#: .\main_app\forms.py:286
+msgid "Session Year"
+msgstr "会议年度"
+
+#: .\main_app\hod_views.py:102
+msgid "Administrative Dashboard"
+msgstr "行政仪表板"
+
+#: .\main_app\hod_views.py:122
+msgid "Add teacher"
+msgstr "增加教师"
+
+#: .\main_app\hod_views.py:162
+#: .\main_app\templates\main_app\sidebar_template.html:221
+msgid "Add Student"
+msgstr "添加学生"
+
+#: .\main_app\hod_views.py:209
+#: .\main_app\templates\main_app\sidebar_template.html:70
+msgid "Add Course"
+msgstr "添加课程"
+
+#: .\main_app\hod_views.py:230
+#: .\main_app\templates\main_app\sidebar_template.html:108
+msgid "Add Subject"
+msgstr "添加科目"
+
+#: .\main_app\hod_views.py:258
+msgid "Add Payment Record"
+msgstr "添加付款记录"
+
+#: .\main_app\hod_views.py:311
+#: .\main_app\templates\main_app\sidebar_template.html:332
+msgid "Add Learning Record"
+msgstr "添加学习记录"
+
+#: .\main_app\hod_views.py:351
+msgid "Add Class Schedule"
+msgstr "添加课程表"
+
+#: .\main_app\hod_views.py:464
+msgid "Manage Teachers"
+msgstr "管理教师"
+
+#: .\main_app\hod_views.py:474
+msgid "Manage Students"
+msgstr "管理学生"
+
+#: .\main_app\hod_views.py:482
+msgid "Manage Courses"
+msgstr "管理课程"
+
+#: .\main_app\hod_views.py:490
+msgid "Manage Subjects"
+msgstr "管理主题"
+
+#: .\main_app\hod_views.py:500
+msgid "Manage Payment Records"
+msgstr "管理付款记录"
+
+#: .\main_app\hod_views.py:535
+msgid "Manage Learning Records"
+msgstr "管理学习记录"
+
+#: .\main_app\hod_views.py:543
+msgid "Manage Class Schedule"
+msgstr "管理时间表"
+
+#: .\main_app\hod_views.py:606
+msgid "Manage Student Queries"
+msgstr "学生查询"
+
+#: .\main_app\hod_views.py:618
+msgid "Edit teacher"
+msgstr "编辑教师"
+
+#: .\main_app\hod_views.py:672
+msgid "Edit Student"
+msgstr "编辑学生"
+
+#: .\main_app\hod_views.py:710
+msgid "Edit Course"
+msgstr "编辑课程"
+
+#: .\main_app\hod_views.py:733
+msgid "Edit Subject"
+msgstr "编辑主题"
+
+#: .\main_app\hod_views.py:761
+msgid "Edit Learning Record"
+msgstr "编辑学习记录"
+
+#: .\main_app\hod_views.py:800
+msgid "Edit Class Schedule"
+msgstr "编辑时间表"
+
+#: .\main_app\hod_views.py:833
+#: .\main_app\templates\main_app\sidebar_template.html:149
+msgid "Add Session"
+msgstr "添加会话"
+
+#: .\main_app\hod_views.py:848
+msgid "Manage Sessions"
+msgstr "管理会话"
+
+#: .\main_app\hod_views.py:855
+msgid "Edit Session"
+msgstr "编辑会话"
+
+#: .\main_app\hod_views.py:892
+msgid "Student Feedback Messages"
+msgstr "学生反馈信息"
+
+#: .\main_app\hod_views.py:913
+msgid "teacher Feedback Messages"
+msgstr "教师反馈信息"
+
+#: .\main_app\hod_views.py:934
+msgid "Leave Applications From teacher"
+msgstr "教师的休假申请"
+
+#: .\main_app\hod_views.py:959
+msgid "Leave Applications From Students"
+msgstr "学生的休假申请"
+
+#: .\main_app\hod_views.py:984
+#: .\main_app\templates\main_app\sidebar_template.html:397
+#: .\main_app\templates\main_app\sidebar_template.html:707
+msgid "View Attendance"
+msgstr "查看考勤"
+
+#: .\main_app\hod_views.py:1019
+msgid "View/Edit Profile"
+msgstr "查看/编辑简介"
+
+#: .\main_app\hod_views.py:1052
+msgid "Send Notifications To teacher"
+msgstr "向教师发送通知"
+
+#: .\main_app\hod_views.py:1061
+msgid "Send Notifications To Students"
+msgstr "向学生发送通知"
+
+#: .\main_app\templates\hod_template\manage_class_schedule.html:22
+msgid "Course Title"
+msgstr "课程标题"
+
+#: .\main_app\templates\hod_template\manage_class_schedule.html:25
+#: .\main_app\templates\main_app\sidebar_template.html:97
+msgid "Subject"
+msgstr "科目"
+
+#: .\main_app\templates\hod_template\manage_class_schedule.html:26
+msgid "Class Time"
+msgstr "上课时间"
+
+#: .\main_app\templates\hod_template\manage_class_schedule.html:28
+msgid "Actions"
+msgstr "操作"
+
+#: .\main_app\templates\hod_template\manage_class_schedule.html:42
+msgid "Edit"
+msgstr "编辑"
+
+#: .\main_app\templates\hod_template\manage_class_schedule.html:43
+msgid "Are you sure about this?"
+msgstr "您确定吗？"
+
+#: .\main_app\templates\hod_template\manage_class_schedule.html:43
+msgid "Delete"
+msgstr "删除"
+
+#: .\main_app\templates\main_app\base.html:9
+msgid "School Management Software"
+msgstr "中之学校管理软件"
+
+#: .\main_app\templates\main_app\base.html:52
+#: .\main_app\templates\main_app\sidebar_template.html:38
+#: .\main_app\templates\main_app\sidebar_template.html:553
+#: .\main_app\templates\main_app\sidebar_template.html:684
+msgid "Home"
+msgstr "首页"
+
+#: .\main_app\templates\main_app\base.html:66
+msgid "Select Language"
+msgstr "选择语言"
+
+#: .\main_app\templates\main_app\sidebar_template.html:48
+#: .\main_app\templates\main_app\sidebar_template.html:565
+#: .\main_app\templates\main_app\sidebar_template.html:696
+msgid "Update Profile"
+msgstr "更新个人资料"
+
+#: .\main_app\templates\main_app\sidebar_template.html:82
+msgid "Manage Course"
+msgstr "管理课程"
+
+#: .\main_app\templates\main_app\sidebar_template.html:120
+msgid "Manage Subject"
+msgstr "管理科目"
+
+#: .\main_app\templates\main_app\sidebar_template.html:161
+msgid "Manage Session"
+msgstr "管理会话"
+
+#: .\main_app\templates\main_app\sidebar_template.html:185
+msgid "Add Teacher"
+msgstr "添加教师"
+
+#: .\main_app\templates\main_app\sidebar_template.html:197
+msgid "Manage Teacher"
+msgstr "管理教师"
+
+#: .\main_app\templates\main_app\sidebar_template.html:210
+msgid "Student"
+msgstr "学生"
+
+#: .\main_app\templates\main_app\sidebar_template.html:235
+msgid "Manage Student"
+msgstr "管理学生"
+
+#: .\main_app\templates\main_app\sidebar_template.html:247
+msgid "Payment Record"
+msgstr "付款记录"
+
+#: .\main_app\templates\main_app\sidebar_template.html:258
+msgid "Add Payment"
+msgstr "添加付款"
+
+#: .\main_app\templates\main_app\sidebar_template.html:271
+msgid "Manage Payment"
+msgstr "管理付款"
+
+#: .\main_app\templates\main_app\sidebar_template.html:284
+msgid "Notify"
+msgstr "通知"
+
+#: .\main_app\templates\main_app\sidebar_template.html:296
+msgid "Notify Teacher"
+msgstr "通知教师"
+
+#: .\main_app\templates\main_app\sidebar_template.html:307
+msgid "Notify Student"
+msgstr "通知学生"
+
+#: .\main_app\templates\main_app\sidebar_template.html:320
+msgid "Learning Record"
+msgstr "学习记录"
+
+#: .\main_app\templates\main_app\sidebar_template.html:343
+msgid "Manage Learning Record"
+msgstr "管理学习记录"
+
+#: .\main_app\templates\main_app\sidebar_template.html:357
+msgid "Schedule"
+msgstr "课程表"
+
+#: .\main_app\templates\main_app\sidebar_template.html:370
+msgid "Add Schedule"
+msgstr "添加时间表"
+
+#: .\main_app\templates\main_app\sidebar_template.html:384
+msgid "Manage Schedule"
+msgstr "管理时间表"
+
+#: .\main_app\templates\main_app\sidebar_template.html:408
+msgid "Queries"
+msgstr "查询"
+
+#: .\main_app\templates\main_app\sidebar_template.html:423
+msgid "Student Queries"
+msgstr "学生查询"
+
+#: .\main_app\templates\main_app\sidebar_template.html:437
+msgid "Teacher Queries"
+msgstr "教师查询"
+
+#: .\main_app\templates\main_app\sidebar_template.html:462
+msgid "Student Feedback"
+msgstr "学生反馈"
+
+#: .\main_app\templates\main_app\sidebar_template.html:474
+msgid "Teacher Feedback"
+msgstr "教师反馈"
+
+#: .\main_app\templates\main_app\sidebar_template.html:487
+msgid "Ask for Leave"
+msgstr "申请请假"
+
+#: .\main_app\templates\main_app\sidebar_template.html:500
+msgid "Teacher Leave"
+msgstr "教师请假"
+
+#: .\main_app\templates\main_app\sidebar_template.html:512
+msgid "Student Leave"
+msgstr "学生请假"
+
+#: .\main_app\templates\main_app\sidebar_template.html:577
+msgid "Add Result"
+msgstr "添加成绩"
+
+#: .\main_app\templates\main_app\sidebar_template.html:588
+msgid "Edit Result"
+msgstr "编辑成绩"
+
+#: .\main_app\templates\main_app\sidebar_template.html:599
+msgid "Take Attendance"
+msgstr "考勤"
+
+#: .\main_app\templates\main_app\sidebar_template.html:610
+msgid "View/Update Attendance"
+msgstr "查看/更新考勤"
+
+#: .\main_app\templates\main_app\sidebar_template.html:621
+#: .\main_app\templates\main_app\sidebar_template.html:724
+msgid "View Notifications"
+msgstr "查看通知"
+
+#: .\main_app\templates\main_app\sidebar_template.html:633
+#: .\main_app\templates\main_app\sidebar_template.html:736
+msgid "Apply For Leave"
+msgstr "申请请假"
+
+#: .\main_app\templates\main_app\sidebar_template.html:715
+msgid "Payment Records"
+msgstr "付款记录"
+
+#: .\main_app\templates\main_app\sidebar_template.html:764
+msgid "Logout"
+msgstr "注销"

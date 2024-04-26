@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from datetime import datetime, timedelta
+from django.utils.translation import gettext_lazy as _
 
 
 class CustomUserManager(UserManager):
@@ -242,7 +243,7 @@ class ClassSchedule(models.Model):
     class_time = models.CharField(max_length=100)
     remark = models.TextField(default="")
 
-    
+
     def lesson_unit_price(self):
         # Fetch the related PaymentRecord for this ClassSchedule
         payment_record = PaymentRecord.objects.filter(course=self.course).first()
@@ -308,18 +309,18 @@ def create_or_update_student_query(sender, instance, created, **kwargs):
         student_query.refund = student.state
 
         # Get related learning records and payment records
-        related_learning_records = student.learningrecord_set.all()
-        related_payment_records = student.paymentrecord_set.all()
+    related_learning_records = student.learningrecord_set.all
+    related_payment_records = student.paymentrecord_set.all()
 
         # Update learning records and payment records fields in StudentQuery
-        learning_record_instance = related_learning_records.first()
-        payment_record_instance = related_payment_records.first()
+    learning_record_instance = related_learning_records.first()
+    payment_record_instance = related_payment_records.first()
 
-        if learning_record_instance:
+    if learning_record_instance:
             student_query.learning_records = learning_record_instance
 
-        if payment_record_instance:
-            student_query.payment_records = payment_record_instance
+    if payment_record_instance:
+        student_query.payment_records = payment_record_instance
 
         # Set payment record id and learning record id
         student_query.payment_record_id = payment_record_instance.id if payment_record_instance else None

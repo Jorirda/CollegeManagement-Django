@@ -1,0 +1,15 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+
+<body>
+    <h2>CSV Data:</h2>
+    <pre>{{ csv_data }}</pre>
+</body>
+{% endblock content %}
+{% block custom_js %}
+<script>
+</script>
+{% endblock custom_js %}

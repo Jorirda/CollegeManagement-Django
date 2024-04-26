@@ -20,7 +20,6 @@ from main_app.EditResultView import EditResultView
 from . import hod_views, teacher_views, student_views, views
 
 urlpatterns = [
-
 #hodviews
     path("", views.login_page, name='login_page'),
     path("get_attendance", views.get_attendance, name='get_attendance'),
@@ -57,6 +56,8 @@ urlpatterns = [
     path("teacher/view/leave/", hod_views.view_teacher_leave, name="view_teacher_leave",),
     path("attendance/view/", hod_views.admin_view_attendance,name="admin_view_attendance",),
     path("attendance/fetch/", hod_views.get_admin_attendance,name='get_admin_attendance'),
+    path("upload", hod_views.get_upload,name='get_upload'),
+    path("result", hod_views.get_result,name='get_result'),
 
 
     #manage

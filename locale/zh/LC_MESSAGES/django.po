@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-26 16:19+0800\n"
+"POT-Creation-Date: 2024-04-26 16:36+0800\n"
 "PO-Revision-Date: 2024-04-26 16:21+0800\n"
 "Last-Translator: Farhaan Muhammad <farhaanp36@gmail.com>\n"
 "Language-Team: \n"
@@ -496,6 +496,18 @@ msgstr "向教师发送通知"
 msgid "Send Notifications To Students"
 msgstr "向学生发送通知"
 
+#: .\main_app\templates\hod_template\manage_campus.html:35
+#: .\main_app\templates\hod_template\manage_class_schedule.html:42
+#: .\main_app\templates\hod_template\manage_institution.html:31
+msgid "Edit"
+msgstr "编辑"
+
+#: .\main_app\templates\hod_template\manage_campus.html:36
+#: .\main_app\templates\hod_template\manage_class_schedule.html:43
+#: .\main_app\templates\hod_template\manage_institution.html:32
+msgid "Delete"
+msgstr "删除"
+
 #: .\main_app\templates\hod_template\manage_class_schedule.html:22
 msgid "Course Title"
 msgstr "课程标题"
@@ -513,17 +525,9 @@ msgstr "上课时间"
 msgid "Actions"
 msgstr "操作"
 
-#: .\main_app\templates\hod_template\manage_class_schedule.html:42
-msgid "Edit"
-msgstr "编辑"
-
 #: .\main_app\templates\hod_template\manage_class_schedule.html:43
 msgid "Are you sure about this?"
 msgstr "您确定吗？"
-
-#: .\main_app\templates\hod_template\manage_class_schedule.html:43
-msgid "Delete"
-msgstr "删除"
 
 #: .\main_app\templates\main_app\base.html:9
 msgid "School Management Software"

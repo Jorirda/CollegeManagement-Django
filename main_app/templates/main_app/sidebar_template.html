@@ -10,22 +10,37 @@
             class="brand-image img-circle elevation-3" >
         <span class="brand-text font-weight-light">中之有限公司</span>
     </a>
+    <a href="{% url 'admin_view_profile' %}" class="brand-link">
+        <!-- <img src="{% static 'dist/img/cmsl.png' %} " alt="AdminLTE Logo"
+            class="brand-image img-circle elevation-3" > -->
+        <img src="/media/6dbf7e8c2d3882fbf24375a09fa2540c.jpg" alt="User Image"
+            class="brand-image img-circle elevation-3 d-block" >
+        <span class="brand-text font-weight-dark">
+            {% if user.is_authenticated %}
+                {{ user.first_name }} {{ user.last_name }}
+            {% else %}
+                No name
+            {% endif %}
+        </span>
+    </a>
+    
 
     <!-- Sidebar -->
     <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <!-- <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
-                <!-- <img src="{{ request.user.profile_pic}}" class="img-circle elevation-2" alt="User Image"> -->
-                <!-- <img src="{{ request.user.profile_pic}}" class="img-circle elevation-2" alt="User Image"> -->
+                <img src="{{ request.user.profile_pic}}" class="img-circle elevation-2" alt="User Image"> 
+                <img src="{{ request.user.profile_pic}}" class="img-circle elevation-2" alt="User Image"> 
                 <img src="/media/6dbf7e8c2d3882fbf24375a09fa2540c.jpg" class="img-circle elevation-2" alt="User Image">
+            </div> 
+             <div class="info">
+                <a href="#" class="d-block">{{user}}</a>
+                {% url 'admin_view_profile' as admin_view_profile %}
+                <a href="{{admin_view_profile}}" class="nav-link {% if admin_view_profile == request.path %} active {% endif %}">Clarke Kent</a>
             </div>
-            <div class="info">
-                <!-- <a href="#" class="d-block">{{user}}</a> -->
-                <a href="#" class="d-block">Clarke Kent</a>
-            </div>
-        </div>
-
+        </div> -->
+       
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
@@ -39,7 +54,7 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     {% url 'admin_view_profile' as admin_view_profile %}
                     <a href="{{admin_view_profile}}"
                         class="nav-link {% if admin_view_profile == request.path %} active {% endif %}">
@@ -48,8 +63,79 @@
                             {% trans "Update Profile" %}
                         </p>
                     </a>
+                </li> -->
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-university"></i>
+                        <p>
+                            Institution
+                            <i class="fas fa-angle-right right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            {% url 'add_institution' as add_institution %}
+                            <a href="{{add_institution}}"
+                                class="nav-link  {% if add_institution == request.path %} active {% endif %}">
+                                <i class="nav-icon fas fa-plus-circle"></i>
+                                <p>
+                                    Add institution
+
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            {% url 'manage_institution' as manage_institution %}
+                            {% url 'edit_institution' course_id as edit_institution %}
+                            <a href="{{manage_institution}}"
+                                class="nav-link  {% if edit_course == request.path or manage_institution == request.path %} active {% endif %}">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>
+                                    Manage Institution
+
+                                </p>
+                            </a>
+                        </li>
+
+
+                    </ul>
                 </li>
-                
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-school"></i>
+                        <p>
+                            Campus
+                            <i class="fas fa-angle-right right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            {% url 'add_campus' as add_campus %}
+                            <a href="{{add_campus}}"
+                                class="nav-link  {% if add_campus == request.path %} active {% endif %}">
+                                <i class="nav-icon fas fa-plus-circle"></i>
+                                <p>
+                                    Add Campus
+
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            {% url 'manage_campus' as manage_campus %}
+                            {% url 'edit_campus' course_id as edit_campus %}
+                            <a href="{{manage_campus}}"
+                                class="nav-link  {% if edit_course == request.path or manage_campus == request.path %} active {% endif %}">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>
+                                    Manage Campus
+
+                                </p>
+                            </a>
+                        </li>
+
+
+                    </ul>
+                </li>
 
 
                 <li class="nav-item has-treeview">
@@ -427,11 +513,11 @@
 
 
                         <li class="nav-item">
-                            {% url 'manage_class_schedule' as manage_class_schedule %}
+                            {% url 'manage_teacher_query' as manage_teacher_query %}
 
                         <li class="nav-item">
-                            <a href="{{manage_class_schedule}}"
-                                class="nav-link  {% if manage_class_schedule == request.path %} active {% endif %}">
+                            <a href="{{manage_teacher_query}}"
+                                class="nav-link  {% if manage_teacher_query == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-address-card"></i>
                                 <p>
                                     {% trans "Teacher Queries" %}

@@ -10,9 +10,11 @@ class ExcelUploadForm(forms.Form):
 class FormSettings(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(FormSettings, self).__init__(*args, **kwargs)
-        # Here make some changes such as:
         for field in self.visible_fields():
-            field.field.widget.attrs['class'] = 'form-control'
+            if isinstance(field.field.widget, forms.CheckboxSelectMultiple):
+                field.field.widget.attrs['class'] = 'form-check-input'
+            else:
+                field.field.widget.attrs['class'] = 'form-control'
 
 
 class CustomUserForm(FormSettings):
@@ -54,38 +56,77 @@ class CustomUserForm(FormSettings):
 
 
 class StudentForm(CustomUserForm):
-    date_of_birth = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}), label=_('Date of Birth'))
-    reg_date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}), label=_('Registration Date'))
-    state = forms.ChoiceField(choices=[('Currently Learning', _('Currently Learning')), ('Completed', _('Completed')), ('Refund', _('Refund'))], label=_('State'))
+    date_of_birth = forms.DateField(required=False, label="Date of Birth", widget=forms.DateInput(attrs={'type': 'date'}))
+    reg_date = forms.DateField(required=False, label="Registration Date", widget=forms.DateInput(attrs={'type': 'date'}))
+    state = forms.ChoiceField(choices=[('Currently Learning', 'Currently Learning'), ('Completed', 'Completed'), ('Refund', 'Refund')], label="State")
+    
+    # Include new fields: campus, grade, home_number, cell_number
+    campus = forms.CharField(max_length=100, required=False, label="Campus")
+    grade = forms.CharField(max_length=10, required=False, label="Grade")
+    home_number = forms.CharField(max_length=20, required=False, label="Home Number")
+    cell_number = forms.CharField(max_length=20, required=False, label="Cell Number")
+
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
         self.fields['remark'] = self.fields.pop('remark')
+        # Hide the contact num field
+        self.fields.pop('contact_num')
         
-    
+        # Reorder fields as requested
+        field_order = ['first_name', 'last_name', 'email', 'home_number', 'cell_number', 
+                       'gender', 'password', 'profile_pic', 'address', 'campus', 
+                       'course', 'grade', 'session', 'date_of_birth', 'reg_date', 
+                       'state', 'remark']
+        
+        # Set the field order
+        self.fields = {k: self.fields[k] for k in field_order}
+
     class Meta(CustomUserForm.Meta):
         model = Student
-        fields = CustomUserForm.Meta.fields + ['date_of_birth', 'reg_date', 'state']
+        fields = CustomUserForm.Meta.fields + \
+            ['course', 'session', 'date_of_birth', 'reg_date', 'state', 'campus', 'grade', 'home_number', 'cell_number']
 
 
 class AdminForm(CustomUserForm):
+    contact_num = forms.CharField(max_length=20, required=False)
+    remark = forms.CharField(widget=forms.Textarea, required=False)
+
     def __init__(self, *args, **kwargs):
         super(AdminForm, self).__init__(*args, **kwargs)
 
+        # Reorder fields as requested
+        field_order = ['first_name', 'last_name', 'email', 'gender', 'password', 'profile_pic', 'address', 'contact_num', 'remark']
+
+        # Set the field order
+        self.fields = {k: self.fields[k] for k in field_order}
+
     class Meta(CustomUserForm.Meta):
         model = Admin
-        fields = CustomUserForm.Meta.fields
-
+        fields = CustomUserForm.Meta.fields + ['contact_num', 'remark']
 
 class TeacherForm(CustomUserForm):
-    work_type = forms.ChoiceField(choices=[('Special Teacher', _('Special Teacher')), ('Temporary Contract', _('Temporary Contract'))], label=_('Work Type'))
-    
+    work_type = forms.ChoiceField(choices=[('Special Teacher', 'Special Teacher'), ('Temporary Contract', 'Temporary Contract')])
+    home_number = forms.CharField(max_length=20, required=False)
+    cell_number = forms.CharField(max_length=20, required=False)
+    campus = forms.CharField(max_length=100, required=False)
+
     def __init__(self, *args, **kwargs):
         super(TeacherForm, self).__init__(*args, **kwargs)
         self.fields['remark'] = self.fields.pop('remark')
+        # Hide the contact num field
+        self.fields.pop('contact_num')
         
+        # Reorder fields as requested
+        field_order = ['first_name', 'last_name', 'email', 'home_number', 'cell_number', 
+                       'gender', 'password', 'profile_pic', 'address', 
+                       'work_type', 'remark', 'course', 'campus']
+
+        # Set the field order
+        self.fields = {k: self.fields[k] for k in field_order}
+
     class Meta(CustomUserForm.Meta):
         model = Teacher
-        fields = CustomUserForm.Meta.fields + ['work_type']
+        fields = CustomUserForm.Meta.fields + ['course', 'work_type', 'home_number', 'cell_number', 'campus']
 
 
 class CourseForm(FormSettings):
@@ -97,7 +138,6 @@ class CourseForm(FormSettings):
         fields = ['name']
         model = Course
 
-
 class SubjectForm(FormSettings):
     name = forms.CharField(label=_('Subject Name'))
     teacher = forms.ModelChoiceField(queryset=Teacher.objects.all(), label=_('Teacher'))
@@ -108,9 +148,24 @@ class SubjectForm(FormSettings):
     class Meta:
         model = Subject
         fields = ['name', 'teacher', 'course']
-        
 
-    
+class InstitutionForm(FormSettings):
+    def __init__(self, *args, **kwargs):
+        super(InstitutionForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = Institution
+        fields = ['name']
+
+class CampusForm(forms.ModelForm):
+    class Meta:
+        model = Campus
+        fields = ['name', 'institution', 'teacher', 'student']
+        widgets = {
+            'teacher': forms.CheckboxSelectMultiple()
+        }
+
+            
 class PaymentRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=DateInput(attrs={'type': 'date'}), label=_('Date'))
     payment_method = forms.ChoiceField(choices=[
@@ -200,7 +255,6 @@ class StudentQueryForm(FormSettings):
                                                'paid_hours', 'remaining_hours', 'course', 'session']
 
 
-
 class SessionForm(FormSettings):
     def __init__(self, *args, **kwargs):
         super(SessionForm, self).__init__(*args, **kwargs)
@@ -274,10 +328,11 @@ class StudentEditForm(CustomUserForm):
 class TeacherEditForm(CustomUserForm):
     def __init__(self, *args, **kwargs):
         super(TeacherEditForm, self).__init__(*args, **kwargs)
+        self.fields['work_type'].required = False  # Make 'work_type' field optional
 
     class Meta(CustomUserForm.Meta):
         model = Teacher
-        fields = CustomUserForm.Meta.fields
+        fields = CustomUserForm.Meta.fields + ['work_type']  # Add 'work_type' to the fields list
 
 
 class EditResultForm(FormSettings):

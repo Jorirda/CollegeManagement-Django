@@ -39,7 +39,11 @@
                   <th>Name</th>
                   <th>Gender</th>
                   <th>Date of Birth</th>
-                  <th>Contact Number</th>
+                  <th>Home Number</th>
+                  <th>Cell Number</th>
+                  <th>State</th>
+                  <th>Payment Status</th>
+                  <th>Refunded</th>
                 </tr>
               </thead>
               <tbody>
@@ -48,7 +52,13 @@
                     <td>{{ query.student_name }}</td>
                     <td>{{ query.gender }}</td>
                     <td>{{ query.date_of_birth }}</td>
-                    <td>{{ query.contact_num }}</td>
+                    <td>{{ query.home_number }}</td>
+                    <td>{{ query.cell_number }}</td>
+                    <!-- <td>{{ query.contact_num }}</td> -->
+                    <td>{{ query.state }}</td>
+                    <td>{{ query.payment_status }}</td>
+                    <td>{{ query.refunded }}</td>
+
                   </tr>
                 {% endfor %}
               </tbody>
@@ -65,29 +75,25 @@
             <table class="table table-bordered table-hover">
               <thead class="thead-dark">
                 <tr>
-                  <th>#</th>
-                  <th>State</th>
-                  <th>Payment Status</th>
-                  <th>Refunded</th>
                   <th>Registration Date</th>
                   <th>Number of Classes</th>
                   <th>Registered Courses</th>
                   <th>Completed Hours</th>
                   <th>Paid Class Hours</th>
+                  <th>Remaining Hours</th>
+
                 </tr>
               </thead>
               <tbody>
                 {% for query in student_query_info %}
                   <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ query.state }}</td>
-                    <td>{{ query.payment_status }}</td>
-                    <td>{{ query.refunded }}</td>
                     <td>{{ query.reg_date }}</td>
                     <td>{{ query.num_of_classes }}</td>
                     <td>{{ query.registered_courses }}</td>
                     <td>{{ query.completed_hours }}</td>
                     <td>{{ query.paid_class_hours }}</td>
+                    <td>{{ query.remaining_hours }}</td>
+
                   </tr>
                 {% endfor %}
               </tbody>
@@ -95,6 +101,46 @@
           </div>
         </div>
       </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <!-- Third Table -->
+            <table class="table table-bordered table-hover">
+              <thead class="thead-dark">
+                <tr>
+                  <th>Date</th>
+                  <th>Campus</th>
+                  <th>Grade</th>
+                  <th>Course</th>
+                  <th>Intructor</th>
+                  <th>Start Time</th>
+                  <th>End Time</th>
+                  <th>Class</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for query in student_query_info %}
+                  <tr>
+                    <td>{{ query.date }}</td>
+                    <td>{{ query.campus }}</td>
+                    <td>{{ query.grade }}</td>
+                    <td>{{ query.course }}</td>
+                    <td>{{ query.instructor }}</td>
+                    <td>{{ query.start_time }}</td>
+                    <td>{{ query.end_time }}</td>
+                    <td>{{ query.class }}</td>
+
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
     </div>
   </div>
 </section>

@@ -8,9 +8,6 @@ from datetime import datetime, timedelta
 from django.utils.translation import gettext_lazy as _
 
 
-
-
-
 class CustomUserManager(UserManager):
     def _create_user(self, email, password, **extra_fields):
         email = self.normalize_email(email)
@@ -45,7 +42,6 @@ class CustomUser(AbstractUser):
     USER_TYPE = ((1, "HOD"), (2, "Teacher"), (3, "Student"))
     GENDER = [("M", "Male"), ("F", "Female")]
 
-
     username = None  # Removed username, using email instead
     email = models.EmailField(unique=True)
     user_type = models.CharField(default=1, choices=USER_TYPE, max_length=1)
@@ -53,6 +49,10 @@ class CustomUser(AbstractUser):
     profile_pic = models.ImageField()
     address = models.TextField()
     contact_num = models.TextField(default="")
+    home_number = models.TextField(default="")
+    cell_number = models.TextField(default="")
+    campus = models.CharField(max_length=100, blank=True)
+    grade = models.CharField(max_length=10, blank=True)
     remark = models.TextField(default="")
     fcm_token = models.TextField(default="")  # For firebase notifications
     created_at = models.DateTimeField(auto_now_add=True)
@@ -64,22 +64,20 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.last_name + ", " + self.first_name
 
-
 #Institution
 class Institution(models.Model):
-    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
 
-#Campus
-class Campus(models.Model):
-    id = models.AutoField(primary_key=True)
-    institution = models.ForeignKey('Institution', on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    
 
 class Admin(models.Model):
-    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    admin = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    remark = models.TextField(default="")
+
+    def __str__(self):
+        return str(self.admin)
 
 
 class Course(models.Model):
@@ -93,29 +91,26 @@ class Course(models.Model):
 
 class Student(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='student_institutions')
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     session = models.ForeignKey(Session, on_delete=models.DO_NOTHING, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
     reg_date = models.DateField(blank=True, null=True)
-    state = models.CharField(max_length = 30, blank = True) #learning/completed/pending refund
+    state = models.CharField(max_length=30, blank=True)  # learning/completed/pending refund
 
     def __str__(self):
         return self.admin.last_name + ", " + self.admin.first_name
 
 
 class Teacher(models.Model):
+    institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='teacher_institutions')
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    work_type = models.CharField(max_length = 30, blank = True) #Special/Temporary
+    work_type = models.CharField(max_length=30, blank=True)  # Special/Temporary
 
     def __str__(self):
         return self.admin.last_name + " " + self.admin.first_name
 
-#Class
-# class Class(models.Model):
-#     name = models.CharField(max_length=100)
-#     student = models.ManyToManyField(Student)
-    
     
 class Subject(models.Model):
     name = models.CharField(max_length=120)
@@ -126,8 +121,17 @@ class Subject(models.Model):
 
     def __str__(self):
         return self.name
+    
+class Campus(models.Model):
+    name = models.CharField(max_length=100)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='campuses')
+    teacher = models.ManyToManyField(Teacher, related_name='campuses')
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='campuses', null=True, blank=True)
 
+    def __str__(self):
+        return self.name
 
+    
 class Attendance(models.Model):
     session = models.ForeignKey(Session, on_delete=models.DO_NOTHING)
     subject = models.ForeignKey(Subject, on_delete=models.DO_NOTHING)
@@ -266,6 +270,14 @@ class StudentQuery(models.Model):
     remaining_hours = models.IntegerField(null=True, default=0)  # Default value for remaining_hours
     learning_records = models.ForeignKey(LearningRecord, null=True, on_delete=models.CASCADE)
 
+class TeacherQuery(models.Model):
+    admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
+    teacher_records = models.ForeignKey(Teacher, null=True, on_delete=models.CASCADE)
+    learning_records = models.ForeignKey(LearningRecord, null=True, on_delete=models.CASCADE)
+    num_of_classes = models.IntegerField(null=True)
+    completed_hours = models.IntegerField(null=True)
+    remaining_hours = models.IntegerField(null=True, default=0)  # Default value for remaining_hours
+
 @receiver(post_save, sender=Student)
 @receiver(post_save, sender=LearningRecord)
 @receiver(post_save, sender=PaymentRecord)
@@ -341,9 +353,69 @@ def create_or_update_student_query(sender, instance, created, **kwargs):
 
         # Save the updated StudentQuery instance
         student_query.save()
-
+    
 # Register signal handlers
 post_save.connect(create_or_update_student_query, sender=Student)
+
+@receiver(post_save, sender=Teacher)
+@receiver(post_save, sender=LearningRecord)
+def create_or_update_teacher_query(sender, instance, created, **kwargs):
+    """
+    Signal handler for creating or updating TeacherQuery instance when a Teacher instance is created or updated.
+    """
+    teacher = None
+    if isinstance(instance, Teacher):
+        teacher = instance
+        print("Teacher")
+    elif isinstance(instance, LearningRecord):
+        teacher = instance.teacher
+        print("Teaching")
+   
+    if teacher:
+        try:
+            # Attempt to retrieve the existing TeacherQuery instance related to the teacher
+            teacher_query = TeacherQuery.objects.get(teacher_records=teacher)
+        except TeacherQuery.DoesNotExist:
+            # If TeacherQuery instance does not exist, create a new one
+            teacher_query = TeacherQuery.objects.create(teacher_records=teacher)
+
+    # Update the fields of the TeacherQuery instance
+        teacher_query.admin = teacher.admin
+       
+        # Get related learning records 
+        related_learning_records = teacher.learningrecord_set.all()
+       
+        # Update learning records fields in TeacherQuery
+        learning_record_instance = related_learning_records.first()
+        
+        if learning_record_instance:
+            teacher_query.learning_records = learning_record_instance
+
+        # Set learning record id
+        teacher_query.learning_record_id = learning_record_instance.id if learning_record_instance else None
+
+        # Calculate class duration for learning records
+        total_class_duration = timedelta()  # Initialize total class duration as timedelta object
+        for record in related_learning_records:
+            class_duration = datetime.combine(datetime.today(), record.end_time) - datetime.combine(datetime.today(), record.starting_time)
+            total_class_duration += class_duration
+
+        # Count the number of courses and subjects
+        # num_of_courses = teacher.learningrecord_set.values('course').distinct().count()
+        num_of_subjects = teacher.learningrecord_set.values('class_name').distinct().count()
+
+        # Update the fields in TeacherQuery instance
+        teacher_query.num_of_classes = num_of_subjects
+
+        # Update the completed hours and remaining hours fields in TeacherQuery
+        teacher_query.completed_hours = total_class_duration.total_seconds() // 3600  # Convert seconds to hours
+        teacher_query.remaining_hours = (num_of_subjects * 2) - teacher_query.completed_hours  # Assuming each class is 30 hours
+
+        # Save the updated StudentQuery instance
+        teacher_query.save()
+
+# Register signal handlers
+post_save.connect(create_or_update_teacher_query, sender=Teacher)
 
 # TeacherQuery here
 # class TeacherQuery(models.Model):

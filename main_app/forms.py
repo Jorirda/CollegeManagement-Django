@@ -7,11 +7,9 @@ from .models import *
 class FormSettings(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(FormSettings, self).__init__(*args, **kwargs)
+        # Here make some changes such as:
         for field in self.visible_fields():
-            if isinstance(field.field.widget, forms.CheckboxSelectMultiple):
-                field.field.widget.attrs['class'] = 'form-check-input'
-            else:
-                field.field.widget.attrs['class'] = 'form-control'
+            field.field.widget.attrs['class'] = 'form-control'
 
 
 class CustomUserForm(FormSettings):
@@ -134,7 +132,6 @@ class TeacherForm(CustomUserForm):
         model = Teacher
         fields = CustomUserForm.Meta.fields + ['course', 'work_type', 'home_number', 'cell_number', 'campus']
 
-
 class CourseForm(FormSettings):
     def __init__(self, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)
@@ -160,14 +157,13 @@ class InstitutionForm(FormSettings):
         model = Institution
         fields = ['name']
 
-class CampusForm(forms.ModelForm):
+class CampusForm(FormSettings):
+    def __init__(self, *args, **kwargs):
+        super(CampusForm, self).__init__(*args, **kwargs)
+
     class Meta:
         model = Campus
         fields = ['name', 'institution', 'teacher', 'student']
-        widgets = {
-            'teacher': forms.CheckboxSelectMultiple()
-        }
-
             
 class PaymentRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}))
@@ -201,7 +197,6 @@ class LearningRecordForm(FormSettings):
         model = LearningRecord
         fields = ['date','student','course','teacher','starting_time','end_time', 'class_name','remark']
 
-
 class ClassScheduleForm(FormSettings):
     lesson_unit_price = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': '¥'}))
    
@@ -211,7 +206,6 @@ class ClassScheduleForm(FormSettings):
     class Meta:
         model = ClassSchedule
         fields = ['course','lesson_unit_price','teacher','subject','class_time','remark']
-
 
 class StudentQueryForm(FormSettings):
     gender = forms.ChoiceField(choices=[('Male', 'Male'), ('Female', 'Female')])
@@ -238,7 +232,6 @@ class StudentQueryForm(FormSettings):
         fields = ['gender', 'date_of_birth', 'contact_num', 'state', 'payment_status', 
                                                'refund_situation', 'reg_date', 'num_classes', 'registered_courses', 'completed_hours', 
                                                'paid_hours', 'remaining_hours', 'course', 'session']
-
 
 class SessionForm(FormSettings):
     def __init__(self, *args, **kwargs):

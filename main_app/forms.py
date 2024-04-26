@@ -104,7 +104,7 @@ class TeacherForm(CustomUserForm):
     work_type = forms.ChoiceField(choices=[('Special Teacher', 'Special Teacher'), ('Temporary Contract', 'Temporary Contract')])
     home_number = forms.CharField(max_length=20, required=False)
     cell_number = forms.CharField(max_length=20, required=False)
-    campus = forms.CharField(max_length=100, required=False)
+    campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False)
 
     def __init__(self, *args, **kwargs):
         super(TeacherForm, self).__init__(*args, **kwargs)
@@ -123,6 +123,7 @@ class TeacherForm(CustomUserForm):
     class Meta(CustomUserForm.Meta):
         model = Teacher
         fields = CustomUserForm.Meta.fields + ['course', 'work_type', 'home_number', 'cell_number', 'campus']
+
 
 class CourseForm(FormSettings):
     name = forms.CharField(label=_('Course Name'))
@@ -158,7 +159,7 @@ class CampusForm(FormSettings):
 
     class Meta:
         model = Campus
-        fields = ['name', 'institution', 'teacher', 'student']
+        fields = ['name', 'institution']
             
 class PaymentRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=DateInput(attrs={'type': 'date'}), label=_('Date'))

@@ -62,7 +62,7 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-university"></i>
                         <p>
-                            Institution
+                            {% trans "Institution" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
@@ -73,7 +73,7 @@
                                 class="nav-link  {% if add_institution == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>
-                                    Add institution
+                                    {% trans "Add Institution" %}
 
                                 </p>
                             </a>
@@ -85,7 +85,7 @@
                                 class="nav-link  {% if edit_course == request.path or manage_institution == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>
-                                    Manage Institution
+                                    {% trans "Manage Institution" %}
 
                                 </p>
                             </a>
@@ -98,7 +98,7 @@
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-school"></i>
                         <p>
-                            Campus
+                            {% trans "Campus" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
@@ -109,7 +109,7 @@
                                 class="nav-link  {% if add_campus == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>
-                                    Add Campus
+                                    {% trans "Add Campus" %}
 
                                 </p>
                             </a>
@@ -121,7 +121,7 @@
                                 class="nav-link  {% if edit_course == request.path or manage_campus == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>
-                                    Manage Campus
+                                    {% trans "Manange Campus" %}
 
                                 </p>
                             </a>

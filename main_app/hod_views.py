@@ -45,8 +45,6 @@ def get_result(excel_file):
 
     return csv_data
 
-
-
 def get_upload(request):
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
@@ -59,7 +57,6 @@ def get_upload(request):
     else:
         form = ExcelUploadForm()
     return render(request, 'hod_template/upload.html', {'form': form})
-
 
 def admin_home(request):
     total_teacher = Teacher.objects.all().count()
@@ -284,7 +281,7 @@ def add_institution(request):
     form = InstitutionForm(request.POST or None)
     context = {
         'form': form,
-        'page_title': 'Add Institution'
+        'page_title':  _('Add Institution')
     }
     if request.method == 'POST':
         if form.is_valid():
@@ -305,21 +302,19 @@ def add_campus(request):
     form = CampusForm(request.POST or None)
     context = {
         'form': form,
-        'page_title': 'Add Campus'
+        'page_title':  _('Add Campus')
     }
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
             institution = form.cleaned_data.get('institution')
-            teacher = form.cleaned_data.get('teacher')
-            student = form.cleaned_data.get('student')
+           
          
             try:
                 campus = Campus()
                 campus.name = name
                 campus.institution = institution
-                campus.teacher = teacher
-                campus.student = student
+                
             
                 campus.save()
                 messages.success(request, "Successfully Added")
@@ -508,7 +503,7 @@ def manage_institution(request):
     institutions = Institution.objects.all()
     context = {
         'institutions': institutions,
-        'page_title': 'Manage Institutions'
+        'page_title':  _('Manage Institutions')
     }
     return render(request, "hod_template/manage_institution.html", context)
 
@@ -516,7 +511,7 @@ def manage_campus(request):
     campuses = Campus.objects.all()
     context = {
         'campuses': campuses,
-        'page_title': 'Manage Campuses'
+        'page_title': _('Manage Campuses')
     }
     return render(request, "hod_template/manage_campus.html", context)
 
@@ -910,7 +905,7 @@ def edit_institution(request, institution_id):
     context = {
         'form': form,
         'institution_id': institution_id,
-        'page_title': 'Edit Institution'
+        'page_title': _('Edit Institution')
     }
     if request.method == 'POST':
         if form.is_valid():
@@ -933,21 +928,19 @@ def edit_campus(request, campus_id):
     context = {
         'form': form,
         'campus_id': campus_id,
-        'page_title': 'Edit Campus'
+        'page_title': _('Edit Campus')
     }
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
             institution = form.cleaned_data.get('institution')
-            teacher = form.cleaned_data.get('teacher')
-            student = form.cleaned_data.get('student')
+           
            
             try:
                 campus = Campus.objects.get(id=campus_id)
                 campus.name = name
                 campus.institution = institution
-                campus.teacher = teacher
-                campus.student = student
+              
                
                 campus.save()
                 messages.success(request, "Successfully Added")

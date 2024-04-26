@@ -124,9 +124,9 @@ class Subject(models.Model):
     
 class Campus(models.Model):
     name = models.CharField(max_length=100)
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='campuses')
-    teacher = models.ForeignKey(Teacher, related_name='campuses')
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='campuses', null=True, blank=True)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='campuses',)
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='campuses',default="")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='campuses', null=True, blank=True,default="")
 
     def __str__(self):
         return self.name

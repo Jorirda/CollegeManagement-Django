@@ -16,9 +16,25 @@ from .forms import *
 from .models import *
 from .forms import ExcelUploadForm
 from django.utils.translation import gettext as _
+from django.views.generic import TemplateView
 
 
+class SidebarView(TemplateView):
+    template_name = 'main_app/sidebar_template.html'
 
+    def get_context_data(self, **kwargs):
+        # Get the existing context from the superclass
+        context = super().get_context_data(**kwargs)
+
+        # Add user-specific data to the context
+        if self.request.user.is_authenticated:
+            context['first_name'] = self.request.user.first_name
+            context['last_name'] = self.request.user.last_name
+        else:
+            context['first_name'] = 'Guest'
+            context['last_name'] = ''
+        return context
+    
 
 def get_result(excel_file):
     # Read the Excel file into a pandas DataFrame

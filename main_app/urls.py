@@ -42,7 +42,6 @@ urlpatterns = [
     path("payment/add", hod_views.add_payment_record, name='add_payment_record'),
     path("learn/add", hod_views.add_learning_record, name='add_learning_record'),
     path("schedule/add", hod_views.add_class_schedule, name='add_class_schedule'),
-    # path("studentquery/add", hod_views.add_student_query, name='add_student_query'),
 
     path("admin_notify_student", hod_views.admin_notify_student,name='admin_notify_student'),
     path("admin_notify_teacher", hod_views.admin_notify_teacher,name='admin_notify_teacher'),

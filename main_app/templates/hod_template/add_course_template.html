@@ -1,5 +1,6 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
+{% load i18n %}
 {% block page_title %}{{page_title}}{% endblock page_title %}
 
 {% block content %}
@@ -14,7 +15,7 @@
                         <h3 class="card-title">{{page_title}}</h3>
                     </div>
 
-                    {% include "main_app/form_template.html" with messages=messages  form=form button_text={% trans "Add Course" %} %}
+                    {% include "main_app/form_template.html" with messages=messages  form=form button_text="Add Course" %}
                 </div>
                 <!-- /.card -->
 

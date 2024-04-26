@@ -1,5 +1,6 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
+{% load i18n %}
 {% block page_title %}<i class="nav-icon fas fa-university"></i>  {{page_title}}{% endblock page_title %}
 
 {% block content %}
@@ -28,8 +29,8 @@
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{institution.name}}</td>
                                     <td>
-                                        <a href="{% url 'edit_institution' institution.id %}" class="btn btn-info">{% trans "Edit" %}</a> -
-                                        <a href="{% url 'delete_institution' institution.id %}" onclick="return confirm('Are you sure you want to delete this institution ?')" class="btn btn-danger">{% trans "Delete" %}</a> 
+                                        <a href="{% url 'edit_institution' institution.id %}" class="btn btn-info">{% trans 'Edit' %}</a> -
+                                        <a href="{% url 'delete_institution' institution.id %}" onclick="return confirm('{% trans 'Are you sure you want to delete this campus ?' %}')" class="btn btn-danger">{% trans 'Delete' %}
                                     </td>
                                 </tr>
                                 {% endfor %}

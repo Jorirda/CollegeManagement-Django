@@ -164,7 +164,7 @@ class CampusForm(FormSettings):
 
     class Meta:
         model = Campus
-        fields = ['name', 'institution', 'teacher', 'student']
+        fields = ['name', 'institution', 'teacher', 'student', 'courses']
 
             
 class PaymentRecordForm(FormSettings):

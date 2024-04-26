@@ -126,7 +126,8 @@ class Campus(models.Model):
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='campuses')
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='campuses', default="")
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='campuses', default="")
-    
+    courses = models.ManyToManyField(Course, related_name='campuses', default="")
+
     def __str__(self):
         return self.name
     

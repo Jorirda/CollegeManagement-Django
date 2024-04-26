@@ -266,12 +266,14 @@ def add_campus(request):
             institution = form.cleaned_data.get('institution')
             teacher = form.cleaned_data.get('teacher')
             student = form.cleaned_data.get('student')
+            courses = form.cleaned_data.get('courses')
             try:
                 campus = Campus()
                 campus.name = name
                 campus.institution = institution
                 campus.teacher = teacher
                 campus.student = student
+                campus.courses = courses
                 campus.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_campus'))
@@ -892,12 +894,14 @@ def edit_campus(request, campus_id):
             institution = form.cleaned_data.get('institution')
             teacher = form.cleaned_data.get('teacher')
             student = form.cleaned_data.get('student')
+            courses = form.cleaned_data.get('courses')
             try:
                 campus = Campus.objects.get(id=campus_id)
                 campus.name = name
                 campus.institution = institution
                 campus.teacher = teacher
                 campus.student = student
+                campus.courses = courses
                 campus.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('edit_campus', args=[campus_id]))

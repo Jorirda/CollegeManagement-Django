@@ -283,8 +283,6 @@ def add_campus(request):
 
     return render(request, 'hod_template/add_campus_template.html', context)
 
-
-
 def add_payment_record(request):
     form = PaymentRecordForm(request.POST or None)
     
@@ -472,7 +470,6 @@ def manage_campus(request):
         'page_title': 'Manage Campuses'
     }
     return render(request, "hod_template/manage_campus.html", context)
-
 
 def manage_payment_record(request):
     payments = PaymentRecord.objects.all()
@@ -881,6 +878,37 @@ def edit_institution(request, institution_id):
 
     return render(request, 'hod_template/edit_institution_template.html', context)
 
+def edit_campus(request, campus_id):
+    instance = get_object_or_404(Campus, id=campus_id)
+    form = CampusForm(request.POST or None, instance=instance)
+    context = {
+        'form': form,
+        'campus_id': campus_id,
+        'page_title': 'Edit Campus'
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            name = form.cleaned_data.get('name')
+            institution = form.cleaned_data.get('institution')
+            teacher = form.cleaned_data.get('teacher')
+            student = form.cleaned_data.get('student')
+            try:
+                campus = Campus.objects.get(id=campus_id)
+                campus.name = name
+                campus.institution = institution
+                campus.teacher = teacher
+                campus.student = student
+                campus.save()
+                messages.success(request, "Successfully Added")
+                return redirect(reverse('edit_campus', args=[campus_id]))
+
+            except Exception as e:
+                messages.error(request, "Could Not Add " + str(e))
+        else:
+            messages.error(request, "Fill Form Properly")
+
+    return render(request, 'hod_template/edit_campus_template.html', context)
+
 def edit_learn(request, learn_id):
     instance = get_object_or_404(LearningRecord, id=learn_id)
     form = LearningRecordForm(request.POST or None, instance=instance)
@@ -1229,6 +1257,12 @@ def delete_institution(request, institution_id):
         messages.error(
             request, "Sorry, some records are associated with this institution. Kindly resolve them and try again.")
     return redirect(reverse('manage_institution'))   
+
+def delete_campus(request, campus_id):
+    campus = get_object_or_404(Campus, id=campus_id)
+    campus.delete()
+    messages.success(request, "Campus deleted successfully!")
+    return redirect(reverse('manage_campus'))
 
 def delete_learning_record(request, learn_id):
     learn = get_object_or_404(LearningRecord, id=learn_id)

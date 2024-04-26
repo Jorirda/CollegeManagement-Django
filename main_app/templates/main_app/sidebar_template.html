@@ -113,7 +113,7 @@
                         <li class="nav-item">
                             {% url 'add_campus' as add_campus %}
                             <a href="{{add_campus}}"
-                                class="nav-link  {% if add_institution == request.path %} active {% endif %}">
+                                class="nav-link  {% if add_campus == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
                                 <p>
                                     Add Campus
@@ -123,7 +123,7 @@
                         </li>
                         <li class="nav-item">
                             {% url 'manage_campus' as manage_campus %}
-                            {% url 'edit_institution' course_id as edit_institution %}
+                            {% url 'edit_campus' course_id as edit_campus %}
                             <a href="{{manage_campus}}"
                                 class="nav-link  {% if edit_course == request.path or manage_campus == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-th"></i>

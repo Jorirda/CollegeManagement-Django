@@ -23,12 +23,14 @@ class CustomUserForm(FormSettings):
     password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
     profile_pic = forms.ImageField(label=_('Profile Picture')) 
     address = forms.CharField(widget=forms.Textarea, label=_('Address'))
+    home_number = forms.CharField(required=True, label=_('Home Number'))
+    cell_number = forms.CharField(required=True, label=_('Cell Number'))
     contact_num = forms.CharField(required=True, label=_('Contact Number'))
     remark = forms.CharField(required=True, label=_('Remark'))
 
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'email', 'gender', 'password', 'profile_pic', 'address', 'contact_num', 'remark']
+        fields = ['first_name', 'last_name', 'email', 'gender', 'password', 'profile_pic', 'address', 'contact_num', 'home_number', 'cell_number', 'remark']
 
     def __init__(self, *args, **kwargs):
         super(CustomUserForm, self).__init__(*args, **kwargs)

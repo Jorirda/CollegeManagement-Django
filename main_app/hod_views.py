@@ -152,7 +152,9 @@ def add_teacher(request):
             first_name = form.cleaned_data.get('first_name')
             last_name = form.cleaned_data.get('last_name')
             address = form.cleaned_data.get('address')
-            contact_num = form.cleaned_data.get('contact_num')
+            home_number = form.cleaned_data.get('home_number')
+            cell_number = form.cleaned_data.get('cell_number')
+            campus = form.cleaned_data.get('campus')
             remark = form.cleaned_data.get('remark')
             email = form.cleaned_data.get('email')
             gender = form.cleaned_data.get('gender')
@@ -165,10 +167,14 @@ def add_teacher(request):
             passport_url = fs.url(filename)
             try:
                 user = CustomUser.objects.create_user(
-                    email=email, password=password, user_type=2, first_name=first_name, last_name=last_name, profile_pic=passport_url)
+                    email=email, password=password, user_type=2, first_name=first_name, last_name=last_name, 
+                    profile_pic=passport_url, 
+                )
                 user.gender = gender
                 user.address = address
-                user.contact_num = contact_num
+                user.home_number = home_number
+                user.cell_number = cell_number
+                user.campus = campus
                 user.remark = remark
                 user.teacher.course = course
                 user.teacher.work_type = work_type
@@ -195,6 +201,8 @@ def add_student(request):
             date_of_birth = student_form.cleaned_data.get('date_of_birth')
             address = student_form.cleaned_data.get('address')
             email = student_form.cleaned_data.get('email')
+            home_number = student_form.cleaned_data.get('home_number')
+            cell_number = student_form.cleaned_data.get('cell_number')
             contact_num = student_form.cleaned_data.get('contact_num')
             password = student_form.cleaned_data.get('password')
             reg_date = student_form.cleaned_data.get('reg_date')
@@ -215,6 +223,8 @@ def add_student(request):
                 user.student.date_of_birth = date_of_birth
                 user.address = address
                 user.student.session = session
+                user.home_number = home_number
+                user.cell_number = cell_number
                 user.contact_num = contact_num
                 user.student.reg_date = reg_date
                 user.student.state = state
@@ -742,10 +752,7 @@ def edit_teacher(request, teacher_id):
 
     if request.method == 'POST':
         if form.is_valid():
-            # Extract cleaned data from the form
             cleaned_data = form.cleaned_data
-
-            # Extract required data
             first_name = cleaned_data.get('first_name')
             last_name = cleaned_data.get('last_name')
             home_number = cleaned_data.get('home_number')
@@ -762,37 +769,31 @@ def edit_teacher(request, teacher_id):
             passport = request.FILES.get('profile_pic')
 
             try:
-                # Get the related CustomUser object directly from the teacher's admin attribute
                 user = teacher.admin
                 user.username = username
                 user.email = email
 
-                # If password is provided, set it
                 if password is not None:
                     user.set_password(password)
 
-                # If profile pic is provided, save it
                 if passport is not None:
                     fs = FileSystemStorage()
                     filename = fs.save(passport.name, passport)
                     passport_url = fs.url(filename)
                     user.profile_pic = passport_url
 
-                # Update other user details
                 user.first_name = first_name
                 user.last_name = last_name
                 user.home_number = home_number
                 user.cell_number = cell_number
-                user.school = campus
+                user.campus = campus
                 user.gender = gender
                 user.address = address
                 user.remark = remark
 
-                # Update teacher details
                 teacher.course = course
                 teacher.work_type = work_type
 
-                # Save changes
                 user.save()
                 teacher.save()
 
@@ -803,10 +804,8 @@ def edit_teacher(request, teacher_id):
         else:
             messages.error(request, "Please fill the form properly")
     else:
-        # For GET request, render the form template
         return render(request, "hod_template/edit_teacher_template.html", context)
 
-    # If the request is POST or if there's an error, render the form template with errors
     return render(request, "hod_template/edit_teacher_template.html", context)
 
 def edit_student(request, student_id):

@@ -1,6 +1,5 @@
 import os
-import random
-import string
+
 import django
 import pandas as pd
 import numpy as np
@@ -18,7 +17,7 @@ django.setup()
 fake = Faker()
 
 # Define the number of samples
-num_samples = 1
+num_samples = 3
 
 # Generate fake data
 data = {
@@ -46,6 +45,7 @@ file_path = 'student_information.xlsx'
 df.to_excel(file_path, index=False)
 
 print(f"Excel file generated: {file_path}")
+
 
 
 def process_data(excel_file, is_teacher):

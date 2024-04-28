@@ -182,7 +182,9 @@ def add_teacher(request):
             passport_url = fs.url(filename)
             try:
                 user = CustomUser.objects.create_user(
-                    email=email, password=password, user_type=2, first_name=first_name, last_name=last_name, profile_pic=passport_url)
+                    email=email, password=password, user_type=2, first_name=first_name, last_name=last_name, 
+                    profile_pic=passport_url, 
+                )
                 user.gender = gender
                 user.address = address
                 user.home_number = home_number
@@ -774,10 +776,7 @@ def edit_teacher(request, teacher_id):
 
     if request.method == 'POST':
         if form.is_valid():
-            # Extract cleaned data from the form
             cleaned_data = form.cleaned_data
-
-            # Extract required data
             first_name = cleaned_data.get('first_name')
             last_name = cleaned_data.get('last_name')
             home_number = cleaned_data.get('home_number')
@@ -795,23 +794,19 @@ def edit_teacher(request, teacher_id):
             passport = request.FILES.get('profile_pic')
 
             try:
-                # Get the related CustomUser object directly from the teacher's admin attribute
                 user = teacher.admin
                 user.username = username
                 user.email = email
 
-                # If password is provided, set it
                 if password is not None:
                     user.set_password(password)
 
-                # If profile pic is provided, save it
                 if passport is not None:
                     fs = FileSystemStorage()
                     filename = fs.save(passport.name, passport)
                     passport_url = fs.url(filename)
                     user.profile_pic = passport_url
 
-                # Update other user details
                 user.first_name = first_name
                 user.last_name = last_name
                 user.home_number = home_number
@@ -826,7 +821,6 @@ def edit_teacher(request, teacher_id):
                 teacher.course = course
                 teacher.work_type = work_type
 
-                # Save changes
                 user.save()
                 teacher.save()
 
@@ -837,10 +831,8 @@ def edit_teacher(request, teacher_id):
         else:
             messages.error(request, "Please fill the form properly")
     else:
-        # For GET request, render the form template
         return render(request, "hod_template/edit_teacher_template.html", context)
 
-    # If the request is POST or if there's an error, render the form template with errors
     return render(request, "hod_template/edit_teacher_template.html", context)
 
 def edit_student(request, student_id):

@@ -82,3 +82,8 @@ h1 {
   background-color: #0056b3;
 }
 
+.user-panel .image img.custom-user-image {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+}

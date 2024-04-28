@@ -5,7 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 from .models import *
 
 class ExcelUploadForm(forms.Form):
-    excel_file = forms.FileField(label=_('Upload Excel File'))
+    excel_file = forms.FileField(label='Upload Excel File')
+    is_teacher = forms.BooleanField(label='Is this data for teachers?', required=False, initial=False)
 
 class FormSettings(forms.ModelForm):
     def __init__(self, *args, **kwargs):

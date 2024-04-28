@@ -5,8 +5,10 @@
 {% block content %}
 
 <body>
-    <h2>CSV Data:</h2>
-    <pre>{{ csv_data }}</pre>
+    <h1>Resulting Table</h1>
+    <p>{{ message }}</p>
+    <!-- Display the HTML table passed from the view -->
+    {{ html_table|safe }}
 </body>
 {% endblock content %}
 {% block custom_js %}

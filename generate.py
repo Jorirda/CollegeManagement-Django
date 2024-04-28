@@ -2,108 +2,108 @@ import os
 import random
 import string
 import django
-import csv
 import pandas as pd
-
-# Set up Django settings
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'college_management_system.settings')
-django.setup()
-
-# Now you can import Django settings safely
+import numpy as np
+from faker import Faker
 from django.contrib.auth.hashers import make_password
 from django.utils.crypto import get_random_string
 from main_app.models import CustomUser
 from django.db import IntegrityError
 
+# Set up Django settings
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'college_management_system.settings')
+django.setup()
 
-def generate_fake_data(num_data):
-    fake_data = []
-    with open('fake_users.txt', 'w') as file:
-        for i in range(num_data):
-            # Generate fake first name and last name
-            unique_id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
-            first_name = "Student"
-            last_name = generate_last_name()
-            email = f"{first_name.lower()}.{last_name.lower()}{unique_id}@qq.com"
-            password = get_random_string(12)  # Generate a random password
-            hashed_password = make_password(password)  # Hash the password
-            # Write email and password to file
-            file.write(f"Email: {email}, Password: {password}\n")
+# Create a Faker generator
+fake = Faker()
 
-            fake_data.append({
-                'first_name': first_name,
-                'last_name': last_name,
-                'email': email,
-                'password': password,  # Include the password in the dictionary
-                'gender': random.choice(['M', 'F']),
-                'profile_pic': '/media/default.jpg',  # Provide a default profile picture path
-                'address': 'Sample Address',
-                'contact_num': '1234567890',  # Provide a default contact number
-                'remark': 'Sample Remark',
-                'fcm_token': ''  # Provide a default FCM token if applicable
-            })
-    return fake_data
-
-def generate_last_name():
-    # Generate a random last name
-    syllables = ['bo', 'cha', 'da', 'fe', 'ga', 'hi', 'jo', 'ka', 'la', 'ma', 'na', 'pa', 'ra', 'sa', 'ta', 'va']
-    last_name = ''.join(random.choices(syllables, k=random.randint(2, 3))).title()
-    return last_name
-
-def write_fake_data_to_database(fake_data):
-    for teacher_data in fake_data:
-        try:
-
-            user = CustomUser.objects.create_user(
-                email=teacher_data['email'],
-                is_teacher=False,
-                is_superuser = False,
-                user_type = 3,
-                first_name=teacher_data['first_name'],
-                last_name=teacher_data['last_name'],
-                password=teacher_data['password'],  # Use the provided password  # Assuming 2 represents the user type for data
-                gender=teacher_data['gender'],
-                profile_pic=teacher_data['profile_pic'],
-                address=teacher_data['address'],
-                contact_num=teacher_data['contact_num'],
-                remark=teacher_data['remark'],
-                fcm_token=teacher_data['fcm_token']
-                )
-
-        except IntegrityError:
-            # Handle integrity errors, e.g., by generating a new admin_id
-            print("Error")
-            pass
+# Define the number of samples
+num_samples = 1
 
 # Generate fake data
-fake_data = generate_fake_data(5)
+data = {
+    'Full Name': [fake.name() for _ in range(num_samples)],
+    'Email': [fake.email() for _ in range(num_samples)],
+    'Home Number': [fake.phone_number() for _ in range(num_samples)],
+    'Cell Number': [fake.phone_number() for _ in range(num_samples)],
+    'Campus': [fake.city() for _ in range(num_samples)],
+    'Grade': np.random.randint(1, 13, size=num_samples),
+    'Gender': [fake.random_element(elements=('Male', 'Female')) for _ in range(num_samples)],
+    'Date of Birth': [fake.date_of_birth(minimum_age=10, maximum_age=18).isoformat() for _ in range(num_samples)],
+    'Address': [fake.address().replace('\n', ', ') for _ in range(num_samples)],
+    'Registration Date': [fake.date_this_year().isoformat() for _ in range(num_samples)],
+    'State': [fake.state() for _ in range(num_samples)],
+    'Remark': ['None' for _ in range(num_samples)]  # Placeholder for remarks
+}
 
-# Write fake data to the database
-# write_fake_data_to_database(fake_data)
+# Create a DataFrame
+df = pd.DataFrame(data)
 
-def excel_to_csv(excel_file, csv_file):
-    # Read the Excel file into a pandas DataFrame
-    df = pd.read_excel(excel_file)
+# Specify a file path to save the Excel file
+file_path = 'student_information.xlsx'
 
-    # Write the DataFrame to a CSV file
-    df.to_csv(csv_file, index=False)  # Set index=False to exclude row numbers from the CSV
+# Save DataFrame to an Excel file
+df.to_excel(file_path, index=False)
 
-# Specify the paths for your Excel and CSV files
-excel_file = 'C:/Users/total/Desktop/开发计划.xlsx'  # Change this to the path of your Excel file
-csv_file = 'output.csv'    # Change this to the desired path for your CSV file
-
-# Convert Excel to CSV
-excel_to_csv(excel_file, csv_file)
-
-def read_csv_and_display_fields(csv_file):
-    with open(csv_file, 'r', encoding='utf-8') as file:
-        csv_reader = csv.DictReader(file)
-        for row in csv_reader:
-            print("Row:")
-            for field, value in row.items():
-                print(f"{field}: {value}")
-            print()  # Add a newline between rows
+print(f"Excel file generated: {file_path}")
 
 
-# Assuming your CSV file is named 'data.csv', you can call the function like this:
-read_csv_and_display_fields('output.csv')
+def process_data(excel_file, is_teacher):
+    try:
+        df = pd.read_excel(excel_file)
+        print("Dataframe loaded successfully with {} rows.".format(len(df)))
+    except Exception as e:
+        print(f"Failed to read Excel file: {str(e)}")
+        return None  # Return early if the file cannot be processed
+
+    fake_data = []
+
+    if is_teacher:
+        file = open('fake_users.txt', 'w')
+        print("Opened file for writing teacher login information.")
+
+    for index,row in df.iterrows():
+        first_name = row['Full Name'].split()[0]
+        last_name = row['Full Name'].split()[-1]
+        email = row['Email']
+
+        if is_teacher:
+            password = get_random_string(12)
+            hashed_password = make_password(password)
+            file.write(f"Email: {email}, Password: {password}\n")
+            print(f"Processed teacher {email} - login info written to file.")
+        else:
+            password = None
+            hashed_password = None
+            print(f"Processed student {email} - no login info required.")
+
+        user_data = {
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': email,
+            'password': hashed_password,
+            'profile_pic': '/media/default.jpg',
+            'gender': row['Gender'],
+            'address': row['Address'],
+            'contact_num': row['Cell Number'],
+            'is_teacher': is_teacher,
+            'user_type': 2 if is_teacher else 3,  # Assuming 2 is for teachers and 3 is for students
+            'fcm_token': ''
+        }
+
+        try:
+            CustomUser.objects.create_user(**user_data)
+            fake_data.append(user_data)
+            print(f"User {email} created and added to fake data.")
+        except IntegrityError as e:
+            print(f"Error: Duplicate or invalid data for email {email} - {str(e)}")
+
+    if is_teacher:
+        file.close()
+        print("Teacher login file closed.")
+
+    print("Data processing complete for", "teachers" if is_teacher else "students")
+    return fake_data  # Returning fake_data could be more useful than just the file path
+
+# Example usage
+# process_data('path_to_excel_file.xlsx', is_teacher=True)

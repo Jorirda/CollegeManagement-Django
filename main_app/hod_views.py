@@ -1,7 +1,12 @@
 import io
 import json
+from django.db import IntegrityError
 import requests
 import pandas as pd
+import numpy as np
+import random
+import string
+
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse, JsonResponse
@@ -12,11 +17,15 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import UpdateView
 from django.db.models import Sum
+from django.contrib.auth.hashers import make_password
+from django.shortcuts import render
+from generate import process_data
 from .forms import *
 from .models import *
 from .forms import ExcelUploadForm
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 
 class SidebarView(TemplateView):
@@ -34,29 +43,34 @@ class SidebarView(TemplateView):
             context['first_name'] = 'Guest'
             context['last_name'] = ''
         return context
-    
 
-def get_result(excel_file):
-    # Read the Excel file into a pandas DataFrame
-    df = pd.read_excel(excel_file)
-
-    # Convert DataFrame to CSV string
-    csv_data = df.to_csv(index=False)
-
-    return csv_data
 
 def get_upload(request):
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
         if form.is_valid():
             excel_file = request.FILES['excel_file']
-            # Process the Excel file using the get_result function
-            csv_data = get_result(excel_file)
-            # Render the result
-            return render(request, 'hod_template/result.html', {'csv_data': csv_data})
+            is_teacher = form.cleaned_data['is_teacher']
+            try:
+
+                # Assuming process_excel is the correct function that processes the file
+                csv_data = get_result(excel_file, is_teacher)  # Changed from get_upload to process_excel
+                process_data(excel_file, is_teacher)
+                message = 'Data processed successfully!'
+                context = {'message': message, 'html_table': csv_data}
+            except Exception as e:
+                message = f"Failed to process data: {str(e)}"
+                context = {'message': message}
+            return render(request, 'hod_template/result.html', context)
     else:
         form = ExcelUploadForm()
     return render(request, 'hod_template/upload.html', {'form': form})
+
+def get_result(excel_file, is_teacher):
+    # Assuming excel_file is an InMemoryUploadedFile object from the form
+    df = pd.read_excel(excel_file.file)  # Read the Excel file into a DataFrame
+    html_table = df.to_html(index=False, classes='table table-bordered table-striped')  # Convert DataFrame to HTML table
+    return html_table
 
 def admin_home(request):
     total_teacher = Teacher.objects.all().count()

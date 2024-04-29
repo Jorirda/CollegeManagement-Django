@@ -1,16 +1,19 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+{% load i18n %}
+
+{% block page_title %}
+  {{ page_title }}
+{% endblock page_title %}
 
 {% block content %}
-
 <section class="content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
+                        <h3 class="card-title">{{ page_title }}</h3>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
@@ -18,32 +21,31 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th>#</th>
-                                    <th>Full Name</th>
-                                    <th>Email</th>
-                                    <th>Gender</th>
-                                    <th>Course</th>
-                                    <th>Avatar</th>
-                                    <th>Action</th>
+                                    <th>{% trans 'Full Name' %}</th>
+                                    <th>{% trans 'Email' %}</th>
+                                    <th>{% trans 'Gender' %}</th>
+                                    <th>{% trans 'Course' %}</th>
+                                    <th>{% trans 'Avatar' %}</th>
+                                    <th>{% trans 'Action' %}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for teacher in allTeacher %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{teacher.last_name}}, {{teacher.first_name}}</td>
-                                    <td>{{teacher.email}}</td>
-                                    <td>{{teacher.gender}}</td>
-                                    <td>{{teacher.teacher.course.name}}</td>
+                                    <td>{{ teacher.last_name }}, {{ teacher.first_name }}</td>
+                                    <td>{{ teacher.email }}</td>
+                                    <td>{{ teacher.gender }}</td>
+                                    <td>{{ teacher.teacher.course.name }}</td>
                                     <td>
-                                        {% if teacher.profile_pic == ""  %}
-                                        No Image
+                                        {% if teacher.profile_pic == "" %}
+                                        {% trans 'No Image' %}
                                         {% else %}
                                         <img class="img img-fluid mb-2" height="56" width="56"
-                                            src="{{teacher.profile_pic}}" alt="">
+                                            src="{{ teacher.profile_pic }}" alt="">
                                         {% endif %}
                                     </td>
-                                    <td><button data-toggle = "modal" data-target = "#myModal"class="btn btn-primary show_notification" value="{{teacher.id}}">Send Notification</button> 
-                                    </td>
+                                    <td><button data-toggle="modal" data-target="#myModal" class="btn btn-primary show_notification" value="{{ teacher.id }}">{% trans 'Send Notification' %}</button></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -54,74 +56,61 @@
         </div>
     </div>
 </section>
-<div class = "modal fade" id = "myModal" tabindex = "-1" role = "dialog" 
-   aria-labelledby = "myModalLabel" aria-hidden = "true">
-   
-   <div class = "modal-dialog">
-      <div class = "modal-content">
-         
-         <div class = "modal-header">Send Notification
-            <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">{% trans 'Send Notification' %}
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                   &times;
             </button>
-            
-           
          </div>
-         
-         <div class = "modal-body">
+         <div class="modal-body">
             <div class="form-group">
-                <input type="text" id="message" class='form-control'>
-                <input type="hidden"  id="teacher_id" class='form-control'>
+                <input type="text" id="message" class="form-control" placeholder="{% trans 'Type your message here...' %}">
+                <input type="hidden" id="teacher_id" class="form-control">
             </div>
          </div>
-         
-         <div class = "modal-footer">
-            <button type = "button" class = "btn btn-danger" data-dismiss = "modal">
-               Close
+         <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">
+               {% trans 'Close' %}
             </button>
-            
-            <button type = "button" id='send' class = "btn btn-success send_notification">
-               Send Notification
+            <button type="button" id='send' class="btn btn-success send_notification">
+               {% trans 'Send Notification' %}
             </button>
          </div>
-         
       </div><!-- /.modal-content -->
    </div><!-- /.modal-dialog -->
-  
 </div><!-- /.modal -->
 {% endblock content %}
 {% block custom_js %}
   <script>
       $(".show_notification").click(function(){
-          $("#teacher_id").val($(this).val())
-      })
+          $("#teacher_id").val($(this).val());
+      });
       $(".send_notification").click(function(){
-          var id = $("#teacher_id").val()
-          var message = $("#message").val()
-          sendNotification(id,message);
-      })
-    function sendNotification(id,message){
+          var id = $("#teacher_id").val();
+          var message = $("#message").val();
+          sendNotification(id, message);
+      });
+    function sendNotification(id, message){
         $.ajax({
             url: "{% url 'send_teacher_notification' %}",
             type: 'POST',
             data: {
                 id: id,
-                message:message
+                message: message
             }
         }).done(function (response) {
-           
           if (response == 'True'){
-            alert("Notification Sent");
+            alert("{% trans 'Notification Sent' %}");
             location.reload();
           }else{
-            alert("Notification could not be saved. Please try again.");
+            alert("{% trans 'Notification could not be saved. Please try again.' %}");
           }
-           
-        }).fail(function (response) {
-            alert("Error in saving token")
-        })
-
+        }).fail(function () {
+            alert("{% trans 'Error in saving notification' %}");
+        });
     }
-
   </script>
 {% endblock custom_js %}

@@ -1,60 +1,47 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}<i class="nav-icon fas fa-user"></i>  {{page_title}}{% endblock page_title %}
+{% load i18n %}
+
+{% block page_title %}
+  <i class="nav-icon fas fa-user"></i>  {{ page_title }}
+{% endblock page_title %}
 
 {% block content %}
-
 <section class="content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3 class="card-title">{{page_title}}</h3>
-                        <h3  class="card-title">Total Students: {{ total_student_count }}</h3>
+                        <h3 class="card-title">{{ page_title }}</h3>
+                        <h3 class="card-title">{% blocktrans with count=total_student_count %}Total Students: {{ count }}{% endblocktrans %}</h3>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
                         <table id="example2" class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
-                                   
                                     <th>#</th>
-                                    <th>Full Name</th>
-                                    <th>Email</th>
-                                    <th>Home Number</th>
-                                    <th>Cell Number</th>
-                                    <th>Campus</th>
-                                    <th>Grade</th>
-                                    <th>Gender</th>
-                                    
+                                    <th>{% trans 'Full Name' %}</th>
+                                    <th>{% trans 'Email' %}</th>
+                                    <th>{% trans 'Home Number' %}</th>
+                                    <th>{% trans 'Cell Number' %}</th>
+                                    <th>{% trans 'Campus' %}</th>
+                                    <th>{% trans 'Grade' %}</th>
+                                    <th>{% trans 'Gender' %}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for student in students %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{student.last_name}}, {{student.first_name}}</td>
-                                    <td>{{student.email}}</td>
-                                    <td>{{student.home_number}}</td>
-                                    <td>{{student.cell_number}}</td>
-                                    <td>{{student.campus}}</td>
-                                    <td>{{student.grade}}</td>
-                                    <td>{{student.gender}}</td>
-                                    
-                                    <!-- <td>
-                                        {% if student.profile_pic == ""  %}
-                                        No Image
-                                        {% else %}
-                                        <img class="img img-fluid mb-2" height="56" width="56"
-                                            src="{{student.profile_pic}}" alt="">
-                                        {% endif %}
-                                    </td>
-                                    <td>{{student.remark}} </td>
-                                    <td><a href="{% url 'edit_student' student.student.id %}" class="btn btn-info">Edit</a> -
-                                        <a href="{% url 'delete_student' student.student.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
-
-                                    </td> -->
+                                    <td>{{ student.last_name }}, {{ student.first_name }}</td>
+                                    <td>{{ student.email }}</td>
+                                    <td>{{ student.home_number }}</td>
+                                    <td>{{ student.cell_number }}</td>
+                                    <td>{{ student.campus }}</td>
+                                    <td>{{ student.grade }}</td>
+                                    <td>{{ student.gender }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -66,49 +53,41 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <!-- <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3 class="card-title">{{page_title}}</h3>
-                        <h3  class="card-title">Total Students: {{ total_student_count }}</h3>
-                    </div> -->
-                    <!-- /.card-header -->
                     <div class="card-body">
                         <table id="example2" class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
                                     <th>#</th>
-                                    <th>Date of Birth</th>
-                                    <th>Address</th>
-                                    <!-- <th>Contact #</th> -->
-                                    <th>Registration Date</th>
-                                    <th>State</th>
-                                    <th>Course</th>
-                                    <th>Avatar</th>
-                                    <th>Remark</th>
-                                    <th>Actions</th>
+                                    <th>{% trans 'Date of Birth' %}</th>
+                                    <th>{% trans 'Address' %}</th>
+                                    <th>{% trans 'Registration Date' %}</th>
+                                    <th>{% trans 'State' %}</th>
+                                    <th>{% trans 'Course' %}</th>
+                                    <th>{% trans 'Avatar' %}</th>
+                                    <th>{% trans 'Remark' %}</th>
+                                    <th>{% trans 'Actions' %}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for student in students %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{student.student.date_of_birth}}</td>
-                                    <td>{{student.address}}</td>
-                                    <!-- <td>{{student.contact_num}}</td> -->
-                                    <td>{{student.student.reg_date}}</td>
-                                    <td>{{student.student.state}}</td>
-                                    <td>{{student.student.course.name}}</td>
+                                    <td>{{ student.student.date_of_birth }}</td>
+                                    <td>{{ student.address }}</td>
+                                    <td>{{ student.student.reg_date }}</td>
+                                    <td>{{ student.student.state }}</td>
+                                    <td>{{ student.student.course.name }}</td>
                                     <td>
-                                        {% if student.profile_pic == ""  %}
-                                        No Image
+                                        {% if student.profile_pic == "" %}
+                                        {% trans 'No Image' %}
                                         {% else %}
-                                        <img class="img img-fluid mb-2" height="56" width="56"
-                                            src="{{student.profile_pic}}" alt="">
+                                        <img class="img img-fluid mb-2" height="56" width="56" src="{{ student.profile_pic }}" alt="">
                                         {% endif %}
                                     </td>
-                                    <td>{{student.remark}} </td>
-                                    <td><a href="{% url 'edit_student' student.student.id %}" class="btn btn-info">Edit</a> -
-                                        <a href="{% url 'delete_student' student.student.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
-
+                                    <td>{{ student.remark }}</td>
+                                    <td>
+                                        <a href="{% url 'edit_student' student.student.id %}" class="btn btn-info">{% trans 'Edit' %}</a> - 
+                                        <a href="{% url 'delete_student' student.student.id %}" class="btn btn-danger" onclick="return confirm('{% trans 'Are you sure about this?' %}')">{% trans 'Delete' %}</a>
                                     </td>
                                 </tr>
                                 {% endfor %}

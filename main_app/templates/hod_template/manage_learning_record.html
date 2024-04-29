@@ -1,52 +1,53 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}<i class="nav-icon fas fa-pencil-ruler"></i>  {{page_title}}{% endblock page_title %}
+{% load i18n %}
+
+{% block page_title %}
+    <i class="nav-icon fas fa-pencil-ruler"></i>  {% trans page_title %}
+{% endblock page_title %}
 
 {% block content %}
-
 <section class="content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
+                        <h3 class="card-title">{{ page_title }}</h3>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
-                       
                         <table id="example2" class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
                                     <th>#</th>
-                                    <th>Date</th>
-                                    <th>Student</th>
-                                    <th>Course</th>
-                                    <th>Teacher</th>
-                                    <th>Starting Time</th>
-                                    <th>End Time</th>
-                                    <th>Class</th>
-                                    <th>Remark</th>
-                                    <th>Actions</th>
+                                    <th>{% trans 'Date' %}</th>
+                                    <th>{% trans 'Student' %}</th>
+                                    <th>{% trans 'Course' %}</th>
+                                    <th>{% trans 'Teacher' %}</th>
+                                    <th>{% trans 'Starting Time' %}</th>
+                                    <th>{% trans 'End Time' %}</th>
+                                    <th>{% trans 'Class' %}</th>
+                                    <th>{% trans 'Remark' %}</th>
+                                    <th>{% trans 'Actions' %}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for learn in learning %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{learn.date}}</td>
-                                    <td>{{learn.student}}</td>
-                                    <td>{{learn.course}}</td>
-                                    <td>{{learn.teacher}}</td>
-                                    <td>{{learn.starting_time}}</td>
-                                    <td>{{learn.end_time}}</td>
-                                    <td>{{learn.class_name}}</td>
-                                    <td>{{learn.remark}}</td>
-                                    <td> 
-                                        <a href="{% url 'edit_learn' learn.id %}" class="btn btn-info">Edit</a> | 
-                                        <a href="{% url 'delete_learning_record' learn.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
-
-                                    </td> 
+                                    <td>{{ learn.date }}</td>
+                                    <td>{{ learn.student }}</td>
+                                    <td>{{ learn.course }}</td>
+                                    <td>{{ learn.teacher }}</td>
+                                    <td>{{ learn.starting_time }}</td>
+                                    <td>{{ learn.end_time }}</td>
+                                    <td>{{ learn.class_name }}</td>
+                                    <td>{{ learn.remark }}</td>
+                                    <td>
+                                        <a href="{% url 'edit_learn' learn.id %}" class="btn btn-info">{% trans 'Edit' %}</a> | 
+                                        <a href="{% url 'delete_learning_record' learn.id %}" class="btn btn-danger" onclick="return confirm('{% trans 'Are you sure about this ?' %}')">{% trans 'Delete' %}</a>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

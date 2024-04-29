@@ -1,5 +1,6 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
+{% load i18n %}
 {% block custom_css %}
   <style>
       .invalid{
@@ -14,7 +15,7 @@
       }
   </style>
 {% endblock custom_css %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+{% block page_title %}{% trans page_title %}{% endblock page_title %}
 
 {% block content %}
 
@@ -25,10 +26,10 @@
                 <!-- general form elements -->
                 <div class="card card-dark">
                     <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
+                        <h3 class="card-title">{% trans page_title %}</h3>
                     </div>
 
-                    {% include "main_app/form_template.html" with messages=messages  form=form button_text="Add Student"%}
+                    {% include "main_app/form_template.html" with messages=messages  form=form button_text=_("Add Student")%}
                 </div>
                 <!-- /.card -->
 

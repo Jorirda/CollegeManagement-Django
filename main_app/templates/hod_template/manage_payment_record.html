@@ -1,63 +1,61 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}<i class="nav-icon fas fa-yen-sign"></i> {{ page_title }}{% endblock page_title %}
+{% load i18n %}
+
+{% block page_title %}
+    <i class="nav-icon fas fa-yen-sign"></i> {{ page_title }}
+{% endblock page_title %}
 
 {% block content %}
-
 <section class="content">
-
     <div class="container-fluid">
-
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3 class="card-title">{{page_title}}</h3>
-                        <h3 class="card-title">Total Income: ¥{{ total_amount_paid }}</h3>
+                        <h3 class="card-title">{{ page_title }}</h3>
+                        <h3 class="card-title">{% blocktrans with total=total_amount_paid %}Total Income: ¥{{ total }}{% endblocktrans %}</h3>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
-                        {% comment %} <h2>Total Income: ¥{{ total_amount_paid }}</h2> {% endcomment %}
                         <table id="example2" class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
                                     <th>#</th>
-                                    <th>Date</th>
-                                    <th>Student</th>
-                                    <th>Course</th>
-                                    <th>Lesson Unit Price</th>
-                                    <th>Class</th>
-                                    <th>Discounted price</th>
-                                    <th>Book Costs</th>
-                                    <th>Other</th>
-                                    <th>Amount Due</th>
-                                    <th>Amount Paid</th>
-                                    <th>Payment Method</th>
-                                    <th>State</th>
-                                    <th>Payee</th>
-                                    <th>Remark</th>
-                                    {% comment %} <th>Actions</th> {% endcomment %}
+                                    <th>{% trans 'Date' %}</th>
+                                    <th>{% trans 'Student' %}</th>
+                                    <th>{% trans 'Course' %}</th>
+                                    <th>{% trans 'Lesson Unit Price' %}</th>
+                                    <th>{% trans 'Class' %}</th>
+                                    <th>{% trans 'Discounted Price' %}</th>
+                                    <th>{% trans 'Book Costs' %}</th>
+                                    <th>{% trans 'Other' %}</th>
+                                    <th>{% trans 'Amount Due' %}</th>
+                                    <th>{% trans 'Amount Paid' %}</th>
+                                    <th>{% trans 'Payment Method' %}</th>
+                                    <th>{% trans 'State' %}</th>
+                                    <th>{% trans 'Payee' %}</th>
+                                    <th>{% trans 'Remark' %}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for payment in payments %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{payment.date}}</td>
-                                    <td>{{payment.student}}</td>
-                                    <td>{{payment.course}}</td>
-                                    <td>¥{{payment.lesson_unit_price}}</td>
-                                    <td>{{payment.class_name}}</td>
-                                    <td>¥{{payment.discounted_price}}</td>
-                                    <td>¥{{payment.book_costs}}</td>
-                                    <td>¥{{payment.other_fee}}</td>
-                                    <td>¥{{payment.amount_due}}</td>
-                                    <td>¥{{payment.amount_paid}}</td>
-                                    <td>{{payment.payment_method}}</td>
-                                    <td>{{payment.status}}</td>
-                                    <td>{{payment.payee}}</td>
-                                    <td>{{payment.remark}}</td>
+                                    <td>{{ payment.date }}</td>
+                                    <td>{{ payment.student }}</td>
+                                    <td>{{ payment.course }}</td>
+                                    <td>¥{{ payment.lesson_unit_price }}</td>
+                                    <td>{{ payment.class_name }}</td>
+                                    <td>¥{{ payment.discounted_price }}</td>
+                                    <td>¥{{ payment.book_costs }}</td>
+                                    <td>¥{{ payment.other_fee }}</td>
+                                    <td>¥{{ payment.amount_due }}</td>
+                                    <td>¥{{ payment.amount_paid }}</td>
+                                    <td>{{ payment.payment_method }}</td>
+                                    <td>{{ payment.status }}</td>
+                                    <td>{{ payment.payee }}</td>
+                                    <td>{{ payment.remark }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

@@ -2,35 +2,50 @@
 {% load i18n %}
 <aside class="main-sidebar sidebar-dark-info elevation-4">
     {% if request.user.user_type == '1' %}
-    <!-- Brand Logo -->
-    <a href="{% url 'admin_home' %}" class="brand-link">
+   <!-- Brand Logo -->
+   <a href="{% url 'admin_home' %}" class="brand-link">
+    <!-- <img src="{% static 'dist/img/cmsl.png' %} " alt="AdminLTE Logo"
+        class="brand-image img-circle elevation-3" > -->
+        <img src="/media/logo.png" alt="Brand Logo"
+        class="elevation-3" style="border-radius: 50%; width: 3rem; height: 3rem;">
+    <span class="brand-text font-weight-light">中之有限公司</span>
+    </a>
+    <a href="{% url 'admin_view_profile' %}" class="brand-link">
         <!-- <img src="{% static 'dist/img/cmsl.png' %} " alt="AdminLTE Logo"
             class="brand-image img-circle elevation-3" > -->
-            <img src="/media/logo.png" alt="Brand Logo"
-            class="brand-image img-circle elevation-3" >
-        <span class="brand-text font-weight-light">中之有限公司</span>
+            <img src="{{ user.profile_pic }}" alt="Brand Logo"
+            class="elevation-3" style="border-radius: 50%; width: 3rem; height: 3rem;">
+        <span class="brand-text font-weight-light">
+            {% if user.is_authenticated %}
+                {{ user.first_name }} {{ user.last_name }}
+            {% else %}
+                Clarke Kent
+            {% endif %}
+        </span>
     </a>
+
+
 
     <!-- Sidebar -->
     <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <!-- <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
-                <!-- Profile Image -->
+               
                 <img src="{{ user.profile_pic }}" class="img-circle elevation-3" alt="User Image">
             </div>
             <div class="info">
-                <!-- User Information -->
+                
                 <a href="{% url 'admin_view_profile' %}" class="d-block">
                     {% if user.is_authenticated %}
                         {{ user.first_name }} {{ user.last_name }}
                     {% else %}
-                        Error
+                        Clarke Kent
                     {% endif %}
                     
                 </a>
             </div>
-        </div>
+        </div> -->
         
 
 
@@ -507,11 +522,11 @@
 
 
                         <li class="nav-item">
-                            {% url 'manage_class_schedule' as manage_class_schedule %}
+                            {% url 'manage_teacher_query' as manage_teacher_query %}
 
                         <li class="nav-item">
-                            <a href="{{manage_class_schedule}}"
-                                class="nav-link  {% if manage_class_schedule == request.path %} active {% endif %}">
+                            <a href="{{manage_teacher_query}}"
+                                class="nav-link  {% if manage_teacher_query == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-address-card"></i>
                                 <p>
                                     {% trans "Teacher Queries" %}
@@ -537,7 +552,7 @@
 
                             <a href="{{ student_feedback_message }}"
                                 class="nav-link  {% if student_feedback_message == request.path %} active {% endif %}">
-                                <i class="nav-icon fas fa-comment-alt"></i>
+                                <i class="nav-icon fas fa-comment"></i>
                                 <p>
                                     {% trans "Student Feedback" %}
 
@@ -604,7 +619,7 @@
                 <a href="#" class="brand-link">
                     <img src="{% static 'dist/img/AdminLTELogo.png' %} " alt="AdminLTE Logo"
                         class="brand-image img-circle elevation-3" style="opacity: .8">
-                    <span class="brand-text font-weight-light"> {% trans "teacher Panel" %}</span>
+                    <span class="brand-text font-weight-light">teacher Panel</span>
                 </a>
 
                 <!-- Sidebar -->
@@ -734,7 +749,7 @@
 
                                 <img src="{% static 'dist/img/AdminLTELogo.png' %} " alt="AdminLTE Logo"
                                     class="brand-image img-circle elevation-3" style="opacity: .8">
-                                <span class="brand-text font-weight-light"> {% trans "Student Panel" %} </span>
+                                <span class="brand-text font-weight-light">Student Panel</span>
                             </a>
 
                             <!-- Sidebar -->
@@ -833,15 +848,7 @@
 
                                         {% endif %}
 
-                                        <li class="nav-item">
-                                            {% url 'get_upload' as upload %}
-                                            <a href="{{upload}}" class="nav-link {% if upload == request.path %} active {% endif %}">
-                                                <i class="nav-icon fas fa-home"></i>
-                                                <p>
-                                                    {% trans "Upload/Import" %}
-                                                </p>
-                                            </a>
-                                        </li>
+
 
                                         <li class="nav-item">
                                             <a href="{% url 'user_logout' %}"

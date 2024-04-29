@@ -70,14 +70,18 @@ class Institution(models.Model):
 
     def __str__(self):
         return self.name
+class Campus(models.Model):
+    name = models.CharField(max_length=100)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='campuses')
 
+    def __str__(self):
+        return self.name
 class Admin(models.Model):
     admin = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     remark = models.TextField(default="")
 
     def __str__(self):
         return str(self.admin)
-
 
 class Course(models.Model):
     name = models.CharField(max_length=120)
@@ -100,13 +104,6 @@ class Student(models.Model):
     def __str__(self):
         return self.admin.last_name + ", " + self.admin.first_name
 
-
-class Campus(models.Model):
-    name = models.CharField(max_length=100)
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='campuses')
-
-    def __str__(self):
-        return self.name
 
 class Teacher(models.Model):
     institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='teacher_institutions')
@@ -225,6 +222,8 @@ class PaymentRecord(models.Model):
 class LearningRecord(models.Model):
     date = models.DateField()
     student = models.ForeignKey(Student, null=True,on_delete=models.DO_NOTHING)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, null=True)
+    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
     course = models.ForeignKey(Course,null=True, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Teacher,null=True, on_delete=models.CASCADE)
     starting_time = models.TimeField(null=True,)

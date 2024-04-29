@@ -1,6 +1,5 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% load i18n %}
 
 {% block page_title %}
   {{ page_title }}
@@ -15,14 +14,14 @@
           <div class="card-body">
             <form method="GET" class="teacher-selector-form">
               <div class="form-group d-flex align-items-center mb-0">
-                <label for="teacher_selector" class="mr-3">{% trans 'Select Teacher:' %}</label>
+                <label for="teacher_selector" class="mr-3">Select Teacher:</label>
                 <select id="teacher_selector" name="teacher_id" class="form-control mr-3">
-                  <option value="">{% trans 'All Teachers' %}</option>
+                  <option value="">All Teachers</option>
                   {% for teacher in teachers %}
                     <option value="{{ teacher.id }}">{{ teacher.first_name }} {{ teacher.last_name }}</option>
                   {% endfor %}
                 </select>
-                <button type="submit" class="btn btn-primary">{% trans 'Search' %}</button>
+                <button type="submit" class="btn btn-primary">Search</button>
               </div>
             </form>
           </div>
@@ -37,14 +36,16 @@
             <table class="table table-bordered table-hover">
               <thead class="thead-dark">
                 <tr>
-                  <th>{% trans 'Name' %}</th>
-                  <th>{% trans 'Gender' %}</th>
-                  <th>{% trans 'Home Number' %}</th>
-                  <th>{% trans 'Cell Number' %}</th>
-                  <th>{% trans 'Campus' %}</th>
-                  <th>{% trans 'Assigned Course' %}</th>
-                  <th>{% trans 'Contract' %}</th>
-                  <th>{% trans 'Address' %}</th>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th>Home Number</th>
+                    <th>Cell Number</th>
+                    <th>Institution</th>
+                    <th>Campus</th>
+                    <th>Assigned Course</th>
+                    <th>Contract</th>
+                   
+                   
                 </tr>
               </thead>
               <tbody>
@@ -54,10 +55,13 @@
                     <td>{{ query.gender }}</td>
                     <td>{{ query.home_number }}</td>
                     <td>{{ query.cell_number }}</td>
-                    <td>{{ query.school }}</td>
+                    <td>{{ query.institution }}</td>
+                    <td>{{ query.campus}}</td>
                     <td>{{ query.course }}</td>
                     <td>{{ query.contract }}</td>
-                    <td>{{ query.address }}</td>
+                   
+                   
+
                   </tr>
                 {% endfor %}
               </tbody>
@@ -74,20 +78,22 @@
             <table class="table table-bordered table-hover">
               <thead class="thead-dark">
                 <tr>
-                  <th>{% trans 'Completed Hours' %}</th>
-                  <th>{% trans 'Number of Classes' %}</th>
-                  <th>{% trans 'Date' %}</th>
-                  <th>{% trans 'Lecturer' %}</th>
-                  <th>{% trans 'Start Time' %}</th>
-                  <th>{% trans 'End Time' %}</th>
-                  <th>{% trans 'Class' %}</th>
+                    <th>Address</th>
+                    <th>Completed Hours</th>
+                    <th>Number of Classes</th>
+                    <th>Date</th>
+                    <th>Lecturer</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Class</th>
                 </tr>
               </thead>
               <tbody>
                 {% for query in teacher_query_info %}
                   <tr>
+                    <td>{{ query.address }}</td>
                     <td>{{ query.completed_hours }}</td>
-                    <td>{{ query.num_of_classes }}</td>
+                    <td>{{ query.num_of_classes}}</td>
                     <td>{{ query.date }}</td>
                     <td>{{ query.teacher_name }}</td>
                     <td>{{ query.start_time }}</td>
@@ -100,6 +106,8 @@
           </div>
         </div>
       </div>
+    </div>
+    </div>
     </div>
   </div>
 </section>

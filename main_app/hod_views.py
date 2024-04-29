@@ -166,7 +166,10 @@ def add_teacher(request):
             first_name = form.cleaned_data.get('first_name')
             last_name = form.cleaned_data.get('last_name')
             address = form.cleaned_data.get('address')
-            contact_num = form.cleaned_data.get('contact_num')
+            home_number = form.cleaned_data.get('home_number')
+            cell_number = form.cleaned_data.get('cell_number')
+            institution = form.cleaned_data.get('institution')
+            campus = form.cleaned_data.get('campus')
             remark = form.cleaned_data.get('remark')
             email = form.cleaned_data.get('email')
             gender = form.cleaned_data.get('gender')
@@ -182,7 +185,10 @@ def add_teacher(request):
                     email=email, password=password, user_type=2, first_name=first_name, last_name=last_name, profile_pic=passport_url)
                 user.gender = gender
                 user.address = address
-                user.contact_num = contact_num
+                user.home_number = home_number
+                user.cell_number = cell_number
+                user.teacher.institution = institution
+                user.teacher.campus = campus
                 user.remark = remark
                 user.teacher.course = course
                 user.teacher.work_type = work_type
@@ -199,25 +205,28 @@ def add_teacher(request):
     return render(request, 'hod_template/add_teacher_template.html', context)
 
 def add_student(request):
-    student_form = StudentForm(request.POST or None, request.FILES or None)
-    context = {'form': student_form, 'page_title': _('Add Student')}
+    form = StudentForm(request.POST or None, request.FILES or None)
+    context = {'form': form, 'page_title': _('Add Student')}
     if request.method == 'POST':
-        if student_form.is_valid():
-            first_name = student_form.cleaned_data.get('first_name')
-            last_name = student_form.cleaned_data.get('last_name')
-            gender = student_form.cleaned_data.get('gender')
-            date_of_birth = student_form.cleaned_data.get('date_of_birth')
-            address = student_form.cleaned_data.get('address')
-            email = student_form.cleaned_data.get('email')
-            contact_num = student_form.cleaned_data.get('contact_num')
-            password = student_form.cleaned_data.get('password')
-            reg_date = student_form.cleaned_data.get('reg_date')
-            state = student_form.cleaned_data.get('state')
-            
-            course = student_form.cleaned_data.get('course')
-            session = student_form.cleaned_data.get('session')
-            
-            remark = student_form.cleaned_data.get('remark')
+        if form.is_valid():
+            first_name = form.cleaned_data.get('first_name')
+            last_name = form.cleaned_data.get('last_name')
+            gender = form.cleaned_data.get('gender')
+            date_of_birth = form.cleaned_data.get('date_of_birth')
+            address = form.cleaned_data.get('address')
+            email = form.cleaned_data.get('email')
+            home_number = form.cleaned_data.get('home_number')
+            cell_number = form.cleaned_data.get('cell_number')
+            institution = form.cleaned_data.get('institution')
+            campus = form.cleaned_data.get('campus')
+            contact_num = form.cleaned_data.get('contact_num')
+            password = form.cleaned_data.get('password')
+            reg_date = form.cleaned_data.get('reg_date')
+            state = form.cleaned_data.get('state')
+            course = form.cleaned_data.get('course')
+            grade = form.cleaned_data.get('grade')
+            session = form.cleaned_data.get('session')
+            remark = form.cleaned_data.get('remark')
             passport = request.FILES['profile_pic']
             fs = FileSystemStorage()
             filename = fs.save(passport.name, passport)
@@ -229,12 +238,17 @@ def add_student(request):
                 user.student.date_of_birth = date_of_birth
                 user.address = address
                 user.student.session = session
-                user.contact_num = contact_num
+                user.home_number = home_number
+                user.cell_number = cell_number
+                user.student.institution = institution
+                user.student.campus = campus
                 user.student.reg_date = reg_date
                 user.student.state = state
                 user.remark = remark
                 user.student.course = course
+                user.student.grade = grade
                 user.save()
+              
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_student'))
             except Exception as e:
@@ -405,6 +419,8 @@ def add_learning_record(request):
         if form.is_valid():
             date = form.cleaned_data.get('date')
             student = form.cleaned_data.get('student')
+            institution = form.cleaned_data.get('institution')
+            campus = form.cleaned_data.get('campus')
             course = form.cleaned_data.get('course')
             teacher = form.cleaned_data.get('teacher')
             starting_time = form.cleaned_data.get('starting_time')
@@ -418,6 +434,8 @@ def add_learning_record(request):
                 learn = LearningRecord()
                 learn.date = date
                 learn.student = student
+                learn.institution = institution
+                learn.campus = campus
                 learn.course = course
                 learn.teacher = teacher
                 learn.starting_time = starting_time
@@ -582,9 +600,9 @@ def manage_student_query(request):
                     'date_of_birth': student_query.student_records.date_of_birth,
                     'home_number': student_query.student_records.admin.home_number,
                     'cell_number': student_query.student_records.admin.cell_number,
-                    'campus': student_query.student_records.admin.campus,
-                    'grade': student_query.student_records.admin.grade,
-                    # 'contact_num': student_query.student_records.admin.contact_num,
+                    'institution': student_query.student_records.institution,
+                    'campus': student_query.student_records.campus,
+                    'grade': student_query.student_records.grade,
                     'state': student_query.student_records.state,
                     'payment_status': student_query.payment_records.status,
                     'refunded': student_query.refund,
@@ -616,9 +634,9 @@ def manage_student_query(request):
                     'date_of_birth': student_query.student_records.date_of_birth,
                     'home_number': student_query.student_records.admin.home_number,
                     'cell_number': student_query.student_records.admin.cell_number,
-                    'campus': student_query.student_records.admin.campus,
-                    'grade': student_query.student_records.admin.grade,
-                    # 'contact_num': student_query.student_records.admin.contact_num,
+                    'institution': student_query.student_records.institution,
+                    'campus': student_query.student_records.campus,
+                    'grade': student_query.student_records.grade,
                     'state': student_query.student_records.state,
                     'payment_status': student_query.payment_records.status,
                     'refunded': student_query.refund,
@@ -657,23 +675,50 @@ def manage_teacher_query(request):
     # Initialize teacher_query_info list
     teacher_query_info = []
 
-    # Retrieve teacher queries based on the selected teacher or all queries if no selection
-    teacher_queries = TeacherQuery.objects.filter(admin_id=selected_teacher_id) if selected_teacher_id else TeacherQuery.objects.all()
+    # If a teacher is selected, filter teacher queries by that teacher
+    if selected_teacher_id:
+        # Retrieve the selected teacher's queries
+        teacher_queries = TeacherQuery.objects.filter(admin_id=selected_teacher_id)
 
-    # Iterate over each teacher query
-    for teacher_query in teacher_queries:
-        if teacher_query.teacher_records:
-            # Build teacher information dict ensuring related objects are not None
+        # Iterate over each teacher query
+        for teacher_query in teacher_queries:
+            # Get related teacher information
             teacher_info = {
                 'teacher_name': teacher_query.admin.get_full_name(),
                 'gender': teacher_query.admin.gender,
-                'home_number': teacher_query.teacher_records.admin.home_number if teacher_query.teacher_records.admin else None,
-                'cell_number': teacher_query.teacher_records.admin.cell_number if teacher_query.teacher_records.admin else None,
-                'campus': teacher_query.teacher_records.admin.campus if teacher_query.teacher_records.admin else None,
-                'contact_num': teacher_query.teacher_records.admin.contact_num if teacher_query.teacher_records.admin else None,
-                'address': teacher_query.teacher_records.admin.address if teacher_query.teacher_records.admin else None,
+                'home_number': teacher_query.teacher_records.admin.home_number,
+                'cell_number': teacher_query.teacher_records.admin.cell_number,
+                'institution': teacher_query.teacher_records.institution,
+                'campus': teacher_query.teacher_records.campus,
+                'address': teacher_query.teacher_records.admin.address,
                 'num_of_classes': teacher_query.num_of_classes,
-                'contract': teacher_query.teacher_records.work_type if teacher_query.teacher_records else None,
+                'contract': teacher_query.teacher_records.work_type,
+                'completed_hours': teacher_query.completed_hours,
+                'remaining_hours': teacher_query.remaining_hours,
+                'date': teacher_query.learning_records.date if teacher_query.learning_records else None,
+                'course': teacher_query.learning_records.course if teacher_query.learning_records else None,
+                'instructor': teacher_query.learning_records.teacher if teacher_query.learning_records else None,
+                'start_time': teacher_query.learning_records.starting_time if teacher_query.learning_records else None,
+                'end_time': teacher_query.learning_records.end_time if teacher_query.learning_records else None,
+                'class': teacher_query.learning_records.class_name if teacher_query.learning_records else None,
+            }
+            # Append teacher query information to the list
+            teacher_query_info.append(teacher_info)
+    else:
+        # If no teacher is selected, retrieve all teacher queries
+        # Iterate over each teacher query
+        for teacher_query in TeacherQuery.objects.all():
+            # Get related teacher information
+            teacher_info = {
+                'teacher_name': teacher_query.admin.get_full_name(),
+                'gender': teacher_query.admin.gender,
+                'home_number': teacher_query.teacher_records.admin.home_number,
+                'cell_number': teacher_query.teacher_records.admin.cell_number,
+                'institution': teacher_query.teacher_records.institution,
+                'campus': teacher_query.teacher_records.campus,
+                'address': teacher_query.teacher_records.admin.address,
+                'num_of_classes': teacher_query.num_of_classes,
+                'contract': teacher_query.teacher_records.work_type,
                 'completed_hours': teacher_query.completed_hours,
                 'remaining_hours': teacher_query.remaining_hours,
                 'date': teacher_query.learning_records.date if teacher_query.learning_records else None,
@@ -695,7 +740,6 @@ def manage_teacher_query(request):
 
     # Render the template with the context
     return render(request, 'hod_template/manage_teacher_query.html', context)
-
 
 def edit_session(request, session_id):
     instance = get_object_or_404(Session, id=session_id)
@@ -738,6 +782,7 @@ def edit_teacher(request, teacher_id):
             last_name = cleaned_data.get('last_name')
             home_number = cleaned_data.get('home_number')
             cell_number = cleaned_data.get('cell_number')
+            institution = cleaned_data.get('institution')
             campus = cleaned_data.get('campus')
             address = cleaned_data.get('address')
             username = cleaned_data.get('username')
@@ -771,12 +816,13 @@ def edit_teacher(request, teacher_id):
                 user.last_name = last_name
                 user.home_number = home_number
                 user.cell_number = cell_number
-                user.school = campus
                 user.gender = gender
                 user.address = address
                 user.remark = remark
 
-                # Update teacher details
+                # Update teacher details 
+                teacher.institution = institution
+                teacher.campus = campus
                 teacher.course = course
                 teacher.work_type = work_type
 
@@ -805,36 +851,63 @@ def edit_student(request, student_id):
         'student_id': student_id,
         'page_title': _('Edit Student')
     }
+
     if request.method == 'POST':
         if form.is_valid():
+            cleaned_data = form.cleaned_data
+            first_name = cleaned_data.get('first_name')
+            last_name = cleaned_data.get('last_name')
+            home_number = cleaned_data.get('home_number')
+            cell_number = cleaned_data.get('cell_number')
+            institution = cleaned_data.get('institution')
+            campus = cleaned_data.get('campus')
+            address = cleaned_data.get('address')
+            email = cleaned_data.get('email')
+            gender = cleaned_data.get('gender')
+            password = cleaned_data.get('password') or None
+            course = cleaned_data.get('course')
+            grade = cleaned_data.get('grade')
+            remark = cleaned_data.get('remark')
+            passport = request.FILES.get('profile_pic')
+
             try:
-                student = form.save(commit=False)
                 user = student.admin
-                user.email = form.cleaned_data.get('email')
-                password = form.cleaned_data.get('password')
-                if password:
+                user.email = email
+
+                if password is not None:
                     user.set_password(password)
-                user.first_name = form.cleaned_data.get('first_name')
-                user.last_name = form.cleaned_data.get('last_name')
-                user.gender = form.cleaned_data.get('gender')  # Update gender here
-                user.address = form.cleaned_data.get('address')
-                # user.contact_num = form.cleaned_data.get('contact_num')
-                user.home_number = form.cleaned_data.get('home_number')
-                user.cell_number = form.cleaned_data.get('cell_number')
-                user.campus = form.cleaned_data.get('campus')
-                user.grade = form.cleaned_data.get('grade')
-                user.remark = form.cleaned_data.get('remark')
-                if request.FILES.get('profile_pic'):
-                    user.profile_pic = request.FILES.get('profile_pic')
+
+                if passport is not None:
+                    fs = FileSystemStorage()
+                    filename = fs.save(passport.name, passport)
+                    passport_url = fs.url(filename)
+                    user.profile_pic = passport_url
+
+                user.first_name = first_name
+                user.last_name = last_name
+                user.home_number = home_number
+                user.cell_number = cell_number
+                user.gender = gender
+                user.address = address
+                user.remark = remark
+
+                student.course = course
+                student.institution = institution
+                student.campus = campus
+                student.grade = grade
+            
                 user.save()
                 student.save()
-                return redirect(reverse('manage_student'))
-                # messages.success(request, "Successfully Updated")
-                # return redirect(reverse('edit_student', args=[student_id]))
+
+                messages.success(request, "Successfully Updated")
+                return redirect(reverse('edit_student', args=[student_id]))
             except Exception as e:
-                messages.error(request, f"Could Not Update: {str(e)}")
+                messages.error(request, "Could Not Update: " + str(e))
         else:
-            messages.error(request, "Please Fill Form Properly!")
+            messages.error(request, "Please fill the form properly")
+    else:
+        return render(request, "hod_template/edit_student_template.html", context)
+
     return render(request, "hod_template/edit_student_template.html", context)
 
 def edit_course(request, course_id):
@@ -953,6 +1026,8 @@ def edit_learn(request, learn_id):
         if form.is_valid():
             date = form.cleaned_data.get('date')
             student = form.cleaned_data.get('student')
+            institution = form.cleaned_data.get('institution')
+            campus = form.cleaned_data.get('campus')
             course = form.cleaned_data.get('course')
             teacher = form.cleaned_data.get('teacher')
             starting_time = form.cleaned_data.get('starting_time')
@@ -965,6 +1040,8 @@ def edit_learn(request, learn_id):
                 learn = LearningRecord.objects.get(id=learn_id)
                 learn.date = date
                 learn.student = student
+                learn.institution = institution
+                learn.campus = campus
                 learn.course = course
                 learn.teacher = teacher
                 learn.starting_time = starting_time
@@ -1230,8 +1307,8 @@ def admin_view_profile(request):
 def admin_notify_teacher(request):
     teacher = CustomUser.objects.filter(user_type=2)
     context = {
-        'page_title': _("Send Notifications To teacher"),
-        'allteacher': teacher
+        'page_title': _("Send Notifications To Teachers"),
+        'teachers': teacher
     }
     return render(request, "hod_template/teacher_notification.html", context)
 
@@ -1273,7 +1350,7 @@ def send_student_notification(request):
 def send_teacher_notification(request):
     id = request.POST.get('id')
     message = request.POST.get('message')
-    teacher = get_object_or_404(teacher, admin_id=id)
+    teacher = get_object_or_404(Teacher, admin_id=id)
     try:
         url = "https://fcm.googleapis.com/fcm/send"
         body = {

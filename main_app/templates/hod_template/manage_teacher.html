@@ -1,66 +1,67 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% load i18n %}
-
-{% block page_title %}
-  <i class="nav-icon fas fa-users"></i>  {{ page_title }}
-{% endblock page_title %}
+{% block page_title %}<i class="nav-icon fas fa-users"></i>  {{page_title}}{% endblock page_title %}
 
 {% block content %}
+
 <section class="content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3 class="card-title">{{ page_title }}</h3>
-                        <h3 class="card-title">{% blocktrans with count=total_teacher_count %}Total Teachers: {{ count }}{% endblocktrans %}</h3>
+                        <h3 class="card-title">{{page_title}}</h3>
+                        <h3  class="card-title">Total Teachers: {{ total_teacher_count }}</h3>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
                         <table id="example2" class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
+                        
                                     <th>#</th>
-                                    <th>{% trans 'Full Name' %}</th>
-                                    <th>{% trans 'Email' %}</th>
-                                    <th>{% trans 'Home Number' %}</th>
-                                    <th>{% trans 'Cell Number' %}</th>
-                                    <th>{% trans 'Campus' %}</th>
-                                    <th>{% trans 'Gender' %}</th>
-                                    <th>{% trans 'Address' %}</th>
-                                    <th>{% trans 'Courses' %}</th>
-                                    <th>{% trans 'Work Type' %}</th>
-                                    <th>{% trans 'Avatar' %}</th>
-                                    <th>{% trans 'Remark' %}</th>
-                                    <th>{% trans 'Actions' %}</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Home Number</th>
+                                    <th>Cell Number</th>
+                                    <th>Institution</th>
+                                    <th>Campus</th>
+                                    <th>Gender</th>
+                                    <th>Address</th>
+                                    <th>Courses</th>
+                                    <th>Work Type</th>
+                                    <th>Avatar</th>
+                                    <th>Remark</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for teacher in allteacher %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{ teacher.last_name }}, {{ teacher.first_name }}</td>
-                                    <td>{{ teacher.email }}</td>
-                                    <td>{{ teacher.home_number }}</td>
-                                    <td>{{ teacher.cell_number }}</td>
-                                    <td>{{ teacher.campus }}</td>
-                                    <td>{{ teacher.gender }}</td>
-                                    <td>{{ teacher.address }}</td>
-                                    <td>{{ teacher.teacher.course.name }}</td>
-                                    <td>{{ teacher.teacher.work_type }}</td>
+                                    <td>{{teacher.last_name}}, {{teacher.first_name}}</td>
+                                    <td>{{teacher.email}}</td>
+                                    <td>{{teacher.home_number}}</td>
+                                    <td>{{teacher.cell_number}}</td>
+                                    <td>{{teacher.teacher.institution.name}}</td>
+                                    <td>{{teacher.teacher.campus.name}}</td>
+                                    <td>{{teacher.gender}}</td>
+                                    <td>{{teacher.address}}</td>
+                                    <td>{{teacher.teacher.course.name}}</td>
+                                    <td>{{teacher.teacher.work_type}}</td>
                                     <td>
-                                        {% if teacher.profile_pic == "" %}
-                                        {% trans 'No Image' %}
+                                        {% if teacher.profile_pic == ""  %}
+                                        No Image
                                         {% else %}
                                         <img class="img img-fluid mb-2" height="56" width="56"
-                                            src="{{ teacher.profile_pic }}" alt="">
+                                            src="{{teacher.profile_pic}}" alt="">
                                         {% endif %}
                                     </td>
-                                    <td>{{ teacher.remark }}</td>
+                                    <td>{{teacher.remark}}</td>
                                     <td>
-                                        <a href="{% url 'edit_teacher' teacher.teacher.id %}" class="btn btn-info">{% trans 'Edit' %}</a> - 
-                                        <a href="{% url 'delete_teacher' teacher.teacher.id %}" class="btn btn-danger" onclick="return confirm('{% trans 'Are you sure about this ?' %}')">{% trans 'Delete' %}</a>
+                                        <a href="{% url 'edit_teacher' teacher.teacher.id %}" class="btn btn-info">Edit</a> - 
+                                        <a href="{% url 'delete_teacher' teacher.teacher.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
+                                    
                                     </td>
                                 </tr>
                                 {% endfor %}

@@ -522,11 +522,11 @@
 
 
                         <li class="nav-item">
-                            {% url 'manage_class_schedule' as manage_class_schedule %}
+                            {% url 'manage_teacher_query' as manage_teacher_query %}
 
                         <li class="nav-item">
-                            <a href="{{manage_class_schedule}}"
-                                class="nav-link  {% if manage_class_schedule == request.path %} active {% endif %}">
+                            <a href="{{manage_teacher_query}}"
+                                class="nav-link  {% if manage_teacher_query == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-address-card"></i>
                                 <p>
                                     {% trans "Teacher Queries" %}

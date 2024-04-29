@@ -224,6 +224,8 @@ class PaymentRecord(models.Model):
 class LearningRecord(models.Model):
     date = models.DateField()
     student = models.ForeignKey(Student, null=True,on_delete=models.DO_NOTHING)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, null=True)
+    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
     course = models.ForeignKey(Course,null=True, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Teacher,null=True, on_delete=models.CASCADE)
     starting_time = models.TimeField(null=True,)

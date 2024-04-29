@@ -40,10 +40,11 @@
                     <th>Gender</th>
                     <th>Home Number</th>
                     <th>Cell Number</th>
+                    <th>Institution</th>
                     <th>Campus</th>
                     <th>Assigned Course</th>
                     <th>Contract</th>
-                    <th>Address</th>
+                   
                    
                 </tr>
               </thead>
@@ -54,10 +55,11 @@
                     <td>{{ query.gender }}</td>
                     <td>{{ query.home_number }}</td>
                     <td>{{ query.cell_number }}</td>
-                    <td>{{ query.school}}</td>
+                    <td>{{ query.institution }}</td>
+                    <td>{{ query.campus}}</td>
                     <td>{{ query.course }}</td>
                     <td>{{ query.contract }}</td>
-                    <td>{{ query.address }}</td>
+                   
                    
 
                   </tr>
@@ -76,6 +78,7 @@
             <table class="table table-bordered table-hover">
               <thead class="thead-dark">
                 <tr>
+                    <th>Address</th>
                     <th>Completed Hours</th>
                     <th>Number of Classes</th>
                     <th>Date</th>
@@ -88,6 +91,7 @@
               <tbody>
                 {% for query in teacher_query_info %}
                   <tr>
+                    <td>{{ query.address }}</td>
                     <td>{{ query.completed_hours }}</td>
                     <td>{{ query.num_of_classes}}</td>
                     <td>{{ query.date }}</td>

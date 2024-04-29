@@ -59,8 +59,9 @@ class StudentForm(CustomUserForm):
     reg_date = forms.DateField(required=False, label="Registration Date", widget=forms.DateInput(attrs={'type': 'date'}))
     state = forms.ChoiceField(choices=[('Currently Learning', 'Currently Learning'), ('Completed', 'Completed'), ('Refund', 'Refund')], label="State")
     
-    # Include new fields: campus, grade, home_number, cell_number
-    campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False)
+    # Include new fields: campus, institution, grade, home_number, cell_number
+    institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False, label="Institution")
+    campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False, label="Campus")
     grade = forms.CharField(max_length=10, required=False, label="Grade")
     home_number = forms.CharField(max_length=20, required=False, label="Home Number")
     cell_number = forms.CharField(max_length=20, required=False, label="Cell Number")
@@ -73,7 +74,7 @@ class StudentForm(CustomUserForm):
         
         # Reorder fields as requested
         field_order = ['first_name', 'last_name', 'email', 'home_number', 'cell_number', 
-                       'gender', 'password', 'profile_pic', 'address', 'campus', 
+                       'gender', 'password', 'profile_pic', 'address', 'institution', 'campus', 
                        'course', 'grade', 'session', 'date_of_birth', 'reg_date', 
                        'state', 'remark']
         
@@ -83,8 +84,7 @@ class StudentForm(CustomUserForm):
     class Meta(CustomUserForm.Meta):
         model = Student
         fields = CustomUserForm.Meta.fields + \
-            ['course', 'session', 'date_of_birth', 'reg_date', 'state', 'campus', 'grade', 'home_number', 'cell_number']
-
+            ['course', 'session', 'date_of_birth', 'reg_date', 'state', 'institution', 'campus', 'grade', 'home_number', 'cell_number']
 
 class AdminForm(CustomUserForm):
     def __init__(self, *args, **kwargs):
@@ -105,6 +105,7 @@ class TeacherForm(CustomUserForm):
     work_type = forms.ChoiceField(choices=[('Special Teacher', 'Special Teacher'), ('Temporary Contract', 'Temporary Contract')])
     home_number = forms.CharField(max_length=20, required=False)
     cell_number = forms.CharField(max_length=20, required=False)
+    institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False, label="Institution")
     campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False)
 
     def __init__(self, *args, **kwargs):
@@ -116,14 +117,14 @@ class TeacherForm(CustomUserForm):
         # Reorder fields as requested
         field_order = ['first_name', 'last_name', 'email', 'home_number', 'cell_number', 
                        'gender', 'password', 'profile_pic', 'address', 
-                       'work_type', 'remark', 'course', 'campus']
+                       'work_type', 'remark', 'course', 'institution', 'campus']
 
         # Set the field order
         self.fields = {k: self.fields[k] for k in field_order}
 
     class Meta(CustomUserForm.Meta):
         model = Teacher
-        fields = CustomUserForm.Meta.fields + ['course', 'work_type', 'home_number', 'cell_number', 'campus']
+        fields = CustomUserForm.Meta.fields + ['course', 'work_type', 'home_number', 'cell_number', 'institution', 'campus']
 
 
 class CourseForm(FormSettings):
@@ -197,13 +198,16 @@ class LearningRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=DateInput(attrs={'type': 'date'}), label=_('Date'))
     starting_time = forms.TimeField(required=False, widget=TimeInput(attrs={'type': 'time'}), label=_('Starting Time'))
     end_time = forms.TimeField(required=False, widget=TimeInput(attrs={'type': 'time'}), label=_('End Time'))
+    institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False)
+    campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False)
+
     
     def __init__(self, *args, **kwargs):
         super(LearningRecordForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = LearningRecord
-        fields = [_('date'), _('student'), _('course'),_('teacher'),_('starting_time'),_('end_time'), _('class_name'),_('remark')]
+        fields = [_('date'), _('student'), _('institution'), _('campus'), _('course'),_('teacher'),_('starting_time'),_('end_time'), _('class_name'),_('remark')]
 
 class ClassScheduleForm(FormSettings):
     lesson_unit_price = forms.DecimalField(widget=TextInput(attrs={'placeholder': _('¥')}), label=_('Lesson Unit Price'))

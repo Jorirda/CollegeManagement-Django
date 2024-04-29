@@ -168,6 +168,7 @@ def add_teacher(request):
             address = form.cleaned_data.get('address')
             home_number = form.cleaned_data.get('home_number')
             cell_number = form.cleaned_data.get('cell_number')
+            institution = form.cleaned_data.get('institution')
             campus = form.cleaned_data.get('campus')
             remark = form.cleaned_data.get('remark')
             email = form.cleaned_data.get('email')
@@ -186,6 +187,7 @@ def add_teacher(request):
                 user.address = address
                 user.home_number = home_number
                 user.cell_number = cell_number
+                user.teacher.institution = institution
                 user.teacher.campus = campus
                 user.remark = remark
                 user.teacher.course = course
@@ -215,6 +217,7 @@ def add_student(request):
             email = form.cleaned_data.get('email')
             home_number = form.cleaned_data.get('home_number')
             cell_number = form.cleaned_data.get('cell_number')
+            institution = form.cleaned_data.get('institution')
             campus = form.cleaned_data.get('campus')
             contact_num = form.cleaned_data.get('contact_num')
             password = form.cleaned_data.get('password')
@@ -237,8 +240,8 @@ def add_student(request):
                 user.student.session = session
                 user.home_number = home_number
                 user.cell_number = cell_number
+                user.student.institution = institution
                 user.student.campus = campus
-                user.contact_num = contact_num
                 user.student.reg_date = reg_date
                 user.student.state = state
                 user.remark = remark
@@ -416,6 +419,8 @@ def add_learning_record(request):
         if form.is_valid():
             date = form.cleaned_data.get('date')
             student = form.cleaned_data.get('student')
+            institution = form.cleaned_data.get('institution')
+            campus = form.cleaned_data.get('campus')
             course = form.cleaned_data.get('course')
             teacher = form.cleaned_data.get('teacher')
             starting_time = form.cleaned_data.get('starting_time')
@@ -429,6 +434,8 @@ def add_learning_record(request):
                 learn = LearningRecord()
                 learn.date = date
                 learn.student = student
+                learn.institution = institution
+                learn.campus = campus
                 learn.course = course
                 learn.teacher = teacher
                 learn.starting_time = starting_time
@@ -593,9 +600,9 @@ def manage_student_query(request):
                     'date_of_birth': student_query.student_records.date_of_birth,
                     'home_number': student_query.student_records.admin.home_number,
                     'cell_number': student_query.student_records.admin.cell_number,
-                    'campus': student_query.student_records.admin.campus,
-                    'grade': student_query.student_records.admin.grade,
-                    # 'contact_num': student_query.student_records.admin.contact_num,
+                    'institution': student_query.student_records.institution,
+                    'campus': student_query.student_records.campus,
+                    'grade': student_query.student_records.grade,
                     'state': student_query.student_records.state,
                     'payment_status': student_query.payment_records.status,
                     'refunded': student_query.refund,
@@ -627,9 +634,9 @@ def manage_student_query(request):
                     'date_of_birth': student_query.student_records.date_of_birth,
                     'home_number': student_query.student_records.admin.home_number,
                     'cell_number': student_query.student_records.admin.cell_number,
-                    'campus': student_query.student_records.admin.campus,
-                    'grade': student_query.student_records.admin.grade,
-                    # 'contact_num': student_query.student_records.admin.contact_num,
+                    'institution': student_query.student_records.institution,
+                    'campus': student_query.student_records.campus,
+                    'grade': student_query.student_records.grade,
                     'state': student_query.student_records.state,
                     'payment_status': student_query.payment_records.status,
                     'refunded': student_query.refund,
@@ -681,19 +688,19 @@ def manage_teacher_query(request):
                 'gender': teacher_query.admin.gender,
                 'home_number': teacher_query.teacher_records.admin.home_number,
                 'cell_number': teacher_query.teacher_records.admin.cell_number,
-                'campus': teacher_query.teacher_records.admin.campus,
-                'contact_num': teacher_query.teacher_records.admin.contact_num,
+                'institution': teacher_query.teacher_records.institution,
+                'campus': teacher_query.teacher_records.campus,
                 'address': teacher_query.teacher_records.admin.address,
                 'num_of_classes': teacher_query.num_of_classes,
                 'contract': teacher_query.teacher_records.work_type,
                 'completed_hours': teacher_query.completed_hours,
                 'remaining_hours': teacher_query.remaining_hours,
-                'date': teacher_query.learning_records.date,
-                'course': teacher_query.learning_records.course,
-                'instructor': teacher_query.learning_records.teacher,
-                'start_time': teacher_query.learning_records.starting_time,
-                'end_time': teacher_query.learning_records.end_time,
-                'class': teacher_query.learning_records.class_name,
+                'date': teacher_query.learning_records.date if teacher_query.learning_records else None,
+                'course': teacher_query.learning_records.course if teacher_query.learning_records else None,
+                'instructor': teacher_query.learning_records.teacher if teacher_query.learning_records else None,
+                'start_time': teacher_query.learning_records.starting_time if teacher_query.learning_records else None,
+                'end_time': teacher_query.learning_records.end_time if teacher_query.learning_records else None,
+                'class': teacher_query.learning_records.class_name if teacher_query.learning_records else None,
             }
             # Append teacher query information to the list
             teacher_query_info.append(teacher_info)
@@ -707,19 +714,19 @@ def manage_teacher_query(request):
                 'gender': teacher_query.admin.gender,
                 'home_number': teacher_query.teacher_records.admin.home_number,
                 'cell_number': teacher_query.teacher_records.admin.cell_number,
-                'campus': teacher_query.teacher_records.admin.campus,
-                'contact_num': teacher_query.teacher_records.admin.contact_num,
+                'institution': teacher_query.teacher_records.institution,
+                'campus': teacher_query.teacher_records.campus,
                 'address': teacher_query.teacher_records.admin.address,
                 'num_of_classes': teacher_query.num_of_classes,
                 'contract': teacher_query.teacher_records.work_type,
                 'completed_hours': teacher_query.completed_hours,
                 'remaining_hours': teacher_query.remaining_hours,
-                'date': teacher_query.learning_records.date,
-                'course': teacher_query.learning_records.course,
-                'instructor': teacher_query.learning_records.teacher,
-                'start_time': teacher_query.learning_records.starting_time,
-                'end_time': teacher_query.learning_records.end_time,
-                'class': teacher_query.learning_records.class_name,
+                'date': teacher_query.learning_records.date if teacher_query.learning_records else None,
+                'course': teacher_query.learning_records.course if teacher_query.learning_records else None,
+                'instructor': teacher_query.learning_records.teacher if teacher_query.learning_records else None,
+                'start_time': teacher_query.learning_records.starting_time if teacher_query.learning_records else None,
+                'end_time': teacher_query.learning_records.end_time if teacher_query.learning_records else None,
+                'class': teacher_query.learning_records.class_name if teacher_query.learning_records else None,
             }
             # Append teacher query information to the list
             teacher_query_info.append(teacher_info)
@@ -775,6 +782,7 @@ def edit_teacher(request, teacher_id):
             last_name = cleaned_data.get('last_name')
             home_number = cleaned_data.get('home_number')
             cell_number = cleaned_data.get('cell_number')
+            institution = cleaned_data.get('institution')
             campus = cleaned_data.get('campus')
             address = cleaned_data.get('address')
             username = cleaned_data.get('username')
@@ -812,7 +820,8 @@ def edit_teacher(request, teacher_id):
                 user.address = address
                 user.remark = remark
 
-                # Update teacher details
+                # Update teacher details 
+                teacher.institution = institution
                 teacher.campus = campus
                 teacher.course = course
                 teacher.work_type = work_type
@@ -850,6 +859,7 @@ def edit_student(request, student_id):
             last_name = cleaned_data.get('last_name')
             home_number = cleaned_data.get('home_number')
             cell_number = cleaned_data.get('cell_number')
+            institution = cleaned_data.get('institution')
             campus = cleaned_data.get('campus')
             address = cleaned_data.get('address')
             email = cleaned_data.get('email')
@@ -882,6 +892,7 @@ def edit_student(request, student_id):
                 user.remark = remark
 
                 student.course = course
+                student.institution = institution
                 student.campus = campus
                 student.grade = grade
             
@@ -1015,6 +1026,8 @@ def edit_learn(request, learn_id):
         if form.is_valid():
             date = form.cleaned_data.get('date')
             student = form.cleaned_data.get('student')
+            institution = form.cleaned_data.get('institution')
+            campus = form.cleaned_data.get('campus')
             course = form.cleaned_data.get('course')
             teacher = form.cleaned_data.get('teacher')
             starting_time = form.cleaned_data.get('starting_time')
@@ -1027,6 +1040,8 @@ def edit_learn(request, learn_id):
                 learn = LearningRecord.objects.get(id=learn_id)
                 learn.date = date
                 learn.student = student
+                learn.institution = institution
+                learn.campus = campus
                 learn.course = course
                 learn.teacher = teacher
                 learn.starting_time = starting_time
@@ -1292,8 +1307,8 @@ def admin_view_profile(request):
 def admin_notify_teacher(request):
     teacher = CustomUser.objects.filter(user_type=2)
     context = {
-        'page_title': _("Send Notifications To teacher"),
-        'allteacher': teacher
+        'page_title': _("Send Notifications To Teachers"),
+        'teachers': teacher
     }
     return render(request, "hod_template/teacher_notification.html", context)
 
@@ -1335,7 +1350,7 @@ def send_student_notification(request):
 def send_teacher_notification(request):
     id = request.POST.get('id')
     message = request.POST.get('message')
-    teacher = get_object_or_404(teacher, admin_id=id)
+    teacher = get_object_or_404(Teacher, admin_id=id)
     try:
         url = "https://fcm.googleapis.com/fcm/send"
         body = {

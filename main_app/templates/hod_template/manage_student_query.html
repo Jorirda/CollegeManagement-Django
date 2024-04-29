@@ -41,9 +41,10 @@
                   <th>Date of Birth</th>
                   <th>Home Number</th>
                   <th>Cell Number</th>
-                  <th>State</th>
-                  <th>Payment Status</th>
-                  <th>Refunded</th>
+                  <th>Institution</th>
+                  <th>Campus</th>
+                  <th>Grade</th>
+                  
                 </tr>
               </thead>
               <tbody>
@@ -54,11 +55,10 @@
                     <td>{{ query.date_of_birth }}</td>
                     <td>{{ query.home_number }}</td>
                     <td>{{ query.cell_number }}</td>
-                    <!-- <td>{{ query.contact_num }}</td> -->
-                    <td>{{ query.state }}</td>
-                    <td>{{ query.payment_status }}</td>
-                    <td>{{ query.refunded }}</td>
-
+                    <td>{{ query.institution }}</td>
+                    <td>{{ query.campus }}</td>
+                    <td>{{ query.grade }}</td>
+                   
                   </tr>
                 {% endfor %}
               </tbody>
@@ -75,6 +75,9 @@
             <table class="table table-bordered table-hover">
               <thead class="thead-dark">
                 <tr>
+                  <th>State</th>
+                  <th>Payment Status</th>
+                  <th>Refunded</th>
                   <th>Registration Date</th>
                   <th>Number of Classes</th>
                   <th>Registered Courses</th>
@@ -87,6 +90,9 @@
               <tbody>
                 {% for query in student_query_info %}
                   <tr>
+                    <td>{{ query.state }}</td>
+                    <td>{{ query.payment_status }}</td>
+                    <td>{{ query.refunded }}</td>
                     <td>{{ query.reg_date }}</td>
                     <td>{{ query.num_of_classes }}</td>
                     <td>{{ query.registered_courses }}</td>

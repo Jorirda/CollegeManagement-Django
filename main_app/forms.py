@@ -60,7 +60,7 @@ class StudentForm(CustomUserForm):
     state = forms.ChoiceField(choices=[('Currently Learning', 'Currently Learning'), ('Completed', 'Completed'), ('Refund', 'Refund')], label="State")
     
     # Include new fields: campus, grade, home_number, cell_number
-    campus = forms.CharField(max_length=100, required=False, label="Campus")
+    campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False)
     grade = forms.CharField(max_length=10, required=False, label="Grade")
     home_number = forms.CharField(max_length=20, required=False, label="Home Number")
     cell_number = forms.CharField(max_length=20, required=False, label="Cell Number")

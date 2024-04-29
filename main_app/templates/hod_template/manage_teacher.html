@@ -27,7 +27,6 @@
                                     <th>Campus</th>
                                     <th>Gender</th>
                                     <th>Address</th>
-                                    <!-- <th>Contact #</th> -->
                                     <th>Courses</th>
                                     <th>Work Type</th>
                                     <th>Avatar</th>
@@ -43,10 +42,9 @@
                                     <td>{{teacher.email}}</td>
                                     <td>{{teacher.home_number}}</td>
                                     <td>{{teacher.cell_number}}</td>
-                                    <td>{{teacher.campus}}</td>
+                                    <td>{{teacher.teacher.campus.name}}</td>
                                     <td>{{teacher.gender}}</td>
                                     <td>{{teacher.address}}</td>
-                                    <!-- <td>{{teacher.contact_num}}</td> -->
                                     <td>{{teacher.teacher.course.name}}</td>
                                     <td>{{teacher.teacher.work_type}}</td>
                                     <td>

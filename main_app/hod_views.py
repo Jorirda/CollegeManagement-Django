@@ -166,7 +166,9 @@ def add_teacher(request):
             first_name = form.cleaned_data.get('first_name')
             last_name = form.cleaned_data.get('last_name')
             address = form.cleaned_data.get('address')
-            contact_num = form.cleaned_data.get('contact_num')
+            home_number = form.cleaned_data.get('home_number')
+            cell_number = form.cleaned_data.get('cell_number')
+            campus = form.cleaned_data.get('campus')
             remark = form.cleaned_data.get('remark')
             email = form.cleaned_data.get('email')
             gender = form.cleaned_data.get('gender')
@@ -182,7 +184,9 @@ def add_teacher(request):
                     email=email, password=password, user_type=2, first_name=first_name, last_name=last_name, profile_pic=passport_url)
                 user.gender = gender
                 user.address = address
-                user.contact_num = contact_num
+                user.home_number = home_number
+                user.cell_number = cell_number
+                user.teacher.campus = campus
                 user.remark = remark
                 user.teacher.course = course
                 user.teacher.work_type = work_type
@@ -199,25 +203,27 @@ def add_teacher(request):
     return render(request, 'hod_template/add_teacher_template.html', context)
 
 def add_student(request):
-    student_form = StudentForm(request.POST or None, request.FILES or None)
-    context = {'form': student_form, 'page_title': _('Add Student')}
+    form = StudentForm(request.POST or None, request.FILES or None)
+    context = {'form': form, 'page_title': _('Add Student')}
     if request.method == 'POST':
-        if student_form.is_valid():
-            first_name = student_form.cleaned_data.get('first_name')
-            last_name = student_form.cleaned_data.get('last_name')
-            gender = student_form.cleaned_data.get('gender')
-            date_of_birth = student_form.cleaned_data.get('date_of_birth')
-            address = student_form.cleaned_data.get('address')
-            email = student_form.cleaned_data.get('email')
-            contact_num = student_form.cleaned_data.get('contact_num')
-            password = student_form.cleaned_data.get('password')
-            reg_date = student_form.cleaned_data.get('reg_date')
-            state = student_form.cleaned_data.get('state')
-            
-            course = student_form.cleaned_data.get('course')
-            session = student_form.cleaned_data.get('session')
-            
-            remark = student_form.cleaned_data.get('remark')
+        if form.is_valid():
+            first_name = form.cleaned_data.get('first_name')
+            last_name = form.cleaned_data.get('last_name')
+            gender = form.cleaned_data.get('gender')
+            date_of_birth = form.cleaned_data.get('date_of_birth')
+            address = form.cleaned_data.get('address')
+            email = form.cleaned_data.get('email')
+            home_number = form.cleaned_data.get('home_number')
+            cell_number = form.cleaned_data.get('cell_number')
+            campus = form.cleaned_data.get('campus')
+            contact_num = form.cleaned_data.get('contact_num')
+            password = form.cleaned_data.get('password')
+            reg_date = form.cleaned_data.get('reg_date')
+            state = form.cleaned_data.get('state')
+            course = form.cleaned_data.get('course')
+            grade = form.cleaned_data.get('grade')
+            session = form.cleaned_data.get('session')
+            remark = form.cleaned_data.get('remark')
             passport = request.FILES['profile_pic']
             fs = FileSystemStorage()
             filename = fs.save(passport.name, passport)
@@ -229,12 +235,17 @@ def add_student(request):
                 user.student.date_of_birth = date_of_birth
                 user.address = address
                 user.student.session = session
+                user.home_number = home_number
+                user.cell_number = cell_number
+                user.student.campus = campus
                 user.contact_num = contact_num
                 user.student.reg_date = reg_date
                 user.student.state = state
                 user.remark = remark
                 user.student.course = course
+                user.student.grade = grade
                 user.save()
+              
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_student'))
             except Exception as e:
@@ -797,12 +808,12 @@ def edit_teacher(request, teacher_id):
                 user.last_name = last_name
                 user.home_number = home_number
                 user.cell_number = cell_number
-                user.school = campus
                 user.gender = gender
                 user.address = address
                 user.remark = remark
 
                 # Update teacher details
+                teacher.campus = campus
                 teacher.course = course
                 teacher.work_type = work_type
 
@@ -831,36 +842,61 @@ def edit_student(request, student_id):
         'student_id': student_id,
         'page_title': _('Edit Student')
     }
+
     if request.method == 'POST':
         if form.is_valid():
+            cleaned_data = form.cleaned_data
+            first_name = cleaned_data.get('first_name')
+            last_name = cleaned_data.get('last_name')
+            home_number = cleaned_data.get('home_number')
+            cell_number = cleaned_data.get('cell_number')
+            campus = cleaned_data.get('campus')
+            address = cleaned_data.get('address')
+            email = cleaned_data.get('email')
+            gender = cleaned_data.get('gender')
+            password = cleaned_data.get('password') or None
+            course = cleaned_data.get('course')
+            grade = cleaned_data.get('grade')
+            remark = cleaned_data.get('remark')
+            passport = request.FILES.get('profile_pic')
+
             try:
-                student = form.save(commit=False)
                 user = student.admin
-                user.email = form.cleaned_data.get('email')
-                password = form.cleaned_data.get('password')
-                if password:
+                user.email = email
+
+                if password is not None:
                     user.set_password(password)
-                user.first_name = form.cleaned_data.get('first_name')
-                user.last_name = form.cleaned_data.get('last_name')
-                user.gender = form.cleaned_data.get('gender')  # Update gender here
-                user.address = form.cleaned_data.get('address')
-                # user.contact_num = form.cleaned_data.get('contact_num')
-                user.home_number = form.cleaned_data.get('home_number')
-                user.cell_number = form.cleaned_data.get('cell_number')
-                user.campus = form.cleaned_data.get('campus')
-                user.grade = form.cleaned_data.get('grade')
-                user.remark = form.cleaned_data.get('remark')
-                if request.FILES.get('profile_pic'):
-                    user.profile_pic = request.FILES.get('profile_pic')
+
+                if passport is not None:
+                    fs = FileSystemStorage()
+                    filename = fs.save(passport.name, passport)
+                    passport_url = fs.url(filename)
+                    user.profile_pic = passport_url
+
+                user.first_name = first_name
+                user.last_name = last_name
+                user.home_number = home_number
+                user.cell_number = cell_number
+                user.gender = gender
+                user.address = address
+                user.remark = remark
+
+                student.course = course
+                student.campus = campus
+                student.grade = grade
+            
                 user.save()
                 student.save()
-                return redirect(reverse('manage_student'))
-                # messages.success(request, "Successfully Updated")
-                # return redirect(reverse('edit_student', args=[student_id]))
+
+                messages.success(request, "Successfully Updated")
+                return redirect(reverse('edit_student', args=[student_id]))
             except Exception as e:
-                messages.error(request, f"Could Not Update: {str(e)}")
+                messages.error(request, "Could Not Update: " + str(e))
         else:
-            messages.error(request, "Please Fill Form Properly!")
+            messages.error(request, "Please fill the form properly")
+    else:
+        return render(request, "hod_template/edit_student_template.html", context)
+
     return render(request, "hod_template/edit_student_template.html", context)
 
 def edit_course(request, course_id):

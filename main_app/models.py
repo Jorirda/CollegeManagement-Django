@@ -51,8 +51,6 @@ class CustomUser(AbstractUser):
     contact_num = models.TextField(default="")
     home_number = models.TextField(default="")
     cell_number = models.TextField(default="")
-    campus = models.CharField(max_length=100, blank=True)
-    grade = models.CharField(max_length=10, blank=True)
     remark = models.TextField(default="")
     fcm_token = models.TextField(default="")  # For firebase notifications
     created_at = models.DateTimeField(auto_now_add=True)
@@ -64,13 +62,20 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.last_name + ", " + self.first_name
 
+
 #Institution
 class Institution(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
+class Campus(models.Model):
+    name = models.CharField(max_length=100)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='campuses')
 
+    def __str__(self):
+        return self.name
+    
 class Admin(models.Model):
     admin = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     remark = models.TextField(default="")
@@ -91,32 +96,26 @@ class Course(models.Model):
 class Student(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='student_institutions')
+    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     session = models.ForeignKey(Session, on_delete=models.DO_NOTHING, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
     reg_date = models.DateField(blank=True, null=True)
-    state = models.CharField(max_length=30, blank=True)  # learning/completed/pending refund
+    state = models.CharField(max_length=30, blank=True) 
+    grade = models.CharField(max_length=10, blank=True, null=True)  
 
-    def __str__(self):
-        return self.admin.last_name + ", " + self.admin.first_name
-
-
-class Campus(models.Model):
-    name = models.CharField(max_length=100)
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='campuses')
-
-    def __str__(self):
-        return self.name
+    
 
 class Teacher(models.Model):
     institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='teacher_institutions')
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
-    campus = models.ForeignKey(Campus, on_delete=models.DO_NOTHING, null=True, blank=True)  # Make it nullable
+    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     work_type = models.CharField(max_length=30, blank=True)  # Special/Temporary
 
     def __str__(self):
         return self.admin.last_name + " " + self.admin.first_name
+
 
 
 class Subject(models.Model):

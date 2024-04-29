@@ -99,7 +99,7 @@
               var status = $("#reply_leave_status").val();
               if (status == '1' || status == '-1') {
                   $.ajax({
-                      url: "{% url 'student_leave_reply' %}",
+                      url: "{% url 'view_student_leave' %}",
                       type: 'POST',
                       data: {
                             id: id,

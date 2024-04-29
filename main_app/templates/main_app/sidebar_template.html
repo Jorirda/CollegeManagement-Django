@@ -604,7 +604,7 @@
                 <a href="#" class="brand-link">
                     <img src="{% static 'dist/img/AdminLTELogo.png' %} " alt="AdminLTE Logo"
                         class="brand-image img-circle elevation-3" style="opacity: .8">
-                    <span class="brand-text font-weight-light"> {% trans teacher Panel %}</span>
+                    <span class="brand-text font-weight-light"> {% trans "teacher Panel" %}</span>
                 </a>
 
                 <!-- Sidebar -->
@@ -734,7 +734,7 @@
 
                                 <img src="{% static 'dist/img/AdminLTELogo.png' %} " alt="AdminLTE Logo"
                                     class="brand-image img-circle elevation-3" style="opacity: .8">
-                                <span class="brand-text font-weight-light"> {% trans Student Panel %} </span>
+                                <span class="brand-text font-weight-light"> {% trans "Student Panel" %} </span>
                             </a>
 
                             <!-- Sidebar -->
@@ -834,7 +834,7 @@
                                         {% endif %}
 
                                         <li class="nav-item">
-                                            {% url 'upload' as upload %}
+                                            {% url 'get_upload' as upload %}
                                             <a href="{{upload}}" class="nav-link {% if upload == request.path %} active {% endif %}">
                                                 <i class="nav-icon fas fa-home"></i>
                                                 <p>

@@ -55,9 +55,9 @@ class CustomUserForm(FormSettings):
 
 
 class StudentForm(CustomUserForm):
-    date_of_birth = forms.DateField(required=False, label="Date of Birth", widget=forms.DateInput(attrs={'type': 'date'}))
-    reg_date = forms.DateField(required=False, label="Registration Date", widget=forms.DateInput(attrs={'type': 'date'}))
-    state = forms.ChoiceField(choices=[('Currently Learning', 'Currently Learning'), ('Completed', 'Completed'), ('Refund', 'Refund')], label="State")
+    date_of_birth = forms.DateField(required=False, label=_("Date of Birth"), widget=forms.DateInput(attrs={'type': 'date'}))
+    reg_date = forms.DateField(required=False, label=_("Registration Date"), widget=forms.DateInput(attrs={'type': 'date'}))
+    state = forms.ChoiceField(choices=[('Currently Learning', _('Currently Learning')), ('Completed', _('Completed')), ('Refund', _('Refund'))], label=_("State"))
     
     # Include new fields: campus, institution, grade, home_number, cell_number
     institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False, label="Institution")

@@ -47,7 +47,14 @@
 *::after {
   box-sizing: border-box;
 }
-
+.custombtn {
+  font-size: 1.25rem;
+  line-height: 1.5;
+  padding: .8125rem .5rem;
+  transition: width .3s ease-in-out;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, .8);
+}
 html {
   font-family: sans-serif;
   line-height: 1.15;

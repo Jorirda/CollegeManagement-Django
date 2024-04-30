@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-29 10:28+0800\n"
-"PO-Revision-Date: 2024-04-29 10:52+0800\n"
+"POT-Creation-Date: 2024-04-30 15:43+0800\n"
+"PO-Revision-Date: 2024-04-30 15:50+0800\n"
 "Last-Translator: Farhaan Muhammad <farhaanp36@gmail.com>\n"
 "Language-Team: \n"
 "Language: zh\n"
@@ -18,12 +18,12 @@ msgstr ""
 "X-Generator: Poedit 3.4.2\n"
 
 #: .\college_management_system\settings.py:137
-#: .\main_app\templates\main_app\base.html:69
+#: .\main_app\templates\main_app\base.html:68
 msgid "English"
 msgstr "英文"
 
 #: .\college_management_system\settings.py:138
-#: .\main_app\templates\main_app\base.html:70
+#: .\main_app\templates\main_app\base.html:69
 msgid "Chinese"
 msgstr "中文"
 
@@ -36,28 +36,26 @@ msgid "Last Name"
 msgstr "姓"
 
 #: .\main_app\forms.py:22
-#: .\main_app\templates\hod_template\manage_student.html:26
-#: .\main_app\templates\hod_template\manage_teacher.html:26
+#: .\main_app\templates\hod_template\manage_student.html:27
+#: .\main_app\templates\hod_template\manage_teacher.html:27
 #: .\main_app\templates\hod_template\student_notification.html:25
-#: .\main_app\templates\hod_template\teacher_notification.html:25
 msgid "Email"
 msgstr "邮箱"
 
-#: .\main_app\forms.py:23 .\main_app\forms.py:220
+#: .\main_app\forms.py:23 .\main_app\forms.py:228
 msgid "Male"
 msgstr "男"
 
-#: .\main_app\forms.py:23 .\main_app\forms.py:221
+#: .\main_app\forms.py:23 .\main_app\forms.py:229
 msgid "Female"
 msgstr "女"
 
-#: .\main_app\forms.py:23 .\main_app\forms.py:222
-#: .\main_app\templates\hod_template\manage_student.html:31
+#: .\main_app\forms.py:23 .\main_app\forms.py:230
+#: .\main_app\templates\hod_template\manage_student.html:33
 #: .\main_app\templates\hod_template\manage_student_query.html:41
-#: .\main_app\templates\hod_template\manage_teacher.html:30
+#: .\main_app\templates\hod_template\manage_teacher.html:32
 #: .\main_app\templates\hod_template\manage_teacher_query.html:41
 #: .\main_app\templates\hod_template\student_notification.html:26
-#: .\main_app\templates\hod_template\teacher_notification.html:26
 msgid "Gender"
 msgstr "性别"
 
@@ -70,13 +68,13 @@ msgid "Profile Picture"
 msgstr "个人图片"
 
 #: .\main_app\forms.py:26
-#: .\main_app\templates\hod_template\manage_student.html:62
-#: .\main_app\templates\hod_template\manage_teacher.html:31
-#: .\main_app\templates\hod_template\manage_teacher_query.html:47
+#: .\main_app\templates\hod_template\manage_student.html:35
+#: .\main_app\templates\hod_template\manage_teacher.html:33
+#: .\main_app\templates\hod_template\manage_teacher_query.html:77
 msgid "Address"
 msgstr "地址"
 
-#: .\main_app\forms.py:27 .\main_app\forms.py:224
+#: .\main_app\forms.py:27 .\main_app\forms.py:232
 msgid "Contact Number"
 msgstr "联系电话"
 
@@ -84,8 +82,8 @@ msgstr "联系电话"
 #: .\main_app\templates\hod_template\manage_class_schedule.html:27
 #: .\main_app\templates\hod_template\manage_learning_record.html:31
 #: .\main_app\templates\hod_template\manage_payment_record.html:38
-#: .\main_app\templates\hod_template\manage_student.html:67
-#: .\main_app\templates\hod_template\manage_teacher.html:35
+#: .\main_app\templates\hod_template\manage_student.html:40
+#: .\main_app\templates\hod_template\manage_teacher.html:37
 msgid "Remark"
 msgstr "备注"
 
@@ -97,285 +95,405 @@ msgstr "仅在您希望更新密码时填写"
 msgid "The given email is already registered"
 msgstr "该电子邮件已注册"
 
-#: .\main_app\forms.py:130
+#: .\main_app\forms.py:58 .\main_app\forms.py:231
+#: .\main_app\templates\hod_template\manage_student.html:34
+#: .\main_app\templates\hod_template\manage_student_query.html:42
+msgid "Date of Birth"
+msgstr "出生日期"
+
+#: .\main_app\forms.py:59 .\main_app\forms.py:240
+#: .\main_app\templates\hod_template\manage_student.html:36
+#: .\main_app\templates\hod_template\manage_student_query.html:80
+msgid "Registration Date"
+msgstr "注册日期"
+
+#: .\main_app\forms.py:60 .\main_app\forms.py:234
+msgid "Currently Learning"
+msgstr "当前学习"
+
+#: .\main_app\forms.py:60 .\main_app\forms.py:179 .\main_app\forms.py:235
+msgid "Completed"
+msgstr "已完成"
+
+#: .\main_app\forms.py:60 .\main_app\forms.py:181 .\main_app\forms.py:236
+msgid "Refund"
+msgstr "退款"
+
+#: .\main_app\forms.py:60 .\main_app\forms.py:237
+#: .\main_app\templates\hod_template\manage_payment_record.html:36
+#: .\main_app\templates\hod_template\manage_student.html:37
+#: .\main_app\templates\hod_template\manage_student_query.html:77
+msgid "State"
+msgstr "州/省"
+
+#: .\main_app\forms.py:63 .\main_app\forms.py:112
+#: .\main_app\templates\hod_template\manage_campus.html:23
+#: .\main_app\templates\hod_template\manage_institution.html:24
+#: .\main_app\templates\hod_template\manage_learning_record.html:24
+#: .\main_app\templates\hod_template\manage_student.html:30
+#: .\main_app\templates\hod_template\manage_student_query.html:45
+#: .\main_app\templates\hod_template\manage_teacher.html:30
+#: .\main_app\templates\hod_template\manage_teacher_query.html:44
+#: .\main_app\templates\main_app\sidebar_template.html:95
+msgid "Institution"
+msgstr "机构"
+
+#: .\main_app\forms.py:64
+#: .\main_app\templates\hod_template\manage_campus.html:22
+#: .\main_app\templates\hod_template\manage_learning_record.html:25
+#: .\main_app\templates\hod_template\manage_student.html:31
+#: .\main_app\templates\hod_template\manage_student_query.html:46
+#: .\main_app\templates\hod_template\manage_student_query.html:117
+#: .\main_app\templates\hod_template\manage_teacher.html:31
+#: .\main_app\templates\hod_template\manage_teacher_query.html:45
+#: .\main_app\templates\main_app\sidebar_template.html:131
+msgid "Campus"
+msgstr "校园"
+
+#: .\main_app\forms.py:65
+#: .\main_app\templates\hod_template\manage_student.html:32
+#: .\main_app\templates\hod_template\manage_student_query.html:47
+#: .\main_app\templates\hod_template\manage_student_query.html:118
+msgid "Grade"
+msgstr "等级"
+
+#: .\main_app\forms.py:66
+#: .\main_app\templates\hod_template\manage_student.html:28
+#: .\main_app\templates\hod_template\manage_student_query.html:43
+#: .\main_app\templates\hod_template\manage_teacher.html:28
+#: .\main_app\templates\hod_template\manage_teacher_query.html:42
+msgid "Home Number"
+msgstr "家庭联系电话"
+
+#: .\main_app\forms.py:67
+#: .\main_app\templates\hod_template\manage_student.html:29
+#: .\main_app\templates\hod_template\manage_student_query.html:44
+#: .\main_app\templates\hod_template\manage_teacher.html:29
+#: .\main_app\templates\hod_template\manage_teacher_query.html:43
+msgid "Cell Number"
+msgstr "联系电话"
+
+#: .\main_app\forms.py:95
+msgid "first_name"
+msgstr "名"
+
+#: .\main_app\forms.py:95
+msgid "last_name"
+msgstr "姓氏"
+
+#: .\main_app\forms.py:95
+msgid "email"
+msgstr "邮箱"
+
+#: .\main_app\forms.py:95
+msgid "gender"
+msgstr "性别"
+
+#: .\main_app\forms.py:95
+msgid "password"
+msgstr "密码"
+
+#: .\main_app\forms.py:95
+msgid "profile_pic"
+msgstr "个人图片"
+
+#: .\main_app\forms.py:107
+msgid "Special Teacher"
+msgstr "特级教师"
+
+#: .\main_app\forms.py:108
+msgid "Temporary Contract"
+msgstr "临时合同"
+
+#: .\main_app\forms.py:131 .\main_app\forms.py:196 .\main_app\forms.py:214
+#: .\main_app\forms.py:224
+msgid "course"
+msgstr "课程"
+
+#: .\main_app\forms.py:131 .\main_app\forms.py:336
+msgid "work_type"
+msgstr "工作类型"
+
+#: .\main_app\forms.py:131
+msgid "home_number"
+msgstr "家庭联系电话"
+
+#: .\main_app\forms.py:131
+msgid "cell_number"
+msgstr "联系电话"
+
+#: .\main_app\forms.py:131 .\main_app\forms.py:168 .\main_app\forms.py:214
+msgid "institution"
+msgstr "机构"
+
+#: .\main_app\forms.py:131 .\main_app\forms.py:214
+msgid "campus"
+msgstr "校园"
+
+#: .\main_app\forms.py:135
 msgid "Course Name"
 msgstr "课程名称"
 
-#: .\main_app\forms.py:139
+#: .\main_app\forms.py:140 .\main_app\forms.py:160 .\main_app\forms.py:168
+msgid "name"
+msgstr "名字"
+
+#: .\main_app\forms.py:144
 msgid "Subject Name"
 msgstr "科目名称"
 
-#: .\main_app\forms.py:140
+#: .\main_app\forms.py:145
 #: .\main_app\templates\hod_template\manage_class_schedule.html:24
 #: .\main_app\templates\hod_template\manage_learning_record.html:27
 #: .\main_app\templates\hod_template\manage_subject.html:25
 #: .\main_app\templates\hod_template\teacher_feedback_template.html:22
 #: .\main_app\templates\hod_template\teacher_leave_view.html:22
-#: .\main_app\templates\main_app\sidebar_template.html:254
+#: .\main_app\templates\main_app\sidebar_template.html:284
 msgid "Teacher"
 msgstr "教师"
 
-#: .\main_app\forms.py:141 .\main_app\forms.py:238
+#: .\main_app\forms.py:146 .\main_app\forms.py:246
 #: .\main_app\templates\hod_template\manage_course.html:25
 #: .\main_app\templates\hod_template\manage_learning_record.html:26
 #: .\main_app\templates\hod_template\manage_payment_record.html:27
-#: .\main_app\templates\hod_template\manage_student.html:65
-#: .\main_app\templates\hod_template\manage_student_query.html:113
+#: .\main_app\templates\hod_template\manage_student.html:38
+#: .\main_app\templates\hod_template\manage_student_query.html:119
 #: .\main_app\templates\hod_template\manage_subject.html:26
 #: .\main_app\templates\hod_template\student_leave_view.html:25
 #: .\main_app\templates\hod_template\student_notification.html:27
 #: .\main_app\templates\hod_template\teacher_feedback_template.html:23
 #: .\main_app\templates\hod_template\teacher_leave_view.html:23
-#: .\main_app\templates\hod_template\teacher_notification.html:27
-#: .\main_app\templates\main_app\sidebar_template.html:139
+#: .\main_app\templates\main_app\sidebar_template.html:169
 msgid "Course"
 msgstr "课程"
 
-#: .\main_app\forms.py:166 .\main_app\forms.py:197 .\main_app\forms.py:265
-#: .\main_app\forms.py:289
-#: .\main_app\templates\hod_template\manage_learning_record.html:24
+#: .\main_app\forms.py:171 .\main_app\forms.py:202 .\main_app\forms.py:273
+#: .\main_app\forms.py:297
+#: .\main_app\templates\hod_template\manage_learning_record.html:22
 #: .\main_app\templates\hod_template\manage_payment_record.html:25
-#: .\main_app\templates\hod_template\manage_student_query.html:110
-#: .\main_app\templates\hod_template\manage_teacher_query.html:79
+#: .\main_app\templates\hod_template\manage_student_query.html:116
+#: .\main_app\templates\hod_template\manage_teacher_query.html:80
 msgid "Date"
 msgstr "日期"
 
-#: .\main_app\forms.py:168
+#: .\main_app\forms.py:173
 msgid "WeChat"
 msgstr "微信"
 
-#: .\main_app\forms.py:169
+#: .\main_app\forms.py:174
 msgid "AliPay"
 msgstr "支付宝"
 
-#: .\main_app\forms.py:170
+#: .\main_app\forms.py:175
 msgid "Bank Card"
 msgstr "银行卡"
 
-#: .\main_app\forms.py:171
+#: .\main_app\forms.py:176
 #: .\main_app\templates\hod_template\manage_payment_record.html:32
 msgid "Other"
 msgstr "其他"
 
-#: .\main_app\forms.py:172
+#: .\main_app\forms.py:177
 #: .\main_app\templates\hod_template\manage_payment_record.html:35
 msgid "Payment Method"
 msgstr "支付方式"
 
-#: .\main_app\forms.py:174 .\main_app\forms.py:227
-msgid "Completed"
-msgstr "已完成"
-
-#: .\main_app\forms.py:175
+#: .\main_app\forms.py:180
 msgid "Pending"
 msgstr "待定"
 
-#: .\main_app\forms.py:176 .\main_app\forms.py:228
-msgid "Refund"
-msgstr "退款"
-
-#: .\main_app\forms.py:177
+#: .\main_app\forms.py:182
 msgid "Status"
 msgstr "状态"
 
-#: .\main_app\forms.py:178 .\main_app\forms.py:179 .\main_app\forms.py:180
-#: .\main_app\forms.py:181 .\main_app\forms.py:182 .\main_app\forms.py:183
-#: .\main_app\forms.py:209
+#: .\main_app\forms.py:183 .\main_app\forms.py:184 .\main_app\forms.py:185
+#: .\main_app\forms.py:186 .\main_app\forms.py:187 .\main_app\forms.py:188
+#: .\main_app\forms.py:217
 msgid "¥"
 msgstr "元"
 
-#: .\main_app\forms.py:178 .\main_app\forms.py:209
+#: .\main_app\forms.py:183 .\main_app\forms.py:217
 #: .\main_app\templates\hod_template\manage_class_schedule.html:23
 #: .\main_app\templates\hod_template\manage_payment_record.html:28
 msgid "Lesson Unit Price"
 msgstr "课时单价"
 
-#: .\main_app\forms.py:179
+#: .\main_app\forms.py:184
 #: .\main_app\templates\hod_template\manage_payment_record.html:30
 msgid "Discounted Price"
 msgstr "折扣价"
 
-#: .\main_app\forms.py:180
+#: .\main_app\forms.py:185
 #: .\main_app\templates\hod_template\manage_payment_record.html:31
 msgid "Book Costs"
 msgstr "书籍费用"
 
-#: .\main_app\forms.py:181
+#: .\main_app\forms.py:186
 msgid "Other Fee"
 msgstr "其他费用"
 
-#: .\main_app\forms.py:182
+#: .\main_app\forms.py:187
 #: .\main_app\templates\hod_template\manage_payment_record.html:33
 msgid "Amount Due"
 msgstr "应付金额"
 
-#: .\main_app\forms.py:183
+#: .\main_app\forms.py:188
 #: .\main_app\templates\hod_template\manage_payment_record.html:34
 msgid "Amount Paid"
 msgstr "已付金额"
 
-#: .\main_app\forms.py:191 .\main_app\forms.py:206
+#: .\main_app\forms.py:196 .\main_app\forms.py:214
 msgid "date"
 msgstr "日期"
 
-#: .\main_app\forms.py:191 .\main_app\forms.py:206
+#: .\main_app\forms.py:196 .\main_app\forms.py:214 .\main_app\forms.py:349
 msgid "student"
 msgstr "学生"
 
-#: .\main_app\forms.py:191 .\main_app\forms.py:206
-msgid "course"
-msgstr "课程"
-
-#: .\main_app\forms.py:191
+#: .\main_app\forms.py:196
 msgid "lesson_unit_price"
 msgstr "课时单价"
 
-#: .\main_app\forms.py:191 .\main_app\forms.py:206
+#: .\main_app\forms.py:196 .\main_app\forms.py:214
 msgid "class_name"
 msgstr "上课时间"
 
-#: .\main_app\forms.py:192
+#: .\main_app\forms.py:197
 msgid "discounted_price"
 msgstr "折扣价"
 
-#: .\main_app\forms.py:192
+#: .\main_app\forms.py:197
 msgid "book_costs"
 msgstr "书籍费用"
 
-#: .\main_app\forms.py:192
+#: .\main_app\forms.py:197
 msgid "other_fee"
 msgstr "其他费用"
 
-#: .\main_app\forms.py:192
+#: .\main_app\forms.py:197
 msgid "amount_due"
 msgstr "应付金额"
 
-#: .\main_app\forms.py:192
+#: .\main_app\forms.py:197
 msgid "amount_paid"
 msgstr "已付金额"
 
-#: .\main_app\forms.py:193
+#: .\main_app\forms.py:198
 msgid "payment_method"
 msgstr "支付方式"
 
-#: .\main_app\forms.py:193
+#: .\main_app\forms.py:198
 msgid "status"
 msgstr "状态"
 
-#: .\main_app\forms.py:193
+#: .\main_app\forms.py:198
 msgid "payee"
 msgstr "收款人"
 
-#: .\main_app\forms.py:193 .\main_app\forms.py:206
+#: .\main_app\forms.py:198 .\main_app\forms.py:214 .\main_app\forms.py:224
 msgid "remark"
 msgstr "备注"
 
-#: .\main_app\forms.py:198
+#: .\main_app\forms.py:203
 #: .\main_app\templates\hod_template\manage_learning_record.html:28
 msgid "Starting Time"
 msgstr "开始时间"
 
-#: .\main_app\forms.py:199
+#: .\main_app\forms.py:204
 #: .\main_app\templates\hod_template\manage_learning_record.html:29
-#: .\main_app\templates\hod_template\manage_student_query.html:116
-#: .\main_app\templates\hod_template\manage_teacher_query.html:82
+#: .\main_app\templates\hod_template\manage_student_query.html:122
+#: .\main_app\templates\hod_template\manage_teacher_query.html:83
 msgid "End Time"
 msgstr "结束时间"
 
-#: .\main_app\forms.py:206
+#: .\main_app\forms.py:214 .\main_app\forms.py:224
 msgid "teacher"
 msgstr "教师"
 
-#: .\main_app\forms.py:206
+#: .\main_app\forms.py:214
 msgid "starting_time"
 msgstr "开始时间"
 
-#: .\main_app\forms.py:206
+#: .\main_app\forms.py:214
 msgid "end_time"
 msgstr "结束时间"
 
-#: .\main_app\forms.py:223
-#: .\main_app\templates\hod_template\manage_student.html:61
-#: .\main_app\templates\hod_template\manage_student_query.html:42
-msgid "Date of Birth"
-msgstr "出生日期"
+#: .\main_app\forms.py:224 .\main_app\forms.py:349
+msgid "subject"
+msgstr "科目"
 
-#: .\main_app\forms.py:226
-msgid "Currently Learning"
-msgstr "当前学习"
+#: .\main_app\forms.py:224
+msgid "class_time"
+msgstr "课时"
 
-#: .\main_app\forms.py:229
-#: .\main_app\templates\hod_template\manage_payment_record.html:36
-#: .\main_app\templates\hod_template\manage_student.html:64
-#: .\main_app\templates\hod_template\manage_student_query.html:45
-msgid "State"
-msgstr "州/省"
-
-#: .\main_app\forms.py:230
-#: .\main_app\templates\hod_template\manage_student_query.html:46
+#: .\main_app\forms.py:238
+#: .\main_app\templates\hod_template\manage_student_query.html:78
 msgid "Payment Status"
 msgstr "支付状态"
 
-#: .\main_app\forms.py:231
+#: .\main_app\forms.py:239
 msgid "Refund Situation"
 msgstr "退款情况"
 
-#: .\main_app\forms.py:232
-#: .\main_app\templates\hod_template\manage_student.html:63
-#: .\main_app\templates\hod_template\manage_student_query.html:77
-msgid "Registration Date"
-msgstr "注册日期"
-
-#: .\main_app\forms.py:233
-#: .\main_app\templates\hod_template\manage_student_query.html:78
-#: .\main_app\templates\hod_template\manage_teacher_query.html:78
+#: .\main_app\forms.py:241
+#: .\main_app\templates\hod_template\manage_student_query.html:81
+#: .\main_app\templates\hod_template\manage_teacher_query.html:79
 msgid "Number of Classes"
 msgstr "课程数量"
 
-#: .\main_app\forms.py:234
+#: .\main_app\forms.py:242
 msgid "Already Registered for Courses"
 msgstr "已注册课程"
 
-#: .\main_app\forms.py:234
-#: .\main_app\templates\hod_template\manage_student_query.html:79
+#: .\main_app\forms.py:242
+#: .\main_app\templates\hod_template\manage_student_query.html:82
 msgid "Registered Courses"
 msgstr "注册的课程"
 
-#: .\main_app\forms.py:235
+#: .\main_app\forms.py:243
 msgid "Course Hours Completed"
 msgstr "已完成的课时"
 
-#: .\main_app\forms.py:235
-#: .\main_app\templates\hod_template\manage_student_query.html:80
-#: .\main_app\templates\hod_template\manage_teacher_query.html:77
+#: .\main_app\forms.py:243
+#: .\main_app\templates\hod_template\manage_student_query.html:83
+#: .\main_app\templates\hod_template\manage_teacher_query.html:78
 msgid "Completed Hours"
 msgstr "已完成的小时"
 
-#: .\main_app\forms.py:236
-#: .\main_app\templates\hod_template\manage_student_query.html:81
+#: .\main_app\forms.py:244
+#: .\main_app\templates\hod_template\manage_student_query.html:84
 msgid "Paid Class Hours"
 msgstr "已付课时"
 
-#: .\main_app\forms.py:236
+#: .\main_app\forms.py:244
 msgid "Paid Hours"
 msgstr "已付小时"
 
-#: .\main_app\forms.py:237
+#: .\main_app\forms.py:245
 msgid "Remaining Class Hours"
 msgstr "剩余课时"
 
-#: .\main_app\forms.py:237
-#: .\main_app\templates\hod_template\manage_student_query.html:82
+#: .\main_app\forms.py:245
+#: .\main_app\templates\hod_template\manage_student_query.html:85
 msgid "Remaining Hours"
 msgstr "剩余小时"
 
-#: .\main_app\forms.py:239
+#: .\main_app\forms.py:247
+#: .\main_app\templates\hod_template\admin_view_attendance.html:51
 #: .\main_app\templates\hod_template\student_feedback_template.html:25
-#: .\main_app\templates\main_app\sidebar_template.html:217
+#: .\main_app\templates\main_app\sidebar_template.html:247
 msgid "Session"
 msgstr "会议"
 
-#: .\main_app\forms.py:266 .\main_app\forms.py:290
+#: .\main_app\forms.py:267
+msgid "start_year"
+msgstr "起始年份"
+
+#: .\main_app\forms.py:268
+msgid "end_year"
+msgstr "年终"
+
+#: .\main_app\forms.py:274 .\main_app\forms.py:298
 #: .\main_app\templates\hod_template\student_feedback_template.html:26
 #: .\main_app\templates\hod_template\student_leave_view.html:26
 #: .\main_app\templates\hod_template\teacher_feedback_template.html:24
@@ -383,16 +501,32 @@ msgstr "会议"
 msgid "Message"
 msgstr "信息"
 
-#: .\main_app\forms.py:279 .\main_app\forms.py:303
-#: .\main_app\templates\main_app\sidebar_template.html:529
-#: .\main_app\templates\main_app\sidebar_template.html:725
-#: .\main_app\templates\main_app\sidebar_template.html:828
+#: .\main_app\forms.py:287 .\main_app\forms.py:311
+#: .\main_app\templates\main_app\sidebar_template.html:562
+#: .\main_app\templates\main_app\sidebar_template.html:783
+#: .\main_app\templates\main_app\sidebar_template.html:886
 msgid "Feedback"
 msgstr "反馈"
 
-#: .\main_app\forms.py:334
+#: .\main_app\forms.py:317
+msgid "feedback"
+msgstr "反馈"
+
+#: .\main_app\forms.py:342
 msgid "Session Year"
 msgstr "会议年度"
+
+#: .\main_app\forms.py:349
+msgid "session_year"
+msgstr "会议年度"
+
+#: .\main_app\forms.py:349
+msgid "test"
+msgstr "测试"
+
+#: .\main_app\forms.py:349
+msgid "exam"
+msgstr "测试"
 
 #: .\main_app\hod_views.py:129
 msgid "Administrative Dashboard"
@@ -402,175 +536,175 @@ msgstr "行政仪表板"
 msgid "Add teacher"
 msgstr "增加教师"
 
-#: .\main_app\hod_views.py:203
+#: .\main_app\hod_views.py:209
 #: .\main_app\templates\hod_template\add_student_template.html:32
-#: .\main_app\templates\main_app\sidebar_template.html:301
+#: .\main_app\templates\main_app\sidebar_template.html:333
 msgid "Add Student"
 msgstr "添加学生"
 
-#: .\main_app\hod_views.py:250
+#: .\main_app\hod_views.py:264
 #: .\main_app\templates\hod_template\add_course_template.html:18
-#: .\main_app\templates\main_app\sidebar_template.html:150
+#: .\main_app\templates\main_app\sidebar_template.html:180
 msgid "Add Course"
 msgstr "添加课程"
 
-#: .\main_app\hod_views.py:271
+#: .\main_app\hod_views.py:285
 #: .\main_app\templates\hod_template\add_subject_template.html:18
-#: .\main_app\templates\main_app\sidebar_template.html:188
+#: .\main_app\templates\main_app\sidebar_template.html:218
 msgid "Add Subject"
 msgstr "添加科目"
 
-#: .\main_app\hod_views.py:298
+#: .\main_app\hod_views.py:312
 #: .\main_app\templates\hod_template\add_institution_template.html:18
-#: .\main_app\templates\main_app\sidebar_template.html:76
+#: .\main_app\templates\main_app\sidebar_template.html:106
 msgid "Add Institution"
 msgstr "添加会话"
 
-#: .\main_app\hod_views.py:319
+#: .\main_app\hod_views.py:333
 #: .\main_app\templates\hod_template\add_campus_template.html:18
-#: .\main_app\templates\main_app\sidebar_template.html:112
+#: .\main_app\templates\main_app\sidebar_template.html:142
 msgid "Add Campus"
 msgstr "添加课程"
 
-#: .\main_app\hod_views.py:349
+#: .\main_app\hod_views.py:363
 msgid "Add Payment Record"
 msgstr "添加付款记录"
 
-#: .\main_app\hod_views.py:402
-#: .\main_app\templates\main_app\sidebar_template.html:412
+#: .\main_app\hod_views.py:416
+#: .\main_app\templates\main_app\sidebar_template.html:445
 msgid "Add Learning Record"
 msgstr "添加学习记录"
 
-#: .\main_app\hod_views.py:442
+#: .\main_app\hod_views.py:460
 msgid "Add Class Schedule"
 msgstr "添加课程表"
 
-#: .\main_app\hod_views.py:486
+#: .\main_app\hod_views.py:504
 msgid "Manage Teachers"
 msgstr "管理教师"
 
-#: .\main_app\hod_views.py:496
+#: .\main_app\hod_views.py:514
 msgid "Manage Students"
 msgstr "管理学生"
 
-#: .\main_app\hod_views.py:504
+#: .\main_app\hod_views.py:522
 msgid "Manage Courses"
 msgstr "管理课程"
 
-#: .\main_app\hod_views.py:512
+#: .\main_app\hod_views.py:530
 msgid "Manage Subjects"
 msgstr "管理主题"
 
-#: .\main_app\hod_views.py:520
+#: .\main_app\hod_views.py:538
 msgid "Manage Institutions"
 msgstr "管理会话"
 
-#: .\main_app\hod_views.py:528
+#: .\main_app\hod_views.py:546
 msgid "Manage Campuses"
 msgstr "管理课程"
 
-#: .\main_app\hod_views.py:538
+#: .\main_app\hod_views.py:556
 msgid "Manage Payment Records"
 msgstr "管理付款记录"
 
-#: .\main_app\hod_views.py:547
+#: .\main_app\hod_views.py:565
 msgid "Manage Learning Records"
 msgstr "管理学习记录"
 
-#: .\main_app\hod_views.py:555
+#: .\main_app\hod_views.py:573
 msgid "Manage Class Schedule"
 msgstr "管理时间表"
 
-#: .\main_app\hod_views.py:644
+#: .\main_app\hod_views.py:662
 msgid "Manage Student Queries"
 msgstr "学生查询"
 
-#: .\main_app\hod_views.py:754
+#: .\main_app\hod_views.py:772
 msgid "Edit teacher"
 msgstr "编辑教师"
 
-#: .\main_app\hod_views.py:832
+#: .\main_app\hod_views.py:852
 msgid "Edit Student"
 msgstr "编辑学生"
 
-#: .\main_app\hod_views.py:872
+#: .\main_app\hod_views.py:919
 #: .\main_app\templates\hod_template\edit_course_template.html:18
 msgid "Edit Course"
 msgstr "编辑课程"
 
-#: .\main_app\hod_views.py:895
+#: .\main_app\hod_views.py:942
 #: .\main_app\templates\hod_template\edit_subject_template.html:18
 msgid "Edit Subject"
 msgstr "编辑主题"
 
-#: .\main_app\hod_views.py:922
+#: .\main_app\hod_views.py:969
 #: .\main_app\templates\hod_template\edit_institution_template.html:18
 msgid "Edit Institution"
 msgstr "编辑机构"
 
-#: .\main_app\hod_views.py:945
+#: .\main_app\hod_views.py:992
 #: .\main_app\templates\hod_template\edit_campus_template.html:18
 msgid "Edit Campus"
 msgstr "编辑校园"
 
-#: .\main_app\hod_views.py:976
+#: .\main_app\hod_views.py:1023
 msgid "Edit Learning Record"
 msgstr "编辑学习记录"
 
-#: .\main_app\hod_views.py:1015
+#: .\main_app\hod_views.py:1066
 msgid "Edit Class Schedule"
 msgstr "编辑时间表"
 
-#: .\main_app\hod_views.py:1048
+#: .\main_app\hod_views.py:1099
 #: .\main_app\templates\hod_template\add_session_template.html:18
-#: .\main_app\templates\main_app\sidebar_template.html:229
+#: .\main_app\templates\main_app\sidebar_template.html:259
 msgid "Add Session"
 msgstr "添加会话"
 
-#: .\main_app\hod_views.py:1063
+#: .\main_app\hod_views.py:1114
 msgid "Manage Sessions"
 msgstr "管理会话"
 
-#: .\main_app\hod_views.py:1070
+#: .\main_app\hod_views.py:1121
 msgid "Edit Session"
 msgstr "编辑会话"
 
-#: .\main_app\hod_views.py:1106
+#: .\main_app\hod_views.py:1157
 msgid "Student Feedback Messages"
 msgstr "学生反馈信息"
 
-#: .\main_app\hod_views.py:1126
+#: .\main_app\hod_views.py:1177
 msgid "teacher Feedback Messages"
 msgstr "教师反馈信息"
 
-#: .\main_app\hod_views.py:1146
+#: .\main_app\hod_views.py:1197
 msgid "Leave Applications From teacher"
 msgstr "教师的休假申请"
 
-#: .\main_app\hod_views.py:1170
+#: .\main_app\hod_views.py:1221
 msgid "Leave Applications From Students"
 msgstr "学生的休假申请"
 
-#: .\main_app\hod_views.py:1194
-#: .\main_app\templates\main_app\sidebar_template.html:477
-#: .\main_app\templates\main_app\sidebar_template.html:787
+#: .\main_app\hod_views.py:1245
+#: .\main_app\templates\main_app\sidebar_template.html:510
+#: .\main_app\templates\main_app\sidebar_template.html:845
 msgid "View Attendance"
 msgstr "查看考勤"
 
-#: .\main_app\hod_views.py:1227
+#: .\main_app\hod_views.py:1278
 msgid "View/Edit Profile"
 msgstr "查看/编辑简介"
 
-#: .\main_app\hod_views.py:1259
-msgid "Send Notifications To teacher"
+#: .\main_app\hod_views.py:1310
+msgid "Send Notifications To Teachers"
 msgstr "向教师发送通知"
 
-#: .\main_app\hod_views.py:1267
+#: .\main_app\hod_views.py:1318
 msgid "Send Notifications To Students"
 msgstr "向学生发送通知"
 
-#: .\main_app\templates\hod_template\add_class_schedule_template.html:18
-#: .\main_app\templates\main_app\sidebar_template.html:450
+#: .\main_app\templates\hod_template\add_class_schedule_template.html:17
+#: .\main_app\templates\main_app\sidebar_template.html:483
 msgid "Add Schedule"
 msgstr "添加时间表"
 
@@ -579,7 +713,7 @@ msgid "Add New Record"
 msgstr "添加新记录"
 
 #: .\main_app\templates\hod_template\add_payment_record_template.html:18
-#: .\main_app\templates\main_app\sidebar_template.html:338
+#: .\main_app\templates\main_app\sidebar_template.html:371
 msgid "Add Payment"
 msgstr "添加付款"
 
@@ -588,14 +722,42 @@ msgid "Add New Query"
 msgstr "添加新查询"
 
 #: .\main_app\templates\hod_template\add_teacher_template.html:31
-#: .\main_app\templates\main_app\sidebar_template.html:265
+#: .\main_app\templates\main_app\sidebar_template.html:296
 msgid "Add Teacher"
 msgstr "添加教师"
 
+#: .\main_app\templates\hod_template\admin_view_attendance.html:42
+#: .\main_app\templates\hod_template\manage_class_schedule.html:25
+#: .\main_app\templates\hod_template\manage_subject.html:24
+#: .\main_app\templates\main_app\sidebar_template.html:207
+msgid "Subject"
+msgstr "科目"
+
+#: .\main_app\templates\hod_template\admin_view_attendance.html:44
+#: .\main_app\templates\hod_template\admin_view_attendance.html:53
+msgid "----"
+msgstr ""
+
+#: .\main_app\templates\hod_template\admin_view_attendance.html:62
+msgid "Fetch Attendance"
+msgstr "查看考勤"
+
+#: .\main_app\templates\hod_template\admin_view_attendance.html:66
+msgid "Attendance Date"
+msgstr "出席日期"
+
+#: .\main_app\templates\hod_template\admin_view_attendance.html:72
+msgid "Fetch Students"
+msgstr "查看学生"
+
+#: .\main_app\templates\hod_template\admin_view_attendance.html:94
+msgid "Kindly Choose Both Subject and Session"
+msgstr "请同时选择主题和会议"
+
 #: .\main_app\templates\hod_template\admin_view_profile.html:18
-#: .\main_app\templates\main_app\sidebar_template.html:56
-#: .\main_app\templates\main_app\sidebar_template.html:645
-#: .\main_app\templates\main_app\sidebar_template.html:776
+#: .\main_app\templates\main_app\sidebar_template.html:86
+#: .\main_app\templates\main_app\sidebar_template.html:703
+#: .\main_app\templates\main_app\sidebar_template.html:834
 msgid "Update Profile"
 msgstr "更新个人资料"
 
@@ -663,31 +825,41 @@ msgstr "每门课程的学生总数"
 msgid "Total Students in Each Subject"
 msgstr "各学科学生总数"
 
-#: .\main_app\templates\hod_template\manage_campus.html:36
+#: .\main_app\templates\hod_template\manage_campus.html:24
+#: .\main_app\templates\hod_template\manage_class_schedule.html:28
+#: .\main_app\templates\hod_template\manage_course.html:26
+#: .\main_app\templates\hod_template\manage_institution.html:25
+#: .\main_app\templates\hod_template\manage_learning_record.html:32
+#: .\main_app\templates\hod_template\manage_session.html:26
+#: .\main_app\templates\hod_template\manage_student.html:41
+#: .\main_app\templates\hod_template\manage_subject.html:27
+#: .\main_app\templates\hod_template\manage_teacher.html:38
+msgid "Actions"
+msgstr "操作"
+
+#: .\main_app\templates\hod_template\manage_campus.html:34
 #: .\main_app\templates\hod_template\manage_class_schedule.html:42
 #: .\main_app\templates\hod_template\manage_course.html:35
 #: .\main_app\templates\hod_template\manage_institution.html:34
-#: .\main_app\templates\hod_template\manage_learning_record.html:48
 #: .\main_app\templates\hod_template\manage_session.html:36
-#: .\main_app\templates\hod_template\manage_student.html:89
+#: .\main_app\templates\hod_template\manage_student.html:71
 #: .\main_app\templates\hod_template\manage_subject.html:38
-#: .\main_app\templates\hod_template\manage_teacher.html:62
+#: .\main_app\templates\hod_template\manage_teacher.html:65
 msgid "Edit"
 msgstr "编辑"
 
-#: .\main_app\templates\hod_template\manage_campus.html:37
+#: .\main_app\templates\hod_template\manage_campus.html:35
 msgid "Are you sure you want to delete this campus ?"
 msgstr "您确定要删除这个园区吗？"
 
-#: .\main_app\templates\hod_template\manage_campus.html:37
+#: .\main_app\templates\hod_template\manage_campus.html:35
 #: .\main_app\templates\hod_template\manage_class_schedule.html:43
 #: .\main_app\templates\hod_template\manage_course.html:36
 #: .\main_app\templates\hod_template\manage_institution.html:35
-#: .\main_app\templates\hod_template\manage_learning_record.html:49
 #: .\main_app\templates\hod_template\manage_session.html:37
-#: .\main_app\templates\hod_template\manage_student.html:90
+#: .\main_app\templates\hod_template\manage_student.html:72
 #: .\main_app\templates\hod_template\manage_subject.html:39
-#: .\main_app\templates\hod_template\manage_teacher.html:63
+#: .\main_app\templates\hod_template\manage_teacher.html:66
 msgid "Delete"
 msgstr "删除"
 
@@ -695,29 +867,11 @@ msgstr "删除"
 msgid "Course Title"
 msgstr "课程标题"
 
-#: .\main_app\templates\hod_template\manage_class_schedule.html:25
-#: .\main_app\templates\hod_template\manage_subject.html:24
-#: .\main_app\templates\main_app\sidebar_template.html:177
-msgid "Subject"
-msgstr "科目"
-
 #: .\main_app\templates\hod_template\manage_class_schedule.html:26
 msgid "Class Time"
 msgstr "上课时间"
 
-#: .\main_app\templates\hod_template\manage_class_schedule.html:28
-#: .\main_app\templates\hod_template\manage_course.html:26
-#: .\main_app\templates\hod_template\manage_institution.html:25
-#: .\main_app\templates\hod_template\manage_learning_record.html:32
-#: .\main_app\templates\hod_template\manage_session.html:26
-#: .\main_app\templates\hod_template\manage_student.html:68
-#: .\main_app\templates\hod_template\manage_subject.html:27
-#: .\main_app\templates\hod_template\manage_teacher.html:36
-msgid "Actions"
-msgstr "操作"
-
 #: .\main_app\templates\hod_template\manage_class_schedule.html:43
-#: .\main_app\templates\hod_template\manage_student.html:90
 msgid "Are you sure about this?"
 msgstr "您确定吗？"
 
@@ -731,34 +885,24 @@ msgstr ""
 msgid "Are you sure you want to delete this course?"
 msgstr "您确定要删除此课程吗？"
 
-#: .\main_app\templates\hod_template\manage_institution.html:24
-#: .\main_app\templates\main_app\sidebar_template.html:65
-msgid "Institution"
-msgstr "机构"
-
 #: .\main_app\templates\hod_template\manage_institution.html:35
 msgid "Are you sure you want to delete this campus?"
 msgstr "您确定要删除这个校园吗？"
 
-#: .\main_app\templates\hod_template\manage_learning_record.html:25
+#: .\main_app\templates\hod_template\manage_learning_record.html:23
 #: .\main_app\templates\hod_template\manage_payment_record.html:26
 #: .\main_app\templates\hod_template\student_feedback_template.html:24
 #: .\main_app\templates\hod_template\student_leave_view.html:24
-#: .\main_app\templates\main_app\sidebar_template.html:290
+#: .\main_app\templates\main_app\sidebar_template.html:321
 msgid "Student"
 msgstr "学生"
 
 #: .\main_app\templates\hod_template\manage_learning_record.html:30
 #: .\main_app\templates\hod_template\manage_payment_record.html:29
-#: .\main_app\templates\hod_template\manage_student_query.html:117
-#: .\main_app\templates\hod_template\manage_teacher_query.html:83
+#: .\main_app\templates\hod_template\manage_student_query.html:123
+#: .\main_app\templates\hod_template\manage_teacher_query.html:84
 msgid "Class"
 msgstr "班级"
-
-#: .\main_app\templates\hod_template\manage_learning_record.html:49
-#: .\main_app\templates\hod_template\manage_teacher.html:63
-msgid "Are you sure about this ?"
-msgstr "您确定吗？"
 
 #: .\main_app\templates\hod_template\manage_payment_record.html:17
 #, python-format
@@ -782,58 +926,37 @@ msgstr "结束"
 msgid "Are you sure you want to delete this?"
 msgstr "你确定要删除这个吗？"
 
-#: .\main_app\templates\hod_template\manage_student.html:17
+#: .\main_app\templates\hod_template\manage_student.html:18
 #, python-format
-msgid "Total Students: %(count)s"
-msgstr "学生总数： %(count)s"
+msgid "Total Students: %(total_student_count)s"
+msgstr "学生总数： %(total_student_count)s"
 
-#: .\main_app\templates\hod_template\manage_student.html:25
-#: .\main_app\templates\hod_template\manage_teacher.html:25
+#: .\main_app\templates\hod_template\manage_student.html:26
+#: .\main_app\templates\hod_template\manage_teacher.html:26
 #: .\main_app\templates\hod_template\student_notification.html:24
-#: .\main_app\templates\hod_template\teacher_notification.html:24
 msgid "Full Name"
 msgstr "名称"
 
-#: .\main_app\templates\hod_template\manage_student.html:27
-#: .\main_app\templates\hod_template\manage_student_query.html:43
-#: .\main_app\templates\hod_template\manage_teacher.html:27
-#: .\main_app\templates\hod_template\manage_teacher_query.html:42
-msgid "Home Number"
-msgstr "家庭联系电话"
-
-#: .\main_app\templates\hod_template\manage_student.html:28
-#: .\main_app\templates\hod_template\manage_student_query.html:44
-#: .\main_app\templates\hod_template\manage_teacher.html:28
-#: .\main_app\templates\hod_template\manage_teacher_query.html:43
-msgid "Cell Number"
-msgstr "联系电话"
-
-#: .\main_app\templates\hod_template\manage_student.html:29
-#: .\main_app\templates\hod_template\manage_student_query.html:111
-#: .\main_app\templates\hod_template\manage_teacher.html:29
-#: .\main_app\templates\hod_template\manage_teacher_query.html:44
-#: .\main_app\templates\main_app\sidebar_template.html:101
-msgid "Campus"
-msgstr "校园"
-
-#: .\main_app\templates\hod_template\manage_student.html:30
-#: .\main_app\templates\hod_template\manage_student_query.html:112
-msgid "Grade"
-msgstr "等级"
-
-#: .\main_app\templates\hod_template\manage_student.html:66
-#: .\main_app\templates\hod_template\manage_teacher.html:34
+#: .\main_app\templates\hod_template\manage_student.html:39
+#: .\main_app\templates\hod_template\manage_teacher.html:36
 #: .\main_app\templates\hod_template\student_notification.html:28
-#: .\main_app\templates\hod_template\teacher_notification.html:28
 msgid "Avatar"
 msgstr "图画"
 
-#: .\main_app\templates\hod_template\manage_student.html:82
-#: .\main_app\templates\hod_template\manage_teacher.html:54
+#: .\main_app\templates\hod_template\manage_student.html:63
+#: .\main_app\templates\hod_template\manage_teacher.html:57
 #: .\main_app\templates\hod_template\student_notification.html:42
-#: .\main_app\templates\hod_template\teacher_notification.html:42
 msgid "No Image"
 msgstr "无图像"
+
+#: .\main_app\templates\hod_template\manage_student.html:66
+msgid "Student Image"
+msgstr "学生形象"
+
+#: .\main_app\templates\hod_template\manage_student.html:72
+#: .\main_app\templates\hod_template\manage_teacher.html:66
+msgid "Are you sure about this ?"
+msgstr "您确定吗？"
 
 #: .\main_app\templates\hod_template\manage_student_query.html:18
 msgid "Select Student:"
@@ -853,31 +976,35 @@ msgstr "搜索"
 msgid "Name"
 msgstr "名称"
 
-#: .\main_app\templates\hod_template\manage_student_query.html:47
+#: .\main_app\templates\hod_template\manage_student_query.html:79
 msgid "Refunded"
 msgstr "退款"
 
-#: .\main_app\templates\hod_template\manage_student_query.html:114
+#: .\main_app\templates\hod_template\manage_student_query.html:120
 msgid "Instructor"
 msgstr "教员"
 
-#: .\main_app\templates\hod_template\manage_student_query.html:115
-#: .\main_app\templates\hod_template\manage_teacher_query.html:81
+#: .\main_app\templates\hod_template\manage_student_query.html:121
+#: .\main_app\templates\hod_template\manage_teacher_query.html:82
 msgid "Start Time"
 msgstr "开始时间"
 
-#: .\main_app\templates\hod_template\manage_teacher.html:17
+#: .\main_app\templates\hod_template\manage_teacher.html:18
 #, python-format
-msgid "Total Teachers: %(count)s"
-msgstr "教师总数：%(count)s"
+msgid "Total Teachers: %(total_teacher_count)s"
+msgstr "教师总数：%(total_teacher_count)s"
 
-#: .\main_app\templates\hod_template\manage_teacher.html:32
+#: .\main_app\templates\hod_template\manage_teacher.html:34
 msgid "Courses"
 msgstr "课程"
 
-#: .\main_app\templates\hod_template\manage_teacher.html:33
+#: .\main_app\templates\hod_template\manage_teacher.html:35
 msgid "Work Type"
 msgstr "工作类型"
+
+#: .\main_app\templates\hod_template\manage_teacher.html:60
+msgid "Teacher Avatar"
+msgstr "教师头像"
 
 #: .\main_app\templates\hod_template\manage_teacher_query.html:18
 msgid "Select Teacher:"
@@ -887,15 +1014,15 @@ msgstr "选择教师："
 msgid "All Teachers"
 msgstr "所有教师"
 
-#: .\main_app\templates\hod_template\manage_teacher_query.html:45
+#: .\main_app\templates\hod_template\manage_teacher_query.html:46
 msgid "Assigned Course"
 msgstr "指定课程"
 
-#: .\main_app\templates\hod_template\manage_teacher_query.html:46
+#: .\main_app\templates\hod_template\manage_teacher_query.html:47
 msgid "Contract"
 msgstr "合同"
 
-#: .\main_app\templates\hod_template\manage_teacher_query.html:80
+#: .\main_app\templates\hod_template\manage_teacher_query.html:81
 msgid "Lecturer"
 msgstr "讲师"
 
@@ -918,7 +1045,6 @@ msgstr "回复"
 #: .\main_app\templates\hod_template\student_notification.html:29
 #: .\main_app\templates\hod_template\teacher_feedback_template.html:27
 #: .\main_app\templates\hod_template\teacher_leave_view.html:27
-#: .\main_app\templates\hod_template\teacher_notification.html:29
 msgid "Action"
 msgstr "行动"
 
@@ -947,7 +1073,6 @@ msgstr "回复反馈意见"
 #: .\main_app\templates\hod_template\student_notification.html:74
 #: .\main_app\templates\hod_template\teacher_feedback_template.html:71
 #: .\main_app\templates\hod_template\teacher_leave_view.html:76
-#: .\main_app\templates\hod_template\teacher_notification.html:76
 msgid "Close"
 msgstr "关闭"
 
@@ -1035,40 +1160,33 @@ msgstr "选择有效答复"
 #: .\main_app\templates\hod_template\student_notification.html:47
 #: .\main_app\templates\hod_template\student_notification.html:61
 #: .\main_app\templates\hod_template\student_notification.html:77
-#: .\main_app\templates\hod_template\teacher_notification.html:48
-#: .\main_app\templates\hod_template\teacher_notification.html:63
-#: .\main_app\templates\hod_template\teacher_notification.html:79
 msgid "Send Notification"
 msgstr "发送通知"
 
 #: .\main_app\templates\hod_template\student_notification.html:68
-#: .\main_app\templates\hod_template\teacher_notification.html:70
 msgid "Type your message here..."
 msgstr "在此输入您的信息..."
 
 #: .\main_app\templates\hod_template\student_notification.html:104
-#: .\main_app\templates\hod_template\teacher_notification.html:106
 msgid "Notification Sent"
 msgstr "发送通知"
 
 #: .\main_app\templates\hod_template\student_notification.html:107
-#: .\main_app\templates\hod_template\teacher_notification.html:109
 msgid "Notification could not be saved. Please try again."
 msgstr "通知无法保存。请重试。"
 
 #: .\main_app\templates\hod_template\student_notification.html:110
-#: .\main_app\templates\hod_template\teacher_notification.html:112
 msgid "Error in saving notification"
 msgstr "保存通知时出错"
 
 #: .\main_app\templates\hod_template\teacher_feedback_template.html:66
 #: .\main_app\templates\hod_template\teacher_leave_view.html:67
 msgid "Reply to"
-msgstr ""
+msgstr "答复"
 
 #: .\main_app\templates\hod_template\teacher_leave_view.html:67
-msgid "\\"
-msgstr ""
+msgid "'s Leave Request"
+msgstr "请假申请"
 
 #: .\main_app\templates\hod_template\teacher_leave_view.html:116
 msgid "Choose a valid response"
@@ -1095,154 +1213,153 @@ msgid "Upload"
 msgstr "上传"
 
 #: .\main_app\templates\main_app\base.html:9
-#: .\main_app\templates\main_app\footer.html:2
+#: .\main_app\templates\main_app\footer.html:3
 msgid "School Management Software"
 msgstr "中之学校管理软件"
 
-#: .\main_app\templates\main_app\base.html:52
-#: .\main_app\templates\main_app\sidebar_template.html:46
-#: .\main_app\templates\main_app\sidebar_template.html:633
-#: .\main_app\templates\main_app\sidebar_template.html:764
+#: .\main_app\templates\main_app\base.html:51
+#: .\main_app\templates\main_app\sidebar_template.html:76
+#: .\main_app\templates\main_app\sidebar_template.html:691
+#: .\main_app\templates\main_app\sidebar_template.html:822
 msgid "Home"
 msgstr "首页"
 
-#: .\main_app\templates\main_app\base.html:66
+#: .\main_app\templates\main_app\base.html:65
 msgid "Select Language"
 msgstr "选择语言"
 
-#: .\main_app\templates\main_app\sidebar_template.html:88
-msgid "Manage Institution"
-msgstr "管理机构"
-
-#: .\main_app\templates\main_app\sidebar_template.html:124
-msgid "Manage Campus"
-msgstr "管理校园"
-
-#: .\main_app\templates\main_app\sidebar_template.html:162
-msgid "Manage Course"
-msgstr "管理课程"
-
-#: .\main_app\templates\main_app\sidebar_template.html:200
-msgid "Manage Subject"
-msgstr "管理科目"
-
-#: .\main_app\templates\main_app\sidebar_template.html:241
-msgid "Manage Session"
-msgstr "管理会话"
-
-#: .\main_app\templates\main_app\sidebar_template.html:277
-msgid "Manage Teacher"
-msgstr "管理教师"
-
-#: .\main_app\templates\main_app\sidebar_template.html:315
-msgid "Manage Student"
-msgstr "管理学生"
-
-#: .\main_app\templates\main_app\sidebar_template.html:327
-msgid "Payment Record"
-msgstr "付款记录"
-
-#: .\main_app\templates\main_app\sidebar_template.html:351
-msgid "Manage Payment"
-msgstr "管理付款"
-
-#: .\main_app\templates\main_app\sidebar_template.html:364
-msgid "Notify"
-msgstr "通知"
-
-#: .\main_app\templates\main_app\sidebar_template.html:376
-msgid "Notify Teacher"
-msgstr "通知教师"
-
-#: .\main_app\templates\main_app\sidebar_template.html:387
-msgid "Notify Student"
-msgstr "通知学生"
-
-#: .\main_app\templates\main_app\sidebar_template.html:400
-msgid "Learning Record"
-msgstr "学习记录"
-
-#: .\main_app\templates\main_app\sidebar_template.html:423
-msgid "Manage Learning Record"
-msgstr "管理学习记录"
-
-#: .\main_app\templates\main_app\sidebar_template.html:437
-msgid "Schedule"
-msgstr "课程表"
-
-#: .\main_app\templates\main_app\sidebar_template.html:464
-msgid "Manage Schedule"
-msgstr "管理时间表"
-
-#: .\main_app\templates\main_app\sidebar_template.html:488
-msgid "Queries"
-msgstr "查询"
-
-#: .\main_app\templates\main_app\sidebar_template.html:503
-msgid "Student Queries"
-msgstr "学生查询"
-
-#: .\main_app\templates\main_app\sidebar_template.html:517
-msgid "Teacher Queries"
-msgstr "教师查询"
-
-#: .\main_app\templates\main_app\sidebar_template.html:542
-msgid "Student Feedback"
-msgstr "学生反馈"
-
-#: .\main_app\templates\main_app\sidebar_template.html:554
-msgid "Teacher Feedback"
-msgstr "教师反馈"
-
-#: .\main_app\templates\main_app\sidebar_template.html:567
-msgid "Ask for Leave"
-msgstr "申请请假"
-
-#: .\main_app\templates\main_app\sidebar_template.html:580
-msgid "Teacher Leave"
-msgstr "教师请假"
-
-#: .\main_app\templates\main_app\sidebar_template.html:592
-msgid "Student Leave"
-msgstr "学生请假"
-
-#: .\main_app\templates\main_app\sidebar_template.html:657
-msgid "Add Result"
-msgstr "添加成绩"
-
-#: .\main_app\templates\main_app\sidebar_template.html:668
-msgid "Edit Result"
-msgstr "编辑成绩"
-
-#: .\main_app\templates\main_app\sidebar_template.html:679
-msgid "Take Attendance"
-msgstr "考勤"
-
-#: .\main_app\templates\main_app\sidebar_template.html:690
-msgid "View/Update Attendance"
-msgstr "查看/更新考勤"
-
-#: .\main_app\templates\main_app\sidebar_template.html:701
-#: .\main_app\templates\main_app\sidebar_template.html:804
-msgid "View Notifications"
-msgstr "查看通知"
-
-#: .\main_app\templates\main_app\sidebar_template.html:713
-#: .\main_app\templates\main_app\sidebar_template.html:816
-msgid "Apply For Leave"
-msgstr "申请请假"
-
-#: .\main_app\templates\main_app\sidebar_template.html:795
-msgid "Payment Records"
-msgstr "付款记录"
-
-#: .\main_app\templates\main_app\sidebar_template.html:841
+#: .\main_app\templates\main_app\base.html:79
 msgid "Upload/Import"
 msgstr "上传/导入"
 
-#: .\main_app\templates\main_app\sidebar_template.html:852
+#: .\main_app\templates\main_app\sidebar_template.html:35
+#: .\main_app\templates\main_app\sidebar_template.html:663
+#: .\main_app\templates\main_app\sidebar_template.html:901
 msgid "Logout"
 msgstr "注销"
 
-#~ msgid "Temporary Contract"
-#~ msgstr "临时合同"
+#: .\main_app\templates\main_app\sidebar_template.html:118
+msgid "Manage Institution"
+msgstr "管理机构"
+
+#: .\main_app\templates\main_app\sidebar_template.html:154
+msgid "Manage Campus"
+msgstr "管理校园"
+
+#: .\main_app\templates\main_app\sidebar_template.html:192
+msgid "Manage Course"
+msgstr "管理课程"
+
+#: .\main_app\templates\main_app\sidebar_template.html:230
+msgid "Manage Subject"
+msgstr "管理科目"
+
+#: .\main_app\templates\main_app\sidebar_template.html:271
+msgid "Manage Session"
+msgstr "管理会话"
+
+#: .\main_app\templates\main_app\sidebar_template.html:308
+msgid "Manage Teacher"
+msgstr "管理教师"
+
+#: .\main_app\templates\main_app\sidebar_template.html:347
+msgid "Manage Student"
+msgstr "管理学生"
+
+#: .\main_app\templates\main_app\sidebar_template.html:359
+msgid "Payment Record"
+msgstr "付款记录"
+
+#: .\main_app\templates\main_app\sidebar_template.html:384
+msgid "Manage Payment"
+msgstr "管理付款"
+
+#: .\main_app\templates\main_app\sidebar_template.html:397
+msgid "Notify"
+msgstr "通知"
+
+#: .\main_app\templates\main_app\sidebar_template.html:409
+msgid "Notify Teacher"
+msgstr "通知教师"
+
+#: .\main_app\templates\main_app\sidebar_template.html:420
+msgid "Notify Student"
+msgstr "通知学生"
+
+#: .\main_app\templates\main_app\sidebar_template.html:433
+msgid "Learning Record"
+msgstr "学习记录"
+
+#: .\main_app\templates\main_app\sidebar_template.html:456
+msgid "Manage Learning Record"
+msgstr "管理学习记录"
+
+#: .\main_app\templates\main_app\sidebar_template.html:470
+msgid "Schedule"
+msgstr "课程表"
+
+#: .\main_app\templates\main_app\sidebar_template.html:497
+msgid "Manage Schedule"
+msgstr "管理时间表"
+
+#: .\main_app\templates\main_app\sidebar_template.html:521
+msgid "Queries"
+msgstr "查询"
+
+#: .\main_app\templates\main_app\sidebar_template.html:536
+msgid "Student Queries"
+msgstr "学生查询"
+
+#: .\main_app\templates\main_app\sidebar_template.html:550
+msgid "Teacher Queries"
+msgstr "教师查询"
+
+#: .\main_app\templates\main_app\sidebar_template.html:575
+msgid "Student Feedback"
+msgstr "学生反馈"
+
+#: .\main_app\templates\main_app\sidebar_template.html:587
+msgid "Teacher Feedback"
+msgstr "教师反馈"
+
+#: .\main_app\templates\main_app\sidebar_template.html:600
+msgid "Ask for Leave"
+msgstr "申请请假"
+
+#: .\main_app\templates\main_app\sidebar_template.html:613
+msgid "Teacher Leave"
+msgstr "教师请假"
+
+#: .\main_app\templates\main_app\sidebar_template.html:625
+msgid "Student Leave"
+msgstr "学生请假"
+
+#: .\main_app\templates\main_app\sidebar_template.html:715
+msgid "Add Result"
+msgstr "添加成绩"
+
+#: .\main_app\templates\main_app\sidebar_template.html:726
+msgid "Edit Result"
+msgstr "编辑成绩"
+
+#: .\main_app\templates\main_app\sidebar_template.html:737
+msgid "Take Attendance"
+msgstr "考勤"
+
+#: .\main_app\templates\main_app\sidebar_template.html:748
+msgid "View/Update Attendance"
+msgstr "查看/更新考勤"
+
+#: .\main_app\templates\main_app\sidebar_template.html:759
+#: .\main_app\templates\main_app\sidebar_template.html:862
+msgid "View Notifications"
+msgstr "查看通知"
+
+#: .\main_app\templates\main_app\sidebar_template.html:771
+#: .\main_app\templates\main_app\sidebar_template.html:874
+msgid "Apply For Leave"
+msgstr "申请请假"
+
+#: .\main_app\templates\main_app\sidebar_template.html:853
+msgid "Payment Records"
+msgstr "付款记录"

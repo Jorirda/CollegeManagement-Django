@@ -86,6 +86,7 @@ class StudentForm(CustomUserForm):
         fields = CustomUserForm.Meta.fields + \
             ['course', 'session', 'date_of_birth', 'reg_date', 'state', 'institution', 'campus', 'grade', 'home_number', 'cell_number']
 
+
 class AdminForm(CustomUserForm):
     def __init__(self, *args, **kwargs):
         super(AdminForm, self).__init__(*args, **kwargs)

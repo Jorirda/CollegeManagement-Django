@@ -1,33 +1,35 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+{% load i18n %}  <!-- Load the i18n tag library to enable translation features -->
+
+{% block page_title %}
+  {{ page_title }}
+{% endblock page_title %}
 
 {% block content %}
-
 <body>
-    <h2>Upload Excel File</h2>
-    <body>
-        <div class="container mt-5">
-            <h2>Upload Excel File</h2>
-            <p>Please choose an Excel file to upload. Indicate if the data is for teachers.</p>
-    
-            <!-- Form for file upload and is_teacher checkbox -->
-            <form action="{% url 'get_upload' %}" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="excelFile">Excel File:</label>
-                    <input type="file" class="form-control-file" id="excelFile" name="excel_file" required>
-                </div>
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="isTeacher" name="is_teacher">
-                    <label class="form-check-label" for="isTeacher">Is this data for teachers?</label>
-                </div>
-                <button type="submit" class="btn btn-primary mt-3">Upload</button>
-            </form>
-        </div>
-    </body>
+    <div class="container mt-5">
+        <h2>{% trans 'Upload Excel File' %}</h2>
+        <p>{% trans 'Please choose an Excel file to upload. Indicate if the data is for teachers.' %}</p>
+
+        <!-- Form for file upload and is_teacher checkbox -->
+        <form action="{% url 'get_upload' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="excelFile">{% trans 'Excel File:' %}</label>
+                <input type="file" class="form-control-file" id="excelFile" name="excel_file" required>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="isTeacher" name="is_teacher">
+                <label class="form-check-label" for="isTeacher">{% trans 'Is this data for teachers?' %}</label>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">{% trans 'Upload' %}</button>
+        </form>
+    </div>
+</body>
 {% endblock content %}
 {% block custom_js %}
 <script>
+// You might add custom JavaScript here if needed in the future.
 </script>
 {% endblock custom_js %}

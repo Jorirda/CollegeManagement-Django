@@ -1,12 +1,15 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+{% load i18n %}
+
+{% block page_title %}
+  {{ page_title }}
+{% endblock page_title %}
 
 {% block content %}
-
 <body>
-    <h1>Resulting Table</h1>
-    <p>{{ message }}</p>
+    <h1>{% trans 'Resulting Table' %}</h1>
+    <p>{{ message }}</p> <!-- Ensure message is translatable if it's a static string, otherwise handle translation in the view -->
     <!-- Display the HTML table passed from the view -->
     {{ html_table|safe }}
 </body>

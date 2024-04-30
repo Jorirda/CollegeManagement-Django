@@ -82,3 +82,9 @@ h1 {
   background-color: #0056b3;
 }
 
+.sidebarcustom {
+  /* Set a fixed height for the sidebar */
+  height: 340vh; /* Adjust as needed */
+  /* overflow-y: auto; Add vertical scrollbar if needed */
+}
+

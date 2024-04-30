@@ -49,6 +49,6 @@ h1 {
   border-color: green;
 }
 
-.green-link {
-  color: green; /* or use a specific shade of green like #008000 */
+.btn-space {
+  padding: 3rem 3rem;
 }

@@ -19,12 +19,11 @@
         href="{% static 'plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css'%} ">
     <!-- iCheck -->
     <link rel="stylesheet" href="{% static 'plugins/icheck-bootstrap/icheck-bootstrap.min.css'%} ">
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="{% static 'dist/css/customstyle.css'%} ">
     
     <!-- Theme style -->
     <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css'%} ">
-
-     <!-- Custom Style -->
-     <link rel="stylesheet" href="{% static 'dist/css/customstyle.css'%} ">
 
     <!-- overlayScrollbars -->
     <link rel="stylesheet" href="{% static 'plugins/overlayScrollbars/css/OverlayScrollbars.min.css'%} ">
@@ -73,6 +72,13 @@
         </div>
     </div>
     <!-- End Locale Switcher -->
+    <!-- New Button for Upload/Import -->
+    {% url 'get_upload' as upload %}
+    <div class="btn-space" style="padding: 0rem 0rem 0rem 0.5rem;">
+    <button onclick="window.location.href='{{ upload }}';" class="btn btn-primary" type="button">
+      {% trans "Upload/Import" %}
+    </button>
+    </div>
 </nav>
 
         <!-- /.navbar -->

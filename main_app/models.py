@@ -103,7 +103,8 @@ class Student(models.Model):
     state = models.CharField(max_length=30, blank=True) 
     grade = models.CharField(max_length=10, blank=True, null=True)  
 
-    
+    def __str__(self):
+        return self.admin.last_name + " " + self.admin.first_name
 
 class Teacher(models.Model):
     institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='teacher_institutions')

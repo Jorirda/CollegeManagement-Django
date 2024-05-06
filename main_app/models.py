@@ -48,7 +48,6 @@ class CustomUser(AbstractUser):
     gender = models.CharField(max_length=1, choices=GENDER)
     profile_pic = models.ImageField()
     address = models.TextField()
-    contact_num = models.TextField(default="")
     home_number = models.TextField(default="")
     cell_number = models.TextField(default="")
     remark = models.TextField(default="")
@@ -69,6 +68,12 @@ class Institution(models.Model):
 
     def __str__(self):
         return self.name
+
+    def delete(self, *args, **kwargs):
+        # Delete associated campuses before deleting the institution
+        self.campuses.all().delete()
+        super().delete(*args, **kwargs)
+
 class Campus(models.Model):
     name = models.CharField(max_length=100)
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='campuses')

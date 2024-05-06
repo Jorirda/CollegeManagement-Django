@@ -1,5 +1,6 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
+<link rel="stylesheet" href="{% static 'dist/css/customstyle.css'%} ">
 {% load i18n %}
 
 {% block page_title %}
@@ -12,7 +13,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="card">
+                <div class="card2">
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <h3 class="card-title">{% trans page_title %}</h3>
                         <h3 class="card-title">{% blocktrans %}Total Students: {{ total_student_count }}{% endblocktrans %}</h3>
@@ -83,3 +84,4 @@
 </section>
 
 {% endblock content %}
+

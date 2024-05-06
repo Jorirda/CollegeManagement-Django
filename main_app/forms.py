@@ -55,16 +55,16 @@ class CustomUserForm(FormSettings):
 
 
 class StudentForm(CustomUserForm):
-    date_of_birth = forms.DateField(required=False, label=_("Date of Birth"), widget=forms.DateInput(attrs={'type': 'date'}))
-    reg_date = forms.DateField(required=False, label=_("Registration Date"), widget=forms.DateInput(attrs={'type': 'date'}))
-    state = forms.ChoiceField(choices=[('Currently Learning', _('Currently Learning')), ('Completed', _('Completed')), ('Refund', _('Refund'))], label=_("State"))
+    date_of_birth = forms.DateField(required=False, label=_("Date of Birth"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
+    reg_date = forms.DateField(required=False, label=_("Registration Date"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
+    state = forms.ChoiceField(choices=[('Currently Learning', _('Currently Learning')), ('Completed', _('Completed')), ('Refund', _('Refund'))], label=_("State"), widget=forms.Select(attrs={'class': 'hideable'}))
     
     # Include new fields: campus, institution, grade, home_number, cell_number
-    institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False, label=_("Institution"))
-    campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False, label=_("Campus"))
-    grade = forms.CharField(max_length=10, required=False, label=_("Grade"))
-    home_number = forms.CharField(max_length=20, required=False, label=_("Home Number"))
-    cell_number = forms.CharField(max_length=20, required=False, label=_("Cell Number"))
+    institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False, label=_("Institution"), widget=forms.TextInput(attrs={'class': 'hideable'}))
+    campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False, label=_("Campus"), widget=forms.TextInput(attrs={'class': 'hideable'}))
+    grade = forms.CharField(max_length=10, required=False, label=_("Grade"), widget=forms.TextInput(attrs={'class': 'hideable'}))
+    home_number = forms.CharField(max_length=20, required=False, label=_("Home Number"), widget=forms.TextInput(attrs={'class': 'hideable'}))
+    cell_number = forms.CharField(max_length=20, required=False, label=_("Cell Number"), widget=forms.TextInput(attrs={'class': 'hideable'}))
 
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)

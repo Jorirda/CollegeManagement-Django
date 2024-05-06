@@ -7,7 +7,29 @@
 {% endblock page_title %}
 
 {% block content %}
-
+<style>
+    .button-small {
+        width: 80px;  /* Sets a fixed width */
+        height: 30px; /* Sets a fixed height */
+        padding: 5px 10px; /* Adjust padding as needed */
+        text-align: center;
+        line-height: 20px; /* Adjust line height to vertically center the text */
+        display: inline-block; /* Ensure it doesn't take full width */
+    }
+    
+    /* Optional: Additional styling to make the buttons look better */
+    .button-small.btn-info {
+        background-color: #17a2b8;
+        color: white;
+        border: none;
+    }
+    
+    .button-small.btn-danger {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+    }
+</style>
 <section class="content">
     <div class="container-fluid">
         <div class="row">
@@ -19,25 +41,24 @@
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="example2" class="table table-bordered table-hover">
+                        <table id="example2" class="table table-bordered table-hover table-responsive">
                             <thead class="thead-dark">
                                 <tr>
                                     <th>#</th>
                                     <th>{% trans "Full Name" %}</th>
-                                    <th>{% trans "Email" %}</th>
+                                    
                                     <th>{% trans "Home Number" %}</th>
                                     <th>{% trans "Cell Number" %}</th>
                                     <th>{% trans "Institution" %}</th>
-                                    <th>{% trans "Campus" %}</th>
-                                    <th>{% trans "Grade" %}</th>
+
                                     <th>{% trans "Gender" %}</th>
                                     <th>{% trans "Date of Birth" %}</th>
-                                    <th>{% trans "Address" %}</th>
+                                    
                                     <th>{% trans "Registration Date" %}</th>
                                     <th>{% trans "State" %}</th>
                                     <th>{% trans "Course" %}</th>
                                     <th>{% trans "Avatar" %}</th>
-                                    <th>{% trans "Remark" %}</th>
+                                    
                                     <th>{% trans "Actions" %}</th>
                                 </tr>
                             </thead>
@@ -46,15 +67,14 @@
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{student.last_name}}, {{student.first_name}}</td>
-                                    <td>{{student.email}}</td>
+                                    
                                     <td>{{student.home_number}}</td>
                                     <td>{{student.cell_number}}</td>
                                     <td>{{student.student.institution}}</td>
-                                    <td>{{student.student.campus}}</td>
-                                    <td>{{student.student.grade}}</td>
+                                    
                                     <td>{{student.gender}}</td>
                                     <td>{{student.student.date_of_birth}}</td>
-                                    <td>{{student.address}}</td>
+                                    
                                     <td>{{student.student.reg_date}}</td>
                                     <td>{{student.student.state}}</td>
                                     <td>{{student.student.course.name}}</td>
@@ -66,11 +86,12 @@
                                             src="{{student.profile_pic}}" alt="{% trans "Student Image" %}">
                                         {% endif %}
                                     </td>
-                                    <td>{{student.remark}} </td>
+                                    
                                     <td>
-                                        <a href="{% url 'edit_student' student.student.id %}" class="btn btn-info">{% trans "Edit" %}</a> -
-                                        <a href="{% url 'delete_student' student.student.id %}" class="btn btn-danger" onclick="return confirm('{% trans 'Are you sure about this ?' %}')">{% trans "Delete" %}</a>
+                                        <a href="{% url 'edit_student' student.student.id %}" class="btn btn-info button-small">{% trans "Edit" %}</a>
+                                        <a href="{% url 'delete_student' student.student.id %}" class="btn btn-danger button-small" onclick="return confirm('{% trans 'Are you sure about this ?' %}')">{% trans "Delete" %}</a>
                                     </td>
+                                    
                                 </tr>
                                 {% endfor %}
                             </tbody>

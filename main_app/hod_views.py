@@ -784,21 +784,21 @@ def edit_teacher(request, teacher_id):
             cell_number = cleaned_data.get('cell_number')
             institution = cleaned_data.get('institution')
             campus = cleaned_data.get('campus')
-            address = cleaned_data.get('address')
+            # address = cleaned_data.get('address')
             username = cleaned_data.get('username')
-            email = cleaned_data.get('email')
+            # email = cleaned_data.get('email')
             gender = cleaned_data.get('gender')
             password = cleaned_data.get('password') or None
             course = cleaned_data.get('course')
             work_type = cleaned_data.get('work_type')
-            remark = cleaned_data.get('remark')
+            # remark = cleaned_data.get('remark')
             passport = request.FILES.get('profile_pic')
 
             try:
                 # Get the related CustomUser object directly from the teacher's admin attribute
                 user = teacher.admin
                 user.username = username
-                user.email = email
+                # user.email = email
 
                 # If password is provided, set it
                 if password is not None:
@@ -817,8 +817,8 @@ def edit_teacher(request, teacher_id):
                 user.home_number = home_number
                 user.cell_number = cell_number
                 user.gender = gender
-                user.address = address
-                user.remark = remark
+                # user.address = address
+                # user.remark = remark
 
                 # Update teacher details 
                 teacher.institution = institution

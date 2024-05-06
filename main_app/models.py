@@ -50,6 +50,7 @@ class CustomUser(AbstractUser):
     address = models.TextField()
     home_number = models.TextField(default="")
     cell_number = models.TextField(default="")
+    grade = models.CharField(max_length=10, blank=True)
     remark = models.TextField(default="")
     fcm_token = models.TextField(default="")  # For firebase notifications
     created_at = models.DateTimeField(auto_now_add=True)
@@ -113,6 +114,7 @@ class Student(models.Model):
 class Teacher(models.Model):
     institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='teacher_institutions')
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
+    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
     campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     work_type = models.CharField(max_length=30, blank=True)  # Special/Temporary

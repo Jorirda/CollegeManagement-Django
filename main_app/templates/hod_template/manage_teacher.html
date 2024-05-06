@@ -23,6 +23,7 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th>#</th>
+<<<<<<< HEAD
                                     <th>{% trans "Full Name" %}</th>
                                     <th>{% trans "Email" %}</th>
                                     <th>{% trans "Home Number" %}</th>
@@ -36,6 +37,20 @@
                                     <th>{% trans "Avatar" %}</th>
                                     <th>{% trans "Remark" %}</th>
                                     <th>{% trans "Actions" %}</th>
+=======
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Home Number</th>
+                                    <th>Cell Number</th>
+                                    <th>Campus</th>
+                                    <th>Gender</th>
+                                    <th>Address</th>
+                                    <th>Courses</th>
+                                    <th>Work Type</th>
+                                    <th>Avatar</th>
+                                    <th>Remark</th>
+                                    <th>Actions</th>
+>>>>>>> 6dd38ad6122f06bc198443aa7ce2089394512d5e
                                 </tr>
                             </thead>
                             <tbody>
@@ -46,8 +61,12 @@
                                     <td>{{teacher.email}}</td>
                                     <td>{{teacher.home_number}}</td>
                                     <td>{{teacher.cell_number}}</td>
+<<<<<<< HEAD
                                     <td>{{teacher.teacher.institution.name}}</td>
                                     <td>{{teacher.teacher.campus.name}}</td>
+=======
+                                    <td>{{teacher.teacher.campus.name}}</td> <!-- Display campus name -->
+>>>>>>> 6dd38ad6122f06bc198443aa7ce2089394512d5e
                                     <td>{{teacher.gender}}</td>
                                     <td>{{teacher.address}}</td>
                                     <td>{{teacher.teacher.course.name}}</td>
@@ -68,6 +87,7 @@
                                 </tr>
                                 {% endfor %}
                             </tbody>
+                            
                         </table>
                     </div>
                 </div>

@@ -9,6 +9,7 @@
     <!-- Brand Logo -->
     <a href="{% url 'admin_home' %}" class="brand-link">
         <!-- <img src="{% static 'dist/img/cmsl.png' %} " alt="AdminLTE Logo"
+<<<<<<< HEAD
         class="brand-image img-circle elevation-3" > -->
         <img src="/media/logo.png" alt="Brand Logo" class="elevation-3"
             style="border-radius: 50%; width: 3rem; height: 3rem;">
@@ -41,17 +42,49 @@
 
 
 
+=======
+            class="brand-image img-circle elevation-3" > -->
+            <img src="/media/logo.png" alt="Brand Logo"
+            class="elevation-3" style="border-radius: 50%; width: 3rem; height: 3rem;">
+        <span class="brand-text font-weight-light">中之有限公司</span>
+    </a>
+    <a href="{% url 'admin_view_profile' %}" class="brand-link">
+        <!-- <img src="{% static 'dist/img/cmsl.png' %} " alt="AdminLTE Logo"
+            class="brand-image img-circle elevation-3" > -->
+            <img src="{{ user.profile_pic }}" alt="Brand Logo"
+            class="elevation-3" style="border-radius: 50%; width: 3rem; height: 3rem;">
+        <span class="brand-text font-weight-light">
+            {% if user.is_authenticated %}
+                {{ user.first_name }} {{ user.last_name }}
+            {% else %}
+                Clarke Kent
+            {% endif %}
+        </span>
+    </a>
+>>>>>>> 6dd38ad6122f06bc198443aa7ce2089394512d5e
 
     <!-- Sidebar -->
     <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
+<<<<<<< HEAD
         <!-- <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
                
                 <img src="{{ user.profile_pic }}" class="img-circle elevation-3" alt="User Image">
-            </div>
-            <div class="info">
+=======
+        <!-- <div class=" user-panel pb-3 mb-3 d-flex">
+            <div class="image">
                 
+                <img src="{{ user.profile_pic }}" class="elevation-3" style="border-radius: 50%; width: 3rem; height: 3rem;" alt="User Image">
+>>>>>>> 6dd38ad6122f06bc198443aa7ce2089394512d5e
+            </div>
+            
+            <div class="info">
+<<<<<<< HEAD
+                
+=======
+        
+>>>>>>> 6dd38ad6122f06bc198443aa7ce2089394512d5e
                 <a href="{% url 'admin_view_profile' %}" class="d-block">
                     {% if user.is_authenticated %}
                         {{ user.first_name }} {{ user.last_name }}
@@ -62,7 +95,11 @@
                 </a>
             </div>
         </div> -->
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 6dd38ad6122f06bc198443aa7ce2089394512d5e
 
 
         <!-- Sidebar Menu -->

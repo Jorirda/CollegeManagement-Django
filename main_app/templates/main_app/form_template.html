@@ -1,19 +1,19 @@
+{% load i18n %}
 <form role="form" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="card-body">
 
-
-        {% for field in form  %}
+        {% for field in form %}
         <div class="form-group">
-            {{field.errors}}
-            {{field.label_tag}}
-            {{field}}
+            {{ field.errors }}
+            {% trans field.label_tag %}
+            {{ field }}
 
+            {% if field.help_text %}
+            <small class="form-text text-muted">{{ field.help_text }}</small>
+            {% endif %}
         </div>
         {% endfor %}
-
-
-
 
     </div>
     <!-- /.card-body -->
@@ -21,11 +21,10 @@
     <div class="card-footer">
         <button type="submit" class="btn btn-success btn-block">
             {% if button_text %}
-            {{button_text}}
+            {{ button_text }}
             {% else %}
-            Submit
+            {% trans "Submit" %}
             {% endif %}
-
         </button>
     </div>
 </form>

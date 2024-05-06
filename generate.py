@@ -85,7 +85,8 @@ def process_data(excel_file, is_teacher):
             'profile_pic': '/media/default.jpg',
             'gender': row['Gender'],
             'address': row['Address'],
-            'contact_num': row['Cell Number'],
+            'cell_number': row['Cell Number'],
+            'home_number': row['Home Number'],
             'is_teacher': is_teacher,
             'user_type': 2 if is_teacher else 3,  # Assuming 2 is for teachers and 3 is for students
             'fcm_token': ''

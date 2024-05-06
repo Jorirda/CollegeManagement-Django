@@ -32,7 +32,10 @@
         <a href="{% url 'user_logout' %}" class="brand-image" style="margin-right: 2rem; color: #28a745;"
             onclick="return confirm('Your session would be terminated.\n\nProceed?')">
 
-            <i class="nav-icon fas fa-power-off"></i>
+            <i class=""><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-box-arrow-in-right" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0z"/>
+                <path fill-rule="evenodd" d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
+              </svg></i>
             <!-- <p>{% trans "Logout" %}</p> -->
 
         </a>
@@ -90,7 +93,10 @@
                 </li> -->
 
                 <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
+                    {% url 'add_institution' as add_institution %}
+                    {% url 'manage_institution' as manage_institution %}
+                    {% url 'edit_institution' course_id as edit_institution %}
+                    <a href="#" class="nav-link {% if request.path == add_institution or request.path == manage_institution or request.path == edit_institution %}active{% endif %}">
                         <i class="nav-icon fas fa-university"></i>
                         <p>
                             {% trans "Institution" %}
@@ -99,34 +105,27 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            {% url 'add_institution' as add_institution %}
-                            <a href="{{add_institution}}"
-                                class="nav-link  {% if add_institution == request.path %} active {% endif %}">
+                            <a href="{{ add_institution }}"
+                               class="nav-link {% if request.path == add_institution %}active{% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
-                                <p>
-                                    {% trans "Add Institution" %}
-
-                                </p>
+                                <p>{% trans "Add Institution" %}</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            {% url 'manage_institution' as manage_institution %}
-                            {% url 'edit_institution' course_id as edit_institution %}
-                            <a href="{{manage_institution}}"
-                                class="nav-link  {% if edit_course == request.path or manage_institution == request.path %} active {% endif %}">
+                            <a href="{{ manage_institution }}"
+                               class="nav-link {% if request.path == manage_institution or request.path == edit_institution %}active{% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
-                                <p>
-                                    {% trans "Manage Institution" %}
-
-                                </p>
+                                <p>{% trans "Manage Institution" %}</p>
                             </a>
                         </li>
-
-
                     </ul>
                 </li>
+                
                 <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
+                    {% url 'add_campus' as add_campus %}
+                    {% url 'manage_campus' as manage_campus %}
+                    {% url 'edit_campus' course_id as edit_campus %}
+                    <a href="#" class="nav-link {% if request.path == add_campus or request.path == manage_campus or request.path == edit_campus %}active{% endif %}">
                         <i class="nav-icon fas fa-school"></i>
                         <p>
                             {% trans "Campus" %}
@@ -135,36 +134,28 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            {% url 'add_campus' as add_campus %}
-                            <a href="{{add_campus}}"
-                                class="nav-link  {% if add_campus == request.path %} active {% endif %}">
+                            <a href="{{ add_campus }}"
+                               class="nav-link {% if request.path == add_campus %}active{% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
-                                <p>
-                                    {% trans "Add Campus" %}
-
-                                </p>
+                                <p>{% trans "Add Campus" %}</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            {% url 'manage_campus' as manage_campus %}
-                            {% url 'edit_campus' course_id as edit_campus %}
-                            <a href="{{manage_campus}}"
-                                class="nav-link  {% if edit_course == request.path or manage_campus == request.path %} active {% endif %}">
+                            <a href="{{ manage_campus }}"
+                               class="nav-link {% if request.path == manage_campus or request.path == edit_campus %}active{% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
-                                <p>
-                                    {% trans "Manage Campus" %}
-
-                                </p>
+                                <p>{% trans "Manage Campus" %}</p>
                             </a>
                         </li>
-
-
                     </ul>
-                </li>
+                </li>                
 
 
                 <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
+                    {% url 'add_course' as add_course %}
+                    {% url 'manage_course' as manage_course %}
+                    {% url 'edit_course' course_id as edit_course %}
+                    <a href="#" class="nav-link {% if request.path == add_course or request.path == manage_course or request.path == edit_course %}active{% endif %}">
                         <i class="nav-icon fas fa-bookmark"></i>
                         <p>
                             {% trans "Course" %}
@@ -173,36 +164,28 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            {% url 'add_course' as add_course %}
-                            <a href="{{add_course}}"
-                                class="nav-link  {% if add_course == request.path %} active {% endif %}">
+                            <a href="{{ add_course }}"
+                               class="nav-link {% if request.path == add_course %}active{% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
-                                <p>
-                                    {% trans "Add Course" %}
-
-                                </p>
+                                <p>{% trans "Add Course" %}</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            {% url 'manage_course' as manage_course %}
-                            {% url 'edit_course' course_id as edit_course %}
-                            <a href="{{manage_course}}"
-                                class="nav-link  {% if edit_course == request.path or manage_course == request.path %} active {% endif %}">
+                            <a href="{{ manage_course }}"
+                               class="nav-link {% if request.path == manage_course or request.path == edit_course %}active{% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
-                                <p>
-                                    {% trans "Manage Course" %}
-
-                                </p>
+                                <p>{% trans "Manage Course" %}</p>
                             </a>
                         </li>
-
-
                     </ul>
-                </li>
+                </li>                
 
 
                 <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
+                    {% url 'add_subject' as add_subject %}
+                    {% url 'manage_subject' as manage_subject %}
+                    {% url 'edit_subject' subject_id as edit_subject %}
+                    <a href="#" class="nav-link {% if request.path == add_subject or request.path == manage_subject or request.path == edit_subject %}active{% endif %}">
                         <i class="nav-icon fas fa-book"></i>
                         <p>
                             {% trans "Subject" %}
@@ -211,38 +194,32 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            {% url 'add_subject' as add_subject %}
-                            <a href="{{add_subject}}"
-                                class="nav-link  {% if add_subject == request.path %} active {% endif %}">
+                            <a href="{{ add_subject }}"
+                               class="nav-link {% if request.path == add_subject %}active{% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
-                                <p>
-                                    {% trans "Add Subject" %}
-
-                                </p>
+                                <p>{% trans "Add Subject" %}</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            {% url 'manage_subject' as manage_subject %}
-                            {% url 'edit_subject' subject_id as edit_subject %}
-                            <a href="{{manage_subject}}"
-                                class="nav-link  {% if edit_subject == request.path or manage_subject == request.path %} active {% endif %}">
+                            <a href="{{ manage_subject }}"
+                               class="nav-link {% if request.path == manage_subject or request.path == edit_subject %}active{% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
-                                <p>
-                                    {% trans "Manage Subject" %}
-
-                                </p>
+                                <p>{% trans "Manage Subject" %}</p>
                             </a>
                         </li>
-
                     </ul>
                 </li>
+                
 
 
 
 
 
                 <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
+                    {% url 'add_session' as add_session %}
+                    {% url 'manage_session' as manage_session %}
+                    {% url 'edit_session' session_id as edit_session %}
+                    <a href="#" class="nav-link {% if request.path == add_session or request.path == manage_session or request.path == edit_session %}active{% endif %}">
                         <i class="nav-icon fas fa-clock"></i>
                         <p>
                             {% trans "Session" %}
@@ -250,36 +227,29 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
-
                         <li class="nav-item">
-                            {% url 'add_session' as add_session %}
-                            <a href="{{add_session}}"
-                                class="nav-link  {% if add_session == request.path %} active {% endif %}">
+                            <a href="{{ add_session }}"
+                               class="nav-link {% if request.path == add_session %}active{% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
-                                <p>
-                                    {% trans "Add Session" %}
-
-                                </p>
+                                <p>{% trans "Add Session" %}</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            {% url 'manage_session' as manage_session %}
-                            {% url 'edit_session' session_id as edit_session %}
-                            <a href="{{manage_session}}"
-                                class="nav-link  {% if edit_session == request.path or manage_session == request.path %} active {% endif %}">
+                            <a href="{{ manage_session }}"
+                               class="nav-link {% if request.path == manage_session or request.path == edit_session %}active{% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
-                                <p>
-                                    {% trans "Manage Session" %}
-
-                                </p>
+                                <p>{% trans "Manage Session" %}</p>
                             </a>
                         </li>
-
                     </ul>
                 </li>
+                
 
                 <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
+                    {% url 'add_teacher' as add_teacher %}
+                    {% url 'manage_teacher' as manage_teacher %}
+                    {% url 'edit_teacher' teacher_id as edit_teacher %}
+                    <a href="#" class="nav-link {% if request.path == add_teacher or request.path == manage_teacher or request.path == edit_teacher %}active{% endif %}">
                         <i class="nav-icon fas fa-users"></i>
                         <p>
                             {% trans "Teacher" %}
@@ -287,36 +257,30 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
-
                         <li class="nav-item">
-                            {% url 'add_teacher' as add_teacher %}
-                            <a href="{{add_teacher}}"
-                                class="nav-link {% if add_teacher == request.path %} active {% endif %}">
+                            <a href="{{ add_teacher }}"
+                               class="nav-link {% if request.path == add_teacher %}active{% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
-                                <p>
-                                    {% trans "Add Teacher" %}
-
-                                </p>
+                                <p>{% trans "Add Teacher" %}</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            {% url 'manage_teacher' as manage_teacher %}
-                            {% url 'edit_teacher' teacher_id as edit_teacher %}
-                            <a href="{{manage_teacher}}"
-                                class="nav-link {% if manage_teacher == request.path or request.path == edit_teacher %} active {% endif %}">
+                            <a href="{{ manage_teacher }}"
+                               class="nav-link {% if request.path == manage_teacher or request.path == edit_teacher %}active{% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
-                                <p>
-                                    {% trans "Manage Teacher" %}
-
-                                </p>
+                                <p>{% trans "Manage Teacher" %}</p>
                             </a>
                         </li>
                     </ul>
                 </li>
+                
 
 
                 <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
+                    {% url 'add_student' as add_student %}
+                    {% url 'manage_student' as manage_student %}
+                    {% url 'edit_student' student_id as edit_student %}
+                    <a href="#" class="nav-link {% if request.path == add_student or request.path == manage_student or request.path == edit_student %}active{% endif %}">
                         <i class="nav-icon fas fa-user"></i>
                         <p>
                             {% trans "Student" %}
@@ -324,37 +288,28 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
-
                         <li class="nav-item">
-                            {% url 'add_student' as add_student%}
-                            <a href="{{add_student}}"
-                                class="nav-link  {% if add_student == request.path %} active {% endif %}">
+                            <a href="{{ add_student }}"
+                               class="nav-link {% if request.path == add_student %}active{% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
-                                <p>
-                                    {% trans "Add Student" %}
-
-                                </p>
+                                <p>{% trans "Add Student" %}</p>
                             </a>
                         </li>
-
                         <li class="nav-item">
-                            {% url 'manage_student' as manage_student %}
-                            {% url 'edit_student' student_id as edit_student %}
-
-                            <a href="{{manage_student}}"
-                                class="nav-link  {% if edit_student == request.path or manage_student == request.path %} active {% endif %}">
+                            <a href="{{ manage_student }}"
+                               class="nav-link {% if request.path == manage_student or request.path == edit_student %}active{% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
-                                <p>
-                                    {% trans "Manage Student" %}
-
-                                </p>
+                                <p>{% trans "Manage Student" %}</p>
                             </a>
                         </li>
                     </ul>
                 </li>
+                
 
                 <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
+                    {% url 'add_payment_record' as add_payment_record %}
+                    {% url 'manage_payment_record' as manage_payment_record %}
+                    <a href="#" class="nav-link {% if request.path == add_payment_record or request.path == manage_payment_record %}active{% endif %}">
                         <i class="nav-icon fas fa-yen-sign"></i>
                         <p>
                             {% trans "Payment Record" %}
@@ -362,37 +317,28 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
-
                         <li class="nav-item">
-                            {% url 'add_payment_record' as add_payment_record%}
-                            <a href="{{add_payment_record}}"
-                                class="nav-link  {% if add_payment_recordt == request.path %} active {% endif %}">
+                            <a href="{{ add_payment_record }}"
+                               class="nav-link {% if request.path == add_payment_record %}active{% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
-                                <p>
-                                    {% trans "Add Payment" %}
-
-                                </p>
+                                <p>{% trans "Add Payment" %}</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            {% url 'manage_payment_record' as manage_payment_record %}
-
-
-                            <a href="{{manage_payment_record}}"
-                                class="nav-link  {% if manage_payment_record == request.path %} active {% endif %}">
+                            <a href="{{ manage_payment_record }}"
+                               class="nav-link {% if request.path == manage_payment_record %}active{% endif %}">
                                 <i class="nav-icon fas fa-receipt"></i>
-                                <p>
-                                    {% trans "Manage Payment" %}
-
-                                </p>
+                                <p>{% trans "Manage Payment" %}</p>
                             </a>
                         </li>
-
                     </ul>
                 </li>
+                
 
                 <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
+                    {% url 'admin_notify_teacher' as admin_notify_teacher %}
+                    {% url 'admin_notify_student' as admin_notify_student %}
+                    <a href="#" class="nav-link {% if request.path == admin_notify_teacher or request.path == admin_notify_student %}active{% endif %}">
                         <i class="nav-icon fas fa-bullhorn"></i>
                         <p>
                             {% trans "Notify" %}
@@ -400,35 +346,28 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
-
                         <li class="nav-item">
-                            {% url 'admin_notify_teacher' as admin_notify_teacher %}
-                            <a href="{{admin_notify_teacher}}"
-                                class="nav-link {% if admin_notify_teacher == request.path %} active {% endif %}">
+                            <a href="{{ admin_notify_teacher }}"
+                               class="nav-link {% if request.path == admin_notify_teacher %}active{% endif %}">
                                 <i class="nav-icon fas fa-bullhorn"></i>
-                                <p>
-                                    {% trans "Notify Teacher" %}
-
-                                </p>
+                                <p>{% trans "Notify Teacher" %}</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            {% url 'admin_notify_student' as admin_notify_student %}
-                            <a href="{{admin_notify_student}}"
-                                class="nav-link {% if admin_notify_student == request.path %} active {% endif %}">
+                            <a href="{{ admin_notify_student }}"
+                               class="nav-link {% if request.path == admin_notify_student %}active{% endif %}">
                                 <i class="nav-icon fas fa-bullhorn"></i>
-                                <p>
-                                    {% trans "Notify Student" %}
-
-                                </p>
+                                <p>{% trans "Notify Student" %}</p>
                             </a>
                         </li>
-
                     </ul>
                 </li>
+                
 
                 <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
+                    {% url 'add_learning_record' as add_learning_record %}
+                    {% url 'manage_learning_record' as manage_learning_record %}
+                    <a href="#" class="nav-link {% if request.path == add_learning_record or request.path == manage_learning_record %}active{% endif %}">
                         <i class="nav-icon fas fa-pencil-ruler"></i>
                         <p>
                             {% trans "Learning Record" %}
@@ -436,36 +375,30 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
-
                         <li class="nav-item">
-                            {% url 'add_learning_record' as add_learning_record %}
-                            <a href="{{add_learning_record}}"
-                                class="nav-link {% if add_learning_record == request.path %} active {% endif %}">
+                            <a href="{{ add_learning_record }}"
+                               class="nav-link {% if request.path == add_learning_record %}active{% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
-                                <p>
-                                    {% trans "Add Learning Record" %}
-
-                                </p>
+                                <p>{% trans "Add Learning Record" %}</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            {% url 'manage_learning_record' as manage_learning_record %}
-                            <a href="{{manage_learning_record}}"
-                                class="nav-link {% if manage_learning_record == request.path %} active {% endif %}">
+                            <a href="{{ manage_learning_record }}"
+                               class="nav-link {% if request.path == manage_learning_record %}active{% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
-                                <p>
-                                    {% trans "Manage Learning Record" %}
-
-                                </p>
+                                <p>{% trans "Manage Learning Record" %}</p>
                             </a>
                         </li>
-
                     </ul>
                 </li>
+                
 
 
                 <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
+                    {% url 'add_class_schedule' as add_class_schedule %}
+                    {% url 'manage_class_schedule' as manage_class_schedule %}
+                    {% url 'admin_view_attendance' as admin_view_attendance %}
+                    <a href="#" class="nav-link {% if request.path == add_class_schedule or request.path == manage_class_schedule or request.path == admin_view_attendance %}active{% endif %}">
                         <i class="nav-icon fas fa-calendar-alt"></i>
                         <p>
                             {% trans "Schedule" %}
@@ -474,90 +407,64 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            {% url 'add_class_schedule' as add_class_schedule %}
-
-                        <li class="nav-item">
-                            <a href="{{add_class_schedule}}"
-                                class="nav-link  {% if add_class_schedule == request.path %} active {% endif %}">
+                            <a href="{{ add_class_schedule }}"
+                               class="nav-link {% if request.path == add_class_schedule %}active{% endif %}">
                                 <i class="nav-icon fas fa-plus-circle"></i>
-                                <p>
-                                    {% trans "Add Schedule" %}
-                                </p>
+                                <p>{% trans "Add Schedule" %}</p>
                             </a>
                         </li>
-
-
                         <li class="nav-item">
-                            {% url 'manage_class_schedule' as manage_class_schedule %}
-
-                        <li class="nav-item">
-                            <a href="{{manage_class_schedule}}"
-                                class="nav-link  {% if manage_class_schedule == request.path %} active {% endif %}">
+                            <a href="{{ manage_class_schedule }}"
+                               class="nav-link {% if request.path == manage_class_schedule %}active{% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
-                                <p>
-                                    {% trans "Manage Schedule" %}
-                                </p>
+                                <p>{% trans "Manage Schedule" %}</p>
                             </a>
                         </li>
-
                         <li class="nav-item">
-                            {% url 'admin_view_attendance' as admin_view_attendance %}
-
-                        <li class="nav-item">
-                            <a href="{{admin_view_attendance}}"
-                                class="nav-link  {% if admin_view_attendance == request.path %} active {% endif %}">
+                            <a href="{{ admin_view_attendance }}"
+                               class="nav-link {% if request.path == admin_view_attendance %}active{% endif %}">
                                 <i class="nav-icon fas fa-calendar-alt"></i>
-                                <p>
-                                    {% trans "View Attendance" %}
-                                </p>
+                                <p>{% trans "View Attendance" %}</p>
                             </a>
                         </li>
                     </ul>
                 </li>
+                
 
                 <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
+                    {% url 'manage_student_query' as manage_student_query %}
+                    {% url 'manage_teacher_query' as manage_teacher_query %}
+                    <a href="#" class="nav-link {% if request.path == manage_student_query or request.path == manage_teacher_query %}active{% endif %}">
                         <i class="nav-icon fas fa-question"></i>
                         <p>
                             {% trans "Queries" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
-
                     <ul class="nav nav-treeview">
-
                         <li class="nav-item">
-                            {% url 'manage_student_query' as manage_student_query %}
-
-                        <li class="nav-item">
-                            <a href="{{manage_student_query}}"
-                                class="nav-link  {% if manage_student_query == request.path %} active {% endif %}">
+                            <a href="{{ manage_student_query }}"
+                               class="nav-link {% if request.path == manage_student_query %}active{% endif %}">
                                 <i class="nav-icon fas fa-address-card"></i>
-                                <p>
-                                    {% trans "Student Queries" %}
-                                </p>
+                                <p>{% trans "Student Queries" %}</p>
                             </a>
                         </li>
-
-
                         <li class="nav-item">
-                            {% url 'manage_teacher_query' as manage_teacher_query %}
-
-                        <li class="nav-item">
-                            <a href="{{manage_teacher_query}}"
-                                class="nav-link  {% if manage_teacher_query == request.path %} active {% endif %}">
+                            <a href="{{ manage_teacher_query }}"
+                               class="nav-link {% if request.path == manage_teacher_query %}active{% endif %}">
                                 <i class="nav-icon fas fa-address-card"></i>
-                                <p>
-                                    {% trans "Teacher Queries" %}
-                                </p>
+                                <p>{% trans "Teacher Queries" %}</p>
                             </a>
                         </li>
                     </ul>
                 </li>
+                
 
 
                 <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
+                    {% url 'student_feedback_message' as student_feedback_message %}
+                    {% url 'teacher_feedback_message' as teacher_feedback_message %}
+                    <a href="#" class="nav-link {% if request.path == student_feedback_message or request.path == teacher_feedback_message %}active{% endif %}">
                         <i class="nav-icon fas fa-comment-alt"></i>
                         <p>
                             {% trans "Feedback" %}
@@ -565,72 +472,52 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
-
                         <li class="nav-item">
-                            {% url 'student_feedback_message' as student_feedback_message %}
-
                             <a href="{{ student_feedback_message }}"
-                                class="nav-link  {% if student_feedback_message == request.path %} active {% endif %}">
+                               class="nav-link {% if request.path == student_feedback_message %}active{% endif %}">
                                 <i class="nav-icon fas fa-comment"></i>
-                                <p>
-                                    {% trans "Student Feedback" %}
-
-                                </p>
+                                <p>{% trans "Student Feedback" %}</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            {% url 'teacher_feedback_message' as teacher_feedback_message %}
-
-                            <a href="{{teacher_feedback_message}}"
-                                class="nav-link   {% if teacher_feedback_message == request.path %} active {% endif %}">
+                            <a href="{{ teacher_feedback_message }}"
+                               class="nav-link {% if request.path == teacher_feedback_message %}active{% endif %}">
                                 <i class="nav-icon fas fa-comment"></i>
-                                <p>
-                                    {% trans "Teacher Feedback" %}
-
-                                </p>
+                                <p>{% trans "Teacher Feedback" %}</p>
                             </a>
                         </li>
-
                     </ul>
                 </li>
+                
 
                 <li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-door-open "></i>
+                    {% url 'view_teacher_leave' as view_teacher_leave %}
+                    {% url 'view_student_leave' as view_student_leave %}
+                    <a href="#" class="nav-link {% if request.path == view_teacher_leave or request.path == view_student_leave %}active{% endif %}">
+                        <i class="nav-icon fas fa-door-open"></i>
                         <p>
                             {% trans "Ask for Leave" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
-
                         <li class="nav-item">
-                            {% url 'view_teacher_leave' as view_teacher_leave %}
-
-                            <a href="{{view_teacher_leave}}"
-                                class="nav-link  {% if view_teacher_leave == request.path %} active {% endif %}">
+                            <a href="{{ view_teacher_leave }}"
+                               class="nav-link {% if request.path == view_teacher_leave %}active{% endif %}">
                                 <i class="nav-icon fas fa-check-double"></i>
-                                <p>
-                                    {% trans "Teacher Leave" %}
-
-                                </p>
+                                <p>{% trans "Teacher Leave" %}</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            {% url 'view_student_leave' as view_student_leave %}
-
-                            <a href="{% url 'view_student_leave' %}"
-                                class="nav-link  {% if view_student_leave == request.path %} active {% endif %}">
+                            <a href="{{ view_student_leave }}"
+                               class="nav-link {% if request.path == view_student_leave %}active{% endif %}">
                                 <i class="nav-icon fas fa-check-double"></i>
-                                <p>
-                                    {% trans "Student Leave" %}
-
-                                </p>
+                                <p>{% trans "Student Leave" %}</p>
                             </a>
                         </li>
-
                     </ul>
                 </li>
+                
 
 
                 {% elif request.user.user_type == '2' %}

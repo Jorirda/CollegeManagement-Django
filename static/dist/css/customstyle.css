@@ -82,6 +82,7 @@ h1 {
   background-color: #0056b3;
 }
 
+<<<<<<< HEAD
 .brand-link-custom {
 
   font-size: 1.25rem;
@@ -97,3 +98,10 @@ h1 {
   align-items: center;
 }
 
+=======
+.user-panel .image img.custom-user-image {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+}
+>>>>>>> 6dd38ad6122f06bc198443aa7ce2089394512d5e

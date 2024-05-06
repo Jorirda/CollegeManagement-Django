@@ -26,6 +26,8 @@ class CustomUserForm(FormSettings):
     address = forms.CharField(widget=forms.Textarea, label=_('Address'))
     home_number = forms.CharField(required=True, label=_('Home Number'))
     cell_number = forms.CharField(required=True, label=_('Cell Number'))
+    home_number = forms.CharField(required=True, label=_('Home Number'))
+    cell_number = forms.CharField(required=True, label=_('Cell Number'))
     contact_num = forms.CharField(required=True, label=_('Contact Number'))
     remark = forms.CharField(required=True, label=_('Remark'))
 
@@ -60,8 +62,18 @@ class StudentForm(CustomUserForm):
     date_of_birth = forms.DateField(required=False, label=_("Date of Birth"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
     reg_date = forms.DateField(required=False, label=_("Registration Date"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
     state = forms.ChoiceField(choices=[('Currently Learning', _('Currently Learning')), ('Completed', _('Completed')), ('Refund', _('Refund'))], label=_("State"), widget=forms.Select(attrs={'class': 'hideable'}))
+    date_of_birth = forms.DateField(required=False, label=_("Date of Birth"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
+    reg_date = forms.DateField(required=False, label=_("Registration Date"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
+    state = forms.ChoiceField(choices=[('Currently Learning', _('Currently Learning')), ('Completed', _('Completed')), ('Refund', _('Refund'))], label=_("State"), widget=forms.Select(attrs={'class': 'hideable'}))
     
     # Include new fields: campus, institution, grade, home_number, cell_number
+<<<<<<< HEAD
+    institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False, label=_("Institution"), widget=forms.TextInput(attrs={'class': 'hideable'}))
+    campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False, label=_("Campus"), widget=forms.TextInput(attrs={'class': 'hideable'}))
+    grade = forms.CharField(max_length=10, required=False, label=_("Grade"), widget=forms.TextInput(attrs={'class': 'hideable'}))
+    home_number = forms.CharField(max_length=20, required=False, label=_("Home Number"), widget=forms.TextInput(attrs={'class': 'hideable'}))
+    cell_number = forms.CharField(max_length=20, required=False, label=_("Cell Number"), widget=forms.TextInput(attrs={'class': 'hideable'}))
+=======
     institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False, label=_("Institution"))
     campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False, label=_("Campus"))
     grade = forms.CharField(max_length=10, required=False, label=_("Grade"))
@@ -69,6 +81,7 @@ class StudentForm(CustomUserForm):
     cell_number = forms.CharField(max_length=20, required=False, label=_("Cell Number"))
     course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, label=_("Course"))
     session = forms.ModelChoiceField(queryset=Session.objects.all(), required=False, label=_("Session"))
+>>>>>>> b12215f25d0989ba2f17eefefb6f9eb6c770dbad
 
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)

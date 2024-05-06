@@ -29,7 +29,7 @@ class CustomUserForm(FormSettings):
 
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'email', 'gender', 'password', 'profile_pic', 'address', 'contact_num', 'remark']
+        fields = ['first_name', 'last_name', 'email', 'gender', 'password', 'profile_pic', 'address', 'contact_num', _('remark')]
 
     def __init__(self, *args, **kwargs):
         super(CustomUserForm, self).__init__(*args, **kwargs)
@@ -68,7 +68,7 @@ class StudentForm(CustomUserForm):
 
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
-        self.fields['remark'] = self.fields.pop('remark')
+        self.fields[_('remark')] = self.fields.pop('remark')
         # Hide the contact num field
         self.fields.pop('contact_num')
         
@@ -76,7 +76,7 @@ class StudentForm(CustomUserForm):
         field_order = ['first_name', 'last_name', 'email', 'home_number', 'cell_number', 
                        'gender', 'password', 'profile_pic', 'address', 'institution', 'campus', 
                        'course', 'grade', 'session', 'date_of_birth', 'reg_date', 
-                       'state', 'remark']
+                       'state', _('remark')]
         
         # Set the field order
         self.fields = {k: self.fields[k] for k in field_order}
@@ -114,7 +114,7 @@ class TeacherForm(CustomUserForm):
 
     def __init__(self, *args, **kwargs):
         super(TeacherForm, self).__init__(*args, **kwargs)
-        self.fields['remark'] = self.fields.pop('remark')
+        self.fields[_('remark')] = self.fields.pop('remark')
         # Hide the contact num field
         self.fields.pop('contact_num')
         
@@ -149,7 +149,7 @@ class SubjectForm(FormSettings):
 
     class Meta:
         model = Subject
-        fields = ['name', 'teacher', 'course']
+        fields = [_('name'), _('teacher'), _('course')]
 
 class InstitutionForm(FormSettings):
     def __init__(self, *args, **kwargs):

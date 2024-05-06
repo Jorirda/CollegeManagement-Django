@@ -461,12 +461,12 @@ def add_class_schedule(request):
     }
     if request.method == 'POST':
         if form.is_valid():
-            course = form.cleaned_data.get('course')
-            lesson_unit_price = form.cleaned_data.get('lesson_unit_price')
-            teacher = form.cleaned_data.get('teacher')
-            subject = form.cleaned_data.get('subject')
-            class_time = form.cleaned_data.get('class_time')
-            remark = form.cleaned_data.get('remark')
+            course = form.cleaned_data.get(_('course'))
+            lesson_unit_price = form.cleaned_data.get(_('lesson_unit_price'))
+            teacher = form.cleaned_data.get(_('teacher'))
+            subject = form.cleaned_data.get(_('subject'))
+            class_time = form.cleaned_data.get(_('class_time'))
+            remark = form.cleaned_data.get(_('remark'))
             
             
             try:
@@ -1262,8 +1262,8 @@ def get_admin_attendance(request):
         json_data = []
         for report in attendance_reports:
             data = {
-                "status":  str(report.status),
-                "name": str(report.student)
+                _("status"):  str(report.status),
+                _("name"): str(report.student)
             }
             json_data.append(data)
         return JsonResponse(json.dumps(json_data), safe=False)
@@ -1295,7 +1295,7 @@ def admin_view_profile(request):
                 custom_user.first_name = first_name
                 custom_user.last_name = last_name
                 custom_user.save()
-                messages.success(request, "Profile Updated!")
+                messages.success(request, _("Profile Updated!"))
                 return redirect(reverse('admin_view_profile'))
             else:
                 messages.error(request, "Invalid Data Provided")

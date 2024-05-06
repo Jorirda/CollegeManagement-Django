@@ -122,14 +122,11 @@ class TeacherForm(CustomUserForm):
 
     def __init__(self, *args, **kwargs):
         super(TeacherForm, self).__init__(*args, **kwargs)
-        self.fields['remark'] = self.fields.pop('remark')
-        # Hide the contact num field
-        self.fields.pop('contact_num')
-        
+       
         # Reorder fields as requested
-        field_order = ['first_name', 'last_name', 'email', 'home_number', 'cell_number', 
+        field_order = ['first_name', 'last_name', 'home_number', 'cell_number', 
                        'gender', 'password', 'profile_pic', 'address', 
-                       'work_type', 'remark', 'course', 'institution', 'campus']
+                       'work_type', 'course', 'institution', 'campus']
 
         # Set the field order
         self.fields = {k: self.fields[k] for k in field_order}

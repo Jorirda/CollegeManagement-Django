@@ -19,22 +19,22 @@
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="example2" class="table table-bordered table-hover">
+                        <table id="example2" class="table table-bordered table-hover table-responsive">
                             <thead class="thead-dark">
                                 <tr>
                                     <th>#</th>
                                     <th>{% trans "Full Name" %}</th>
-                                    <th>{% trans "Email" %}</th>
+                                    <!-- <th>{% trans "Email" %}</th> -->
                                     <th>{% trans "Home Number" %}</th>
                                     <th>{% trans "Cell Number" %}</th>
                                     <th>{% trans "Institution" %}</th>
                                     <th>{% trans "Campus" %}</th>
                                     <th>{% trans "Gender" %}</th>
-                                    <th>{% trans "Address" %}</th>
+                                    <!-- <th>{% trans "Address" %}</th> -->
                                     <th>{% trans "Courses" %}</th>
                                     <th>{% trans "Work Type" %}</th>
                                     <th>{% trans "Avatar" %}</th>
-                                    <th>{% trans "Remark" %}</th>
+                                    <!-- <th>{% trans "Remark" %}</th> -->
                                     <th>{% trans "Actions" %}</th>
                                 </tr>
                             </thead>
@@ -43,13 +43,13 @@
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{teacher.last_name}}, {{teacher.first_name}}</td>
-                                    <td>{{teacher.email}}</td>
+                                    <!-- <td>{{teacher.email}}</td> -->
                                     <td>{{teacher.home_number}}</td>
                                     <td>{{teacher.cell_number}}</td>
                                     <td>{{teacher.teacher.institution.name}}</td>
                                     <td>{{teacher.teacher.campus.name}}</td>
                                     <td>{{teacher.gender}}</td>
-                                    <td>{{teacher.address}}</td>
+                                    <!-- <td>{{teacher.address}}</td> -->
                                     <td>{{teacher.teacher.course.name}}</td>
                                     <td>{{teacher.teacher.work_type}}</td>
                                     <td>
@@ -60,7 +60,7 @@
                                             src="{{teacher.profile_pic}}" alt="{% trans 'Teacher Avatar' %}">
                                         {% endif %}
                                     </td>
-                                    <td>{{teacher.remark}}</td>
+                                    <!-- <td>{{teacher.remark}}</td> -->
                                     <td>
                                         <a href="{% url 'edit_teacher' teacher.teacher.id %}" class="btn btn-info">{% trans "Edit" %}</a> - 
                                         <a href="{% url 'delete_teacher' teacher.teacher.id %}" class="btn btn-danger" onclick="return confirm('{% trans 'Are you sure about this ?' %}')">{% trans "Delete" %}</a>

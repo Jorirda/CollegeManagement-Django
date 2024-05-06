@@ -24,12 +24,13 @@ class CustomUserForm(FormSettings):
     password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
     profile_pic = forms.ImageField(label=_('Profile Picture')) 
     address = forms.CharField(widget=forms.Textarea, label=_('Address'))
-    contact_num = forms.CharField(required=True, label=_('Contact Number'))
+    home_number = forms.CharField(required=True, label=_('Home Number'))
+    cell_number = forms.CharField(required=True, label=_('Cell Number'))
     remark = forms.CharField(required=True, label=_('Remark'))
 
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'email', 'gender', 'password', 'profile_pic', 'address', 'contact_num', _('remark')]
+        fields = ['first_name', 'last_name', 'email', 'gender', 'password', 'profile_pic', 'address', 'home_number', 'cell_number', 'remark']
 
     def __init__(self, *args, **kwargs):
         super(CustomUserForm, self).__init__(*args, **kwargs)
@@ -55,9 +56,12 @@ class CustomUserForm(FormSettings):
 
 
 class StudentForm(CustomUserForm):
-    date_of_birth = forms.DateField(required=False, label=_("Date of Birth"), widget=forms.DateInput(attrs={'type': 'date'}))
-    reg_date = forms.DateField(required=False, label=_("Registration Date"), widget=forms.DateInput(attrs={'type': 'date'}))
-    state = forms.ChoiceField(choices=[('Currently Learning', _('Currently Learning')), ('Completed', _('Completed')), ('Refund', _('Refund'))], label=_("State"))
+    date_of_birth = forms.DateField(required=False, label=_("Date of Birth"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
+    reg_date = forms.DateField(required=False, label=_("Registration Date"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
+    state = forms.ChoiceField(choices=[('Currently Learning', _('Currently Learning')), ('Completed', _('Completed')), ('Refund', _('Refund'))], label=_("State"), widget=forms.Select(attrs={'class': 'hideable'}))
+    date_of_birth = forms.DateField(required=False, label=_("Date of Birth"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
+    reg_date = forms.DateField(required=False, label=_("Registration Date"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
+    state = forms.ChoiceField(choices=[('Currently Learning', _('Currently Learning')), ('Completed', _('Completed')), ('Refund', _('Refund'))], label=_("State"), widget=forms.Select(attrs={'class': 'hideable'}))
     
     # Include new fields: campus, institution, grade, home_number, cell_number
     institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False, label=_("Institution"))
@@ -72,7 +76,7 @@ class StudentForm(CustomUserForm):
         super(StudentForm, self).__init__(*args, **kwargs)
         self.fields['remark'] = self.fields.pop('remark')
         # Hide the contact num field
-        self.fields.pop('contact_num')
+        
         
         # Reorder fields as requested
         field_order = ['first_name', 'last_name', 'email', 'home_number', 'cell_number', 

@@ -45,7 +45,8 @@
                                             src="{{ teacher.profile_pic }}" alt="{% trans 'Teacher Image' %}">
                                         {% endif %}
                                     </td>
-                                    <td><button data-toggle="modal" data-target="#myModal" class="btn btn-primary show_notification" value="{{ teacher.id }}">{{ 'Send Notification' | trans }}</button></td>
+                                    <td><button data-toggle="modal" data-target="#myModal" class="btn btn-primary show_notification" value="{{ teacher.id }}"> {% trans 'Send Notification' %} </button></td>
+
                                 </tr>
                                 {% endfor %}
                             </tbody>

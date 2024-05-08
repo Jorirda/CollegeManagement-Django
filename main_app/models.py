@@ -29,7 +29,6 @@ class CustomUserManager(UserManager):
         assert extra_fields["is_superuser"]
         return self._create_user(email, password, **extra_fields)
 
-
 class Session(models.Model):
     start_year = models.DateField()
     end_year = models.DateField()
@@ -37,19 +36,18 @@ class Session(models.Model):
     def __str__(self):
         return "From " + str(self.start_year) + " to " + str(self.end_year)
 
-
 class CustomUser(AbstractUser):
     USER_TYPE = ((1, "HOD"), (2, "Teacher"), (3, "Student"))
     GENDER = [("M", "Male"), ("F", "Female")]
 
-    username = None  # Removed username, using email instead
+    username = None # Removed username, using email instead
+    full_name = models.TextField(default="")
     email = models.EmailField(unique=True)
     user_type = models.CharField(default=1, choices=USER_TYPE, max_length=1)
     gender = models.CharField(max_length=1, choices=GENDER)
     profile_pic = models.ImageField()
-    address = models.TextField()
-    home_number = models.TextField(default="")
-    cell_number = models.TextField(default="")
+    address = models.TextField(default="")
+    phone_number = models.TextField(default="")
     remark = models.TextField(default="")
     fcm_token = models.TextField(default="")  # For firebase notifications
     created_at = models.DateTimeField(auto_now_add=True)
@@ -59,10 +57,8 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.last_name + ", " + self.first_name
+        return self.full_name
 
-
-#Institution
 class Institution(models.Model):
     name = models.CharField(max_length=100)
 
@@ -82,7 +78,7 @@ class Campus(models.Model):
         return self.name
     
 class Admin(models.Model):
-    admin = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     remark = models.TextField(default="")
 
     def __str__(self):
@@ -96,7 +92,6 @@ class Course(models.Model):
     def __str__(self):
         return self.name
 
-
 class Student(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='student_institutions')
@@ -109,19 +104,17 @@ class Student(models.Model):
     grade = models.CharField(max_length=10, blank=True, null=True)  
 
     def __str__(self):
-        return self.admin.last_name + " " + self.admin.first_name
+        return self.admin.full_name
 
-class Teacher(models.Model):
+class Teacher(models.Model):  
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='teacher_institutions')
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
-    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     work_type = models.CharField(max_length=30, blank=True)  # Special/Temporary
 
     def __str__(self):
-        return self.admin.last_name + " " + self.admin.first_name
-
-
+        return self.admin.full_name
 
 class Subject(models.Model):
     name = models.CharField(max_length=120)
@@ -230,9 +223,7 @@ class LearningRecord(models.Model):
     date = models.DateField()
     student = models.ForeignKey(Student, null=True,on_delete=models.DO_NOTHING)
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE, null=True)
-    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, null=True)
-    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
+    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)    
     course = models.ForeignKey(Course,null=True, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Teacher,null=True, on_delete=models.CASCADE)
     starting_time = models.TimeField(null=True,)
@@ -403,8 +394,6 @@ post_save.connect(create_or_update_teacher_query, sender=Teacher)
 #     remaining_hours = models.IntegerField(null = True)
 
 #     learning_records = models.ForeignKey(LearningRecord, null=True,on_delete=models.CASCADE)
-
-
 
 
 

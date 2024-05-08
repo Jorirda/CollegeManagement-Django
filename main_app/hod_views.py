@@ -163,11 +163,9 @@ def add_teacher(request):
     context = {'form': form, 'page_title': _('Add teacher')}
     if request.method == 'POST':
         if form.is_valid():
-            first_name = form.cleaned_data.get('first_name')
-            last_name = form.cleaned_data.get('last_name')
+            full_name = form.cleaned_data.get('full_name')
             address = form.cleaned_data.get('address')
-            home_number = form.cleaned_data.get('home_number')
-            cell_number = form.cleaned_data.get('cell_number')
+            phone_number = form.cleaned_data.get('phone_number')
             institution = form.cleaned_data.get('institution')
             campus = form.cleaned_data.get('campus')
             remark = form.cleaned_data.get('remark')
@@ -182,11 +180,10 @@ def add_teacher(request):
             passport_url = fs.url(filename)
             try:
                 user = CustomUser.objects.create_user(
-                    email=email, password=password, user_type=2, first_name=first_name, last_name=last_name, profile_pic=passport_url)
+                    email=email, password=password, user_type=2, full_name=full_name, profile_pic=passport_url)
                 user.gender = gender
                 user.address = address
-                user.home_number = home_number
-                user.cell_number = cell_number
+                user.phone_number = phone_number
                 user.teacher.institution = institution
                 user.teacher.campus = campus
                 user.remark = remark
@@ -778,54 +775,46 @@ def edit_teacher(request, teacher_id):
             cleaned_data = form.cleaned_data
 
             # Extract required data
-            first_name = cleaned_data.get('first_name')
-            last_name = cleaned_data.get('last_name')
-            home_number = cleaned_data.get('home_number')
-            cell_number = cleaned_data.get('cell_number')
-            institution = cleaned_data.get('institution')
-            campus = cleaned_data.get('campus')
-            # address = cleaned_data.get('address')
-            username = cleaned_data.get('username')
+            full_name = cleaned_data.get('full_name')
             # email = cleaned_data.get('email')
             gender = cleaned_data.get('gender')
             password = cleaned_data.get('password') or None
+            address = cleaned_data.get('address')  # Extract address here
+            phone_number = cleaned_data.get('phone_number')
+            institution = cleaned_data.get('institution')
+            campus = cleaned_data.get('campus')
             course = cleaned_data.get('course')
             work_type = cleaned_data.get('work_type')
-            # remark = cleaned_data.get('remark')
-            passport = request.FILES.get('profile_pic')
+            remark = cleaned_data.get('remark')
+            # passport = request.FILES.get('profile_pic')
 
             try:
                 # Get the related CustomUser object directly from the teacher's admin attribute
                 user = teacher.admin
-                user.username = username
                 # user.email = email
+                user.remark = remark
+                user.full_name = full_name
+                user.gender = gender
+                user.address = address  # Set the address here
+                user.phone_number = phone_number
 
                 # If password is provided, set it
                 if password is not None:
                     user.set_password(password)
 
                 # If profile pic is provided, save it
-                if passport is not None:
-                    fs = FileSystemStorage()
-                    filename = fs.save(passport.name, passport)
-                    passport_url = fs.url(filename)
-                    user.profile_pic = passport_url
-
-                # Update other user details
-                user.first_name = first_name
-                user.last_name = last_name
-                user.home_number = home_number
-                user.cell_number = cell_number
-                user.gender = gender
-                # user.address = address
-                # user.remark = remark
+                # if passport is not None:
+                #     fs = FileSystemStorage()
+                #     filename = fs.save(passport.name, passport)
+                #     passport_url = fs.url(filename)
+                #     user.profile_pic = passport_url
 
                 # Update teacher details 
                 teacher.institution = institution
                 teacher.campus = campus
                 teacher.course = course
                 teacher.work_type = work_type
-
+              
                 # Save changes
                 user.save()
                 teacher.save()
@@ -842,6 +831,7 @@ def edit_teacher(request, teacher_id):
 
     # If the request is POST or if there's an error, render the form template with errors
     return render(request, "hod_template/edit_teacher_template.html", context)
+
 
 def edit_student(request, student_id):
     student = get_object_or_404(Student, id=student_id)
@@ -1094,49 +1084,6 @@ def edit_class_schedule(request, schedule_id):
             messages.error(request, "Fill Form Properly")
     return render(request, 'hod_template/edit_class_schedule_template.html', context)
 
-def add_session(request):
-    form = SessionForm(request.POST or None)
-    context = {'form': form, 'page_title': _('Add Session')}
-    if request.method == 'POST':
-        if form.is_valid():
-            try:
-                form.save()
-                messages.success(request, "Session Created")
-                return redirect(reverse('add_session'))
-            except Exception as e:
-                messages.error(request, 'Could Not Add ' + str(e))
-        else:
-            messages.error(request, 'Fill Form Properly ')
-    return render(request, "hod_template/add_session_template.html", context)
-
-def manage_session(request):
-    sessions = Session.objects.all()
-    context = {'sessions': sessions, 'page_title': _('Manage Sessions')}
-    return render(request, "hod_template/manage_session.html", context)
-
-def edit_session(request, session_id):
-    instance = get_object_or_404(Session, id=session_id)
-    form = SessionForm(request.POST or None, instance=instance)
-    context = {'form': form, 'session_id': session_id,
-               'page_title': _('Edit Session')}
-    if request.method == 'POST':
-        if form.is_valid():
-            try:
-                form.save()
-                messages.success(request, "Session Updated")
-                return redirect(reverse('edit_session', args=[session_id]))
-            except Exception as e:
-                messages.error(
-                    request, "Session Could Not Be Updated " + str(e))
-                return render(request, "hod_template/edit_session_template.html", context)
-        else:
-            messages.error(request, "Invalid Form Submitted ")
-            return render(request, "hod_template/edit_session_template.html", context)
-
-    else:
-        return render(request, "hod_template/edit_session_template.html", context)
-
-
 @csrf_exempt
 def check_email_availability(request):
     email = request.POST.get("email")
@@ -1280,8 +1227,9 @@ def admin_view_profile(request):
     if request.method == 'POST':
         try:
             if form.is_valid():
-                first_name = form.cleaned_data.get('first_name')
-                last_name = form.cleaned_data.get('last_name')
+                full_name = form.cleaned_data.get('full_name')
+                # first_name = form.cleaned_data.get('first_name')
+                # last_name = form.cleaned_data.get('last_name')
                 password = form.cleaned_data.get('password') or None
                 passport = request.FILES.get('profile_pic') or None
                 custom_user = admin.admin
@@ -1292,8 +1240,9 @@ def admin_view_profile(request):
                     filename = fs.save(passport.name, passport)
                     passport_url = fs.url(filename)
                     custom_user.profile_pic = passport_url
-                custom_user.first_name = first_name
-                custom_user.last_name = last_name
+                custom_user.full_name = full_name
+                # custom_user.first_name = first_name
+                # custom_user.last_name = last_name
                 custom_user.save()
                 messages.success(request, _("Profile Updated!"))
                 return redirect(reverse('admin_view_profile'))

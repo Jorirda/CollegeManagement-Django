@@ -22,10 +22,15 @@
                 style="border-radius: 50%; width: 3rem; height: 3rem;">
             <span class="brand-text font-weight-dark">
                 {% if user.is_authenticated %}
+                {{ user.full_name }} 
+                {% else %}
+                Unknown
+                {% endif %}
+                <!-- {% if user.is_authenticated %}
                 {{ user.first_name }} {{ user.last_name }}
                 {% else %}
                 Clarke Kent
-                {% endif %}
+                {% endif %} -->
             </span>
         </a>
 

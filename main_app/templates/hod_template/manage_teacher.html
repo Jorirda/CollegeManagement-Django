@@ -14,27 +14,25 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3 class="card-title">{% trans page_title %}</h3>
-                        <h3 class="card-title">{% blocktrans %}Total Teachers: {{ total_teacher_count }}{% endblocktrans %}</h3>
-                    </div>
+                        <div class="d-flex align-items-center">
+                            <img src="/media/user.png" alt="Teacher Image" class="rounded-circle mr-3" style="width: 50px; height: 50px;">
+                            <h3 class="card-title">{% trans "Fill in the Instructor's Details" %}</h3>
+                        </div>
+                        <h3 class="card-title">{% blocktrans %}Total Teachers: {{ total_teacher_count }} 人 {% endblocktrans %}</h3>
+                    </div>                    
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="example2" class="table table-bordered table-hover table-responsive">
+                        <table id="example2" class="table table-bordered table-hover ">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th>#</th>
+                                    <th>Index No.</th>
                                     <th>{% trans "Full Name" %}</th>
-                                    <!-- <th>{% trans "Email" %}</th> -->
-                                    <th>{% trans "Home Number" %}</th>
-                                    <th>{% trans "Cell Number" %}</th>
-                                    <th>{% trans "Institution" %}</th>
-                                    <th>{% trans "Campus" %}</th>
                                     <th>{% trans "Gender" %}</th>
-                                    <!-- <th>{% trans "Address" %}</th> -->
-                                    <th>{% trans "Courses" %}</th>
-                                    <th>{% trans "Work Type" %}</th>
-                                    <th>{% trans "Avatar" %}</th>
-                                    <!-- <th>{% trans "Remark" %}</th> -->
+                                    <th>{% trans "Address" %}</th>
+                                    <th>{% trans "Phone Number" %}</th>
+                                    <th>{% trans "Teaching Courses" %}</th>
+                                    <th>{% trans "Contract" %}</th>
+                                    <th>{% trans "Remark" %}</th>
                                     <th>{% trans "Actions" %}</th>
                                 </tr>
                             </thead>
@@ -42,25 +40,13 @@
                                 {% for teacher in allteacher %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{teacher.last_name}}, {{teacher.first_name}}</td>
-                                    <!-- <td>{{teacher.email}}</td> -->
-                                    <td>{{teacher.home_number}}</td>
-                                    <td>{{teacher.cell_number}}</td>
-                                    <td>{{teacher.teacher.institution.name}}</td>
-                                    <td>{{teacher.teacher.campus.name}}</td>
+                                    <td>{{teacher.full_name}}</td>
                                     <td>{{teacher.gender}}</td>
-                                    <!-- <td>{{teacher.address}}</td> -->
+                                    <td>{{teacher.address}}</td>
+                                    <td>{{teacher.phone_number}}</td>
                                     <td>{{teacher.teacher.course.name}}</td>
                                     <td>{{teacher.teacher.work_type}}</td>
-                                    <td>
-                                        {% if teacher.profile_pic == "" %}
-                                        {% trans "No Image" %}
-                                        {% else %}
-                                        <img class="img img-fluid mb-2" height="56" width="56"
-                                            src="{{teacher.profile_pic}}" alt="{% trans 'Teacher Avatar' %}">
-                                        {% endif %}
-                                    </td>
-                                    <!-- <td>{{teacher.remark}}</td> -->
+                                    <td>{{teacher.remark}}</td>
                                     <td>
                                         <a href="{% url 'edit_teacher' teacher.teacher.id %}" class="btn btn-info">{% trans "Edit" %}</a> - 
                                         <a href="{% url 'delete_teacher' teacher.teacher.id %}" class="btn btn-danger" onclick="return confirm('{% trans 'Are you sure about this ?' %}')">{% trans "Delete" %}</a>

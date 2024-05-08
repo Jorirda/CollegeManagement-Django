@@ -15,10 +15,8 @@ class FormSettings(forms.ModelForm):
         for field in self.visible_fields():
             field.field.widget.attrs['class'] = 'form-control'
 
-
 class CustomUserForm(FormSettings):
-    first_name = forms.CharField(required=True, label=_('First Name'))
-    last_name = forms.CharField(required=True, label=_('Last Name'))
+    full_name = forms.CharField(required=True, label=_('Full Name'))
     email = forms.EmailField(required=True, label=_('Email'))
     gender = forms.ChoiceField(choices=[('male', _('Male')), ('female', _('Female'))], label=_('Gender'))
     password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
@@ -30,7 +28,7 @@ class CustomUserForm(FormSettings):
 
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'email', 'gender', 'password', 'profile_pic', 'address', 'home_number', 'cell_number', 'remark']
+        fields = ['full_name', 'email', 'gender', 'password', 'profile_pic', 'address', 'home_number', 'cell_number', 'remark']
 
     def __init__(self, *args, **kwargs):
         super(CustomUserForm, self).__init__(*args, **kwargs)
@@ -54,16 +52,14 @@ class CustomUserForm(FormSettings):
                     raise forms.ValidationError(_("The given email is already registered"))
         return formEmail
 
-
 class StudentForm(CustomUserForm):
+    full_name = forms.CharField(required=True, label=_('Full Name'))
+    gender = forms.ChoiceField(choices=[('male', _('Male')), ('female', _('Female'))], label=_('Gender'))
+    password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
+    profile_pic = forms.ImageField(label=_('Profile Picture'))
     date_of_birth = forms.DateField(required=False, label=_("Date of Birth"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
     reg_date = forms.DateField(required=False, label=_("Registration Date"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
     state = forms.ChoiceField(choices=[('Currently Learning', _('Currently Learning')), ('Completed', _('Completed')), ('Refund', _('Refund'))], label=_("State"), widget=forms.Select(attrs={'class': 'hideable'}))
-    date_of_birth = forms.DateField(required=False, label=_("Date of Birth"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
-    reg_date = forms.DateField(required=False, label=_("Registration Date"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
-    state = forms.ChoiceField(choices=[('Currently Learning', _('Currently Learning')), ('Completed', _('Completed')), ('Refund', _('Refund'))], label=_("State"), widget=forms.Select(attrs={'class': 'hideable'}))
-    
-    # Include new fields: campus, institution, grade, home_number, cell_number
     institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False, label=_("Institution"))
     campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False, label=_("Campus"))
     grade = forms.CharField(max_length=10, required=False, label=_("Grade"))
@@ -74,67 +70,71 @@ class StudentForm(CustomUserForm):
 
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
-        self.fields['remark'] = self.fields.pop('remark')
-        # Hide the contact num field
-        
-        
+       
         # Reorder fields as requested
-        field_order = ['first_name', 'last_name', 'email', 'home_number', 'cell_number', 
-                       'gender', 'password', 'profile_pic', 'address', 'institution', 'campus', 
-                       'course', 'grade', 'session', 'date_of_birth', 'reg_date', 
-                       'state', 'remark']
-        
+        field_order = [_('full_name'), _('gender'), _('password'), _('profile_pic'), 
+                       _('date_of_birth'), _('reg_date'), _('state'), _('address'), _('institution'), 
+                       _('campus'), _('course'), _('grade'), _('session'), _('home_number'), _('cell_number'), _('remark')]
+
         # Set the field order
         self.fields = {k: self.fields[k] for k in field_order}
 
-    class Meta(CustomUserForm.Meta):
+    class Meta:
         model = Student
-        fields = CustomUserForm.Meta.fields + \
-            ['course', 'session', 'date_of_birth', 'reg_date', 'state', 'institution', 'campus', 'grade', 'home_number', 'cell_number', 'remark']
-
+        fields = ['full_name', 'gender', 'password', 'profile_pic', 'date_of_birth', 'reg_date', 
+                  'state', 'address', 'institution', 'campus', 'course', 'grade', 'session', 'home_number', 
+                  'cell_number', 'remark']
 
 class AdminForm(CustomUserForm):
+    full_name = forms.CharField(required=True, label=_('Full Name'))
+    email = forms.EmailField(required=True, label=_('Email'))
+    gender = forms.ChoiceField(choices=[('male', _('Male')), ('female', _('Female'))], label=_('Gender'))
+    password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
+    profile_pic = forms.ImageField(label=_('Profile Picture'))
+
     def __init__(self, *args, **kwargs):
         super(AdminForm, self).__init__(*args, **kwargs)
 
         # Reorder fields as requested
-        field_order = [_('first_name'), _('last_name'), _('email'), _('gender'), _('password'), _('profile_pic')]
+        field_order = [_('full_name'), _('email'), _('gender'), _('password'), _('profile_pic')]
 
         # Set the field order
         self.fields = {k: self.fields[k] for k in field_order}
 
-    class Meta(CustomUserForm.Meta):
+    class Meta:
         model = Admin
-        fields = CustomUserForm.Meta.fields
-
+        fields = ['full_name', 'email', 'gender', 'password', 'profile_pic', 'address', 'home_number', 'cell_number', 'remark']
 
 class TeacherForm(CustomUserForm):
-    work_type = forms.ChoiceField(choices=[
-        ('Special Teacher', _('Special Teacher')),
-        ('Temporary Contract', _('Temporary Contract')),
-    ],label=_("Work Type"))
-    home_number = forms.CharField(max_length=20, required=False, label=_("Home Number"))
-    cell_number = forms.CharField(max_length=20, required=False, label=_("Cell Number"))
+    full_name = forms.CharField(required=True, label=_('Full Name'))
+    gender = forms.ChoiceField(choices=[('male', _('Male')), ('female', _('Female'))], label=_('Gender'))
+    password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
+    address = forms.CharField(widget=forms.Textarea, label=_('Address'))  # Add this line
+    phone_number = forms.CharField(max_length=20, required=False, label=_("Phone Number"))
     institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False, label=_("Institution"))
     campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False, label=_("Campus"))
     course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, label=_("Course"))
-    
+    work_type = forms.ChoiceField(choices=[
+        ('Full Time', _('Full Time')),
+        ('Part Time', _('Part Time')),
+    ],label=_("Contract"))
+    remark = forms.CharField(required=True, label=_('Remark'))
 
     def __init__(self, *args, **kwargs):
         super(TeacherForm, self).__init__(*args, **kwargs)
        
         # Reorder fields as requested
-        field_order = ['first_name', 'last_name', 'home_number', 'cell_number', 
-                       'gender', 'password', 'profile_pic', 'address', 
-                       'work_type', 'course', 'institution', 'campus']
+        field_order = [_('full_name'), _('gender'), _('password'), 
+                       _('address'), _('phone_number'), _('institution'), _('campus'), 
+                       _('course'), _('work_type'), _('remark')]
 
         # Set the field order
         self.fields = {k: self.fields[k] for k in field_order}
 
-    class Meta(CustomUserForm.Meta):
+    class Meta:
         model = Teacher
-        fields = CustomUserForm.Meta.fields + [_('course'), _('work_type'), _('home_number'), _('cell_number'), _('institution'), _('campus')]
-
+        fields = ['full_name', 'gender', 'password',  'address', 
+                  'phone_number', 'institution', 'campus', 'course', 'work_type', 'remark']
 
 class CourseForm(FormSettings):
     name = forms.CharField(label=_('Course Name'))

@@ -54,36 +54,36 @@ class CustomUserForm(FormSettings):
 
 class StudentForm(CustomUserForm):
     full_name = forms.CharField(required=True, label=_('Full Name'))
-    gender = forms.ChoiceField(choices=[('male', _('Male')), ('female', _('Female'))], label=_('Gender'))
+    gender = forms.ChoiceField(choices=[('男', _('Male')), ('女', _('Female'))], label=_('Gender'))
     password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
-    profile_pic = forms.ImageField(label=_('Profile Picture'))
+    address = forms.CharField(widget=forms.Textarea, label=_('Address'))
     date_of_birth = forms.DateField(required=False, label=_("Date of Birth"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
     reg_date = forms.DateField(required=False, label=_("Registration Date"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
-    state = forms.ChoiceField(choices=[('Currently Learning', _('Currently Learning')), ('Completed', _('Completed')), ('Refund', _('Refund'))], label=_("State"), widget=forms.Select(attrs={'class': 'hideable'}))
-    institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False, label=_("Institution"))
-    campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False, label=_("Campus"))
-    grade = forms.CharField(max_length=10, required=False, label=_("Grade"))
-    home_number = forms.CharField(max_length=20, required=False, label=_("Home Number"))
-    cell_number = forms.CharField(max_length=20, required=False, label=_("Cell Number"))
-    course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, label=_("Course"))
-    session = forms.ModelChoiceField(queryset=Session.objects.all(), required=False, label=_("Session"))
+    status = forms.ChoiceField(choices=[  
+        ('Currently Learning', _('Currently Learning')),
+        ('Completed', _('Completed')),
+        ('Refund', _('Refund')),
+    ], label=_("Status"), widget=forms.Select(attrs={'class': 'hideable'}))
+    phone_number = forms.CharField(max_length=20, required=False, label=_("Phone Number"))
+    remark = forms.CharField(label=_('Remark'))
+    
 
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
        
         # Reorder fields as requested
-        field_order = [_('full_name'), _('gender'), _('password'), _('profile_pic'), 
-                       _('date_of_birth'), _('reg_date'), _('state'), _('address'), _('institution'), 
-                       _('campus'), _('course'), _('grade'), _('session'), _('home_number'), _('cell_number'), _('remark')]
+        field_order = [_('full_name'), _('password'), _('gender'), _('date_of_birth'), _('address'), _('phone_number'), _('reg_date'),_('status'), _('remark')]
+                         
+                         
 
         # Set the field order
         self.fields = {k: self.fields[k] for k in field_order}
 
     class Meta:
         model = Student
-        fields = ['full_name', 'gender', 'password', 'profile_pic', 'date_of_birth', 'reg_date', 
-                  'state', 'address', 'institution', 'campus', 'course', 'grade', 'session', 'home_number', 
-                  'cell_number', 'remark']
+        fields = ['full_name', 'gender', 'password', 'date_of_birth', 'reg_date', 
+                   'status', 'address', 'phone_number', 'remark'] 
+
 
 class AdminForm(CustomUserForm):
     full_name = forms.CharField(required=True, label=_('Full Name'))
@@ -107,11 +107,11 @@ class AdminForm(CustomUserForm):
 
 class TeacherForm(CustomUserForm):
     full_name = forms.CharField(required=True, label=_('Full Name'))
-    gender = forms.ChoiceField(choices=[('male', _('Male')), ('female', _('Female'))], label=_('Gender'))
+    gender = forms.ChoiceField(choices=[(' 男', _('Male')), ('女', _('Female'))], label=_('Gender'))
     password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
     address = forms.CharField(widget=forms.Textarea, label=_('Address'))  # Add this line
     phone_number = forms.CharField(max_length=20, required=False, label=_("Phone Number"))
-    institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False, label=_("Institution"))
+    # institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False, label=_("Institution"))
     campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False, label=_("Campus"))
     course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, label=_("Course"))
     work_type = forms.ChoiceField(choices=[
@@ -125,7 +125,7 @@ class TeacherForm(CustomUserForm):
        
         # Reorder fields as requested
         field_order = [_('full_name'), _('gender'), _('password'), 
-                       _('address'), _('phone_number'), _('institution'), _('campus'), 
+                       _('address'), _('phone_number'), _('campus'), 
                        _('course'), _('work_type'), _('remark')]
 
         # Set the field order
@@ -134,7 +134,7 @@ class TeacherForm(CustomUserForm):
     class Meta:
         model = Teacher
         fields = ['full_name', 'gender', 'password',  'address', 
-                  'phone_number', 'institution', 'campus', 'course', 'work_type', 'remark']
+                  'phone_number', 'campus', 'course', 'work_type', 'remark']
 
 class CourseForm(FormSettings):
     name = forms.CharField(label=_('Course Name'))
@@ -156,24 +156,24 @@ class SubjectForm(FormSettings):
         model = Subject
         fields = [_('name'), _('teacher'), _('course')]
 
-class InstitutionForm(FormSettings):
-    name = forms.CharField(label=_('Name'))
-    def __init__(self, *args, **kwargs):
-        super(InstitutionForm, self).__init__(*args, **kwargs)
+# class InstitutionForm(FormSettings):
+#     name = forms.CharField(label=_('Name'))
+#     def __init__(self, *args, **kwargs):
+#         super(InstitutionForm, self).__init__(*args, **kwargs)
 
-    class Meta:
-        model = Institution
-        fields = [_('name')]
+#     class Meta:
+#         model = Institution
+#         fields = [_('name')]
 
 class CampusForm(FormSettings):
     name = forms.CharField(label=_('Name'))
-    institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False, label=_("Institution"))
+    # institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False, label=_("Institution"))
     def __init__(self, *args, **kwargs):
         super(CampusForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = Campus
-        fields = [_('name'), _('institution')]
+        fields = [_('name')]
             
 class PaymentRecordForm(FormSettings):
     class_name = forms.CharField(label=_('Class Name'))
@@ -215,7 +215,7 @@ class LearningRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=DateInput(attrs={'type': 'date'}), label=_('Date'))
     starting_time = forms.TimeField(required=False, widget=TimeInput(attrs={'type': 'time'}), label=_('Starting Time'))
     end_time = forms.TimeField(required=False, widget=TimeInput(attrs={'type': 'time'}), label=_('End Time'))
-    institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False)
+    # institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False)
     campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False)
 
     
@@ -224,7 +224,7 @@ class LearningRecordForm(FormSettings):
 
     class Meta:
         model = LearningRecord
-        fields = [_('date'), _('student'), _('institution'), _('campus'), _('course'),_('teacher'),_('starting_time'),_('end_time'), _('class_name'),_('remark')]
+        fields = [_('date'), _('student'), _('campus'), _('course'),_('teacher'),_('starting_time'),_('end_time'), _('class_name'),_('remark')]
 
 class ClassScheduleForm(FormSettings):
     lesson_unit_price = forms.DecimalField(widget=TextInput(attrs={'placeholder': _('¥')}), label=_('Lesson Unit Price'))

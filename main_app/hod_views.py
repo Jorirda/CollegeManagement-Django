@@ -166,7 +166,7 @@ def add_teacher(request):
             full_name = form.cleaned_data.get('full_name')
             address = form.cleaned_data.get('address')
             phone_number = form.cleaned_data.get('phone_number')
-            institution = form.cleaned_data.get('institution')
+            # institution = form.cleaned_data.get('institution')
             campus = form.cleaned_data.get('campus')
             remark = form.cleaned_data.get('remark')
             email = form.cleaned_data.get('email')
@@ -184,7 +184,7 @@ def add_teacher(request):
                 user.gender = gender
                 user.address = address
                 user.phone_number = phone_number
-                user.teacher.institution = institution
+                # user.teacher.institution = institution
                 user.teacher.campus = campus
                 user.remark = remark
                 user.teacher.course = course
@@ -206,23 +206,19 @@ def add_student(request):
     context = {'form': form, 'page_title': _('Add Student')}
     if request.method == 'POST':
         if form.is_valid():
-            first_name = form.cleaned_data.get('first_name')
-            last_name = form.cleaned_data.get('last_name')
+            full_name = form.cleaned_data.get('full_name')
             gender = form.cleaned_data.get('gender')
             date_of_birth = form.cleaned_data.get('date_of_birth')
             address = form.cleaned_data.get('address')
             email = form.cleaned_data.get('email')
-            home_number = form.cleaned_data.get('home_number')
-            cell_number = form.cleaned_data.get('cell_number')
-            institution = form.cleaned_data.get('institution')
-            campus = form.cleaned_data.get('campus')
-            contact_num = form.cleaned_data.get('contact_num')
+            phone_number = form.cleaned_data.get('phone_number')
+            # institution = form.cleaned_data.get('institution')
             password = form.cleaned_data.get('password')
             reg_date = form.cleaned_data.get('reg_date')
-            state = form.cleaned_data.get('state')
-            course = form.cleaned_data.get('course')
-            grade = form.cleaned_data.get('grade')
-            session = form.cleaned_data.get('session')
+            status = form.cleaned_data.get('state')
+            # course = form.cleaned_data.get('course')
+            # grade = form.cleaned_data.get('grade')
+            # session = form.cleaned_data.get('session')
             remark = form.cleaned_data.get('remark')
             passport = request.FILES['profile_pic']
             fs = FileSystemStorage()
@@ -230,20 +226,16 @@ def add_student(request):
             passport_url = fs.url(filename)
             try:
                 user = CustomUser.objects.create_user(
-                    email=email, password=password, user_type=3, first_name=first_name, last_name=last_name, profile_pic=passport_url)
+                    email=email, password=password, user_type=3, full_name=full_name, profile_pic=passport_url)
                 user.gender = gender
                 user.student.date_of_birth = date_of_birth
                 user.address = address
-                user.student.session = session
-                user.home_number = home_number
-                user.cell_number = cell_number
-                user.student.institution = institution
-                user.student.campus = campus
+                user.phone_number = phone_number
+                # user.student.session = session
+                # user.student.institution = institution
+                user.student.status = status
                 user.student.reg_date = reg_date
-                user.student.state = state
                 user.remark = remark
-                user.student.course = course
-                user.student.grade = grade
                 user.save()
               
                 messages.success(request, "Successfully Added")
@@ -302,26 +294,26 @@ def add_subject(request):
 
     return render(request, 'hod_template/add_subject_template.html', context)
 
-def add_institution(request):
-    form = InstitutionForm(request.POST or None)
-    context = {
-        'form': form,
-        'page_title':  _('Add Institution')
-    }
-    if request.method == 'POST':
-        if form.is_valid():
-            name = form.cleaned_data.get('name')
-            try:
-                institution = Institution()
-                institution.name = name
-                institution.save()
-                messages.success(request, "Successfully Added")
-                return redirect(reverse('add_institution'))
-            except:
-                messages.error(request, "Could Not Add")
-        else:
-            messages.error(request, "Could Not Add")
-    return render(request, 'hod_template/add_institution_template.html', context)
+# def add_institution(request):
+#     form = InstitutionForm(request.POST or None)
+#     context = {
+#         'form': form,
+#         'page_title':  _('Add Institution')
+#     }
+#     if request.method == 'POST':
+#         if form.is_valid():
+#             name = form.cleaned_data.get('name')
+#             try:
+#                 institution = Institution()
+#                 institution.name = name
+#                 institution.save()
+#                 messages.success(request, "Successfully Added")
+#                 return redirect(reverse('add_institution'))
+#             except:
+#                 messages.error(request, "Could Not Add")
+#         else:
+#             messages.error(request, "Could Not Add")
+#     return render(request, 'hod_template/add_institution_template.html', context)
 
 def add_campus(request):
     form = CampusForm(request.POST or None)
@@ -332,13 +324,13 @@ def add_campus(request):
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
-            institution = form.cleaned_data.get('institution')
+            # institution = form.cleaned_data.get('institution')
            
          
             try:
                 campus = Campus()
                 campus.name = name
-                campus.institution = institution
+                # campus.institution = institution
                 
             
                 campus.save()
@@ -416,7 +408,7 @@ def add_learning_record(request):
         if form.is_valid():
             date = form.cleaned_data.get('date')
             student = form.cleaned_data.get('student')
-            institution = form.cleaned_data.get('institution')
+            # institution = form.cleaned_data.get('institution')
             campus = form.cleaned_data.get('campus')
             course = form.cleaned_data.get('course')
             teacher = form.cleaned_data.get('teacher')
@@ -431,7 +423,7 @@ def add_learning_record(request):
                 learn = LearningRecord()
                 learn.date = date
                 learn.student = student
-                learn.institution = institution
+                # learn.institution = institution
                 learn.campus = campus
                 learn.course = course
                 learn.teacher = teacher
@@ -528,13 +520,13 @@ def manage_subject(request):
     }
     return render(request, "hod_template/manage_subject.html", context)
 
-def manage_institution(request):
-    institutions = Institution.objects.all()
-    context = {
-        'institutions': institutions,
-        'page_title':  _('Manage Institutions')
-    }
-    return render(request, "hod_template/manage_institution.html", context)
+# def manage_institution(request):
+#     institutions = Institution.objects.all()
+#     context = {
+#         'institutions': institutions,
+#         'page_title':  _('Manage Institutions')
+#     }
+#     return render(request, "hod_template/manage_institution.html", context)
 
 def manage_campus(request):
     campuses = Campus.objects.all()
@@ -597,7 +589,7 @@ def manage_student_query(request):
                     'date_of_birth': student_query.student_records.date_of_birth,
                     'home_number': student_query.student_records.admin.home_number,
                     'cell_number': student_query.student_records.admin.cell_number,
-                    'institution': student_query.student_records.institution,
+                    # 'institution': student_query.student_records.institution,
                     'campus': student_query.student_records.campus,
                     'grade': student_query.student_records.grade,
                     'state': student_query.student_records.state,
@@ -631,7 +623,7 @@ def manage_student_query(request):
                     'date_of_birth': student_query.student_records.date_of_birth,
                     'home_number': student_query.student_records.admin.home_number,
                     'cell_number': student_query.student_records.admin.cell_number,
-                    'institution': student_query.student_records.institution,
+                    # 'institution': student_query.student_records.institution,
                     'campus': student_query.student_records.campus,
                     'grade': student_query.student_records.grade,
                     'state': student_query.student_records.state,
@@ -685,7 +677,7 @@ def manage_teacher_query(request):
                 'gender': teacher_query.admin.gender,
                 'home_number': teacher_query.teacher_records.admin.home_number,
                 'cell_number': teacher_query.teacher_records.admin.cell_number,
-                'institution': teacher_query.teacher_records.institution,
+                # 'institution': teacher_query.teacher_records.institution,
                 'campus': teacher_query.teacher_records.campus,
                 'address': teacher_query.teacher_records.admin.address,
                 'num_of_classes': teacher_query.num_of_classes,
@@ -711,7 +703,7 @@ def manage_teacher_query(request):
                 'gender': teacher_query.admin.gender,
                 'home_number': teacher_query.teacher_records.admin.home_number,
                 'cell_number': teacher_query.teacher_records.admin.cell_number,
-                'institution': teacher_query.teacher_records.institution,
+                # 'institution': teacher_query.teacher_records.institution,
                 'campus': teacher_query.teacher_records.campus,
                 'address': teacher_query.teacher_records.admin.address,
                 'num_of_classes': teacher_query.num_of_classes,
@@ -781,7 +773,7 @@ def edit_teacher(request, teacher_id):
             password = cleaned_data.get('password') or None
             address = cleaned_data.get('address')  # Extract address here
             phone_number = cleaned_data.get('phone_number')
-            institution = cleaned_data.get('institution')
+            # institution = cleaned_data.get('institution')
             campus = cleaned_data.get('campus')
             course = cleaned_data.get('course')
             work_type = cleaned_data.get('work_type')
@@ -810,7 +802,7 @@ def edit_teacher(request, teacher_id):
                 #     user.profile_pic = passport_url
 
                 # Update teacher details 
-                teacher.institution = institution
+                # teacher.institution = institution
                 teacher.campus = campus
                 teacher.course = course
                 teacher.work_type = work_type
@@ -832,7 +824,6 @@ def edit_teacher(request, teacher_id):
     # If the request is POST or if there's an error, render the form template with errors
     return render(request, "hod_template/edit_teacher_template.html", context)
 
-
 def edit_student(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     form = StudentForm(request.POST or None, instance=student)
@@ -845,46 +836,40 @@ def edit_student(request, student_id):
     if request.method == 'POST':
         if form.is_valid():
             cleaned_data = form.cleaned_data
-            first_name = cleaned_data.get('first_name')
-            last_name = cleaned_data.get('last_name')
-            home_number = cleaned_data.get('home_number')
-            cell_number = cleaned_data.get('cell_number')
-            institution = cleaned_data.get('institution')
-            campus = cleaned_data.get('campus')
+            full_name = cleaned_data.get('full_name')
+            phone_number = cleaned_data.get('phone_number')
+            # institution = cleaned_data.get('institution')
             address = cleaned_data.get('address')
-            email = cleaned_data.get('email')
+            # email = cleaned_data.get('email')
             gender = cleaned_data.get('gender')
             password = cleaned_data.get('password') or None
-            course = cleaned_data.get('course')
-            grade = cleaned_data.get('grade')
+            status = cleaned_data.get('status')
             remark = cleaned_data.get('remark')
-            passport = request.FILES.get('profile_pic')
 
             try:
                 user = student.admin
-                user.email = email
+                # user.email = email
 
                 if password is not None:
                     user.set_password(password)
 
-                if passport is not None:
-                    fs = FileSystemStorage()
-                    filename = fs.save(passport.name, passport)
-                    passport_url = fs.url(filename)
-                    user.profile_pic = passport_url
+                # if passport is not None:
+                #     fs = FileSystemStorage()
+                #     filename = fs.save(passport.name, passport)
+                #     passport_url = fs.url(filename)
+                #     user.profile_pic = passport_url
 
-                user.first_name = first_name
-                user.last_name = last_name
-                user.home_number = home_number
-                user.cell_number = cell_number
+                user.phone_number = phone_number
+                user.full_name = full_name
                 user.gender = gender
                 user.address = address
                 user.remark = remark
 
-                student.course = course
-                student.institution = institution
-                student.campus = campus
-                student.grade = grade
+                student.status = status
+                # student.course = course
+                # student.institution = institution
+                # student.campus = campus
+                # student.grade = grade
             
                 user.save()
                 student.save()
@@ -950,28 +935,28 @@ def edit_subject(request, subject_id):
             messages.error(request, "Fill Form Properly")
     return render(request, 'hod_template/edit_subject_template.html', context)
 
-def edit_institution(request, institution_id):
-    instance = get_object_or_404(Institution, id=institution_id)
-    form = InstitutionForm(request.POST or None, instance=instance)
-    context = {
-        'form': form,
-        'institution_id': institution_id,
-        'page_title': _('Edit Institution')
-    }
-    if request.method == 'POST':
-        if form.is_valid():
-            name = form.cleaned_data.get('name')
-            try:
-                institution = Institution.objects.get(id=institution_id)
-                institution.name = name
-                institution.save()
-                messages.success(request, "Successfully Updated")
-            except:
-                messages.error(request, "Could Not Update")
-        else:
-            messages.error(request, "Could Not Update")
+# def edit_institution(request, institution_id):
+#     instance = get_object_or_404(Institution, id=institution_id)
+#     form = InstitutionForm(request.POST or None, instance=instance)
+#     context = {
+#         'form': form,
+#         'institution_id': institution_id,
+#         'page_title': _('Edit Institution')
+#     }
+#     if request.method == 'POST':
+#         if form.is_valid():
+#             name = form.cleaned_data.get('name')
+#             try:
+#                 institution = Institution.objects.get(id=institution_id)
+#                 institution.name = name
+#                 institution.save()
+#                 messages.success(request, "Successfully Updated")
+#             except:
+#                 messages.error(request, "Could Not Update")
+#         else:
+#             messages.error(request, "Could Not Update")
 
-    return render(request, 'hod_template/edit_institution_template.html', context)
+#     return render(request, 'hod_template/edit_institution_template.html', context)
 
 def edit_campus(request, campus_id):
     instance = get_object_or_404(Campus, id=campus_id)
@@ -984,13 +969,13 @@ def edit_campus(request, campus_id):
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
-            institution = form.cleaned_data.get('institution')
+            # institution = form.cleaned_data.get('institution')
            
            
             try:
                 campus = Campus.objects.get(id=campus_id)
                 campus.name = name
-                campus.institution = institution
+                # campus.institution = institution
               
                
                 campus.save()
@@ -1016,7 +1001,7 @@ def edit_learn(request, learn_id):
         if form.is_valid():
             date = form.cleaned_data.get('date')
             student = form.cleaned_data.get('student')
-            institution = form.cleaned_data.get('institution')
+            # institution = form.cleaned_data.get('institution')
             campus = form.cleaned_data.get('campus')
             course = form.cleaned_data.get('course')
             teacher = form.cleaned_data.get('teacher')
@@ -1030,7 +1015,7 @@ def edit_learn(request, learn_id):
                 learn = LearningRecord.objects.get(id=learn_id)
                 learn.date = date
                 learn.student = student
-                learn.institution = institution
+                # learn.institution = institution
                 learn.campus = campus
                 learn.course = course
                 learn.teacher = teacher
@@ -1349,15 +1334,15 @@ def delete_subject(request, subject_id):
     messages.success(request, "Subject deleted successfully!")
     return redirect(reverse('manage_subject'))
 
-def delete_institution(request, institution_id):
-    institution = get_object_or_404(Institution, id=institution_id)
-    try:
-        institution.delete()
-        messages.success(request, "Institution deleted successfully!")
-    except Exception:
-        messages.error(
-            request, "Sorry, some records are associated with this institution. Kindly resolve them and try again.")
-    return redirect(reverse('manage_institution'))   
+# def delete_institution(request, institution_id):
+#     institution = get_object_or_404(Institution, id=institution_id)
+#     try:
+#         institution.delete()
+#         messages.success(request, "Institution deleted successfully!")
+#     except Exception:
+#         messages.error(
+#             request, "Sorry, some records are associated with this institution. Kindly resolve them and try again.")
+#     return redirect(reverse('manage_institution'))   
 
 def delete_campus(request, campus_id):
     campus = get_object_or_404(Campus, id=campus_id)

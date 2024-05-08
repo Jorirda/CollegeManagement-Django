@@ -59,20 +59,20 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.full_name
 
-class Institution(models.Model):
-    name = models.CharField(max_length=100)
+# class Institution(models.Model):
+#     name = models.CharField(max_length=100)
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 
-    def delete(self, *args, **kwargs):
-        # Delete associated campuses before deleting the institution
-        self.campuses.all().delete()
-        super().delete(*args, **kwargs)
+#     def delete(self, *args, **kwargs):
+#         # Delete associated campuses before deleting the institution
+#         self.campuses.all().delete()
+#         super().delete(*args, **kwargs)
     
 class Campus(models.Model):
     name = models.CharField(max_length=100)
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='campuses')
+    # institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='campuses')
 
     def __str__(self):
         return self.name
@@ -94,21 +94,21 @@ class Course(models.Model):
 
 class Student(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='student_institutions')
+    # institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='student_institutions')
     campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
-    session = models.ForeignKey(Session, on_delete=models.DO_NOTHING, null=True)
+    # session = models.ForeignKey(Session, on_delete=models.DO_NOTHING, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
     reg_date = models.DateField(blank=True, null=True)
-    state = models.CharField(max_length=30, blank=True) 
-    grade = models.CharField(max_length=10, blank=True, null=True)  
+    status = models.CharField(max_length=30, blank=True) 
+    # grade = models.CharField(max_length=10, blank=True, null=True)  
 
     def __str__(self):
         return self.admin.full_name
 
 class Teacher(models.Model):  
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='teacher_institutions')
+    # institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='teacher_institutions')
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
     work_type = models.CharField(max_length=30, blank=True)  # Special/Temporary
@@ -222,7 +222,7 @@ class PaymentRecord(models.Model):
 class LearningRecord(models.Model):
     date = models.DateField()
     student = models.ForeignKey(Student, null=True,on_delete=models.DO_NOTHING)
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, null=True)
+    # institution = models.ForeignKey(Institution, on_delete=models.CASCADE, null=True)
     campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)    
     course = models.ForeignKey(Course,null=True, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Teacher,null=True, on_delete=models.CASCADE)

@@ -212,13 +212,9 @@ def add_student(request):
             address = form.cleaned_data.get('address')
             email = form.cleaned_data.get('email')
             phone_number = form.cleaned_data.get('phone_number')
-            # institution = form.cleaned_data.get('institution')
             password = form.cleaned_data.get('password')
             reg_date = form.cleaned_data.get('reg_date')
             status = form.cleaned_data.get('state')
-            # course = form.cleaned_data.get('course')
-            # grade = form.cleaned_data.get('grade')
-            # session = form.cleaned_data.get('session')
             remark = form.cleaned_data.get('remark')
             passport = request.FILES['profile_pic']
             fs = FileSystemStorage()
@@ -231,8 +227,6 @@ def add_student(request):
                 user.student.date_of_birth = date_of_birth
                 user.address = address
                 user.phone_number = phone_number
-                # user.student.session = session
-                # user.student.institution = institution
                 user.student.status = status
                 user.student.reg_date = reg_date
                 user.remark = remark
@@ -408,30 +402,27 @@ def add_learning_record(request):
         if form.is_valid():
             date = form.cleaned_data.get('date')
             student = form.cleaned_data.get('student')
-            # institution = form.cleaned_data.get('institution')
-            campus = form.cleaned_data.get('campus')
             course = form.cleaned_data.get('course')
             teacher = form.cleaned_data.get('teacher')
-            starting_time = form.cleaned_data.get('starting_time')
+            start_time = form.cleaned_data.get('start_time')
             end_time = form.cleaned_data.get('end_time')
-            class_name = form.cleaned_data.get('class_name')
-            remark = form.cleaned_data.get('remark')
+            lesson_hours = form.cleaned_data.get('lesson_hours')
             
-            
+            # Get the remark from the associated student
+            remark = student.admin.remark if student and student.admin else None
+                    
             try:
-                
                 learn = LearningRecord()
                 learn.date = date
                 learn.student = student
-                # learn.institution = institution
-                learn.campus = campus
                 learn.course = course
                 learn.teacher = teacher
-                learn.starting_time = starting_time
+                learn.start_time = start_time
                 learn.end_time = end_time
-                learn.class_name = class_name
-                learn.remark= remark
+                learn.lesson_hours = lesson_hours
+                learn.remark = remark  # Assign the remark here
                 learn.save()
+                
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_learning_record'))
 
@@ -441,6 +432,7 @@ def add_learning_record(request):
             messages.error(request, "Fill Form Properly")
 
     return render(request, 'hod_template/add_learning_record_template.html', context)
+
 
 def add_class_schedule(request):
     form = ClassScheduleForm(request.POST or None)
@@ -548,9 +540,9 @@ def manage_payment_record(request):
     return render(request, "hod_template/manage_payment_record.html", context)
 
 def manage_learning_record(request):
-    learning = LearningRecord.objects.all()
+    learningrecords = LearningRecord.objects.all()
     context = {
-        'learning': learning,
+        'learningrecords': learningrecords,
         'page_title': _('Manage Learning Records')
     }
     return render(request, "hod_template/manage_learning_record.html", context)
@@ -838,9 +830,7 @@ def edit_student(request, student_id):
             cleaned_data = form.cleaned_data
             full_name = cleaned_data.get('full_name')
             phone_number = cleaned_data.get('phone_number')
-            # institution = cleaned_data.get('institution')
             address = cleaned_data.get('address')
-            # email = cleaned_data.get('email')
             gender = cleaned_data.get('gender')
             password = cleaned_data.get('password') or None
             status = cleaned_data.get('status')
@@ -866,11 +856,7 @@ def edit_student(request, student_id):
                 user.remark = remark
 
                 student.status = status
-                # student.course = course
-                # student.institution = institution
-                # student.campus = campus
-                # student.grade = grade
-            
+           
                 user.save()
                 student.save()
 
@@ -989,9 +975,9 @@ def edit_campus(request, campus_id):
 
     return render(request, 'hod_template/edit_campus_template.html', context)
 
-def edit_learn(request, learn_id):
-    instance = get_object_or_404(LearningRecord, id=learn_id)
-    form = LearningRecordForm(request.POST or None, instance=instance)
+def edit_learning_record(request, learn_id):
+    learningrecord = get_object_or_404(LearningRecord, id=learn_id)
+    form = LearningRecordForm(request.POST or None, instance=learningrecord)
     context = {
         'form': form,
         'learn_id': learn_id,
@@ -1001,36 +987,33 @@ def edit_learn(request, learn_id):
         if form.is_valid():
             date = form.cleaned_data.get('date')
             student = form.cleaned_data.get('student')
-            # institution = form.cleaned_data.get('institution')
-            campus = form.cleaned_data.get('campus')
             course = form.cleaned_data.get('course')
             teacher = form.cleaned_data.get('teacher')
-            starting_time = form.cleaned_data.get('starting_time')
-            end_time = form.cleaned_data.get('end_time')
-            class_name = form.cleaned_data.get('class_name')
+            lesson_hours = form.cleaned_data.get('lesson_hours')
             remark = form.cleaned_data.get('remark')
             
             try:
+                learningrecord.date = date
+                learningrecord.student = student
+                learningrecord.course = course
+                learningrecord.teacher = teacher
+                learningrecord.lesson_hours = lesson_hours
                 
-                learn = LearningRecord.objects.get(id=learn_id)
-                learn.date = date
-                learn.student = student
-                # learn.institution = institution
-                learn.campus = campus
-                learn.course = course
-                learn.teacher = teacher
-                learn.starting_time = starting_time
-                learn.end_time = end_time
-                learn.class_name = class_name
-                learn.remark= remark
-                learn.save()
+                # Get the remark from the associated student
+                remark = student.admin.remark if student and student.admin else None
+                learningrecord.remark = remark
+                
+                learningrecord.save()
+              
                 messages.success(request, "Successfully Updated")
-                return redirect(reverse('edit_learn', args=[learn_id]))
+                return redirect(reverse('edit_learning_record', args=[learn_id]))
             except Exception as e:
-                messages.error(request, "Could Not Add " + str(e))
+                messages.error(request, "Could Not Update: " + str(e))
         else:
             messages.error(request, "Fill Form Properly")
     return render(request, 'hod_template/edit_learning_record_template.html', context)
+
+
 
 def edit_class_schedule(request, schedule_id):
     instance = get_object_or_404(ClassSchedule, id=schedule_id)

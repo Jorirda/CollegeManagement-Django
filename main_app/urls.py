@@ -80,7 +80,7 @@ urlpatterns = [
     path("subject/edit/<int:subject_id>",hod_views.edit_subject, name='edit_subject'),
     # path("institution/edit/<int:institution_id>", hod_views.edit_institution, name='edit_institution'),
     path("campus/edit/<int:campus_id>",hod_views.edit_campus, name='edit_campus'),
-    path("learn/edit/<int:learn_id>",hod_views.edit_learn, name='edit_learn'),
+    path("learn/edit/<int:learn_id>",hod_views.edit_learning_record, name='edit_learn'),
     path("schedule/edit/<int:schedule_id>",hod_views.edit_class_schedule, name='edit_class_schedule'),
    
 

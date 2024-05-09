@@ -4,8 +4,9 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.db import IntegrityError, models
 from django.contrib.auth.models import AbstractUser
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from django.utils.translation import gettext_lazy as _
+
 
 
 class CustomUserManager(UserManager):
@@ -97,7 +98,6 @@ class Student(models.Model):
     # institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='student_institutions')
     campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
-    # session = models.ForeignKey(Session, on_delete=models.DO_NOTHING, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
     reg_date = models.DateField(blank=True, null=True)
     status = models.CharField(max_length=30, blank=True) 
@@ -220,17 +220,16 @@ class PaymentRecord(models.Model):
 
 #Learning Record
 class LearningRecord(models.Model):
+    admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
     date = models.DateField()
-    student = models.ForeignKey(Student, null=True,on_delete=models.DO_NOTHING)
-    # institution = models.ForeignKey(Institution, on_delete=models.CASCADE, null=True)
-    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)    
-    course = models.ForeignKey(Course,null=True, on_delete=models.CASCADE)
-    teacher = models.ForeignKey(Teacher,null=True, on_delete=models.CASCADE)
-    starting_time = models.TimeField(null=True,)
-    end_time = models.TimeField(null=True,)
-    class_name = models.CharField(max_length=100, null=True,)
-    remark = models.TextField(null=True,)
-
+    student = models.ForeignKey(Student, null=True, on_delete=models.DO_NOTHING)    
+    course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(Teacher, null=True, on_delete=models.CASCADE)
+    start_time = models.TimeField(null=True)
+    end_time = models.TimeField(null=True)
+    lesson_hours = models.TextField(default="")
+    
+    
 #Class Schedule
 class ClassSchedule(models.Model):
     course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)

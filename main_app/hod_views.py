@@ -620,43 +620,14 @@ def manage_student_query(request):
                     'instructor': student_query.learning_records.teacher,
                     'start_time': student_query.learning_records.start_time,
                     'end_time': student_query.learning_records.end_time,
+                    'paid': student_query.payment_records.amount_paid,
+                    'lesson_hours': student_query.learning_records.lesson_hours,
                     # 'class': student_query.learning_records.class_name,
                 }
                 # Append student query information to the list
                 student_query_info.append(student_info)
 
-    else:
-        # If no student is selected, retrieve all student queries
-        # Iterate over each student query
-        for student_query in StudentQuery.objects.all():
-            # Check if the student_query has an associated payment_records object
-            if student_query.payment_records:
-                # Get related student information
-                student_info = {
-                    'student_name': student_query.admin.get_full_name(),
-                    'gender': student_query.admin.gender,
-                    'date_of_birth': student_query.student_records.date_of_birth,
-                    'phone_number': student_query.student_records.admin.phone_number,
-                    # 'institution': student_query.student_records.institution,
-                    'campus': student_query.student_records.campus,
-                    'grade': student_query.student_records.grade,
-                    'state': student_query.student_records.status,
-                    'payment_status': student_query.payment_records.status,
-                    'refunded': student_query.refund,
-                    'reg_date': student_query.student_records.reg_date,
-                    'num_of_classes': student_query.num_of_classes,
-                    'registered_courses': student_query.registered_courses,
-                    'completed_hours': student_query.completed_hours,
-                    'remaining_hours': student_query.remaining_hours,
-                    'date': student_query.learning_records.date,
-                    'course': student_query.learning_records.course,
-                    'instructor': student_query.learning_records.teacher,
-                    'start_time': student_query.learning_records.start_time,
-                    'end_time': student_query.learning_records.end_time,
-                    # 'class': student_query.learning_records.class_name,
-                }
-                # Append student query information to the list
-                student_query_info.append(student_info)
+
 
     # Prepare the context to pass to the template
     context = {

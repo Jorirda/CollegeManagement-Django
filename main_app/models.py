@@ -101,12 +101,12 @@ class Student(models.Model):
     date_of_birth = models.DateField(blank=True, null=True)
     reg_date = models.DateField(blank=True, null=True)
     status = models.CharField(max_length=30, blank=True) 
-    # grade = models.CharField(max_length=10, blank=True, null=True)  
+    grade = models.CharField(max_length=10, blank=True, null=True)  
 
     def __str__(self):
         return self.admin.full_name
 
-class Teacher(models.Model):  
+class Teacher(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     # institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='teacher_institutions')
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)

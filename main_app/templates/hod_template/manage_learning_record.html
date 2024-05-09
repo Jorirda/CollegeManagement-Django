@@ -16,7 +16,26 @@
                             <img src="/media/pencil.png" alt="Teacher Image" class="rounded-circle mr-3" style="width: 50px; height: 50px;">
                             <h3 class="card-title">{% trans "Student's Learning Record" %}</h3>
                         </div>
-                    </div>         
+                        <div class="ml-auto">
+                            <form method="get" action="{% url 'manage_learning_record' %}" class="form-inline">
+                                {% comment %} <select name="grade" class="form-control">
+                                    <option value="" {% if not request.GET.grade %}selected{% endif %}>Select Grade</option>
+                                    {% for grade in grades %}
+                                    <option value="{{ grade }}" {% if request.GET.grade == grade %}selected{% endif %}>{{ grade }}</option>
+                                    {% endfor %}
+                                </select> {% endcomment %}
+                                <select name="teacher_name" class="form-control">
+                                    <option value="" {% if not request.GET.teacher_name %}selected{% endif %}>Select Teacher</option>
+                                    {% for teacher in teachers %}
+                                    <option value="{{ teacher.admin.id }}" {% if request.GET.teacher_name == teacher.admin.id %}selected{% endif %}>
+                                        {{ teacher.admin.full_name }}  <!-- Adjust if different -->
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn-success ml-2">Filter</button>
+                            </form>
+                        </div>
+                    </div>
                     <!-- /.card-header -->
                     <div class="card-body">
 

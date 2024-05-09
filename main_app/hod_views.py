@@ -29,6 +29,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from datetime import datetime, timedelta
 
 
+
 class SidebarView(TemplateView):
     template_name = 'main_app/sidebar_template.html'
 
@@ -540,12 +541,35 @@ def manage_payment_record(request):
     return render(request, "hod_template/manage_payment_record.html", context)
 
 def manage_learning_record(request):
+    # Retrieve all distinct teachers
+    teachers = Teacher.objects.select_related('admin').all().distinct()
+
+    # Retrieve distinct grades from students associated with learning records
+    grades = LearningRecord.objects.order_by('student__grade').values_list('student__grade', flat=True).distinct()
+
+    # Get the selected teacher and grade from the form submission
+    selected_teacher_id = request.GET.get('teacher_name', None)
+    selected_grade = request.GET.get('grade', None)
+
+    # Initialize learning records list
     learningrecords = LearningRecord.objects.all()
+
+    # Apply filters if selections are made
+    if selected_teacher_id:
+        learningrecords = learningrecords.filter(teacher__admin__id=selected_teacher_id)  # Adjusted for correct field
+    if selected_grade:
+        learningrecords = learningrecords.filter(student__grade=selected_grade)
+
+    # Prepare the context to pass to the template
     context = {
+        'teachers': teachers,
+        'grades': list(grades),
         'learningrecords': learningrecords,
-        'page_title': _('Manage Learning Records')
+        'page_title': _('Manage Learning Record')
     }
-    return render(request, "hod_template/manage_learning_record.html", context)
+
+    # Render the template with the context
+    return render(request, 'hod_template/manage_learning_record.html', context)
 
 def manage_class_schedule(request):
     class_schedules = ClassSchedule.objects.all()
@@ -615,7 +639,7 @@ def manage_student_query(request):
                     'phone_number': student_query.student_records.admin.phone_number,
                     # 'institution': student_query.student_records.institution,
                     'campus': student_query.student_records.campus,
-                    # 'grade': student_query.student_records.grade,
+                    'grade': student_query.student_records.grade,
                     'state': student_query.student_records.status,
                     'payment_status': student_query.payment_records.status,
                     'refunded': student_query.refund,

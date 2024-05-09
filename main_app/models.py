@@ -229,7 +229,7 @@ class LearningRecord(models.Model):
     end_time = models.TimeField(null=True)
     lesson_hours = models.TextField(default="")
     
-    
+
 #Class Schedule
 class ClassSchedule(models.Model):
     course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)
@@ -358,19 +358,19 @@ def create_or_update_teacher_query(sender, instance, created, **kwargs):
         # Calculate class duration for learning records
         total_class_duration = timedelta()  # Initialize total class duration as timedelta object
         for record in related_learning_records:
-            class_duration = datetime.combine(datetime.today(), record.end_time) - datetime.combine(datetime.today(), record.starting_time)
+            class_duration = datetime.combine(datetime.today(), record.end_time) - datetime.combine(datetime.today(), record.start_time)
             total_class_duration += class_duration
 
         # Count the number of courses and subjects
         # num_of_courses = teacher.learningrecord_set.values('course').distinct().count()
-        num_of_subjects = teacher.learningrecord_set.values('class_name').distinct().count()
+        # num_of_subjects = teacher.learningrecord_set.values('class_name').distinct().count()
 
         # Update the fields in TeacherQuery instance
-        teacher_query.num_of_classes = num_of_subjects
+        # teacher_query.num_of_classes = num_of_subjects
 
         # Update the completed hours and remaining hours fields in TeacherQuery
         teacher_query.completed_hours = total_class_duration.total_seconds() // 3600  # Convert seconds to hours
-        teacher_query.remaining_hours = (num_of_subjects * 2) - teacher_query.completed_hours  # Assuming each class is 30 hours
+        # teacher_query.remaining_hours = (num_of_subjects * 2) - teacher_query.completed_hours  # Assuming each class is 30 hours
 
         # Save the updated StudentQuery instance
         teacher_query.save()

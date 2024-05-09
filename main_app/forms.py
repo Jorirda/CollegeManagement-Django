@@ -215,21 +215,21 @@ class LearningRecordForm(FormSettings):
     student = forms.ModelChoiceField(queryset=Student.objects.all(), required=False, label=_("Name"))
     course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, label=_("Course"))
     teacher = forms.ModelChoiceField(queryset=Teacher.objects.all(), required=False, label=_("Teacher"))
-    lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"))
-    remark = forms.CharField(required=False, label=_('Remark'), disabled=True)
+    lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"), disabled=True)
 
     def __init__(self, *args, **kwargs):
         super(LearningRecordForm, self).__init__(*args, **kwargs)
 
         # Reorder fields as requested
-        field_order = [_('student'), _('course'), _('teacher'), _('date'), _('start_time'), _('end_time'), _('lesson_hours'), _('remark')]
+        field_order = [_('student'), _('course'), _('teacher'), _('date'), _('start_time'), _('end_time'), _('lesson_hours')]
 
         # Set the field order
         self.fields = {k: self.fields[k] for k in field_order}
 
     class Meta:
         model = LearningRecord
-        fields = [_('date'), _('start_time'), _('end_time'), _('student'), _('course'), _('teacher'), _('lesson_hours'), _('remark')]
+        fields = [_('date'), _('start_time'), _('end_time'), _('student'), _('course'), _('teacher'), _('lesson_hours')]
+
 
 class ClassScheduleForm(FormSettings):
     lesson_unit_price = forms.DecimalField(widget=TextInput(attrs={'placeholder': _('¥')}), label=_('Lesson Unit Price'))

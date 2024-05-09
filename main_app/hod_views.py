@@ -26,6 +26,7 @@ from .forms import ExcelUploadForm
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from datetime import datetime, timedelta
 
 
 class SidebarView(TemplateView):
@@ -433,7 +434,6 @@ def add_learning_record(request):
 
     return render(request, 'hod_template/add_learning_record_template.html', context)
 
-
 def add_class_schedule(request):
     form = ClassScheduleForm(request.POST or None)
     context = {
@@ -579,12 +579,11 @@ def manage_student_query(request):
                     'student_name': student_query.admin.get_full_name(),
                     'gender': student_query.admin.gender,
                     'date_of_birth': student_query.student_records.date_of_birth,
-                    'home_number': student_query.student_records.admin.home_number,
-                    'cell_number': student_query.student_records.admin.cell_number,
+                    'phone_number': student_query.student_records.admin.phone_number,
                     # 'institution': student_query.student_records.institution,
                     'campus': student_query.student_records.campus,
-                    'grade': student_query.student_records.grade,
-                    'state': student_query.student_records.state,
+                    # 'grade': student_query.student_records.grade,
+                    'state': student_query.student_records.status,
                     'payment_status': student_query.payment_records.status,
                     'refunded': student_query.refund,
                     'reg_date': student_query.student_records.reg_date,
@@ -595,9 +594,9 @@ def manage_student_query(request):
                     'date': student_query.learning_records.date,
                     'course': student_query.learning_records.course,
                     'instructor': student_query.learning_records.teacher,
-                    'start_time': student_query.learning_records.starting_time,
+                    'start_time': student_query.learning_records.start_time,
                     'end_time': student_query.learning_records.end_time,
-                    'class': student_query.learning_records.class_name,
+                    # 'class': student_query.learning_records.class_name,
                 }
                 # Append student query information to the list
                 student_query_info.append(student_info)
@@ -613,12 +612,11 @@ def manage_student_query(request):
                     'student_name': student_query.admin.get_full_name(),
                     'gender': student_query.admin.gender,
                     'date_of_birth': student_query.student_records.date_of_birth,
-                    'home_number': student_query.student_records.admin.home_number,
-                    'cell_number': student_query.student_records.admin.cell_number,
+                    'phone_number': student_query.student_records.admin.phone_number,
                     # 'institution': student_query.student_records.institution,
                     'campus': student_query.student_records.campus,
-                    'grade': student_query.student_records.grade,
-                    'state': student_query.student_records.state,
+                    # 'grade': student_query.student_records.grade,
+                    'state': student_query.student_records.status,
                     'payment_status': student_query.payment_records.status,
                     'refunded': student_query.refund,
                     'reg_date': student_query.student_records.reg_date,
@@ -629,9 +627,9 @@ def manage_student_query(request):
                     'date': student_query.learning_records.date,
                     'course': student_query.learning_records.course,
                     'instructor': student_query.learning_records.teacher,
-                    'start_time': student_query.learning_records.starting_time,
+                    'start_time': student_query.learning_records.start_time,
                     'end_time': student_query.learning_records.end_time,
-                    'class': student_query.learning_records.class_name,
+                    # 'class': student_query.learning_records.class_name,
                 }
                 # Append student query information to the list
                 student_query_info.append(student_info)
@@ -667,8 +665,9 @@ def manage_teacher_query(request):
             teacher_info = {
                 'teacher_name': teacher_query.admin.get_full_name(),
                 'gender': teacher_query.admin.gender,
-                'home_number': teacher_query.teacher_records.admin.home_number,
-                'cell_number': teacher_query.teacher_records.admin.cell_number,
+                'phone_number': teacher_query.teacher_records.admin.phone_number,
+                # 'home_number': teacher_query.teacher_records.admin.home_number,
+                # 'cell_number': teacher_query.teacher_records.admin.cell_number,
                 # 'institution': teacher_query.teacher_records.institution,
                 'campus': teacher_query.teacher_records.campus,
                 'address': teacher_query.teacher_records.admin.address,
@@ -679,9 +678,9 @@ def manage_teacher_query(request):
                 'date': teacher_query.learning_records.date if teacher_query.learning_records else None,
                 'course': teacher_query.learning_records.course if teacher_query.learning_records else None,
                 'instructor': teacher_query.learning_records.teacher if teacher_query.learning_records else None,
-                'start_time': teacher_query.learning_records.starting_time if teacher_query.learning_records else None,
+                'start_time': teacher_query.learning_records.start_time if teacher_query.learning_records else None,
                 'end_time': teacher_query.learning_records.end_time if teacher_query.learning_records else None,
-                'class': teacher_query.learning_records.class_name if teacher_query.learning_records else None,
+                # 'class': teacher_query.learning_records.class_name if teacher_query.learning_records else None,
             }
             # Append teacher query information to the list
             teacher_query_info.append(teacher_info)
@@ -693,8 +692,9 @@ def manage_teacher_query(request):
             teacher_info = {
                 'teacher_name': teacher_query.admin.get_full_name(),
                 'gender': teacher_query.admin.gender,
-                'home_number': teacher_query.teacher_records.admin.home_number,
-                'cell_number': teacher_query.teacher_records.admin.cell_number,
+                'phone_number': teacher_query.teacher_records.admin.phone_number,
+                # 'home_number': teacher_query.teacher_records.admin.home_number,
+                # 'cell_number': teacher_query.teacher_records.admin.cell_number,
                 # 'institution': teacher_query.teacher_records.institution,
                 'campus': teacher_query.teacher_records.campus,
                 'address': teacher_query.teacher_records.admin.address,
@@ -705,9 +705,9 @@ def manage_teacher_query(request):
                 'date': teacher_query.learning_records.date if teacher_query.learning_records else None,
                 'course': teacher_query.learning_records.course if teacher_query.learning_records else None,
                 'instructor': teacher_query.learning_records.teacher if teacher_query.learning_records else None,
-                'start_time': teacher_query.learning_records.starting_time if teacher_query.learning_records else None,
+                'start_time': teacher_query.learning_records.start_time if teacher_query.learning_records else None,
                 'end_time': teacher_query.learning_records.end_time if teacher_query.learning_records else None,
-                'class': teacher_query.learning_records.class_name if teacher_query.learning_records else None,
+                # 'class': teacher_query.learning_records.class_name if teacher_query.learning_records else None,
             }
             # Append teacher query information to the list
             teacher_query_info.append(teacher_info)
@@ -989,14 +989,19 @@ def edit_learning_record(request, learn_id):
             student = form.cleaned_data.get('student')
             course = form.cleaned_data.get('course')
             teacher = form.cleaned_data.get('teacher')
-            lesson_hours = form.cleaned_data.get('lesson_hours')
-            remark = form.cleaned_data.get('remark')
+            start_time = form.cleaned_data.get('start_time')
+            end_time = form.cleaned_data.get('end_time')
+
+            # Calculate lesson hours
+            lesson_hours = calculate_lesson_hours(start_time, end_time)
             
             try:
                 learningrecord.date = date
                 learningrecord.student = student
                 learningrecord.course = course
                 learningrecord.teacher = teacher
+                learningrecord.start_time = start_time
+                learningrecord.end_time = end_time
                 learningrecord.lesson_hours = lesson_hours
                 
                 # Get the remark from the associated student
@@ -1012,6 +1017,30 @@ def edit_learning_record(request, learn_id):
         else:
             messages.error(request, "Fill Form Properly")
     return render(request, 'hod_template/edit_learning_record_template.html', context)
+
+# def calculate_lesson_hours(start_time, end_time):
+#     start = datetime.strptime(start_time.strftime('%H:%M:%S'), '%H:%M:%S')
+#     end = datetime.strptime(end_time.strftime('%H:%M:%S'), '%H:%M:%S')
+#     delta = end - start
+#     hours, remainder = divmod(delta.total_seconds(), 3600)
+#     minutes, _ = divmod(remainder, 60)
+#     return "{:02}:{:02}".format(int(hours), int(minutes))
+
+def calculate_lesson_hours(start_time, end_time):
+    start = datetime.strptime(start_time.strftime('%H:%M:%S'), '%H:%M:%S')
+    end = datetime.strptime(end_time.strftime('%H:%M:%S'), '%H:%M:%S')
+    if start_time >= end_time:
+        raise ValueError("End time must be after start time.")
+    delta = end - start
+    hours, remainder = divmod(delta.total_seconds(), 3600)
+    minutes, _ = divmod(remainder, 60)
+    
+    if int(minutes) == 0:
+        return f"{int(hours)}h"
+    else:
+        return f"{int(hours)}h {int(minutes)}m"
+    
+
 
 
 

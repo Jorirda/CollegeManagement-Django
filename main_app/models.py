@@ -113,6 +113,7 @@ class Classes(models.Model):
 
     def __str__(self):
         return self.name
+    
 class LearningRecord(models.Model):
     admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
     date = models.DateField()

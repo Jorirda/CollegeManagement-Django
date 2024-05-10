@@ -76,15 +76,12 @@ class Admin(models.Model):
 
 class Course(models.Model):
     name = models.CharField(max_length=120)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
 
 class Student(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    # institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='student_institutions')
     campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     date_of_birth = models.DateField(blank=True, null=True)
@@ -97,7 +94,6 @@ class Student(models.Model):
 
 class Teacher(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    # institution = models.ForeignKey(Institution, on_delete=models.DO_NOTHING, null=True, blank=False, related_name='teacher_institutions')
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
     work_type = models.CharField(max_length=30, blank=True)  # Special/Temporary
@@ -105,90 +101,73 @@ class Teacher(models.Model):
     def __str__(self):
         return self.admin.full_name
 
+#Learning Record
+
 class Classes(models.Model):
     name = models.CharField(max_length=120)
     teacher = models.ForeignKey(Teacher,on_delete=models.CASCADE,)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    updated_at = models.DateTimeField(auto_now=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    start_time = models.TimeField(null=True)
+    end_time = models.TimeField(null=True)
+    lesson_hours = models.TextField(default="")
 
     def __str__(self):
         return self.name
-    
-class Attendance(models.Model):
-    session = models.ForeignKey(Session, on_delete=models.DO_NOTHING)
-    classes = models.ForeignKey(Classes, on_delete=models.DO_NOTHING)
-    date = models.DateField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-class AttendanceReport(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.DO_NOTHING)
-    attendance = models.ForeignKey(Attendance, on_delete=models.CASCADE)
-    status = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-class LeaveReportStudent(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    date = models.CharField(max_length=60)
-    message = models.TextField()
-    status = models.SmallIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-class LeaveReportTeacher(models.Model):
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    date = models.CharField(max_length=60)
-    message = models.TextField()
-    status = models.SmallIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-class FeedbackStudent(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    feedback = models.TextField()
-    reply = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-class FeedbackTeacher(models.Model):
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    feedback = models.TextField()
-    reply = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-class NotificationTeacher(models.Model):
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    message = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-class NotificationStudent(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    message = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-class StudentResult(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    classes = models.ForeignKey(Classes, on_delete=models.CASCADE)
-    test = models.FloatField(default=0)
-    exam = models.FloatField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-#Learning Record
 class LearningRecord(models.Model):
     admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
     date = models.DateField()
     student = models.ForeignKey(Student, null=True, on_delete=models.DO_NOTHING)    
     course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Teacher, null=True, on_delete=models.CASCADE)
-    start_time = models.TimeField(null=True)
-    end_time = models.TimeField(null=True)
-    lesson_hours = models.TextField(default="")
+    classes = models.ForeignKey(Classes, null=True, on_delete=models.CASCADE)
+
+class Attendance(models.Model):
+    session = models.ForeignKey(Session, on_delete=models.DO_NOTHING)
+    classes = models.ForeignKey(Classes, on_delete=models.DO_NOTHING)
+    date = models.DateField()
+
+class AttendanceReport(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.DO_NOTHING)
+    attendance = models.ForeignKey(Attendance, on_delete=models.CASCADE)
+    status = models.BooleanField(default=False)
+
+class LeaveReportStudent(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    date = models.CharField(max_length=60)
+    message = models.TextField()
+    status = models.SmallIntegerField(default=0)
+
+class LeaveReportTeacher(models.Model):
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    date = models.CharField(max_length=60)
+    message = models.TextField()
+    status = models.SmallIntegerField(default=0)
+
+class FeedbackStudent(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    feedback = models.TextField()
+    reply = models.TextField()
+
+class FeedbackTeacher(models.Model):
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    feedback = models.TextField()
+    reply = models.TextField()
+
+class NotificationTeacher(models.Model):
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    message = models.TextField()
+
+class NotificationStudent(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    message = models.TextField()
+
+
+class StudentResult(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    classes = models.ForeignKey(Classes, on_delete=models.CASCADE)
+    test = models.FloatField(default=0)
+    exam = models.FloatField(default=0)
+
 
 #Payment Record
 class PaymentRecord(models.Model):
@@ -211,9 +190,9 @@ class PaymentRecord(models.Model):
         related_name='payment_record', 
         on_delete=models.SET_NULL
     )
-class LessonHours(models.Model):
-    learning_record = models.ForeignKey(LearningRecord, on_delete=models.CASCADE)
-    hours = models.DecimalField(max_digits=10, decimal_places=2)
+# class LessonHours(models.Model):
+#     learning_record = models.ForeignKey(LearningRecord, on_delete=models.CASCADE)
+#     hours = models.DecimalField(max_digits=10, decimal_places=2)
 
     
 #Refund page

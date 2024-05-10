@@ -66,9 +66,9 @@ def refund_records(request):
                 'total_hours' : "student_query.learning_records.total_hours",  # Assuming there's a field for total hours
                 'hours_spent': student_query.completed_hours,
                 'hours_remaining': student_query.remaining_hours,
-                'lesson_price': "student_query.learning_records.lesson_price",  # Assuming there's a field for lesson price
-                'refund_remainder': calculate_refund_remainder(student_query),  # Assuming a function to calculate
-                'amount_refunded': "student_query.payment_records.amount_refunded",  # Assuming this field exists
+                'lesson_price': student_query.payment_records.lesson_unit_price,  # Assuming there's a field for lesson price
+                'refund_amount': "?",  # Assuming a function to calculate
+                'amount_refunded': student_query.payment_records.amount_paid,  # Assuming this field exists
                 'refund_reason': "student_query.refund_reason",  # Assuming this field exists
             }
             # Append student query information to the list
@@ -81,9 +81,6 @@ def refund_records(request):
 
     return render(request, 'hod_template/refund_records.html', context)
 
-def calculate_refund_remainder(student_query):
-    # Placeholder for your refund calculation logic
-    return 0  # Placeholder return value
 
 def get_upload(request):
     if request.method == 'POST':

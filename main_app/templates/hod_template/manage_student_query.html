@@ -5,8 +5,8 @@
 {% block page_title %}
   {{ page_title }}
 {% endblock page_title %}
-
 {% block content %}
+
 <section class="content">
   <div class="container-fluid">
     <div class="row">
@@ -17,12 +17,12 @@
               <div class="form-group d-flex align-items-center mb-0">
                 <label for="student_selector" class="mr-3">{% trans "Select Student:" %}</label>
                 <select id="student_selector" name="student_id" class="form-control mr-3">
-                  <option value="">{% trans "All Students" %}</option>
+                  <option value="">{% trans "Select a Student" %}</option>
                   {% for student in students %}
                     <option value="{{ student.id }}">{{ student.first_name }} {{ student.last_name }}</option>
                   {% endfor %}
                 </select>
-                <button type="submit" class="btn btn-primary">{% trans "Search" %}</button>
+                <button type="submit" class="btn btn-success">{% trans "Search" %}</button>
               </div>
             </form>
           </div>
@@ -33,112 +33,90 @@
       <div class="col-md-12">
         <div class="card">
           <div class="card-body">
-            <!-- First Table -->
-            <table class="table table-bordered table-hover">
-              <thead class="thead-dark">
-                <tr>
-                  <th>{% trans "Name" %}</th>
-                  <th>{% trans "Gender" %}</th>
-                  <th>{% trans "Date of Birth" %}</th>
-                  <th>{% trans "Phone Number" %}</th>
-                  <th>{% trans "Campus" %}</th>
-                  <th>{% trans "Grade" %}</th>
-                </tr>
-              </thead>
+            <table class="table table-bordered">
               <tbody>
                 {% for query in student_query_info %}
                   <tr>
+                    <th style="width: 22.3%;" class="table-dark">{% trans "Student Name" %}</th>
                     <td>{{ query.student_name }}</td>
-                    <td>{{ query.gender }}</td>
-                    <td>{{ query.date_of_birth }}</td>
-                    <td>{{ query.phone_number }}</td>
-                    <td>{{ query.campus }}</td>
-                    <td>{{ query.grade }}</td>
                   </tr>
-                {% endfor %}
+
               </tbody>
             </table>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <!-- Second Table -->
-            <table class="table table-bordered table-hover">
-              <thead class="thead-dark">
-                <tr>
-                  <th>{% trans "State" %}</th>
-                  <th>{% trans "Payment Status" %}</th>
-                  <th>{% trans "Refunded" %}</th>
-                  <th>{% trans "Registration Date" %}</th>
-                  <th>{% trans "Number of Classes" %}</th>
-                  <th>{% trans "Registered Courses" %}</th>
-                  <th>{% trans "Completed Hours" %}</th>
-                  <th>{% trans "Paid Class Hours" %}</th>
-                  <th>{% trans "Remaining Hours" %}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for query in student_query_info %}
-                  <tr>
-                    <td>{{ query.state }}</td>
-                    <td>{{ query.payment_status }}</td>
-                    <td>{{ query.refunded }}</td>
-                    <td>{{ query.reg_date }}</td>
-                    <td>{{ query.num_of_classes }}</td>
-                    <td>{{ query.registered_courses }}</td>
-                    <td>{{ query.completed_hours }}</td>
-                    <td>{{ query.paid_class_hours }}</td>
-                    <td>{{ query.remaining_hours }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <!-- Third Table -->
-            <table class="table table-bordered table-hover">
-              <thead class="thead-dark">
-                <tr>
-                  <th>{% trans "Date" %}</th>
-                  <th>{% trans "Campus" %}</th>
-                  <th>{% trans "Grade" %}</th>
-                  <th>{% trans "Course" %}</th>
-                  <th>{% trans "Instructor" %}</th>
-                  <th>{% trans "Start Time" %}</th>
-                  <th>{% trans "End Time" %}</th>
-                  <!-- <th>{% trans "Class" %}</th> -->
-                </tr>
-              </thead>
-              <tbody>
-                {% for query in student_query_info %}
-                  <tr>
-                    <td>{{ query.date }}</td>
-                    <td>{{ query.campus }}</td>
-                    <td>{{ query.grade }}</td>
-                    <td>{{ query.course }}</td>
-                    <td>{{ query.instructor }}</td>
-                    <td>{{ query.start_time }}</td>
-                    <td>{{ query.end_time }}</td>
-                    <!-- <td>{{ query.class }}</td> -->
-                  </tr>
-                {% endfor %}
-              </tbody>
+            <!-- Details Table -->
+            <table class="table table-bordered table-hover table-sm">
+              <tr>
+                <th class="table-dark">{% trans "Gender" %}</th>
+                <td>{{ query.gender }}</td>
+                <th class="table-dark">{% trans "Date of Birth" %}</th>
+                <td>{{ query.date_of_birth }}</td>
+                <th class="table-dark">{% trans "Contact Details" %}</th>
+                <td>{{ query.phone_number }}</td>
+              </tr>
+              <tr>
+                <th class="table-dark">{% trans "Status" %}</th>
+                <td>{{ query.state }}</td>
+                <th class="table-dark">{% trans "Total Amount Paid" %}</th>
+                <td>{{ query.paid }}</td>
+                <th class="table-dark">{% trans "Refund Status" %}</th>
+                <td>{{ query.refunded }}</td>
+              </tr>
+              <tr>
+                <th class="table-dark">{% trans "Enrolment Date" %}</th>
+                <td>{{ query.reg_date}}</td>
+                <th class="table-dark">{% trans "Number of Classes" %}</th>
+                <td>{{ query.num_of_classes }}</td>
+                <th class="table-dark">{% trans "Enrolled Course" %}</th>
+                <td>{{ query.course }}</td>
+              </tr>
+              <tr>
+                <th style="background-color: black; color: white">{% trans "Lesson Hours Completed" %}</th>
+                <td>{{ query.completed_hours }}</td>
+                <th class="table-dark">{% trans "Hours Paid for" %}</th>
+                <td>{{ query.paid_class_hours }}</td>
+                <th class="table-dark">{% trans "Hours Remaining" %}</th>
+                <td>{{ query.remaining_hours }}</td>
+              </tr>
             </table>
           </div>
         </div>
       </div>
     </div>
   </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <!-- Class Details Table -->
+          <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+              <tr>
+                <th>{% trans "Date" %}</th>
+                <th>{% trans "Course" %}</th>
+                <th>{% trans "Class Teacher" %}</th>
+                <th>{% trans "Starting Time" %}</th>
+                <th>{% trans "Ending Time" %}</th>
+                <th>{% trans "Lesson Hours" %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>{{ query.date }}</td>
+                  <td>{{ query.course }}</td>
+                  <td>{{ query.instructor }}</td>
+                  <td>{{ query.start_time }}</td>
+                  <td>{{ query.end_time }}</td>
+                  <td>{{ query.lesson_hours }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 </section>
 
 {% block custom_js %}

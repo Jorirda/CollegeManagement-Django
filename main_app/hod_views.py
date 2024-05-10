@@ -519,10 +519,10 @@ def manage_course(request):
     return render(request, "hod_template/manage_course.html", context)
 
 def manage_classes(request):
-    classess = Classes.objects.all()
+    classes = Classes.objects.all()
     context = {
-        'classess': classess,
-        'page_title': _('Manage Classess')
+        'classess': classes,
+        'page_title': _('Manage Classes')
     }
     return render(request, "hod_template/manage_classes.html", context)
 
@@ -992,6 +992,16 @@ def edit_payment_record(request, payment_id):
                 paymentrecord.remark = remark
 
                 paymentrecord.save()
+
+                # Check if lesson hours are retrieved properly
+                if paymentrecord.learning_record:
+                    lesson_hours = paymentrecord.calculate_lesson_hours()
+                    if lesson_hours is not None:
+                        messages.success(request, _("Lesson hours retrieved successfully"))
+                    else:
+                        messages.error(request, _("Lesson hours are called but not being shown"))
+                else:
+                    messages.error(request, _("Lesson hours are not being retrieved"))
 
                 messages.success(request, "Successfully Updated")
                 return redirect(reverse('edit_payment_record', args=[payment_id]))

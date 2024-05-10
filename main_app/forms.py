@@ -55,7 +55,6 @@ class CustomUserForm(FormSettings):
 class StudentForm(CustomUserForm):
     full_name = forms.CharField(required=True, label=_('Full Name'))
     gender = forms.ChoiceField(choices=[('男', _('Male')), ('女', _('Female'))], label=_('Gender'))
-    password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
     address = forms.CharField(widget=forms.Textarea, label=_('Address'))
     date_of_birth = forms.DateField(required=False, label=_("Date of Birth"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
     reg_date = forms.DateField(required=False, label=_("Registration Date"), widget=forms.DateInput(attrs={'type': 'date', 'class': 'hideable'}))
@@ -79,7 +78,7 @@ class StudentForm(CustomUserForm):
 
     class Meta:
         model = Student
-        fields = ['full_name', 'gender', 'password', 'date_of_birth', 'reg_date', 
+        fields = ['full_name', 'gender', 'date_of_birth', 'reg_date', 
                    'status', 'address', 'phone_number', 'remark'] 
 
 class AdminForm(FormSettings):
@@ -233,8 +232,6 @@ class PaymentRecordForm(FormSettings):
             _('discounted_price'), _('book_costs'), _('other_fee'), _('amount_due'), _('amount_paid'), 
             _('payment_method'), _('status'), _('payee'), _('remark'), _('lesson_hours')
         ]
-
-
 
 class ClassScheduleForm(FormSettings):
     lesson_unit_price = forms.DecimalField(widget=TextInput(attrs={'placeholder': _('¥')}), label=_('Lesson Unit Price'))

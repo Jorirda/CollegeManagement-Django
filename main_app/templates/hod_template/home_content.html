@@ -57,14 +57,14 @@
                 small box -->
                 <!-- <div class="small-box bg-danger">
                     <div class="inner">
-                        <h3>{{total_subject}}</h3>
+                        <h3>{{total_classes}}</h3>
 
-                        <p>{% trans "Total Subjects" %}</p>
+                        <p>{% trans "Total Classess" %}</p>
                     </div>
                     <div class="icon">
                       <i class="nav-icon fas fa-book"></i>
                     </div>
-                    <a href="{% url 'manage_subject' %}" class="small-box-footer">{% trans "More info" %} <i class="fas fa-arrow-circle-right"></i></a>
+                    <a href="{% url 'manage_classes' %}" class="small-box-footer">{% trans "More info" %} <i class="fas fa-arrow-circle-right"></i></a>
                 </div>
             </div> -->
             <!-- ./col -->
@@ -94,7 +94,7 @@
                 <div class="col-md-6">
                     <div class="card card-dark">
               <div class="card-header">
-                <h3 class="card-title">{% trans "Attendance Per Subject" %}</h3>
+                <h3 class="card-title">{% trans "Attendance Per Classes" %}</h3>
 
                 <div class="card-tools">
                   <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
@@ -168,7 +168,7 @@
             <!-- PIE CHART -->
             <div class="card card-dark">
               <div class="card-header">
-                <h3 class="card-title">{% trans "Total Students in Each Subject" %}</h3>
+                <h3 class="card-title">{% trans "Total Students in Each Classes" %}</h3>
 
                 <div class="card-tools">
                   <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
@@ -213,14 +213,14 @@
           options: pieOptions      
         });
 
-        var subject_list = {{ subject_list|safe|escape }};
+        var classes_list = {{ classes_list|safe|escape }};
         var attendance_list = {{ attendance_list }};
   
             var barChartData = {
-      labels  : subject_list,
+      labels  : classes_list,
       datasets: [
       {
-        label               : 'Attendance Per Subject',
+        label               : 'Attendance Per Classes',
         backgroundColor     : '#17A2B8',
         borderColor         : 'rgba(60,141,188,0.8)',
         pointRadius          : false,
@@ -259,14 +259,14 @@
         })
        
 
-      // Total Students in Each Subject
-      var student_count_list_in_subject = {{ student_count_list_in_subject }}
-      var subject_list = {{ subject_list|safe }}
+      // Total Students in Each Classes
+      var student_count_list_in_classes = {{ student_count_list_in_classes }}
+      var classes_list = {{ classes_list|safe }}
       var pieData3 = {
-        labels: subject_list,
+        labels: classes_list,
         datasets: [
           {
-            data: student_count_list_in_subject,
+            data: student_count_list_in_classes,
             backgroundColor : ['#8f251f', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#894e9c', '#0b523a', '#a1156d', '#9e4603'],
           }
         ]

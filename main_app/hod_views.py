@@ -28,8 +28,6 @@ from django.views.generic import TemplateView
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from datetime import datetime, timedelta
 
-
-
 class SidebarView(TemplateView):
     template_name = 'main_app/sidebar_template.html'
 
@@ -45,7 +43,6 @@ class SidebarView(TemplateView):
             context['first_name'] = 'Guest'
             context['last_name'] = ''
         return context
-
 
 def get_upload(request):
     if request.method == 'POST':
@@ -290,27 +287,6 @@ def add_subject(request):
 
     return render(request, 'hod_template/add_subject_template.html', context)
 
-# def add_institution(request):
-#     form = InstitutionForm(request.POST or None)
-#     context = {
-#         'form': form,
-#         'page_title':  _('Add Institution')
-#     }
-#     if request.method == 'POST':
-#         if form.is_valid():
-#             name = form.cleaned_data.get('name')
-#             try:
-#                 institution = Institution()
-#                 institution.name = name
-#                 institution.save()
-#                 messages.success(request, "Successfully Added")
-#                 return redirect(reverse('add_institution'))
-#             except:
-#                 messages.error(request, "Could Not Add")
-#         else:
-#             messages.error(request, "Could Not Add")
-#     return render(request, 'hod_template/add_institution_template.html', context)
-
 def add_campus(request):
     form = CampusForm(request.POST or None)
     context = {
@@ -342,38 +318,37 @@ def add_campus(request):
 
 def add_payment_record(request):
     form = PaymentRecordForm(request.POST or None)
-    
     context = {
         'form': form,
-        'page_title': _('Add Payment Record'),
-       
+        'page_title': _('Add Payment Record')
     }
-    
     if request.method == 'POST':
         if form.is_valid():
             date = form.cleaned_data.get('date')
             student = form.cleaned_data.get('student')
             course = form.cleaned_data.get('course')
+            learning = form.cleaned_data.get('learning')
             lesson_unit_price = form.cleaned_data.get('lesson_unit_price')
-            class_name = form.cleaned_data.get('class_name')
             discounted_price = form.cleaned_data.get('discounted_price')
             book_costs = form.cleaned_data.get('book_costs')
             other_fee = form.cleaned_data.get('other_fee')
-            amount_due =form.cleaned_data.get('amount_due')
+            amount_due = form.cleaned_data.get('amount_due')
             amount_paid = form.cleaned_data.get('amount_paid')
             payment_method = form.cleaned_data.get('payment_method')
             status = form.cleaned_data.get('status')
             payee = form.cleaned_data.get('payee')
             remark = form.cleaned_data.get('remark')
-            
-            
+
             try:
                 payment = PaymentRecord()
                 payment.date = date
                 payment.student = student
                 payment.course = course
+                payment.learning = form.cleaned_data.get('learning')
+                # Get lesson hours if learning record is provided
+                if payment.learning:
+                    payment.lesson_hours = payment.learning.lesson_hours
                 payment.lesson_unit_price = lesson_unit_price
-                payment.class_name = class_name
                 payment.discounted_price = discounted_price
                 payment.book_costs = book_costs
                 payment.other_fee = other_fee
@@ -382,16 +357,17 @@ def add_payment_record(request):
                 payment.payment_method = payment_method
                 payment.status = status
                 payment.payee = payee
-                payment.remark= remark
+                payment.remark = remark
                 payment.save()
+
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_payment_record'))
 
             except Exception as e:
-                messages.error(request, "Could Not Add " + str(e))
+                messages.error(request, "Could Not Add: " + str(e))
         else:
             messages.error(request, "Fill Form Properly")
-            
+
     return render(request, 'hod_template/add_payment_record_template.html', context)
 
 def add_learning_record(request):
@@ -409,10 +385,9 @@ def add_learning_record(request):
             start_time = form.cleaned_data.get('start_time')
             end_time = form.cleaned_data.get('end_time')
             lesson_hours = form.cleaned_data.get('lesson_hours')
-            
             # Get the remark from the associated student
             remark = student.admin.remark if student and student.admin else None
-                    
+            
             try:
                 learn = LearningRecord()
                 learn.date = date
@@ -513,14 +488,6 @@ def manage_subject(request):
     }
     return render(request, "hod_template/manage_subject.html", context)
 
-# def manage_institution(request):
-#     institutions = Institution.objects.all()
-#     context = {
-#         'institutions': institutions,
-#         'page_title':  _('Manage Institutions')
-#     }
-#     return render(request, "hod_template/manage_institution.html", context)
-
 def manage_campus(request):
     campuses = Campus.objects.all()
     context = {
@@ -531,14 +498,14 @@ def manage_campus(request):
 
 def manage_payment_record(request):
     payments = PaymentRecord.objects.all()
-
-    total_amount_paid = PaymentRecord.objects.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+    total_amount_paid = payments.aggregate(Sum('amount_paid'))['amount_paid__sum']
     context = {
         'payments': payments,
-        'page_title': _('Manage Payment Records'),
-        'total_amount_paid': total_amount_paid,
+        'total_amount_paid': total_amount_paid if total_amount_paid else 0,
+        'page_title': _('Manage Payment Records')
     }
-    return render(request, "hod_template/manage_payment_record.html", context)
+    return render(request, 'manage_payment_record.html', context)
+
 
 def manage_learning_record(request):
     # Retrieve all distinct teachers
@@ -945,29 +912,6 @@ def edit_subject(request, subject_id):
             messages.error(request, "Fill Form Properly")
     return render(request, 'hod_template/edit_subject_template.html', context)
 
-# def edit_institution(request, institution_id):
-#     instance = get_object_or_404(Institution, id=institution_id)
-#     form = InstitutionForm(request.POST or None, instance=instance)
-#     context = {
-#         'form': form,
-#         'institution_id': institution_id,
-#         'page_title': _('Edit Institution')
-#     }
-#     if request.method == 'POST':
-#         if form.is_valid():
-#             name = form.cleaned_data.get('name')
-#             try:
-#                 institution = Institution.objects.get(id=institution_id)
-#                 institution.name = name
-#                 institution.save()
-#                 messages.success(request, "Successfully Updated")
-#             except:
-#                 messages.error(request, "Could Not Update")
-#         else:
-#             messages.error(request, "Could Not Update")
-
-#     return render(request, 'hod_template/edit_institution_template.html', context)
-
 def edit_campus(request, campus_id):
     instance = get_object_or_404(Campus, id=campus_id)
     form = CampusForm(request.POST or None, instance=instance)
@@ -998,6 +942,61 @@ def edit_campus(request, campus_id):
             messages.error(request, "Fill Form Properly")
 
     return render(request, 'hod_template/edit_campus_template.html', context)
+
+def edit_payment_record(request, payment_id):
+    paymentrecord = get_object_or_404(PaymentRecord, id=payment_id)
+    form = PaymentRecordForm(request.POST or None, instance=paymentrecord)
+    context = {
+        'form': form,
+        'payment_id': payment_id,
+        'page_title': _('Edit Payment Record')
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            date = form.cleaned_data.get('date')
+            student = form.cleaned_data.get('student')
+            course = form.cleaned_data.get('course')
+            learning = form.cleaned_data.get('learning')
+            lesson_unit_price = form.cleaned_data.get('lesson_unit_price')
+            discounted_price = form.cleaned_data.get('discounted_price')
+            book_costs = form.cleaned_data.get('book_costs')
+            other_fee = form.cleaned_data.get('other_fee')
+            amount_due = form.cleaned_data.get('amount_due')
+            amount_paid = form.cleaned_data.get('amount_paid')
+            payment_method = form.cleaned_data.get('payment_method')
+            status = form.cleaned_data.get('status')
+            payee = form.cleaned_data.get('payee')
+            remark = form.cleaned_data.get('remark')
+
+            try:
+                paymentrecord.date = date
+                paymentrecord.student = student
+                paymentrecord.course = course
+                paymentrecord.learning = learning
+                paymentrecord.lesson_unit_price = lesson_unit_price
+                paymentrecord.discounted_price = discounted_price
+                paymentrecord.book_costs = book_costs
+                paymentrecord.other_fee = other_fee
+                paymentrecord.amount_due = amount_due
+                paymentrecord.amount_paid = amount_paid
+                paymentrecord.payment_method = payment_method
+                paymentrecord.status = status
+                paymentrecord.payee = payee
+                paymentrecord.remark = remark
+
+                # Get the lesson_hours from the associated learning
+                lesson_hours = learning.lesson_hours if learning and learning.lesson_hours else None
+                paymentrecord.lesson_hours = lesson_hours
+
+                paymentrecord.save()
+
+                messages.success(request, "Successfully Updated")
+                return redirect(reverse('edit_payment_record', args=[payment_id]))
+            except Exception as e:
+                messages.error(request, "Could Not Update: " + str(e))
+        else:
+            messages.error(request, "Fill Form Properly")
+    return render(request, 'hod_template/edit_payment_record_template.html', context)
 
 def edit_learning_record(request, learn_id):
     learningrecord = get_object_or_404(LearningRecord, id=learn_id)
@@ -1064,10 +1063,6 @@ def calculate_lesson_hours(start_time, end_time):
     else:
         return f"{int(hours)}h {int(minutes)}m"
     
-
-
-
-
 def edit_class_schedule(request, schedule_id):
     instance = get_object_or_404(ClassSchedule, id=schedule_id)
     form = ClassScheduleForm(request.POST or None, instance=instance)
@@ -1370,21 +1365,17 @@ def delete_subject(request, subject_id):
     messages.success(request, "Subject deleted successfully!")
     return redirect(reverse('manage_subject'))
 
-# def delete_institution(request, institution_id):
-#     institution = get_object_or_404(Institution, id=institution_id)
-#     try:
-#         institution.delete()
-#         messages.success(request, "Institution deleted successfully!")
-#     except Exception:
-#         messages.error(
-#             request, "Sorry, some records are associated with this institution. Kindly resolve them and try again.")
-#     return redirect(reverse('manage_institution'))   
-
 def delete_campus(request, campus_id):
     campus = get_object_or_404(Campus, id=campus_id)
     campus.delete()
     messages.success(request, "Campus deleted successfully!")
     return redirect(reverse('manage_campus'))
+
+def delete_payment_record(request, payment_id):
+    payment = get_object_or_404(PaymentRecord, id=payment_id)
+    payment.delete()
+    messages.success(request, "Record deleted Successfully!")
+    return redirect(reverse('manage_payment_record'))
 
 def delete_learning_record(request, learn_id):
     learn = get_object_or_404(LearningRecord, id=learn_id)

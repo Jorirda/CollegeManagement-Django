@@ -199,12 +199,23 @@ class StudentResult(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+#Learning Record
+class LearningRecord(models.Model):
+    admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
+    date = models.DateField()
+    student = models.ForeignKey(Student, null=True, on_delete=models.DO_NOTHING)    
+    course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(Teacher, null=True, on_delete=models.CASCADE)
+    start_time = models.TimeField(null=True)
+    end_time = models.TimeField(null=True)
+    lesson_hours = models.TextField(default="")
 
 #Payment Record
 class PaymentRecord(models.Model):
     date = models.DateField()
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    course = models.ForeignKey(Course,on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    learning = models.ForeignKey(LearningRecord, null=True, on_delete=models.CASCADE)
     lesson_unit_price = models.DecimalField(max_digits=10, decimal_places=2)
     class_name = models.CharField(max_length=100)
     discounted_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -216,18 +227,9 @@ class PaymentRecord(models.Model):
     status = models.CharField(max_length=100)
     payee = models.CharField(max_length=255)
     remark = models.TextField(default="")
-
-
-#Learning Record
-class LearningRecord(models.Model):
-    admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
-    date = models.DateField()
-    student = models.ForeignKey(Student, null=True, on_delete=models.DO_NOTHING)    
-    course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)
-    teacher = models.ForeignKey(Teacher, null=True, on_delete=models.CASCADE)
-    start_time = models.TimeField(null=True)
-    end_time = models.TimeField(null=True)
     lesson_hours = models.TextField(default="")
+
+    
     
 
 #Class Schedule

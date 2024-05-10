@@ -66,10 +66,9 @@ urlpatterns = [
     path("subject/manage/", hod_views.manage_subject, name='manage_subject'),
     # path("institution/manage/", hod_views.manage_institution, name='manage_institution'),
     path("campus/manage/", hod_views.manage_campus, name='manage_campus'),
-    path("payment/manage", hod_views.manage_payment_record, name='manage_payment_record'),
-    path("learn/manage", hod_views.manage_learning_record, name='manage_learning_record'),
-    path("schedule/manage", hod_views.manage_class_schedule, name='manage_class_schedule'),
-    
+    path("payment/manage/", hod_views.manage_payment_record, name='manage_payment_record'),
+    path("learn/manage/", hod_views.manage_learning_record, name='manage_learning_record'),
+    path("schedule/manage/", hod_views.manage_class_schedule, name='manage_class_schedule'),
     path("student/query", hod_views.manage_student_query, name = "manage_student_query"),
     path("teacher/query", hod_views.manage_teacher_query, name = "manage_teacher_query"),
 
@@ -80,6 +79,7 @@ urlpatterns = [
     path("subject/edit/<int:subject_id>",hod_views.edit_subject, name='edit_subject'),
     # path("institution/edit/<int:institution_id>", hod_views.edit_institution, name='edit_institution'),
     path("campus/edit/<int:campus_id>",hod_views.edit_campus, name='edit_campus'),
+    path("payment/edit/<int:payment_id>",hod_views.edit_payment_record, name='edit_payment_record'),
     path("learn/edit/<int:learn_id>",hod_views.edit_learning_record, name='edit_learning_record'),
     path("schedule/edit/<int:schedule_id>",hod_views.edit_class_schedule, name='edit_class_schedule'),
    
@@ -92,6 +92,7 @@ urlpatterns = [
     path("student/delete/<int:student_id>",hod_views.delete_student, name='delete_student'),
     # path("institution/delete/<int:institution_id>", hod_views.delete_institution, name='delete_institution'),
     path("campus/edit/<int:campus_id>",hod_views.delete_campus, name='delete_campus'),
+    path("payment/delete/<int:payment_id>",hod_views.delete_payment_record, name='delete_payment_record'),
     path("learn/delete/<int:learn_id>",hod_views.delete_learning_record, name='delete_learning_record'),
     path("schedule/delete/<int:schedule_id>",hod_views.delete_class_schedule, name='delete_class_schedule'),
 

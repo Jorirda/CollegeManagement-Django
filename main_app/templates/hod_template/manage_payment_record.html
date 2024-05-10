@@ -13,7 +13,10 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3 class="card-title">{{ page_title }}</h3>
+                        <div class="d-flex align-items-center">
+                            <img src="/media/dollar.png" alt="Teacher Image" class="rounded-circle mr-3" style="width: 50px; height: 50px;">
+                            <h3 class="card-title">{{ page_title }}</h3>
+                        </div>
                         <h3 class="card-title">{% blocktrans with total=total_amount_paid %}Total Income: ¥{{ total }}{% endblocktrans %}</h3>
                     </div>
                     <!-- /.card-header -->
@@ -21,21 +24,22 @@
                         <table id="example2" class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th>#</th>
+                                    <th>{% trans 'Index No.' %}</th>
                                     <th>{% trans 'Date' %}</th>
                                     <th>{% trans 'Student' %}</th>
                                     <th>{% trans 'Course' %}</th>
                                     <th>{% trans 'Lesson Unit Price' %}</th>
-                                    <th>{% trans 'Class' %}</th>
+                                    <th>{% trans 'Lesson Hours' %}</th>
                                     <th>{% trans 'Discounted Price' %}</th>
                                     <th>{% trans 'Book Costs' %}</th>
                                     <th>{% trans 'Other' %}</th>
                                     <th>{% trans 'Amount Due' %}</th>
                                     <th>{% trans 'Amount Paid' %}</th>
                                     <th>{% trans 'Payment Method' %}</th>
-                                    <th>{% trans 'State' %}</th>
+                                    <th>{% trans 'Status' %}</th>
                                     <th>{% trans 'Payee' %}</th>
                                     <th>{% trans 'Remark' %}</th>
+                                    <th>{% trans 'Actions' %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -46,7 +50,7 @@
                                     <td>{{ payment.student }}</td>
                                     <td>{{ payment.course }}</td>
                                     <td>¥{{ payment.lesson_unit_price }}</td>
-                                    <td>{{ payment.class_name }}</td>
+                                    <td>{{ payment.lesson_hours }}</td> <!-- Display lesson hours -->
                                     <td>¥{{ payment.discounted_price }}</td>
                                     <td>¥{{ payment.book_costs }}</td>
                                     <td>¥{{ payment.other_fee }}</td>
@@ -56,6 +60,10 @@
                                     <td>{{ payment.status }}</td>
                                     <td>{{ payment.payee }}</td>
                                     <td>{{ payment.remark }}</td>
+                                    <td> 
+                                        <a href="{% url 'edit_payment_record' payment.id %}" class="btn btn-info">{% trans "Edit" %}</a> | 
+                                        <a href="{% url 'delete_payment_record' payment.id %}" class="btn btn-danger" onclick="return confirm('{% trans 'Are you sure about this ?' %}')">{% trans "Delete" %}</a>
+                                    </td> 
                                 </tr>
                                 {% endfor %}
                             </tbody>

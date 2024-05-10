@@ -82,7 +82,7 @@ class StudentForm(CustomUserForm):
         fields = ['full_name', 'gender', 'password', 'date_of_birth', 'reg_date', 
                    'status', 'address', 'phone_number', 'remark'] 
 
-class AdminForm(CustomUserForm):
+class AdminForm(FormSettings):
     full_name = forms.CharField(required=True, label=_('Full Name'))
     email = forms.EmailField(required=True, label=_('Email'))
     gender = forms.ChoiceField(choices=[('male', _('Male')), ('female', _('Female'))], label=_('Gender'))
@@ -100,9 +100,9 @@ class AdminForm(CustomUserForm):
 
     class Meta:
         model = Admin
-        fields = ['full_name', 'email', 'gender', 'password', 'profile_pic', 'address', 'home_number', 'cell_number', 'remark']
+        fields = ['full_name', 'email', 'gender', 'password', 'profile_pic']
 
-class TeacherForm(CustomUserForm):
+class TeacherForm(FormSettings):
     full_name = forms.CharField(required=True, label=_('Full Name'))
     gender = forms.ChoiceField(choices=[(' 男', _('Male')), ('女', _('Female'))], label=_('Gender'))
     password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
@@ -142,25 +142,16 @@ class CourseForm(FormSettings):
         fields = [_('name')]
         model = Course
 
-class SubjectForm(FormSettings):
-    name = forms.CharField(label=_('Subject Name'))
+class ClassesForm(FormSettings):
+    name = forms.CharField(label=_('Classes Name'))
     teacher = forms.ModelChoiceField(queryset=Teacher.objects.all(), label=_('Teacher'))
     course = forms.ModelChoiceField(queryset=Course.objects.all(), label=_('Course'))
     def __init__(self, *args, **kwargs):
-        super(SubjectForm, self).__init__(*args, **kwargs)
+        super(ClassesForm, self).__init__(*args, **kwargs)
 
     class Meta:
-        model = Subject
+        model = Classes
         fields = [_('name'), _('teacher'), _('course')]
-
-# class InstitutionForm(FormSettings):
-#     name = forms.CharField(label=_('Name'))
-#     def __init__(self, *args, **kwargs):
-#         super(InstitutionForm, self).__init__(*args, **kwargs)
-
-#     class Meta:
-#         model = Institution
-#         fields = [_('name')]
 
 class CampusForm(FormSettings):
     name = forms.CharField(label=_('Name'))
@@ -217,17 +208,33 @@ class PaymentRecordForm(FormSettings):
     other_fee = forms.DecimalField(widget=TextInput(attrs={'placeholder': _('¥')}), label=_('Other Fee'))
     amount_due = forms.DecimalField(widget=TextInput(attrs={'placeholder': _('¥')}), label=_('Amount Due'))
     amount_paid = forms.DecimalField(widget=TextInput(attrs={'placeholder': _('¥')}), label=_('Amount Paid'))
+    lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"), disabled=True)
     
     def __init__(self, *args, **kwargs):
         super(PaymentRecordForm, self).__init__(*args, **kwargs)
      
+    def clean(self):
+        cleaned_data = super().clean()
+        student = cleaned_data.get("student")
+        course = cleaned_data.get("course")
+
+        if student and course:
+            # Retrieve the LearningRecord with matching student and course
+            learning_record = LearningRecord.objects.filter(student=student, course=course).first()
+            if learning_record:
+                cleaned_data["lesson_hours"] = learning_record.lesson_hours
+
+        return cleaned_data
+    
     class Meta:
         model = PaymentRecord
         fields = [
-        _('date'), _('student'), 'course', _('lesson_unit_price'),
-        _('discounted_price'), _('book_costs'), _('other_fee'), _('amount_due'), _('amount_paid'), 
-        _('payment_method'), _('status'), _('payee'), _('remark')
-    ]
+            _('date'), _('student'), 'course', _('lesson_unit_price'),
+            _('discounted_price'), _('book_costs'), _('other_fee'), _('amount_due'), _('amount_paid'), 
+            _('payment_method'), _('status'), _('payee'), _('remark'), _('lesson_hours')
+        ]
+
+
 
 class ClassScheduleForm(FormSettings):
     lesson_unit_price = forms.DecimalField(widget=TextInput(attrs={'placeholder': _('¥')}), label=_('Lesson Unit Price'))
@@ -237,7 +244,7 @@ class ClassScheduleForm(FormSettings):
 
     class Meta:
         model = ClassSchedule
-        fields = [_('course'),'lesson_unit_price',_('teacher'),_('subject'),_('class_time'),_('remark')]
+        fields = [_('course'),'lesson_unit_price',_('teacher'),_('classes'),_('class_time'),_('remark')]
 
 class StudentQueryForm(FormSettings):
     gender = forms.ChoiceField(choices=[
@@ -361,4 +368,4 @@ class EditResultForm(FormSettings):
 
     class Meta:
         model = StudentResult
-        fields = [_('session_year'), _('subject'), _('student'), _('test'), _('exam')]
+        fields = [_('session_year'), _('classes'), _('student'), _('test'), _('exam')]

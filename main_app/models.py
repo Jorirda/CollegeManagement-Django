@@ -60,17 +60,6 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.full_name
 
-# class Institution(models.Model):
-#     name = models.CharField(max_length=100)
-
-#     def __str__(self):
-#         return self.name
-
-#     def delete(self, *args, **kwargs):
-#         # Delete associated campuses before deleting the institution
-#         self.campuses.all().delete()
-#         super().delete(*args, **kwargs)
-    
 class Campus(models.Model):
     name = models.CharField(max_length=100)
     # institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='campuses')
@@ -116,7 +105,7 @@ class Teacher(models.Model):
     def __str__(self):
         return self.admin.full_name
 
-class Subject(models.Model):
+class Classes(models.Model):
     name = models.CharField(max_length=120)
     teacher = models.ForeignKey(Teacher,on_delete=models.CASCADE,)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -126,14 +115,12 @@ class Subject(models.Model):
     def __str__(self):
         return self.name
     
-    
 class Attendance(models.Model):
     session = models.ForeignKey(Session, on_delete=models.DO_NOTHING)
-    subject = models.ForeignKey(Subject, on_delete=models.DO_NOTHING)
+    classes = models.ForeignKey(Classes, on_delete=models.DO_NOTHING)
     date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
 
 class AttendanceReport(models.Model):
     student = models.ForeignKey(Student, on_delete=models.DO_NOTHING)
@@ -141,7 +128,6 @@ class AttendanceReport(models.Model):
     status = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
 
 class LeaveReportStudent(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -151,7 +137,6 @@ class LeaveReportStudent(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
 class LeaveReportTeacher(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     date = models.CharField(max_length=60)
@@ -160,14 +145,12 @@ class LeaveReportTeacher(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
 class FeedbackStudent(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     feedback = models.TextField()
     reply = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
 
 class FeedbackTeacher(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
@@ -176,13 +159,11 @@ class FeedbackTeacher(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
 class NotificationTeacher(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
 
 class NotificationStudent(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -190,10 +171,9 @@ class NotificationStudent(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
 class StudentResult(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    classes = models.ForeignKey(Classes, on_delete=models.CASCADE)
     test = models.FloatField(default=0)
     exam = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -215,9 +195,7 @@ class PaymentRecord(models.Model):
     date = models.DateField()
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    learning = models.ForeignKey(LearningRecord, null=True, on_delete=models.CASCADE)
     lesson_unit_price = models.DecimalField(max_digits=10, decimal_places=2)
-    class_name = models.CharField(max_length=100)
     discounted_price = models.DecimalField(max_digits=10, decimal_places=2)
     book_costs = models.DecimalField(max_digits=10, decimal_places=2)
     other_fee = models.DecimalField(max_digits=10, decimal_places=2)
@@ -227,17 +205,33 @@ class PaymentRecord(models.Model):
     status = models.CharField(max_length=100)
     payee = models.CharField(max_length=255)
     remark = models.TextField(default="")
-    lesson_hours = models.TextField(default="")
+    learning_record = models.OneToOneField(
+        LearningRecord, 
+        null=True, 
+        related_name='payment_record', 
+        on_delete=models.SET_NULL
+    )
+class LessonHours(models.Model):
+    learning_record = models.ForeignKey(LearningRecord, on_delete=models.CASCADE)
+    hours = models.DecimalField(max_digits=10, decimal_places=2)
 
     
-    
+#Refund page
+class RefundRecord(models.Model):
+    admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student,null=True, on_delete=models.CASCADE)
+    learning_records = models.ForeignKey(LearningRecord, null=True, on_delete=models.CASCADE)
+    payment_records = models.ForeignKey(PaymentRecord,null=True, on_delete=models.CASCADE)
+    refund_amount = models.DecimalField(max_digits=10,null=True, decimal_places=2)
+    amount_refunded = models.DecimalField(max_digits=10,null=True, decimal_places=2)
+    refund_reason = models.TextField(null=True,)
 
 #Class Schedule
 class ClassSchedule(models.Model):
     course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)
     lesson_unit_price = models.DecimalField(max_digits=10, decimal_places=2)
     teacher = models.ForeignKey(Teacher,null=True, on_delete=models.CASCADE)
-    subject = models.ForeignKey(Subject,null=True, on_delete=models.DO_NOTHING)
+    classes = models.ForeignKey(Classes,null=True, on_delete=models.DO_NOTHING)
     class_time = models.CharField(max_length=100)
     remark = models.TextField(default="")
 
@@ -363,16 +357,16 @@ def create_or_update_teacher_query(sender, instance, created, **kwargs):
             class_duration = datetime.combine(datetime.today(), record.end_time) - datetime.combine(datetime.today(), record.start_time)
             total_class_duration += class_duration
 
-        # Count the number of courses and subjects
+        # Count the number of courses and classess
         # num_of_courses = teacher.learningrecord_set.values('course').distinct().count()
-        # num_of_subjects = teacher.learningrecord_set.values('class_name').distinct().count()
+        # num_of_classess = teacher.learningrecord_set.values('class_name').distinct().count()
 
         # Update the fields in TeacherQuery instance
-        # teacher_query.num_of_classes = num_of_subjects
+        # teacher_query.num_of_classes = num_of_classess
 
         # Update the completed hours and remaining hours fields in TeacherQuery
         teacher_query.completed_hours = total_class_duration.total_seconds() // 3600  # Convert seconds to hours
-        # teacher_query.remaining_hours = (num_of_subjects * 2) - teacher_query.completed_hours  # Assuming each class is 30 hours
+        # teacher_query.remaining_hours = (num_of_classess * 2) - teacher_query.completed_hours  # Assuming each class is 30 hours
 
         # Save the updated StudentQuery instance
         teacher_query.save()

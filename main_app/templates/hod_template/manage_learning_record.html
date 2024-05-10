@@ -5,7 +5,29 @@
 {% block page_title %}<i class="nav-icon fas fa-pencil-ruler"></i>  {{ page_title }}{% endblock page_title %}
 
 {% block content %}
+<style>
+    /* Flex container for responsive button alignment */
+    .responsive-buttons {
+        display: flex;
+        justify-content: space-around; /* Distributes space around items */
+        flex-wrap: wrap; /* Allows items to wrap onto the next line as needed */
+    }
 
+    /* Responsive button styling */
+    .btn-responsive {
+        flex: 1 1 auto; /* Allows the button to grow and shrink as needed */
+        margin: 5px; /* Adds margin around buttons */
+        min-width: 68px; /* Minimum width of each button */
+        text-align: center; /* Centers button text */
+    }
+
+    /* Media query for smaller screens */
+    @media (max-width: 576px) {
+        .btn-responsive {
+            flex-basis: 100%; /* Each button takes full width of the container on small screens */
+        }
+    }
+</style>
 <section class="content">
     <div class="container-fluid">
         <div class="row">
@@ -66,9 +88,9 @@
                                     <td>{{ learn.end_time }}</td>
                                     <td>{{ learn.lesson_hours }}</td>
                                     <td>{{ learn.student.admin.remark }}</td>
-                                    <td> 
-                                        <a href="{% url 'edit_learning_record' learn.id %}" class="btn btn-info">{% trans "Edit" %}</a> | 
-                                        <a href="{% url 'delete_learning_record' learn.id %}" class="btn btn-danger" onclick="return confirm('{% trans 'Are you sure about this ?' %}')">{% trans "Delete" %}</a>
+                                    <td class="responsive-buttons"> 
+                                        <a href="{% url 'edit_learning_record' learn.id %}" class="btn btn-info btn-responsive">{% trans "Edit" %}</a>
+                                        <a href="{% url 'delete_learning_record' learn.id %}" class="btn btn-danger btn-responsive" onclick="return confirm('{% trans 'Are you sure about this ?' %}')">{% trans "Delete" %}</a>
 
                                     </td> 
                                 </tr>

@@ -44,6 +44,47 @@ class SidebarView(TemplateView):
             context['last_name'] = ''
         return context
 
+def refund_records(request):
+    student_query = StudentQuery.objects.all()
+
+
+    # Initialize a list to hold student query information
+    student_query_info = []
+
+    # Iterate over each student query
+    for student_query in student_query:
+    # Your code here for handling the case where the payment has been refunded
+
+        # Check if the student_query has an associated payment_records object and refund condition is met
+        if student_query.payment_records:  # Assuming 'Refunded' is a status
+            print(student_query.payment_records.status)
+            # Get related student information
+            student_info = {
+                'student_name': student_query.admin.get_full_name(),
+                'date_of_birth': student_query.student_records.date_of_birth,
+                'course': student_query.learning_records.course,
+                'total_hours' : "student_query.learning_records.total_hours",  # Assuming there's a field for total hours
+                'hours_spent': student_query.completed_hours,
+                'hours_remaining': student_query.remaining_hours,
+                'lesson_price': "student_query.learning_records.lesson_price",  # Assuming there's a field for lesson price
+                'refund_remainder': calculate_refund_remainder(student_query),  # Assuming a function to calculate
+                'amount_refunded': "student_query.payment_records.amount_refunded",  # Assuming this field exists
+                'refund_reason': "student_query.refund_reason",  # Assuming this field exists
+            }
+            # Append student query information to the list
+            student_query_info.append(student_info)
+
+    context = {
+        'refund_info': student_query_info,
+        'page_title': 'Manage Refund Records'
+    }
+
+    return render(request, 'hod_template/refund_records.html', context)
+
+def calculate_refund_remainder(student_query):
+    # Placeholder for your refund calculation logic
+    return 0  # Placeholder return value
+
 def get_upload(request):
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
@@ -74,39 +115,39 @@ def get_result(excel_file, is_teacher):
 def admin_home(request):
     total_teacher = Teacher.objects.all().count()
     total_students = Student.objects.all().count()
-    subjects = Subject.objects.all()
-    total_subject = subjects.count()
+    classess = Classes.objects.all()
+    total_classes = classess.count()
     total_course = Course.objects.all().count()
-    attendance_list = Attendance.objects.filter(subject__in=subjects)
+    attendance_list = Attendance.objects.filter(classes__in=classess)
     total_attendance = attendance_list.count()
     attendance_list = []
-    subject_list = []
-    for subject in subjects:
-        attendance_count = Attendance.objects.filter(subject=subject).count()
-        subject_list.append(subject.name[:7])
+    classes_list = []
+    for classes in classess:
+        attendance_count = Attendance.objects.filter(classes=classes).count()
+        classes_list.append(classes.name[:7])
         attendance_list.append(attendance_count)
 
-    # Total Subjects and students in Each Course
+    # Total Classess and students in Each Course
     course_all = Course.objects.all()
     course_name_list = []
-    subject_count_list = []
+    classes_count_list = []
     student_count_list_in_course = []
 
     for course in course_all:
-        subjects = Subject.objects.filter(course_id=course.id).count()
+        classess = Classes.objects.filter(course_id=course.id).count()
         students = Student.objects.filter(course_id=course.id).count()
         course_name_list.append(course.name)
-        subject_count_list.append(subjects)
+        classes_count_list.append(classess)
         student_count_list_in_course.append(students)
     
-    subject_all = Subject.objects.all()
-    subject_list = []
-    student_count_list_in_subject = []
-    for subject in subject_all:
-        course = Course.objects.get(id=subject.course.id)
+    classes_all = Classes.objects.all()
+    classes_list = []
+    student_count_list_in_classes = []
+    for classes in classes_all:
+        course = Course.objects.get(id=classes.course.id)
         student_count = Student.objects.filter(course_id=course.id).count()
-        subject_list.append(subject.name)
-        student_count_list_in_subject.append(student_count)
+        classes_list.append(classes.name)
+        student_count_list_in_classes.append(student_count)
 
 
     # For Students
@@ -129,13 +170,13 @@ def admin_home(request):
         'total_students': total_students,
         'total_teacher': total_teacher,
         'total_course': total_course,
-        'total_subject': total_subject,
-        'subject_list': subject_list,
+        'total_classes': total_classes,
+        'classes_list': classes_list,
         'attendance_list': attendance_list,
         'student_attendance_present_list': student_attendance_present_list,
         'student_attendance_leave_list': student_attendance_leave_list,
         "student_name_list": student_name_list,
-        "student_count_list_in_subject": student_count_list_in_subject,
+        "student_count_list_in_classes": student_count_list_in_classes,
         "student_count_list_in_course": student_count_list_in_course,
         "course_name_list": course_name_list,
 
@@ -260,11 +301,11 @@ def add_course(request):
             messages.error(request, "Could Not Add")
     return render(request, 'hod_template/add_course_template.html', context)
 
-def add_subject(request):
-    form = SubjectForm(request.POST or None)
+def add_classes(request):
+    form = ClassesForm(request.POST or None)
     context = {
         'form': form,
-        'page_title': _('Add Subject')
+        'page_title': _('Add Classes')
     }
     if request.method == 'POST':
         if form.is_valid():
@@ -272,20 +313,20 @@ def add_subject(request):
             course = form.cleaned_data.get('course')
             teacher = form.cleaned_data.get('teacher')
             try:
-                subject = Subject()
-                subject.name = name
-                subject.teacher = teacher
-                subject.course = course
-                subject.save()
+                classes = Classes()
+                classes.name = name
+                classes.teacher = teacher
+                classes.course = course
+                classes.save()
                 messages.success(request, "Successfully Added")
-                return redirect(reverse('add_subject'))
+                return redirect(reverse('add_classes'))
 
             except Exception as e:
                 messages.error(request, "Could Not Add " + str(e))
         else:
             messages.error(request, "Fill Form Properly")
 
-    return render(request, 'hod_template/add_subject_template.html', context)
+    return render(request, 'hod_template/add_classes_template.html', context)
 
 def add_campus(request):
     form = CampusForm(request.POST or None)
@@ -338,17 +379,14 @@ def add_payment_record(request):
             status = form.cleaned_data.get('status')
             payee = form.cleaned_data.get('payee')
             remark = form.cleaned_data.get('remark')
-
+           
             try:
                 payment = PaymentRecord()
                 payment.date = date
                 payment.student = student
                 payment.course = course
-                payment.learning = form.cleaned_data.get('learning')
-                # Get lesson hours if learning record is provided
-                if payment.learning:
-                    payment.lesson_hours = payment.learning.lesson_hours
-                payment.lesson_unit_price = lesson_unit_price
+                payment.learning = learning
+                payment.lesson_unit_price= lesson_unit_price
                 payment.discounted_price = discounted_price
                 payment.book_costs = book_costs
                 payment.other_fee = other_fee
@@ -359,7 +397,7 @@ def add_payment_record(request):
                 payment.payee = payee
                 payment.remark = remark
                 payment.save()
-
+                
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_payment_record'))
 
@@ -421,7 +459,7 @@ def add_class_schedule(request):
             course = form.cleaned_data.get(_('course'))
             lesson_unit_price = form.cleaned_data.get(_('lesson_unit_price'))
             teacher = form.cleaned_data.get(_('teacher'))
-            subject = form.cleaned_data.get(_('subject'))
+            classes = form.cleaned_data.get(_('classes'))
             class_time = form.cleaned_data.get(_('class_time'))
             remark = form.cleaned_data.get(_('remark'))
             
@@ -432,7 +470,7 @@ def add_class_schedule(request):
                 class_schedule.course = course
                 class_schedule.lesson_unit_price = lesson_unit_price
                 class_schedule.teacher = teacher
-                class_schedule.subject = subject
+                class_schedule.classes = classes
                 class_schedule.class_time = class_time
                 class_schedule.remark= remark
                         
@@ -480,13 +518,13 @@ def manage_course(request):
     }
     return render(request, "hod_template/manage_course.html", context)
 
-def manage_subject(request):
-    subjects = Subject.objects.all()
+def manage_classes(request):
+    classess = Classes.objects.all()
     context = {
-        'subjects': subjects,
-        'page_title': _('Manage Subjects')
+        'classess': classess,
+        'page_title': _('Manage Classess')
     }
-    return render(request, "hod_template/manage_subject.html", context)
+    return render(request, "hod_template/manage_classes.html", context)
 
 def manage_campus(request):
     campuses = Campus.objects.all()
@@ -497,15 +535,17 @@ def manage_campus(request):
     return render(request, "hod_template/manage_campus.html", context)
 
 def manage_payment_record(request):
-    payments = PaymentRecord.objects.all()
+    payments = PaymentRecord.objects.all().select_related('learning_record')
     total_amount_paid = payments.aggregate(Sum('amount_paid'))['amount_paid__sum']
+    for payment in payments:
+        lesson_hours = payment.learning_record.lesson_hours if payment.learning_record else None
+        print(f"Payment ID: {payment.id}, LearningRecord: {lesson_hours}")
     context = {
         'payments': payments,
         'total_amount_paid': total_amount_paid if total_amount_paid else 0,
         'page_title': _('Manage Payment Records')
     }
-    return render(request, 'manage_payment_record.html', context)
-
+    return render(request, 'hod_template/manage_payment_record.html', context)
 
 def manage_learning_record(request):
     # Retrieve all distinct teachers
@@ -628,9 +668,6 @@ def manage_teacher_query(request):
                 'teacher_name': teacher_query.admin.get_full_name(),
                 'gender': teacher_query.admin.gender,
                 'phone_number': teacher_query.teacher_records.admin.phone_number,
-                # 'home_number': teacher_query.teacher_records.admin.home_number,
-                # 'cell_number': teacher_query.teacher_records.admin.cell_number,
-                # 'institution': teacher_query.teacher_records.institution,
                 'campus': teacher_query.teacher_records.campus,
                 'address': teacher_query.teacher_records.admin.address,
                 'num_of_classes': teacher_query.num_of_classes,
@@ -655,9 +692,6 @@ def manage_teacher_query(request):
                 'teacher_name': teacher_query.admin.get_full_name(),
                 'gender': teacher_query.admin.gender,
                 'phone_number': teacher_query.teacher_records.admin.phone_number,
-                # 'home_number': teacher_query.teacher_records.admin.home_number,
-                # 'cell_number': teacher_query.teacher_records.admin.cell_number,
-                # 'institution': teacher_query.teacher_records.institution,
                 'campus': teacher_query.teacher_records.campus,
                 'address': teacher_query.teacher_records.admin.address,
                 'num_of_classes': teacher_query.num_of_classes,
@@ -856,13 +890,13 @@ def edit_course(request, course_id):
 
     return render(request, 'hod_template/edit_course_template.html', context)
 
-def edit_subject(request, subject_id):
-    instance = get_object_or_404(Subject, id=subject_id)
-    form = SubjectForm(request.POST or None, instance=instance)
+def edit_classes(request, classes_id):
+    instance = get_object_or_404(Classes, id=classes_id)
+    form = ClassesForm(request.POST or None, instance=instance)
     context = {
         'form': form,
-        'subject_id': subject_id,
-        'page_title': _('Edit Subject')
+        'classes_id': classes_id,
+        'page_title': _('Edit Classes')
     }
     if request.method == 'POST':
         if form.is_valid():
@@ -870,18 +904,18 @@ def edit_subject(request, subject_id):
             course = form.cleaned_data.get('course')
             teacher = form.cleaned_data.get('teacher')
             try:
-                subject = Subject.objects.get(id=subject_id)
-                subject.name = name
-                subject.teacher = teacher
-                subject.course = course
-                subject.save()
+                classes = Classes.objects.get(id=classes_id)
+                classes.name = name
+                classes.teacher = teacher
+                classes.course = course
+                classes.save()
                 messages.success(request, "Successfully Updated")
-                return redirect(reverse('edit_subject', args=[subject_id]))
+                return redirect(reverse('edit_classes', args=[classes_id]))
             except Exception as e:
                 messages.error(request, "Could Not Add " + str(e))
         else:
             messages.error(request, "Fill Form Properly")
-    return render(request, 'hod_template/edit_subject_template.html', context)
+    return render(request, 'hod_template/edit_classes_template.html', context)
 
 def edit_campus(request, campus_id):
     instance = get_object_or_404(Campus, id=campus_id)
@@ -917,11 +951,13 @@ def edit_campus(request, campus_id):
 def edit_payment_record(request, payment_id):
     paymentrecord = get_object_or_404(PaymentRecord, id=payment_id)
     form = PaymentRecordForm(request.POST or None, instance=paymentrecord)
+    
     context = {
         'form': form,
         'payment_id': payment_id,
-        'page_title': _('Edit Payment Record')
+        'page_title': _('Edit Payment Record'),
     }
+    
     if request.method == 'POST':
         if form.is_valid():
             date = form.cleaned_data.get('date')
@@ -955,10 +991,6 @@ def edit_payment_record(request, payment_id):
                 paymentrecord.payee = payee
                 paymentrecord.remark = remark
 
-                # Get the lesson_hours from the associated learning
-                lesson_hours = learning.lesson_hours if learning and learning.lesson_hours else None
-                paymentrecord.lesson_hours = lesson_hours
-
                 paymentrecord.save()
 
                 messages.success(request, "Successfully Updated")
@@ -977,48 +1009,37 @@ def edit_learning_record(request, learn_id):
         'learn_id': learn_id,
         'page_title': _('Edit Learning Record')
     }
+
     if request.method == 'POST':
         if form.is_valid():
-            date = form.cleaned_data.get('date')
-            student = form.cleaned_data.get('student')
-            course = form.cleaned_data.get('course')
-            teacher = form.cleaned_data.get('teacher')
-            start_time = form.cleaned_data.get('start_time')
-            end_time = form.cleaned_data.get('end_time')
-
-            # Calculate lesson hours
-            lesson_hours = calculate_lesson_hours(start_time, end_time)
-            
             try:
-                learningrecord.date = date
-                learningrecord.student = student
-                learningrecord.course = course
-                learningrecord.teacher = teacher
-                learningrecord.start_time = start_time
-                learningrecord.end_time = end_time
+                # Save the form data
+                form.save()
+
+                # Calculate lesson hours
+                lesson_hours = calculate_lesson_hours(
+                    form.cleaned_data['start_time'],
+                    form.cleaned_data['end_time']
+                )
+
+                # Update lesson_hours
                 learningrecord.lesson_hours = lesson_hours
-                
-                # Get the remark from the associated student
-                remark = student.admin.remark if student and student.admin else None
-                learningrecord.remark = remark
-                
                 learningrecord.save()
-              
-                messages.success(request, "Successfully Updated")
+
+                # Get the remark from the associated student
+                remark = learningrecord.student.admin.remark if learningrecord.student and learningrecord.student.admin else None
+                learningrecord.remark = remark
+                learningrecord.save()
+
+                messages.success(request, _("Successfully Updated"))
+                context['lesson_hours'] = lesson_hours
                 return redirect(reverse('edit_learning_record', args=[learn_id]))
             except Exception as e:
-                messages.error(request, "Could Not Update: " + str(e))
+                messages.error(request, _("Could Not Update: ") + str(e))
         else:
-            messages.error(request, "Fill Form Properly")
+            messages.error(request, _("Fill Form Properly"))
+    
     return render(request, 'hod_template/edit_learning_record_template.html', context)
-
-# def calculate_lesson_hours(start_time, end_time):
-#     start = datetime.strptime(start_time.strftime('%H:%M:%S'), '%H:%M:%S')
-#     end = datetime.strptime(end_time.strftime('%H:%M:%S'), '%H:%M:%S')
-#     delta = end - start
-#     hours, remainder = divmod(delta.total_seconds(), 3600)
-#     minutes, _ = divmod(remainder, 60)
-#     return "{:02}:{:02}".format(int(hours), int(minutes))
 
 def calculate_lesson_hours(start_time, end_time):
     start = datetime.strptime(start_time.strftime('%H:%M:%S'), '%H:%M:%S')
@@ -1034,6 +1055,15 @@ def calculate_lesson_hours(start_time, end_time):
     else:
         return f"{int(hours)}h {int(minutes)}m"
     
+# def calculate_lesson_hours(start_time, end_time):
+#     start = datetime.strptime(start_time.strftime('%H:%M:%S'), '%H:%M:%S')
+#     end = datetime.strptime(end_time.strftime('%H:%M:%S'), '%H:%M:%S')
+#     delta = end - start
+#     hours, remainder = divmod(delta.total_seconds(), 3600)
+#     minutes, _ = divmod(remainder, 60)
+#     return "{:02}:{:02}".format(int(hours), int(minutes))
+
+ 
 def edit_class_schedule(request, schedule_id):
     instance = get_object_or_404(ClassSchedule, id=schedule_id)
     form = ClassScheduleForm(request.POST or None, instance=instance)
@@ -1047,7 +1077,7 @@ def edit_class_schedule(request, schedule_id):
             course = form.cleaned_data.get('course')
             lesson_unit_price = form.cleaned_data.get('lesson_unit_price')
             teacher = form.cleaned_data.get('teacher')
-            subject = form.cleaned_data.get('subject')
+            classes = form.cleaned_data.get('classes')
             class_time = form.cleaned_data.get('class_time')
             remark = form.cleaned_data.get('remark')
             
@@ -1058,7 +1088,7 @@ def edit_class_schedule(request, schedule_id):
                 class_schedule.course = course
                 class_schedule.lesson_unit_price = lesson_unit_price
                 class_schedule.teacher = teacher
-                class_schedule.subject = subject
+                class_schedule.classes = classes
                 class_schedule.class_time = class_time
                 class_schedule.remark= remark
                 class_schedule.save()
@@ -1171,10 +1201,10 @@ def view_student_leave(request):
             return False
 
 def admin_view_attendance(request):
-    subjects = Subject.objects.all()
+    classess = Classes.objects.all()
     sessions = Session.objects.all()
     context = {
-        'subjects': subjects,
+        'classess': classess,
         'sessions': sessions,
         'page_title': _('View Attendance')
     }
@@ -1183,11 +1213,11 @@ def admin_view_attendance(request):
 
 @csrf_exempt
 def get_admin_attendance(request):
-    subject_id = request.POST.get('subject')
+    classes_id = request.POST.get('classes')
     session_id = request.POST.get('session')
     attendance_date_id = request.POST.get('attendance_date_id')
     try:
-        subject = get_object_or_404(Subject, id=subject_id)
+        classes = get_object_or_404(Classes, id=classes_id)
         session = get_object_or_404(Session, id=session_id)
         attendance = get_object_or_404(
             Attendance, id=attendance_date_id, session=session)
@@ -1330,11 +1360,11 @@ def delete_course(request, course_id):
             request, "Sorry, some students are assigned to this course already. Kindly change the affected student course and try again")
     return redirect(reverse('manage_course'))
 
-def delete_subject(request, subject_id):
-    subject = get_object_or_404(Subject, id=subject_id)
-    subject.delete()
-    messages.success(request, "Subject deleted successfully!")
-    return redirect(reverse('manage_subject'))
+def delete_classes(request, classes_id):
+    classes = get_object_or_404(Classes, id=classes_id)
+    classes.delete()
+    messages.success(request, "Classes deleted successfully!")
+    return redirect(reverse('manage_classes'))
 
 def delete_campus(request, campus_id):
     campus = get_object_or_404(Campus, id=campus_id)
@@ -1351,7 +1381,7 @@ def delete_payment_record(request, payment_id):
 def delete_learning_record(request, learn_id):
     learn = get_object_or_404(LearningRecord, id=learn_id)
     learn.delete()
-    messages.success(request, "Subject deleted successfully!")
+    messages.success(request, "Classes deleted successfully!")
     return redirect(reverse('manage_learning_record'))
 
 def delete_class_schedule(request, schedule_id):
@@ -1369,3 +1399,4 @@ def delete_session(request, session_id):
         messages.error(
             request, "There are students assigned to this session. Please move them to another session.")
     return redirect(reverse('manage_session'))
+

@@ -8,7 +8,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.decorators.csrf import csrf_exempt
 from .EmailBackend import EmailBackend
-from .models import Attendance, Session, Subject
+from .models import Attendance, Session, Classes
 from django.shortcuts import redirect
 from django.utils.translation import activate, LANGUAGE_SESSION_KEY
 
@@ -82,12 +82,12 @@ def logout_user(request):
 
 @csrf_exempt
 def get_attendance(request):
-    subject_id = request.POST.get('subject')
+    classes_id = request.POST.get('classes')
     session_id = request.POST.get('session')
     try:
-        subject = get_object_or_404(Subject, id=subject_id)
+        classes = get_object_or_404(Classes, id=classes_id)
         session = get_object_or_404(Session, id=session_id)
-        attendance = Attendance.objects.filter(subject=subject, session=session)
+        attendance = Attendance.objects.filter(classes=classes, session=session)
         attendance_list = []
         for attd in attendance:
             data = {

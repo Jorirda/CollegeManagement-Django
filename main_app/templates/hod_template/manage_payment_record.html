@@ -29,7 +29,6 @@
                                     <th>{% trans 'Student' %}</th>
                                     <th>{% trans 'Course' %}</th>
                                     <th>{% trans 'Lesson Unit Price' %}</th>
-                                    <th>{% trans 'Lesson Hours' %}</th>
                                     <th>{% trans 'Discounted Price' %}</th>
                                     <th>{% trans 'Book Costs' %}</th>
                                     <th>{% trans 'Other' %}</th>
@@ -39,6 +38,7 @@
                                     <th>{% trans 'Status' %}</th>
                                     <th>{% trans 'Payee' %}</th>
                                     <th>{% trans 'Remark' %}</th>
+                                    <th>{% trans 'Lesson Hours' %}</th> <!-- Added -->
                                     <th>{% trans 'Actions' %}</th>
                                 </tr>
                             </thead>
@@ -50,16 +50,17 @@
                                     <td>{{ payment.student }}</td>
                                     <td>{{ payment.course }}</td>
                                     <td>¥{{ payment.lesson_unit_price }}</td>
-                                    <td>{{ payment.lesson_hours }}</td> <!-- Display lesson hours -->
                                     <td>¥{{ payment.discounted_price }}</td>
                                     <td>¥{{ payment.book_costs }}</td>
                                     <td>¥{{ payment.other_fee }}</td>
                                     <td>¥{{ payment.amount_due }}</td>
                                     <td>¥{{ payment.amount_paid }}</td>
-                                    <td>{{ payment.payment_method }}</td>
-                                    <td>{{ payment.status }}</td>
-                                    <td>{{ payment.payee }}</td>
-                                    <td>{{ payment.remark }}</td>
+                                    <td>{{  payment.payment_method }}</td>
+                                    <td>{{  payment.status }}</td>
+                                    <td>{{  payment.payee }}</td>
+                                    <td>{{  payment.remark }}</td>
+                                    Hey there: {{payment.learning.course}}
+                                    <td>{{  payment.learning_record.lesson_hours }}</td> <!-- Updated -->
                                     <td> 
                                         <a href="{% url 'edit_payment_record' payment.id %}" class="btn btn-info">{% trans "Edit" %}</a> | 
                                         <a href="{% url 'delete_payment_record' payment.id %}" class="btn btn-danger" onclick="return confirm('{% trans 'Are you sure about this ?' %}')">{% trans "Delete" %}</a>

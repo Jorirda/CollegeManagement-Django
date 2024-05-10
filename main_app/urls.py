@@ -36,7 +36,7 @@ urlpatterns = [
     path("teacher/add", hod_views.add_teacher, name='add_teacher'),
     path("course/add", hod_views.add_course, name='add_course'),
     path("student/add/", hod_views.add_student, name='add_student'),
-    path("subject/add/", hod_views.add_subject, name='add_subject'),
+    path("classes/add/", hod_views.add_classes, name='add_classes'),
     # path("institution/add/", hod_views.add_institution, name='add_institution'),
     path("campus/add/", hod_views.add_campus, name='add_campus'),
     path("payment/add", hod_views.add_payment_record, name='add_payment_record'),
@@ -57,13 +57,14 @@ urlpatterns = [
     path("attendance/fetch/", hod_views.get_admin_attendance,name='get_admin_attendance'),
     path("upload", hod_views.get_upload,name='get_upload'),
     path("result", hod_views.get_result,name='get_result'),
+    path('refunds', hod_views.refund_records, name='refund_records'),
 
 
     #manage
     path("teacher/manage/", hod_views.manage_teacher, name='manage_teacher'),
     path("student/manage/", hod_views.manage_student, name='manage_student'),
     path("course/manage/", hod_views.manage_course, name='manage_course'),
-    path("subject/manage/", hod_views.manage_subject, name='manage_subject'),
+    path("classes/manage/", hod_views.manage_classes, name='manage_classes'),
     # path("institution/manage/", hod_views.manage_institution, name='manage_institution'),
     path("campus/manage/", hod_views.manage_campus, name='manage_campus'),
     path("payment/manage/", hod_views.manage_payment_record, name='manage_payment_record'),
@@ -76,7 +77,7 @@ urlpatterns = [
     path("teacher/edit/<int:teacher_id>", hod_views.edit_teacher, name='edit_teacher'),
     path("student/edit/<int:student_id>", hod_views.edit_student, name='edit_student'),
     path("course/edit/<int:course_id>",hod_views.edit_course, name='edit_course'),
-    path("subject/edit/<int:subject_id>",hod_views.edit_subject, name='edit_subject'),
+    path("classes/edit/<int:classes_id>",hod_views.edit_classes, name='edit_classes'),
     # path("institution/edit/<int:institution_id>", hod_views.edit_institution, name='edit_institution'),
     path("campus/edit/<int:campus_id>",hod_views.edit_campus, name='edit_campus'),
     path("payment/edit/<int:payment_id>",hod_views.edit_payment_record, name='edit_payment_record'),
@@ -87,7 +88,7 @@ urlpatterns = [
     #delete
     path("teacher/delete/<int:teacher_id>",hod_views.delete_teacher, name='delete_teacher'),
     path("course/delete/<int:course_id>",hod_views.delete_course, name='delete_course'),
-    path("subject/delete/<int:subject_id>",hod_views.delete_subject, name='delete_subject'),
+    path("classes/delete/<int:classes_id>",hod_views.delete_classes, name='delete_classes'),
     path("session/delete/<int:session_id>",hod_views.delete_session, name='delete_session'),
     path("student/delete/<int:student_id>",hod_views.delete_student, name='delete_student'),
     # path("institution/delete/<int:institution_id>", hod_views.delete_institution, name='delete_institution'),

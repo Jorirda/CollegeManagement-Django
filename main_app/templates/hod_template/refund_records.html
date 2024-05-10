@@ -1,0 +1,46 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% load i18n %}  <!-- Ensure i18n is properly configured in your Django settings -->
+
+{% block page_title %}
+    <i class="nav-icon fas fa-bookmark"></i> {% trans page_title %}
+{% endblock page_title %}
+
+{% block content %}
+<h1>{% trans page_title %}</h1>  <!-- Translating the page title -->
+<table border="1">
+    <thead>
+        <tr>
+            <th>{% trans "Date of Birth" %}</th>
+            <th>{% trans "Student Name" %}</th>
+            <th>{% trans "Course" %}</th>
+            <th>{% trans "Total Lesson Hours" %}</th>
+            <th>{% trans "Hours Spent" %}</th>
+            <th>{% trans "Hours Remaining" %}</th>
+            <th>{% trans "Unit Price" %}</th>
+            <th>{% trans "Amount to be Refunded" %}</th>
+            <th>{% trans "Amount Refunded" %}</th>
+            <th>{% trans "Reason for Refund" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for refund in refund_info %}
+        <tr>
+            <td>{{ refund.date_of_birth|date:"Y-m-d" }}</td>
+            <td>{{ refund.student_name }}</td>
+            <td>{{ refund.course }}</td>
+            <td>{{ refund.total_hours }}</td>
+            <td>{{ refund.hours_spent }}</td>
+            <td>{{ refund.hours_remaining }}</td>
+            <td>{{ refund.lesson_price }}</td>
+            <td>{{ refund.refund_remainder }}</td>
+            <td>{{ refund.amount_refunded }}</td>
+            <td>{{ refund.refund_reason }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="12">{% trans "No refund refunds found." %}</td></tr>
+        {{ refund_info|safe }}
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -61,6 +61,19 @@
             }
         }
     });
+    document.getElementById('id_course').addEventListener('change', function() {
+        var courseId = this.value;
+        fetch(`/get-grade-choices/?course_id=${courseId}`)
+            .then(response => response.json())
+            .then(data => {
+                var select = document.getElementById('id_grade');
+                select.innerHTML = '';
+                data.choices.forEach(function(choice) {
+                    var option = new Option(choice[1], choice[0]);
+                    select.add(option);
+                });
+            });
+    });
 </script>
 
 {% endblock content %}

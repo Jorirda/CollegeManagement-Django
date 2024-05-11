@@ -54,15 +54,7 @@
             var minutes = Math.floor(duration.asMinutes()) % 60;
 
             var lessonHoursField = $('#id_lesson_hours');
-            if (minutes === 0) {
-                lessonHoursField.val(hours + 'h');
-            } else {
-                lessonHoursField.val(hours + 'h ' + minutes + 'm');
-            }
+            lessonHoursField.val(hours + 'h ' + (minutes ? (minutes + 'm') : ''));
         }
-    });
 </script>
-
-
-
 {% endblock content %}

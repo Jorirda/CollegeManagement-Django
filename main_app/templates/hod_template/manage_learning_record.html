@@ -40,12 +40,6 @@
                         </div>
                         <div class="ml-auto">
                             <form method="get" action="{% url 'manage_learning_record' %}" class="form-inline">
-                                {% comment %} <select name="grade" class="form-control">
-                                    <option value="" {% if not request.GET.grade %}selected{% endif %}>Select Grade</option>
-                                    {% for grade in grades %}
-                                    <option value="{{ grade }}" {% if request.GET.grade == grade %}selected{% endif %}>{{ grade }}</option>
-                                    {% endfor %}
-                                </select> {% endcomment %}
                                 <select name="teacher_name" class="form-control">
                                     <option value="" {% if not request.GET.teacher_name %}selected{% endif %}>Select Teacher</option>
                                     {% for teacher in teachers %}
@@ -60,7 +54,6 @@
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
-
                         <table id="example2" class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
@@ -91,7 +84,6 @@
                                     <td class="responsive-buttons"> 
                                         <a href="{% url 'edit_learning_record' learn.id %}" class="btn btn-info btn-responsive">{% trans "Edit" %}</a>
                                         <a href="{% url 'delete_learning_record' learn.id %}" class="btn btn-danger btn-responsive" onclick="return confirm('{% trans 'Are you sure about this ?' %}')">{% trans "Delete" %}</a>
-
                                     </td> 
                                 </tr>
                                 {% endfor %}
@@ -103,4 +95,5 @@
         </div>
     </div>
 </section>
+
 {% endblock content %}

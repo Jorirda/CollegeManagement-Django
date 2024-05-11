@@ -26,7 +26,9 @@ from .forms import ExcelUploadForm
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from datetime import datetime, timedelta
+from datetime import time
+from django.http import JsonResponse
+
 
 class SidebarView(TemplateView):
     template_name = 'main_app/sidebar_template.html'
@@ -43,6 +45,14 @@ class SidebarView(TemplateView):
             context['first_name'] = 'Guest'
             context['last_name'] = ''
         return context
+    
+def get_grade_choices(request):
+    course_id = request.GET.get('course_id')
+    if course_id:
+        choices = ClassScheduleForm().get_level_grade_choices(course_id)
+    else:
+        choices = []
+    return JsonResponse({'choices': choices})
 
 def refund_records(request):
     student_query = StudentQuery.objects.all()
@@ -251,7 +261,7 @@ def add_student(request):
             password = form.cleaned_data.get('password')
             grade = form.cleaned_data.get('grade')
             reg_date = form.cleaned_data.get('reg_date')
-            status = form.cleaned_data.get('state')
+            status = form.cleaned_data.get('status')
             remark = form.cleaned_data.get('remark')
             passport = request.FILES['profile_pic']
             fs = FileSystemStorage()
@@ -287,13 +297,13 @@ def add_course(request):
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
-            overview = form.cleaned_data.get('description')
-            levels = form.cleaned_data.get('levels')
+            overview = form.cleaned_data.get('overview')
+            level_grade = form.cleaned_data.get('level_grade')
             try:
                 course = Course()
                 course.name = name
                 course.overview = overview
-                course.levels = levels
+                course.level_end = level_grade
                 course.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_course'))
@@ -377,6 +387,7 @@ def add_payment_record(request):
             other_fee = form.cleaned_data.get('other_fee')
             amount_due = form.cleaned_data.get('amount_due')
             amount_paid = form.cleaned_data.get('amount_paid')
+            total_lesson_hours = form.cleaned_data.get('total_lesson_hours')
             payment_method = form.cleaned_data.get('payment_method')
             status = form.cleaned_data.get('status')
             payee = form.cleaned_data.get('payee')
@@ -390,6 +401,7 @@ def add_payment_record(request):
                 payment.learning = learning
                 payment.lesson_unit_price= lesson_unit_price
                 payment.discounted_price = discounted_price
+                payment.lesson_hours = total_lesson_hours
                 payment.book_costs = book_costs
                 payment.other_fee = other_fee
                 payment.amount_due = amount_due
@@ -462,8 +474,10 @@ def add_class_schedule(request):
             lesson_unit_price = form.cleaned_data.get('lesson_unit_price')
             teacher = form.cleaned_data.get('teacher')
             classes = form.cleaned_data.get('classes')
+            grade = form.cleaned_data.get('grade')
             start_time = form.cleaned_data.get('start_time')  
             end_time = form.cleaned_data.get('end_time') 
+            lesson_hours = form.cleaned_data.get('lesson_hours') 
             remark = form.cleaned_data.get('remark')
             
             
@@ -474,8 +488,10 @@ def add_class_schedule(request):
                 class_schedule.lesson_unit_price = lesson_unit_price
                 class_schedule.teacher = teacher
                 class_schedule.classes = classes
+                class_schedule.grade = grade
                 class_schedule.start_time = start_time
                 class_schedule.end_time = end_time
+                class_schedule.lesson_hours = lesson_hours
                 class_schedule.remark= remark
                         
                 class_schedule.save()
@@ -488,6 +504,7 @@ def add_class_schedule(request):
             messages.error(request, "Fill Form Properly")
 
     return render(request, 'hod_template/add_class_schedule_template.html', context)
+
 
 def manage_session(request):
     sessions = Session.objects.all()
@@ -541,9 +558,9 @@ def manage_campus(request):
 def manage_payment_record(request):
     payments = PaymentRecord.objects.all().select_related('learning_record')
     total_amount_paid = payments.aggregate(Sum('amount_paid'))['amount_paid__sum']
-    for payment in payments:
-        lesson_hours = payment.learning_record.lesson_hours if payment.learning_record else None
-        print(f"Payment ID: {payment.id}, LearningRecord: {lesson_hours}")
+    # for payment in payments:
+        # lesson_hours = payment.learning_record.lesson_hours if payment.learning_record else None
+        # print(f"Payment ID: {payment.id}, LearningRecord: {lesson_hours}")
     context = {
         'payments': payments,
         'total_amount_paid': total_amount_paid if total_amount_paid else 0,
@@ -551,36 +568,62 @@ def manage_payment_record(request):
     }
     return render(request, 'hod_template/manage_payment_record.html', context)
 
+from datetime import time
+
 def manage_learning_record(request):
-    # Retrieve all distinct teachers
+    if request.is_ajax() and request.GET.get('course_id'):
+        return get_course_schedule(request)
+
     teachers = Teacher.objects.select_related('admin').all().distinct()
+    learningrecords = LearningRecord.objects.all()
+    class_schedules = ClassSchedule.objects.all()
 
-    # Retrieve distinct grades from students associated with learning records
-    grades = LearningRecord.objects.order_by('student__grade').values_list('student__grade', flat=True).distinct()
-
-    # Get the selected teacher and grade from the form submission
     selected_teacher_id = request.GET.get('teacher_name', None)
     selected_grade = request.GET.get('grade', None)
 
-    # Initialize learning records list
-    learningrecords = LearningRecord.objects.all()
-
-    # Apply filters if selections are made
     if selected_teacher_id:
-        learningrecords = learningrecords.filter(teacher__admin__id=selected_teacher_id)  # Adjusted for correct field
+        learningrecords = learningrecords.filter(teacher__admin__id=selected_teacher_id)
+        class_schedules = class_schedules.filter(teacher__admin__id=selected_teacher_id)
     if selected_grade:
         learningrecords = learningrecords.filter(student__grade=selected_grade)
 
-    # Prepare the context to pass to the template
+    # Update LearningRecord fields with ClassSchedule data if course and teacher match
+    for record in learningrecords:
+        for schedule in class_schedules:
+            if record.course == schedule.course and record.teacher == schedule.teacher:
+                if schedule.start_time:
+                    record.start_time = schedule.start_time
+                if schedule.end_time is not None:
+                    record.end_time = schedule.end_time
+                if schedule.lesson_hours:
+                    record.lesson_hours = schedule.lesson_hours
+                record.save()
+                break  # Once updated, break the loop
+
     context = {
         'teachers': teachers,
-        'grades': list(grades),
         'learningrecords': learningrecords,
+        'class_schedules': class_schedules,  # Add class schedules to the context
         'page_title': _('Manage Learning Record')
     }
 
-    # Render the template with the context
     return render(request, 'hod_template/manage_learning_record.html', context)
+
+
+
+
+# def get_course_schedule(request):
+#     course_id = request.GET.get('course_id')
+#     schedule = ClassSchedule.objects.filter(course_id=course_id).first()
+#     if schedule:
+#         data = {
+#             'start_time': schedule.start_time.strftime("%H:%M"),
+#             'end_time': schedule.end_time.strftime("%H:%M"),
+#             'lesson_hours': schedule.lesson_hours
+#         }
+#     else:
+#         data = {}
+#     return JsonResponse(data)
 
 def manage_class_schedule(request):
     class_schedules = ClassSchedule.objects.all()
@@ -884,13 +927,13 @@ def edit_course(request, course_id):
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
-            overview = form.cleaned_data.get('description')
-            level = form.cleaned_data.get('level_grade')
+            overview = form.cleaned_data.get('overview')  # corrected field name
+            level_grade = form.cleaned_data.get('level_grade')
             try:
                 course = Course.objects.get(id=course_id)
                 course.name = name
                 course.overview = overview
-                course.level_end = level
+                course.level_end = level_grade
                 course.save()
                 messages.success(request, "Successfully Updated")
             except:
@@ -980,6 +1023,7 @@ def edit_payment_record(request, payment_id):
             other_fee = form.cleaned_data.get('other_fee')
             amount_due = form.cleaned_data.get('amount_due')
             amount_paid = form.cleaned_data.get('amount_paid')
+            total_lesson_hours = form.cleaned_data.get('total_lesson_hours')
             payment_method = form.cleaned_data.get('payment_method')
             status = form.cleaned_data.get('status')
             payee = form.cleaned_data.get('payee')
@@ -995,6 +1039,7 @@ def edit_payment_record(request, payment_id):
                 paymentrecord.book_costs = book_costs
                 paymentrecord.other_fee = other_fee
                 paymentrecord.amount_due = amount_due
+                paymentrecord.lesson_hours = total_lesson_hours
                 paymentrecord.amount_paid = amount_paid
                 paymentrecord.payment_method = payment_method
                 paymentrecord.status = status
@@ -1004,14 +1049,14 @@ def edit_payment_record(request, payment_id):
                 paymentrecord.save()
 
                 # Check if lesson hours are retrieved properly
-                if paymentrecord.learning_record:
-                    lesson_hours = paymentrecord.calculate_lesson_hours()
-                    if lesson_hours is not None:
-                        messages.success(request, _("Lesson hours retrieved successfully"))
-                    else:
-                        messages.error(request, _("Lesson hours are called but not being shown"))
-                else:
-                    messages.error(request, _("Lesson hours are not being retrieved"))
+                # if paymentrecord.learning_record:
+                #     # lesson_hours = paymentrecord.calculate_lesson_hours()
+                #     # if lesson_hours is not None:
+                #     #     messages.success(request, _("Lesson hours retrieved successfully"))
+                #     # else:
+                #     #     messages.error(request, _("Lesson hours are called but not being shown"))
+                #     else:
+                #         messages.error(request, _("Lesson hours are not being retrieved"))
 
                 messages.success(request, "Successfully Updated")
                 return redirect(reverse('edit_payment_record', args=[payment_id]))
@@ -1022,8 +1067,8 @@ def edit_payment_record(request, payment_id):
     return render(request, 'hod_template/edit_payment_record_template.html', context)
 
 def edit_learning_record(request, learn_id):
-    learningrecord = get_object_or_404(LearningRecord, id=learn_id)
-    form = LearningRecordForm(request.POST or None, instance=learningrecord)
+    learning_record = get_object_or_404(LearningRecord, id=learn_id)
+    form = LearningRecordForm(request.POST or None, instance=learning_record)
     context = {
         'form': form,
         'learn_id': learn_id,
@@ -1033,31 +1078,22 @@ def edit_learning_record(request, learn_id):
     if request.method == 'POST':
         if form.is_valid():
             try:
-                # Save the form data
                 form.save()
-
-                # Calculate lesson hours
-                lesson_hours = calculate_lesson_hours(
-                    form.cleaned_data['start_time'],
-                    form.cleaned_data['end_time']
-                )
-
-                # Update lesson_hours
-                learningrecord.lesson_hours = lesson_hours
-                learningrecord.save()
-
-                # Get the remark from the associated student
-                remark = learningrecord.student.admin.remark if learningrecord.student and learningrecord.student.admin else None
-                learningrecord.remark = remark
-                learningrecord.save()
-
                 messages.success(request, _("Successfully Updated"))
-                context['lesson_hours'] = lesson_hours
                 return redirect(reverse('edit_learning_record', args=[learn_id]))
             except Exception as e:
                 messages.error(request, _("Could Not Update: ") + str(e))
         else:
             messages.error(request, _("Fill Form Properly"))
+    else:
+        # If it's a GET request, prepopulate start_time, end_time, and lesson_hours
+        if learning_record.course and learning_record.teacher:
+            # Get corresponding ClassSchedule data
+            class_schedule = ClassSchedule.objects.filter(course=learning_record.course, teacher=learning_record.teacher).first()
+            if class_schedule:
+                form.fields['start_time'].initial = class_schedule.start_time
+                form.fields['end_time'].initial = class_schedule.end_time
+                form.fields['lesson_hours'].initial = class_schedule.lesson_hours
     
     return render(request, 'hod_template/edit_learning_record_template.html', context)
 
@@ -1074,16 +1110,7 @@ def calculate_lesson_hours(start_time, end_time):
         return f"{int(hours)}h"
     else:
         return f"{int(hours)}h {int(minutes)}m"
-    
-# def calculate_lesson_hours(start_time, end_time):
-#     start = datetime.strptime(start_time.strftime('%H:%M:%S'), '%H:%M:%S')
-#     end = datetime.strptime(end_time.strftime('%H:%M:%S'), '%H:%M:%S')
-#     delta = end - start
-#     hours, remainder = divmod(delta.total_seconds(), 3600)
-#     minutes, _ = divmod(remainder, 60)
-#     return "{:02}:{:02}".format(int(hours), int(minutes))
 
- 
 def edit_class_schedule(request, schedule_id):
     instance = get_object_or_404(ClassSchedule, id=schedule_id)
     form = ClassScheduleForm(request.POST or None, instance=instance)
@@ -1105,6 +1132,10 @@ def edit_class_schedule(request, schedule_id):
             
             
             try:
+                lesson_hours = calculate_lesson_hours(
+                    start_time,
+                    end_time
+                )
                 
                 class_schedule = ClassSchedule.objects.get(id=schedule_id)
                 class_schedule.course = course

@@ -21,6 +21,7 @@ from . import hod_views, teacher_views, student_views, views
 
 urlpatterns = [
 #hodviews
+    path('get-grade-choices/', hod_views.get_grade_choices, name='get-grade-choices'),
     path("", views.login_page, name='login_page'),
     path("get_attendance", views.get_attendance, name='get_attendance'),
     path("firebase-messaging-sw.js", views.showFirebaseJS, name='showFirebaseJS'),

@@ -70,7 +70,7 @@ class StudentForm(CustomUserForm):
         super(StudentForm, self).__init__(*args, **kwargs)
        
         # Reorder fields as requested
-        field_order = [_('full_name'), _('password'), _('gender'), _('date_of_birth'), _('address'), _('phone_number'), _('reg_date'),_('status'), _('remark')]
+        field_order = [_('full_name'), _('gender'), _('date_of_birth'), _('address'), _('phone_number'), _('reg_date'),_('status'), _('remark')]
                          
         # Set the field order
         self.fields = {k: self.fields[k] for k in field_order}
@@ -133,13 +133,13 @@ class TeacherForm(FormSettings):
 
 class CourseForm(FormSettings):
     name = forms.CharField(label=_('Course Name'))
-    description = forms.CharField(label=_('Course Desciption'))
+    overview = forms.CharField(label=_('Course Desciption'))
     # level = forms.ChoiceField(choices=[])
     # Combined choices where each number corresponds to a letter grade
     LEVEL_GRADE_CHOICES = [(str(i), chr(64 + i)) for i in range(1, 8)]
     level_grade = forms.ChoiceField(
         choices=LEVEL_GRADE_CHOICES,
-        label="Level and Grade",
+        label="Max Level",
         help_text="Select a level, which corresponds to a grade."
     )
     def __init__(self, *args, **kwargs):
@@ -173,14 +173,14 @@ class CampusForm(FormSettings):
     class Meta:
         model = Campus
         fields = [_('name')]
-            
+
 class LearningRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=DateInput(attrs={'type': 'date'}), label=_('Date'))
-    start_time = forms.TimeField(required=False, widget=TimeInput(attrs={'type': 'time'}), label=_('Start Time'))
-    end_time = forms.TimeField(required=False, widget=TimeInput(attrs={'type': 'time'}), label=_('End Time'))
     student = forms.ModelChoiceField(queryset=Student.objects.all(), required=False, label=_("Name"))
     course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, label=_("Course"))
     teacher = forms.ModelChoiceField(queryset=Teacher.objects.all(), required=False, label=_("Teacher"))
+    start_time = forms.TimeField(required=False, label=_("Start Time"))
+    end_time = forms.TimeField(required=False, label=_("End Time"))
     lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"), disabled=True)
 
     def __init__(self, *args, **kwargs):
@@ -194,14 +194,30 @@ class LearningRecordForm(FormSettings):
 
     class Meta:
         model = LearningRecord
-        fields = [_('date'), _('start_time'), _('end_time'), _('student'), _('course'), _('teacher'), _('lesson_hours')]
+        fields = ['date', 'student', 'course', 'teacher', 'start_time', 'end_time', 'lesson_hours']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        course = cleaned_data.get('course')
+        teacher = cleaned_data.get('teacher')
+
+        if course and teacher:
+            class_schedule = ClassSchedule.objects.filter(course=course, teacher=teacher).first()
+            if class_schedule:
+                cleaned_data['start_time'] = class_schedule.start_time
+                cleaned_data['end_time'] = class_schedule.end_time
+                cleaned_data['lesson_hours'] = class_schedule.lesson_hours
+
+        return cleaned_data
+
+
 
 class PaymentRecordForm(FormSettings):
     payee = forms.CharField(label=_('Payee'))
     remark = forms.CharField(required=True, label=_('Remark'))
     student = forms.ModelChoiceField(queryset=Student.objects.all(), required=False, label=_("Student"))
     course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, label=_("Course"))
-    date = forms.DateField(required=False, widget=DateInput(attrs={'type': 'date'}), label=_('Date'))
+    date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}), label=_('Date'))
     payment_method = forms.ChoiceField(choices=[
         ('WeChat', _('WeChat')), 
         ('AliPay', _('AliPay')), 
@@ -213,43 +229,42 @@ class PaymentRecordForm(FormSettings):
         ('Pending', _('Pending')), 
         ('Refund', _('Refund'))
     ], label=_('Status'))
-    lesson_unit_price = forms.DecimalField(widget=TextInput(attrs={'placeholder': _('¥')}), label=_('Lesson Unit Price'))
-    discounted_price = forms.DecimalField(widget=TextInput(attrs={'placeholder': _('¥')}), label=_('Discounted Price'))
-    book_costs = forms.DecimalField(widget=TextInput(attrs={'placeholder': _('¥')}), label=_('Book Costs'))
-    other_fee = forms.DecimalField(widget=TextInput(attrs={'placeholder': _('¥')}), label=_('Other Fee'))
-    amount_due = forms.DecimalField(widget=TextInput(attrs={'placeholder': _('¥')}), label=_('Amount Due'))
-    amount_paid = forms.DecimalField(widget=TextInput(attrs={'placeholder': _('¥')}), label=_('Amount Paid'))
-    lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"), disabled=True)
-    
-    def __init__(self, *args, **kwargs):
-        super(PaymentRecordForm, self).__init__(*args, **kwargs)
-     
-    def clean(self):
-        cleaned_data = super().clean()
-        student = cleaned_data.get("student")
-        course = cleaned_data.get("course")
+    lesson_unit_price = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Lesson Unit Price'))
+    discounted_price = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Discounted Price'))
+    book_costs = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Book Costs'))
+    other_fee = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Other Fee'))
+    amount_due = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Amount Due'))
+    amount_paid = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Amount Paid'))
+    lesson_hours = forms.DecimalField(required=False, decimal_places=2, max_digits=10, initial=0, label=_("Lesson Hours"))
 
-        if student and course:
-            # Retrieve the LearningRecord with matching student and course
-            learning_record = LearningRecord.objects.filter(student=student, course=course).first()
-            if learning_record:
-                cleaned_data["lesson_hours"] = learning_record.lesson_hours
-
-        return cleaned_data
-    
     class Meta:
         model = PaymentRecord
         fields = [
             _('date'), _('student'), 'course', _('lesson_unit_price'),
             _('discounted_price'), _('book_costs'), _('other_fee'), _('amount_due'), _('amount_paid'), 
             _('payment_method'), _('status'), _('payee'), _('remark'), _('lesson_hours')
-        ]
+        ] # Ensures all model fields are included
 
 class ClassScheduleForm(FormSettings):
+    def get_level_grade_choices(self, course_id=None):
+        if course_id:
+            course = Course.objects.get(id=course_id)
+            min_level = course.level_start
+            max_level = course.level_end
+        else:
+            min_level = 1
+            max_level = 8
+
+        return [(str(i), chr(64 + i)) for i in range(min_level, max_level + 1)]
+
     course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, widget=forms.Select(attrs={'class': 'form-control'}), label=_('Course'))
     lesson_unit_price = forms.DecimalField(required=False, widget=forms.TextInput(attrs={'placeholder': _('Lesson Unit Price'), 'class': 'form-control'}), label=_('Lesson Unit Price'))
     teacher = forms.ModelChoiceField(queryset=Teacher.objects.all(), required=False, widget=forms.Select(attrs={'class': 'form-control'}), label=_('Teacher'))
-    grade = forms.ModelChoiceField(queryset=Student.objects.all(), required=False, widget=forms.Select(attrs={'class': 'form-control'}), label=_('Grade'))
+    grade = forms.ChoiceField(
+        choices=[],  # Initialize empty, will set in __init__
+        label=_("Max Level"),
+        help_text=_("Select a level, which corresponds to a grade.")
+    )
     start_time = forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time'}), label=_('Start Time'))
     end_time = forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time'}), label=_('End Time'))
     lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"), disabled=True)
@@ -257,10 +272,13 @@ class ClassScheduleForm(FormSettings):
 
     def __init__(self, *args, **kwargs):
         super(ClassScheduleForm, self).__init__(*args, **kwargs)
+        initial_course_id = self.instance.course.id if self.instance and self.instance.course else None
+        self.fields['grade'].choices = self.get_level_grade_choices(initial_course_id)
 
     class Meta:
         model = ClassSchedule
         fields = ['course', 'lesson_unit_price', 'teacher', 'grade', 'start_time', 'end_time', 'lesson_hours', 'remark']
+
 
 class StudentQueryForm(FormSettings):
     gender = forms.ChoiceField(choices=[

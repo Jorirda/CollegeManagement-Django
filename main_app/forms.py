@@ -136,12 +136,12 @@ class CourseForm(FormSettings):
     description = forms.CharField(label=_('Course Desciption'))
     # level = forms.ChoiceField(choices=[])
     # Combined choices where each number corresponds to a letter grade
-    # LEVEL_GRADE_CHOICES = [(str(i), chr(64 + i)) for i in range(1, 8)]
-    # level_grade = forms.ChoiceField(
-    #     choices=LEVEL_GRADE_CHOICES,
-    #     label="Level and Grade",
-    #     help_text="Select a level, which corresponds to a grade."
-    # )
+    LEVEL_GRADE_CHOICES = [(str(i), chr(64 + i)) for i in range(1, 8)]
+    level_grade = forms.ChoiceField(
+        choices=LEVEL_GRADE_CHOICES,
+        label="Level and Grade",
+        help_text="Select a level, which corresponds to a grade."
+    )
     def __init__(self, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)
         # instance = kwargs.get('instance')

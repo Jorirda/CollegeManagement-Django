@@ -1,7 +1,6 @@
 from django import forms
 from django.forms.widgets import DateInput, TextInput, TimeInput
 from django.utils.translation import ugettext_lazy as _
-
 from .models import *
 
 class ExcelUploadForm(forms.Form):
@@ -134,11 +133,24 @@ class TeacherForm(FormSettings):
 
 class CourseForm(FormSettings):
     name = forms.CharField(label=_('Course Name'))
+    description = forms.CharField(label=_('Course Desciption'))
+    # level = forms.ChoiceField(choices=[])
+    # Combined choices where each number corresponds to a letter grade
+    # LEVEL_GRADE_CHOICES = [(str(i), chr(64 + i)) for i in range(1, 8)]
+    # level_grade = forms.ChoiceField(
+    #     choices=LEVEL_GRADE_CHOICES,
+    #     label="Level and Grade",
+    #     help_text="Select a level, which corresponds to a grade."
+    # )
     def __init__(self, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)
+        # instance = kwargs.get('instance')
+        # if instance:
+        #     # Generate level choices from instance range
+        #     self.fields['level'].choices = [(i, str(i)) for i in range(instance.level_start, instance.level_end + 1)]
 
     class Meta:
-        fields = [_('name')]
+        fields = [_('name'),'overview','level_grade']
         model = Course
 
 class ClassesForm(FormSettings):
@@ -234,14 +246,21 @@ class PaymentRecordForm(FormSettings):
         ]
 
 class ClassScheduleForm(FormSettings):
-    lesson_unit_price = forms.DecimalField(widget=TextInput(attrs={'placeholder': _('¥')}), label=_('Lesson Unit Price'))
-   
+    course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, widget=forms.Select(attrs={'class': 'form-control'}), label=_('Course'))
+    lesson_unit_price = forms.DecimalField(required=False, widget=forms.TextInput(attrs={'placeholder': _('Lesson Unit Price'), 'class': 'form-control'}), label=_('Lesson Unit Price'))
+    teacher = forms.ModelChoiceField(queryset=Teacher.objects.all(), required=False, widget=forms.Select(attrs={'class': 'form-control'}), label=_('Teacher'))
+    grade = forms.ModelChoiceField(queryset=Student.objects.all(), required=False, widget=forms.Select(attrs={'class': 'form-control'}), label=_('Grade'))
+    start_time = forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time'}), label=_('Start Time'))
+    end_time = forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time'}), label=_('End Time'))
+    lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"), disabled=True)
+    remark = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': _('Remark'), 'class': 'form-control'}), label=_('Remark'))
+
     def __init__(self, *args, **kwargs):
         super(ClassScheduleForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = ClassSchedule
-        fields = [_('course'),'lesson_unit_price',_('teacher'),_('classes'),_('class_time'),_('remark')]
+        fields = ['course', 'lesson_unit_price', 'teacher', 'grade', 'start_time', 'end_time', 'lesson_hours', 'remark']
 
 class StudentQueryForm(FormSettings):
     gender = forms.ChoiceField(choices=[
@@ -301,7 +320,6 @@ class LeaveReportTeacherForm(FormSettings):
             'date': DateInput(attrs={'type': 'date'}),
         }
 
-
 class FeedbackTeacherForm(FormSettings):
     feedback = forms.CharField(widget=TextInput(), label=_('Feedback'))
     def __init__(self, *args, **kwargs):
@@ -310,7 +328,6 @@ class FeedbackTeacherForm(FormSettings):
     class Meta:
         model = FeedbackTeacher
         fields = ['feedback']
-
 
 class LeaveReportStudentForm(FormSettings):
     date = forms.DateField(widget=DateInput(attrs={'type': 'date'}), label=_('Date'))
@@ -325,7 +342,6 @@ class LeaveReportStudentForm(FormSettings):
             'date': DateInput(attrs={'type': 'date'}),
         }
 
-
 class FeedbackStudentForm(FormSettings):
     feedback = forms.CharField(widget=TextInput(), label=_('Feedback'))
     def __init__(self, *args, **kwargs):
@@ -335,7 +351,6 @@ class FeedbackStudentForm(FormSettings):
         model = FeedbackStudent
         fields = [_('feedback')]
 
-
 class StudentEditForm(CustomUserForm):
     def __init__(self, *args, **kwargs):
         super(StudentEditForm, self).__init__(*args, **kwargs)
@@ -343,7 +358,6 @@ class StudentEditForm(CustomUserForm):
     class Meta(CustomUserForm.Meta):
         model = Student
         fields = CustomUserForm.Meta.fields 
-
 
 class TeacherEditForm(CustomUserForm):
     def __init__(self, *args, **kwargs):
@@ -353,7 +367,6 @@ class TeacherEditForm(CustomUserForm):
     class Meta(CustomUserForm.Meta):
         model = Teacher
         fields = CustomUserForm.Meta.fields + [_('work_type')]  # Add 'work_type' to the fields list
-
 
 class EditResultForm(FormSettings):
     session_list = Session.objects.all()

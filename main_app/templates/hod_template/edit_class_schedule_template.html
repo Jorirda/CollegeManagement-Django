@@ -22,4 +22,45 @@
         </div>
     </div>
 </section>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'js/moment.min.js' %}"></script>
+<script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+<script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.timepicker').datetimepicker({
+            format: 'HH:mm'
+        });
+
+        $('#id_start_time, #id_end_time').on('change', function () {
+            var startTime = $('#id_start_time').val();
+            var endTime = $('#id_end_time').val();
+            calculateLessonHours(startTime, endTime);
+        });
+
+        function calculateLessonHours(start, end) {
+            var startTime = moment(start, 'HH:mm');
+            var endTime = moment(end, 'HH:mm');
+
+            if (endTime.isBefore(startTime)) {
+                alert('{% trans "End time must be after start time." %}');
+                return;
+            }
+
+            var duration = moment.duration(endTime.diff(startTime));
+            var hours = Math.floor(duration.asHours());
+            var minutes = Math.floor(duration.asMinutes()) % 60;
+
+            var lessonHoursField = $('#id_lesson_hours');
+            if (minutes === 0) {
+                lessonHoursField.val(hours + 'h');
+            } else {
+                lessonHoursField.val(hours + 'h ' + minutes + 'm');
+            }
+        }
+    });
+</script>
+
 {% endblock content %}

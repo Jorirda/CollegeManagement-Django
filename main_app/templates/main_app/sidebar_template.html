@@ -90,13 +90,15 @@
                 </li>
                 <li class="nav-item">
                     {% url 'refund_records' as refund %}
-                    <a href="{{refund}}" class="nav-link {% if refund == request.path %} active {% endif %}">
-                        <i class="nav-icon fas fa-home"></i>
+                    <a href="{{ refund }}" class="nav-link {% if refund == request.path %} active {% endif %}">
+                        <i class="nav-icon fas fa-undo-alt"></i> <!-- Changed icon to represent refund -->
                         <p>
                             {% trans "Refund" %}
                         </p>
                     </a>
                 </li>
+                
+                
                 <!-- <li class="nav-item">
                     {% url 'admin_view_profile' as admin_view_profile %}
                     <a href="{{admin_view_profile}}"

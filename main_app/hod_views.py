@@ -81,7 +81,6 @@ def refund_records(request):
 
     return render(request, 'hod_template/refund_records.html', context)
 
-
 def get_upload(request):
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
@@ -250,6 +249,7 @@ def add_student(request):
             email = form.cleaned_data.get('email')
             phone_number = form.cleaned_data.get('phone_number')
             password = form.cleaned_data.get('password')
+            grade = form.cleaned_data.get('grade')
             reg_date = form.cleaned_data.get('reg_date')
             status = form.cleaned_data.get('state')
             remark = form.cleaned_data.get('remark')
@@ -265,6 +265,7 @@ def add_student(request):
                 user.address = address
                 user.phone_number = phone_number
                 user.student.status = status
+                user.student.grade = grade
                 user.student.reg_date = reg_date
                 user.remark = remark
                 user.save()
@@ -286,9 +287,13 @@ def add_course(request):
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
+            overview = form.cleaned_data.get('description')
+            levels = form.cleaned_data.get('levels')
             try:
                 course = Course()
                 course.name = name
+                course.overview = overview
+                course.levels = levels
                 course.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_course'))
@@ -453,12 +458,13 @@ def add_class_schedule(request):
     }
     if request.method == 'POST':
         if form.is_valid():
-            course = form.cleaned_data.get(_('course'))
-            lesson_unit_price = form.cleaned_data.get(_('lesson_unit_price'))
-            teacher = form.cleaned_data.get(_('teacher'))
-            classes = form.cleaned_data.get(_('classes'))
-            class_time = form.cleaned_data.get(_('class_time'))
-            remark = form.cleaned_data.get(_('remark'))
+            course = form.cleaned_data.get('course')
+            lesson_unit_price = form.cleaned_data.get('lesson_unit_price')
+            teacher = form.cleaned_data.get('teacher')
+            classes = form.cleaned_data.get('classes')
+            start_time = form.cleaned_data.get('start_time')  
+            end_time = form.cleaned_data.get('end_time') 
+            remark = form.cleaned_data.get('remark')
             
             
             try:
@@ -468,7 +474,8 @@ def add_class_schedule(request):
                 class_schedule.lesson_unit_price = lesson_unit_price
                 class_schedule.teacher = teacher
                 class_schedule.classes = classes
-                class_schedule.class_time = class_time
+                class_schedule.start_time = start_time
+                class_schedule.end_time = end_time
                 class_schedule.remark= remark
                         
                 class_schedule.save()
@@ -822,6 +829,7 @@ def edit_student(request, student_id):
         if form.is_valid():
             cleaned_data = form.cleaned_data
             full_name = cleaned_data.get('full_name')
+            grade = cleaned_data.get('grade')
             phone_number = cleaned_data.get('phone_number')
             address = cleaned_data.get('address')
             gender = cleaned_data.get('gender')
@@ -849,6 +857,7 @@ def edit_student(request, student_id):
                 user.remark = remark
 
                 student.status = status
+                student.grade = grade
            
                 user.save()
                 student.save()
@@ -875,9 +884,13 @@ def edit_course(request, course_id):
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
+            overview = form.cleaned_data.get('description')
+            level = form.cleaned_data.get('level_grade')
             try:
                 course = Course.objects.get(id=course_id)
                 course.name = name
+                course.overview = overview
+                course.level_end = level
                 course.save()
                 messages.success(request, "Successfully Updated")
             except:
@@ -1084,8 +1097,10 @@ def edit_class_schedule(request, schedule_id):
             course = form.cleaned_data.get('course')
             lesson_unit_price = form.cleaned_data.get('lesson_unit_price')
             teacher = form.cleaned_data.get('teacher')
-            classes = form.cleaned_data.get('classes')
-            class_time = form.cleaned_data.get('class_time')
+            grade = form.cleaned_data.get('grade')
+            start_time = form.cleaned_data.get('start_time')  # Corrected here
+            end_time = form.cleaned_data.get('end_time') 
+            lesson_hours = form.cleaned_data.get('lesson_hours') 
             remark = form.cleaned_data.get('remark')
             
             
@@ -1095,8 +1110,10 @@ def edit_class_schedule(request, schedule_id):
                 class_schedule.course = course
                 class_schedule.lesson_unit_price = lesson_unit_price
                 class_schedule.teacher = teacher
-                class_schedule.classes = classes
-                class_schedule.class_time = class_time
+                class_schedule.grade = grade
+                class_schedule.start_time = start_time
+                class_schedule.end_time = end_time
+                class_schedule.lesson_hours = lesson_hours
                 class_schedule.remark= remark
                 class_schedule.save()
 

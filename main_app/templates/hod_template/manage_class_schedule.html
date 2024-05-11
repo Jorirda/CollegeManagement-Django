@@ -36,7 +36,7 @@
                                     <td>¥{{ class_schedule.lesson_unit_price }}</td>
                                     <td>{{ class_schedule.teacher }}</td>
                                     <!-- <td>{{ class_schedule.subject }}</td> -->
-                                    <td>{{ class_schedule.class_time }}</td>
+                                    <td>{{ class_schedule.start_time|time:"h:i A" }} to {{ class_schedule.end_time|time:"h:i A" }}</td>
                                     <td>{{ class_schedule.remark }}</td>
                                     <td>
                                         <a href="{% url 'edit_class_schedule' class_schedule.id %}" class="btn btn-info">{% trans 'Edit' %}</a> - 

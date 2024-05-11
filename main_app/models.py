@@ -66,16 +66,18 @@ class Campus(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 class Admin(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     remark = models.TextField(default="")
 
     def __str__(self):
         return str(self.admin)
-
 class Course(models.Model):
     name = models.CharField(max_length=120)
+    overview = models.TextField(default="")
+    level_start = models.IntegerField(default=1)
+    level_end = models.IntegerField(default=4)
 
     def __str__(self):
         return self.name
@@ -87,7 +89,7 @@ class Student(models.Model):
     date_of_birth = models.DateField(blank=True, null=True)
     reg_date = models.DateField(blank=True, null=True)
     status = models.CharField(max_length=30, blank=True) 
-    grade = models.CharField(max_length=10, blank=True, null=True)  
+    grade = models.CharField(max_length=30, blank=True,null=True)  
 
     def __str__(self):
         return self.admin.full_name
@@ -105,22 +107,30 @@ class Teacher(models.Model):
 
 class Classes(models.Model):
     name = models.CharField(max_length=120)
-    teacher = models.ForeignKey(Teacher,on_delete=models.CASCADE,)
+    teacher = models.ForeignKey(Teacher,on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    start_time = models.TimeField(null=True)
-    end_time = models.TimeField(null=True)
-    lesson_hours = models.TextField(default="")
 
     def __str__(self):
         return self.name
-    
+
+
+class ClassSchedule(models.Model):
+    course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)
+    lesson_unit_price = models.DecimalField(max_digits=10,default=0, decimal_places=2)
+    teacher = models.ForeignKey(Teacher,null=True, on_delete=models.CASCADE)
+    grade = models.ForeignKey(Student,null=True, on_delete=models.DO_NOTHING)
+    start_time = models.TimeField(null=True)
+    end_time = models.TimeField(null=True)
+    lesson_hours = models.CharField(max_length=10, null=True)
+    remark = models.TextField(default="")
+
 class LearningRecord(models.Model):
     admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
     date = models.DateField()
-    student = models.ForeignKey(Student, null=True, on_delete=models.DO_NOTHING)    
+    student = models.ForeignKey(Student, null=True, on_delete=models.DO_NOTHING)
     course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Teacher, null=True, on_delete=models.CASCADE)
-    classes = models.ForeignKey(Classes, null=True, on_delete=models.CASCADE)
+    schedule = models.ForeignKey(ClassSchedule, null=True, on_delete=models.CASCADE)
 
 class Attendance(models.Model):
     session = models.ForeignKey(Session, on_delete=models.DO_NOTHING)
@@ -195,26 +205,16 @@ class PaymentRecord(models.Model):
 #     learning_record = models.ForeignKey(LearningRecord, on_delete=models.CASCADE)
 #     hours = models.DecimalField(max_digits=10, decimal_places=2)
 
-    
+
 #Refund page
 class RefundRecord(models.Model):
-    admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
+    # admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
     student = models.ForeignKey(Student,null=True, on_delete=models.CASCADE)
     learning_records = models.ForeignKey(LearningRecord, null=True, on_delete=models.CASCADE)
     payment_records = models.ForeignKey(PaymentRecord,null=True, on_delete=models.CASCADE)
     refund_amount = models.DecimalField(max_digits=10,null=True, decimal_places=2)
     amount_refunded = models.DecimalField(max_digits=10,null=True, decimal_places=2)
     refund_reason = models.TextField(null=True,)
-
-#Class Schedule
-class ClassSchedule(models.Model):
-    course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)
-    lesson_unit_price = models.DecimalField(max_digits=10, decimal_places=2)
-    teacher = models.ForeignKey(Teacher,null=True, on_delete=models.CASCADE)
-    classes = models.ForeignKey(Classes,null=True, on_delete=models.DO_NOTHING)
-    class_time = models.CharField(max_length=100)
-    remark = models.TextField(default="")
-
 
     def lesson_unit_price(self):
         # Fetch the related PaymentRecord for this ClassSchedule
@@ -353,23 +353,6 @@ def create_or_update_teacher_query(sender, instance, created, **kwargs):
 
 # Register signal handlers
 post_save.connect(create_or_update_teacher_query, sender=Teacher)
-
-# TeacherQuery here
-# class TeacherQuery(models.Model):
-#     GENDER_CHOICES = [
-#         ('M', 'Male'),
-#         ('F', 'Female'),
-#     ]
-
-#     admin = models.OneToOneField(CustomUser,null = True, on_delete=models.CASCADE)
-#     num_of_classes = models.IntegerField(null = True)
-#     registered_courses = models.CharField(max_length=100, null=True)
-#     completed_hours = models.IntegerField(null = True)
-#     paid_class_hours = models.IntegerField(null = True)
-#     remaining_hours = models.IntegerField(null = True)
-
-#     learning_records = models.ForeignKey(LearningRecord, null=True,on_delete=models.CASCADE)
-
 
 
 @receiver(post_save, sender=CustomUser)

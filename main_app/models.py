@@ -200,13 +200,14 @@ class PaymentRecord(models.Model):
     status = models.CharField(max_length=100)
     payee = models.CharField(max_length=255)
     remark = models.TextField(default="")
-    lesson_hours = models.DecimalField(max_digits=10, null=True, decimal_places=2)
+    lesson_hours = models.DecimalField(max_digits=10, default=0, decimal_places=2)
     learning_record = models.OneToOneField(
         LearningRecord, 
         null=True, 
         related_name='payment_record', 
         on_delete=models.SET_NULL
     )
+
 # class LessonHours(models.Model):
 #     learning_record = models.ForeignKey(LearningRecord, on_delete=models.CASCADE)
 #     hours = models.DecimalField(max_digits=10, decimal_places=2)

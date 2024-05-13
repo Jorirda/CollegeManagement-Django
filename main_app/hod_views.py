@@ -1023,7 +1023,8 @@ def edit_payment_record(request, payment_id):
             other_fee = form.cleaned_data.get('other_fee')
             amount_due = form.cleaned_data.get('amount_due')
             amount_paid = form.cleaned_data.get('amount_paid')
-            total_lesson_hours = form.cleaned_data.get('total_lesson_hours')
+            lesson_hours = form.cleaned_data.get('lesson_hours')
+            print(lesson_hours)
             payment_method = form.cleaned_data.get('payment_method')
             status = form.cleaned_data.get('status')
             payee = form.cleaned_data.get('payee')
@@ -1039,7 +1040,7 @@ def edit_payment_record(request, payment_id):
                 paymentrecord.book_costs = book_costs
                 paymentrecord.other_fee = other_fee
                 paymentrecord.amount_due = amount_due
-                paymentrecord.lesson_hours = total_lesson_hours
+                paymentrecord.lesson_hours = lesson_hours
                 paymentrecord.amount_paid = amount_paid
                 paymentrecord.payment_method = payment_method
                 paymentrecord.status = status
@@ -1051,12 +1052,12 @@ def edit_payment_record(request, payment_id):
                 # Check if lesson hours are retrieved properly
                 # if paymentrecord.learning_record:
                 #     # lesson_hours = paymentrecord.calculate_lesson_hours()
-                #     # if lesson_hours is not None:
-                #     #     messages.success(request, _("Lesson hours retrieved successfully"))
-                #     # else:
-                #     #     messages.error(request, _("Lesson hours are called but not being shown"))
+                #     if lesson_hours is not None:
+                #         messages.success(request, _("Lesson hours retrieved successfully"))
                 #     else:
-                #         messages.error(request, _("Lesson hours are not being retrieved"))
+                #         messages.error(request, _("Lesson hours are called but not being shown"))
+                # else:
+                #     messages.error(request, _("Lesson hours are not being retrieved"))
 
                 messages.success(request, "Successfully Updated")
                 return redirect(reverse('edit_payment_record', args=[payment_id]))

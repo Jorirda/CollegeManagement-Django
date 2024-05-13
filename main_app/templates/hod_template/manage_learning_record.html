@@ -40,6 +40,12 @@
                         </div>
                         <div class="ml-auto">
                             <form method="get" action="{% url 'manage_learning_record' %}" class="form-inline">
+                                <select name="grade" class="form-control">
+                                    <option value="" {% if not request.GET.grade %}selected{% endif %}>Select Grade</option>
+                                    {% for grade in grades %}
+                                    <option value="{{ grade }}" {% if request.GET.grade == grade %}selected{% endif %}>{{ grade }}</option>
+                                    {% endfor %}
+                                </select> 
                                 <select name="teacher_name" class="form-control">
                                     <option value="" {% if not request.GET.teacher_name %}selected{% endif %}>Select Teacher</option>
                                     {% for teacher in teachers %}

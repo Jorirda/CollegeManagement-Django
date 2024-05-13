@@ -140,7 +140,7 @@ class LearningRecord(models.Model):
 
 class Attendance(models.Model):
     session = models.ForeignKey(Session, on_delete=models.DO_NOTHING)
-    classes = models.ForeignKey(Classes, on_delete=models.DO_NOTHING)
+    classes = models.ForeignKey(ClassSchedule, on_delete=models.DO_NOTHING)
     date = models.DateField()
 
 class AttendanceReport(models.Model):
@@ -259,6 +259,7 @@ class TeacherQuery(models.Model):
     completed_hours = models.IntegerField(null=True)
     remaining_hours = models.IntegerField(null=True, default=0)  # Default value for remaining_hours
 
+@receiver(post_save, sender=Attendance)
 @receiver(post_save, sender=Student)
 @receiver(post_save, sender=LearningRecord)
 @receiver(post_save, sender=PaymentRecord)

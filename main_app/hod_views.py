@@ -69,21 +69,22 @@ def refund_records(request):
         if student_query.payment_records:  # Assuming 'Refunded' is a status
             print(student_query.payment_records.status)
             # Get related student information
+            # refund_amt = student_query.payment_records.amount_paid - ()
             student_info = {
                 'student_name': student_query.admin.get_full_name(),
                 'date_of_birth': student_query.student_records.date_of_birth,
                 'course': student_query.learning_records.course,
-                'total_hours' : "student_query.learning_records.total_hours",  # Assuming there's a field for total hours
+                'total_hours' : student_query.payment_records.lesson_hours,  # Assuming there's a field for total hours
                 'hours_spent': student_query.completed_hours,
                 'hours_remaining': student_query.remaining_hours,
                 'lesson_price': student_query.payment_records.lesson_unit_price,  # Assuming there's a field for lesson price
-                'refund_amount': "?",  # Assuming a function to calculate
-                'amount_refunded': student_query.payment_records.amount_paid,  # Assuming this field exists
-                'refund_reason': "student_query.refund_reason",  # Assuming this field exists
+                'refund_amount': student_query.payment_records.amount_paid,  # Assuming a function to calculate
+                'amount_refunded': ((student_query.payment_records.amount_paid - student_query.payment_records.lesson_unit_price)+((student_query.payment_records.lesson_unit_price / student_query.payment_records.lesson_hours)*(student_query.remaining_hours))),  # Assuming this field exists
+                'refund_reason': student_query.payment_records.remark,  # Assuming this field exists
             }
             # Append student query information to the list
             student_query_info.append(student_info)
-
+ 
     context = {
         'refund_info': student_query_info,
         'page_title': 'Manage Refund Records'
@@ -121,36 +122,36 @@ def get_result(excel_file, is_teacher):
 def admin_home(request):
     total_teacher = Teacher.objects.all().count()
     total_students = Student.objects.all().count()
-    classess = Classes.objects.all()
-    total_classes = classess.count()
+    classes = ClassSchedule.objects.all()
+    total_classes = classes.count()
     total_course = Course.objects.all().count()
-    attendance_list = Attendance.objects.filter(classes__in=classess)
+    attendance_list = Attendance.objects.filter(classes__in=classes)
     total_attendance = attendance_list.count()
     attendance_list = []
     classes_list = []
-    for classes in classess:
+    for classes in classes:
         attendance_count = Attendance.objects.filter(classes=classes).count()
-        classes_list.append(classes.name[:7])
+        classes_list.append(classes.course.name[:7])
         attendance_list.append(attendance_count)
 
-    # Total Classess and students in Each Course
+    # Total Classes and students in Each Course
     course_all = Course.objects.all()
     course_name_list = []
     classes_count_list = []
     student_count_list_in_course = []
 
     for course in course_all:
-        classess = Classes.objects.filter(course_id=course.id).count()
+        classes = Classes.objects.filter(course_id=course.id).count()
         students = Student.objects.filter(course_id=course.id).count()
         course_name_list.append(course.name)
-        classes_count_list.append(classess)
+        classes_count_list.append(classes)
         student_count_list_in_course.append(students)
     
     classes_all = Classes.objects.all()
     classes_list = []
     student_count_list_in_classes = []
     for classes in classes_all:
-        course = Course.objects.get(id=classes.course.id)
+        course = Course.objects.get(id=classes.course.pk)
         student_count = Student.objects.filter(course_id=course.id).count()
         classes_list.append(classes.name)
         student_count_list_in_classes.append(student_count)
@@ -169,7 +170,7 @@ def admin_home(request):
         leave = LeaveReportStudent.objects.filter(student_id=student.id, status=1).count()
         student_attendance_present_list.append(attendance)
         student_attendance_leave_list.append(leave+absent)
-        student_name_list.append(student.admin.first_name)
+        student_name_list.append(student.admin.full_name)
 
     context = {
         'page_title': _("Administrative Dashboard"),
@@ -544,7 +545,7 @@ def manage_course(request):
 def manage_classes(request):
     classes = Classes.objects.all()
     context = {
-        'classess': classes,
+        'classes': classes,
         'page_title': _('Manage Classes')
     }
     return render(request, "hod_template/manage_classes.html", context)
@@ -1249,10 +1250,10 @@ def view_student_leave(request):
             return False
 
 def admin_view_attendance(request):
-    classess = Classes.objects.all()
+    classes = Classes.objects.all()
     sessions = Session.objects.all()
     context = {
-        'classess': classess,
+        'classes': classes,
         'sessions': sessions,
         'page_title': _('View Attendance')
     }

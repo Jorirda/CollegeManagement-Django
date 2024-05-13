@@ -6,6 +6,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import (HttpResponseRedirect, get_object_or_404,redirect, render)
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import ObjectDoesNotExist
 
 from .forms import *
 from .models import *
@@ -39,10 +40,11 @@ def teacher_home(request):
 
 def teacher_take_attendance(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
-    classess = Classes.objects.filter(teacher_id=teacher)
+    print(teacher)
+    classes = ClassSchedule.objects.filter(teacher=teacher)
     sessions = Session.objects.all()
     context = {
-        'classess': classess,
+        'classes': classes,
         'sessions': sessions,
         'page_title': 'Take Attendance'
     }
@@ -55,15 +57,17 @@ def get_students(request):
     classes_id = request.POST.get('classes')
     session_id = request.POST.get('session')
     try:
-        classes = get_object_or_404(Classes, id=classes_id)
+        classes = get_object_or_404(ClassSchedule, id=classes_id)
+        print("hi")
+        print(classes)
         session = get_object_or_404(Session, id=session_id)
         students = Student.objects.filter(
-            course_id=classes.course.id, session=session)
+            course_id=classes.course)
         student_data = []
         for student in students:
             data = {
                     "id": student.id,
-                    "name": student.admin.last_name + " " + student.admin.first_name
+                    "name":  student.admin.full_name
                     }
             student_data.append(data)
         return JsonResponse(json.dumps(student_data), content_type='application/json', safe=False)
@@ -73,30 +77,45 @@ def get_students(request):
 
 @csrf_exempt
 def save_attendance(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid request'}, status=405)
+
     student_data = request.POST.get('student_ids')
     date = request.POST.get('date')
     classes_id = request.POST.get('classes')
     session_id = request.POST.get('session')
-    students = json.loads(student_data)
+
+    if not (student_data and date and classes_id and session_id):
+        return JsonResponse({'error': 'Missing data'}, status=400)
+
     try:
+        students = json.loads(student_data)
         session = get_object_or_404(Session, id=session_id)
-        classes = get_object_or_404(Classes, id=classes_id)
+        classes = get_object_or_404(ClassSchedule, id=classes_id)
         attendance = Attendance(session=session, classes=classes, date=date)
         attendance.save()
 
         for student_dict in students:
             student = get_object_or_404(Student, id=student_dict.get('id'))
-            attendance_report = AttendanceReport(student=student, attendance=attendance, status=student_dict.get('status'))
+            status = student_dict.get('status', 0)  # Assuming '0' as default status if not provided
+            attendance_report = AttendanceReport(student=student, attendance=attendance, status=status)
             attendance_report.save()
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except ObjectDoesNotExist as e:
+        return JsonResponse({'error': str(e)}, status=404)
     except Exception as e:
-        return None
+        # Log the exception for debugging purposes
+        # Consider using logging here instead of printing
+        print("An error occurred:", e)
+        return JsonResponse({'error': 'Server error'}, status=500)
 
     return HttpResponse("OK")
 
 
 def teacher_update_attendance(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
-    classess = Classes.objects.filter(teacher_id=teacher)
+    classess = Course.objects.filter(teacher_id=teacher)
     sessions = Session.objects.all()
     context = {
         'classess': classess,

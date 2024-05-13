@@ -175,40 +175,30 @@ class CampusForm(FormSettings):
         fields = [_('name')]
 
 class LearningRecordForm(FormSettings):
-    date = forms.DateField(required=False, widget=DateInput(attrs={'type': 'date'}), label=_('Date'))
+    date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}), label=_('Date'))
     student = forms.ModelChoiceField(queryset=Student.objects.all(), required=False, label=_("Name"))
     course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, label=_("Course"))
     teacher = forms.ModelChoiceField(queryset=Teacher.objects.all(), required=False, label=_("Teacher"))
-    start_time = forms.TimeField(required=False, label=_("Start Time"))
-    end_time = forms.TimeField(required=False, label=_("End Time"))
-    lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"), disabled=True)
-
-    def __init__(self, *args, **kwargs):
-        super(LearningRecordForm, self).__init__(*args, **kwargs)
-
-        # Reorder fields as requested
-        field_order = [_('student'), _('course'), _('teacher'), _('date'), _('start_time'), _('end_time'), _('lesson_hours')]
-
-        # Set the field order
-        self.fields = {k: self.fields[k] for k in field_order}
+    start_time = forms.TimeField(required=False, label=_("Start Time"), widget=forms.TimeInput(attrs={'readonly': 'readonly'}))
+    end_time = forms.TimeField(required=False, label=_("End Time"), widget=forms.TimeInput(attrs={'readonly': 'readonly'}))
+    lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"))
 
     class Meta:
         model = LearningRecord
         fields = ['date', 'student', 'course', 'teacher', 'start_time', 'end_time', 'lesson_hours']
 
-    def clean(self):
-        cleaned_data = super().clean()
-        course = cleaned_data.get('course')
-        teacher = cleaned_data.get('teacher')
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['start_time'].widget.attrs['readonly'] = True
+        self.fields['end_time'].widget.attrs['readonly'] = True
 
-        if course and teacher:
-            class_schedule = ClassSchedule.objects.filter(course=course, teacher=teacher).first()
-            if class_schedule:
-                cleaned_data['start_time'] = class_schedule.start_time
-                cleaned_data['end_time'] = class_schedule.end_time
-                cleaned_data['lesson_hours'] = class_schedule.lesson_hours
+    def set_class_schedule_data(self, course_id, teacher_id):
+        class_schedule = ClassSchedule.objects.filter(course_id=course_id, teacher_id=teacher_id).first()
+        if class_schedule:
+            self.fields['start_time'].initial = class_schedule.start_time.strftime('%H:%M')
+            self.fields['end_time'].initial = class_schedule.end_time.strftime('%H:%M')
+            self.fields['lesson_hours'].initial = class_schedule.lesson_hours if class_schedule.lesson_hours is not None else ''
 
-        return cleaned_data
 
 
 

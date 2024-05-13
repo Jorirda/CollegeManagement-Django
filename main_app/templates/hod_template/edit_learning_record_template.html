@@ -22,4 +22,41 @@
         </div>
     </div>
 </section>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#id_course, #id_teacher').change(function () {
+            var courseId = $('#id_course').val();
+            var teacherId = $('#id_teacher').val();
+    
+            $.ajax({
+                url: '/fetch-class-schedule/',
+                method: 'GET',
+                data: {
+                    'course_id': courseId,
+                    'teacher_id': teacherId
+                },
+                dataType: 'json', // Ensure proper JSON handling
+                success: function (data) {
+                    if (data) {
+                        $('#id_start_time').val(data.start_time || '');
+                        $('#id_end_time').val(data.end_time || '');
+                        $('#id_lesson_hours').val(data.lesson_hours || '');
+                    } else {
+                        $('#id_start_time').val('');
+                        $('#id_end_time').val('');
+                        $('#id_lesson_hours').val('');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr.responseText);
+                    // Handle errors here, for example, show an alert to the user
+                    alert("Failed to fetch class schedule. Please try again later.");
+                }
+            });
+        });
+    });
+</script>
+
+    
 {% endblock content %}

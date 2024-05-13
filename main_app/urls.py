@@ -82,7 +82,7 @@ urlpatterns = [
     path("payment/edit/<int:payment_id>",hod_views.edit_payment_record, name='edit_payment_record'),
     path("learn/edit/<int:learn_id>",hod_views.edit_learning_record, name='edit_learning_record'),
     path("schedule/edit/<int:schedule_id>",hod_views.edit_class_schedule, name='edit_class_schedule'),
-   
+    path('fetch-class-schedule/', hod_views.fetch_class_schedule, name='fetch_class_schedule'),
 
     #delete
     path("teacher/delete/<int:teacher_id>",hod_views.delete_teacher, name='delete_teacher'),

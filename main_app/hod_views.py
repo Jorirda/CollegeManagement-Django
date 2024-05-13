@@ -606,6 +606,7 @@ def manage_student_query(request):
         for student_query in student_queries:
             # Check if the student_query has an associated payment_records object
             if student_query.payment_records:
+                priceper = (student_query.payment_records.amount_paid / student_query.payment_records.lesson_hours)
                 # Get related student information
                 student_info = {
                     'student_name': student_query.admin.get_full_name(),
@@ -630,6 +631,7 @@ def manage_student_query(request):
                     'end_time': student_query.learning_records.end_time,
                     'paid': student_query.payment_records.amount_paid,
                     'lesson_hours': student_query.learning_records.lesson_hours,
+                    'paid_class_hours': student_query.payment_records.lesson_hours,
                     # 'class': student_query.learning_records.class_name,
                 }
                 # Append student query information to the list

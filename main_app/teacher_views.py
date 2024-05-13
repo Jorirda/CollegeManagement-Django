@@ -15,23 +15,23 @@ def teacher_home(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
     total_students = Student.objects.filter(course=teacher.course).count()
     total_leave = LeaveReportTeacher.objects.filter(teacher=teacher).count()
-    subjects = Subject.objects.filter(teacher=teacher)
-    total_subject = subjects.count()
-    attendance_list = Attendance.objects.filter(subject__in=subjects)
+    classess = Classes.objects.filter(teacher=teacher)
+    total_classes = classess.count()
+    attendance_list = Attendance.objects.filter(classes__in=classess)
     total_attendance = attendance_list.count()
     attendance_list = []
-    subject_list = []
-    for subject in subjects:
-        attendance_count = Attendance.objects.filter(subject=subject).count()
-        subject_list.append(subject.name)
+    classes_list = []
+    for classes in classess:
+        attendance_count = Attendance.objects.filter(classes=classes).count()
+        classes_list.append(classes.name)
         attendance_list.append(attendance_count)
     context = {
         'page_title': 'Teacher Panel - ' + str(teacher.admin.last_name) + ' (' + str(teacher.course) + ')',
         'total_students': total_students,
         'total_attendance': total_attendance,
         'total_leave': total_leave,
-        'total_subject': total_subject,
-        'subject_list': subject_list,
+        'total_classes': total_classes,
+        'classes_list': classes_list,
         'attendance_list': attendance_list
     }
     return render(request, 'teacher_template/home_content.html', context)
@@ -39,10 +39,10 @@ def teacher_home(request):
 
 def teacher_take_attendance(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
-    subjects = Subject.objects.filter(teacher_id=teacher)
+    classess = Classes.objects.filter(teacher_id=teacher)
     sessions = Session.objects.all()
     context = {
-        'subjects': subjects,
+        'classess': classess,
         'sessions': sessions,
         'page_title': 'Take Attendance'
     }
@@ -52,13 +52,13 @@ def teacher_take_attendance(request):
 
 @csrf_exempt
 def get_students(request):
-    subject_id = request.POST.get('subject')
+    classes_id = request.POST.get('classes')
     session_id = request.POST.get('session')
     try:
-        subject = get_object_or_404(Subject, id=subject_id)
+        classes = get_object_or_404(Classes, id=classes_id)
         session = get_object_or_404(Session, id=session_id)
         students = Student.objects.filter(
-            course_id=subject.course.id, session=session)
+            course_id=classes.course.id, session=session)
         student_data = []
         for student in students:
             data = {
@@ -75,13 +75,13 @@ def get_students(request):
 def save_attendance(request):
     student_data = request.POST.get('student_ids')
     date = request.POST.get('date')
-    subject_id = request.POST.get('subject')
+    classes_id = request.POST.get('classes')
     session_id = request.POST.get('session')
     students = json.loads(student_data)
     try:
         session = get_object_or_404(Session, id=session_id)
-        subject = get_object_or_404(Subject, id=subject_id)
-        attendance = Attendance(session=session, subject=subject, date=date)
+        classes = get_object_or_404(Classes, id=classes_id)
+        attendance = Attendance(session=session, classes=classes, date=date)
         attendance.save()
 
         for student_dict in students:
@@ -96,10 +96,10 @@ def save_attendance(request):
 
 def teacher_update_attendance(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
-    subjects = Subject.objects.filter(teacher_id=teacher)
+    classess = Classes.objects.filter(teacher_id=teacher)
     sessions = Session.objects.all()
     context = {
-        'subjects': subjects,
+        'classess': classess,
         'sessions': sessions,
         'page_title': 'Update Attendance'
     }
@@ -255,30 +255,30 @@ def teacher_view_notification(request):
 
 def teacher_add_result(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
-    subjects = Subject.objects.filter(teacher=teacher)
+    classess = Classes.objects.filter(teacher=teacher)
     sessions = Session.objects.all()
     context = {
         'page_title': 'Result Upload',
-        'subjects': subjects,
+        'classess': classess,
         'sessions': sessions
     }
     if request.method == 'POST':
         try:
             student_id = request.POST.get('student_list')
-            subject_id = request.POST.get('subject')
+            classes_id = request.POST.get('classes')
             test = request.POST.get('test')
             exam = request.POST.get('exam')
             student = get_object_or_404(Student, id=student_id)
-            subject = get_object_or_404(Subject, id=subject_id)
+            classes = get_object_or_404(Classes, id=classes_id)
             try:
                 data = StudentResult.objects.get(
-                    student=student, subject=subject)
+                    student=student, classes=classes)
                 data.exam = exam
                 data.test = test
                 data.save()
                 messages.success(request, "Scores Updated")
             except:
-                result = StudentResult(student=student, subject=subject, test=test, exam=exam)
+                result = StudentResult(student=student, classes=classes, test=test, exam=exam)
                 result.save()
                 messages.success(request, "Scores Saved")
         except Exception as e:
@@ -289,11 +289,11 @@ def teacher_add_result(request):
 @csrf_exempt
 def fetch_student_result(request):
     try:
-        subject_id = request.POST.get('subject')
+        classes_id = request.POST.get('classes')
         student_id = request.POST.get('student')
         student = get_object_or_404(Student, id=student_id)
-        subject = get_object_or_404(Subject, id=subject_id)
-        result = StudentResult.objects.get(student=student, subject=subject)
+        classes = get_object_or_404(Classes, id=classes_id)
+        result = StudentResult.objects.get(student=student, classes=classes)
         result_data = {
             'exam': result.exam,
             'test': result.test

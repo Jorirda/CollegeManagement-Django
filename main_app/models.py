@@ -6,6 +6,7 @@ from django.db import IntegrityError, models
 from django.contrib.auth.models import AbstractUser
 from datetime import datetime, timedelta, date
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Sum
 
 
 
@@ -188,6 +189,7 @@ class StudentResult(models.Model):
 #Payment Record
 class PaymentRecord(models.Model):
     date = models.DateField()
+    # next_payment_date = models.DateField()
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     lesson_unit_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -292,6 +294,20 @@ def create_or_update_student_query(sender, instance, created, **kwargs):
         if payment_record_instance:
             student_query.payment_records = payment_record_instance
 
+        student_query.paid_class_hours =  (student_query.payment_records.lesson_hours)
+        
+        # Retrieve the student's learning records as a queryset
+        learning_records_query = LearningRecord.objects.filter(student=student)
+
+        # Aggregate the total lesson hours
+        total_lesson_hours = learning_records_query.aggregate(Sum('lesson_hours'))['lesson_hours__sum'] or 0
+        total_lesson_hours = int(total_lesson_hours)  # Convert to int, truncating decimals
+
+        # Use the aggregated hours in your calculation
+        attendance_count = AttendanceReport.objects.filter(student_id=student_query.pk).count()
+        student_query.remaining_hours = student_query.paid_class_hours - (total_lesson_hours * attendance_count)
+        student_query.completed_hours = (total_lesson_hours * attendance_count)
+        
         # Assuming you want to save the student_query after modifications
         try:
             student_query.save()

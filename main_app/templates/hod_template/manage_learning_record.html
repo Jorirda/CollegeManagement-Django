@@ -6,25 +6,22 @@
 
 {% block content %}
 <style>
-    /* Flex container for responsive button alignment */
     .responsive-buttons {
         display: flex;
-        justify-content: space-around; /* Distributes space around items */
-        flex-wrap: wrap; /* Allows items to wrap onto the next line as needed */
+        justify-content: space-around;
+        flex-wrap: wrap;
     }
 
-    /* Responsive button styling */
     .btn-responsive {
-        flex: 1 1 auto; /* Allows the button to grow and shrink as needed */
-        margin: 5px; /* Adds margin around buttons */
-        min-width: 68px; /* Minimum width of each button */
-        text-align: center; /* Centers button text */
+        flex: 1 1 auto;
+        margin: 5px;
+        min-width: 68px;
+        text-align: center;
     }
 
-    /* Media query for smaller screens */
     @media (max-width: 576px) {
         .btn-responsive {
-            flex-basis: 100%; /* Each button takes full width of the container on small screens */
+            flex-basis: 100%;
         }
     }
 </style>
@@ -40,21 +37,21 @@
                         </div>
                         <div class="ml-auto">
                             <form method="get" action="{% url 'manage_learning_record' %}" class="form-inline">
-                                <select name="grade" class="form-control">
-                                    <option value="" {% if not request.GET.grade %}selected{% endif %}>Select Grade</option>
+                                <select name="grade" id="gradeFilter" class="form-control">
+                                    <option value="" {% if not request.GET.grade %}selected{% endif %}>{% trans "Select Grade" %}</option>
                                     {% for grade in grades %}
-                                    <option value="{{ grade }}" {% if request.GET.grade == grade %}selected{% endif %}>{{ grade }}</option>
+                                    <option value="{{ grade.0 }}" {% if request.GET.grade == grade.0 %}selected{% endif %}>{{ grade.1 }}</option>
                                     {% endfor %}
-                                </select> 
+                                </select>
                                 <select name="teacher_name" class="form-control">
-                                    <option value="" {% if not request.GET.teacher_name %}selected{% endif %}>Select Teacher</option>
+                                    <option value="" {% if not request.GET.teacher_name %}selected{% endif %}>{% trans "Select Teacher" %}</option>
                                     {% for teacher in teachers %}
-                                    <option value="{{ teacher.admin.id }}" {% if request.GET.teacher_name == teacher.admin.id %}selected{% endif %}>
-                                        {{ teacher.admin.full_name }}  <!-- Adjust if different -->
+                                    <option value="{{ teacher.admin.id }}" {% if request.GET.teacher_name == teacher.admin.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ teacher.admin.full_name }}
                                     </option>
                                     {% endfor %}
                                 </select>
-                                <button type="submit" class="btn btn-success ml-2">Filter</button>
+                                <button type="submit" class="btn btn-success ml-2">{% trans "Filter" %}</button>
                             </form>
                         </div>
                     </div>
@@ -101,5 +98,4 @@
         </div>
     </div>
 </section>
-
 {% endblock content %}

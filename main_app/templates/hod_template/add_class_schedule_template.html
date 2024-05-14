@@ -21,8 +21,6 @@
         </div>
     </div>
 </section>
-
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{% static 'js/moment.min.js' %}"></script>
 <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
@@ -54,7 +52,26 @@
             var minutes = Math.floor(duration.asMinutes()) % 60;
 
             var lessonHoursField = $('#id_lesson_hours');
-            lessonHoursField.val(hours + 'h ' + (minutes ? (minutes + 'm') : ''));
+            if (minutes === 0) {
+                lessonHoursField.val(hours + 'h');
+            } else {
+                lessonHoursField.val(hours + 'h ' + minutes + 'm');
+            }
         }
+    });
+    document.getElementById('id_course').addEventListener('change', function() {
+        var courseId = this.value;
+        fetch(`/get-grade-choices/?course_id=${courseId}`)
+            .then(response => response.json())
+            .then(data => {
+                var select = document.getElementById('id_grade');
+                select.innerHTML = '';
+                data.choices.forEach(function(choice) {
+                    var option = new Option(choice[1], choice[0]);
+                    select.add(option);
+                });
+            });
+    });
 </script>
+
 {% endblock content %}

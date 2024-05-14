@@ -192,15 +192,6 @@ class LearningRecordForm(FormSettings):
         self.fields['start_time'].widget.attrs['readonly'] = True
         self.fields['end_time'].widget.attrs['readonly'] = True
 
-    def set_class_schedule_data(self, course_id, teacher_id):
-        class_schedule = ClassSchedule.objects.filter(course_id=course_id, teacher_id=teacher_id).first()
-        if class_schedule:
-            self.fields['start_time'].initial = class_schedule.start_time.strftime('%H:%M')
-            self.fields['end_time'].initial = class_schedule.end_time.strftime('%H:%M')
-            self.fields['lesson_hours'].initial = class_schedule.lesson_hours if class_schedule.lesson_hours is not None else ''
-
-
-
 
 class PaymentRecordForm(FormSettings):
     payee = forms.CharField(label=_('Payee'))

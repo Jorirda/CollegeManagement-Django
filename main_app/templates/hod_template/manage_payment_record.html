@@ -8,17 +8,46 @@
 
 {% block content %}
 <style>
-    /* Additional styles */
+    .responsive-buttons {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+
+    .btn-responsive {
+        flex: 1 1 auto;
+        margin: 5px;
+        min-width: 68px;
+        text-align: center;
+    }
+
+    @media (max-width: 576px) {
+        .btn-responsive {
+            flex-basis: 100%;
+        }
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    th, td {
+        white-space: nowrap;
+    }
 </style>
 <section class="content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header">
-                        <!-- Card header content -->
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="d-flex align-items-center">
+                            <i class="nav-icon fas fa-yen-sign" style="font-size: 24px; margin-right: 10px;"></i>
+                            <h3 class="card-title">{{ page_title }}</h3>
+                        </div>
                     </div>
-                    <div class="card-body">
+                    <!-- /.card-header -->
+                    <div class="card-body table-container">
                         <table id="example2" class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>

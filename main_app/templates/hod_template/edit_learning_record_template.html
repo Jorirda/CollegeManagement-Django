@@ -24,33 +24,74 @@
 </section>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-        $(document).ready(function () {
+    $(document).ready(function () {
         $('#id_course, #id_teacher').change(function () {
             var courseId = $('#id_course').val();
             var teacherId = $('#id_teacher').val();
-
+            
+            // Check if both course and teacher are selected
+            if (courseId && teacherId) {
+                $.ajax({
+                    url: '/fetch-class-schedule/',
+                    method: 'GET',
+                    data: {
+                        'course_id': courseId,
+                        'teacher_id': teacherId
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data) {
+                            $('#id_start_time').val(data.start_time || '');
+                            $('#id_end_time').val(data.end_time || '');
+                            $('#id_lesson_hours').val(data.lesson_hours || '');
+                            // Set the selected teacher
+                            $('#id_teacher').val(teacherId);
+                        } else {
+                            $('#id_start_time').val('');
+                            $('#id_end_time').val('');
+                            $('#id_lesson_hours').val('');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(xhr.responseText); 
+                        // Handle errors here, for example, show an alert to the user
+                        alert("Failed to fetch class schedule. Please try again later.");
+                    }
+                });
+            }
+        });
+        
+        $('#id_course').change(function () {
+            var courseId = $(this).val();
+            
+            //Filter Teachers based on the selected course
             $.ajax({
-                url: '/fetch-class-schedule/',
+                url: '/filter-teachers/',
                 method: 'GET',
                 data: {
-                    'course_id': courseId,
-                    'teacher_id': teacherId
+                    'course_id': courseId
                 },
                 dataType: 'json',
                 success: function (data) {
-                    $('#id_start_time').val(data.start_time || '');
-                    $('#id_end_time').val(data.end_time || '');
-                    $('#id_lesson_hours').val(data.lesson_hours || '');
+                    if (data) {
+                        $('#id_teacher').empty();
+                        $.each(data.teachers, function(index, teacher) {
+                            $('#id_teacher').append('<option value="'+ teacher[0] + '">' + teacher[1] + '</option>');
+                        });
+                    } else {
+                        $('#id_teacher').empty().append('<option value="">No teachers available</option>');
+                    }
                 },
                 error: function (xhr, status, error) {
-                    console.error(xhr.responseText);
+                    console.error(xhr.responseText); 
+                    // Handle errors here, for example, show an alert to the user
                     alert("Failed to fetch class schedule. Please try again later.");
                 }
+
             });
         });
     });
-
-</script> 
+</script>
 {% endblock content %}
 
 

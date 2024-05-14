@@ -178,7 +178,7 @@ class LearningRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}), label=_('Date'))
     student = forms.ModelChoiceField(queryset=Student.objects.all(), required=False, label=_("Name"))
     course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, label=_("Course"))
-    teacher = forms.ModelChoiceField(queryset=Teacher.objects.all(), required=False, label=_("Teacher"))
+    teacher = forms.ModelChoiceField(queryset=Teacher.objects.none(), required=False, label=_("Teacher"))  # Changed queryset to none
     start_time = forms.TimeField(required=False, label=_("Start Time"), widget=forms.TimeInput(attrs={'readonly': 'readonly'}))
     end_time = forms.TimeField(required=False, label=_("End Time"), widget=forms.TimeInput(attrs={'readonly': 'readonly'}))
     lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"), disabled=True)
@@ -191,6 +191,12 @@ class LearningRecordForm(FormSettings):
         super().__init__(*args, **kwargs)
         self.fields['start_time'].widget.attrs['readonly'] = True
         self.fields['end_time'].widget.attrs['readonly'] = True
+
+        if 'course' in self.data:
+            course_id = int(self.data['course'])
+            self.filter_teachers_by_course(course_id)
+        elif self.instance.pk:
+            self.filter_teachers_by_course(self.instance.course_id)
 
     def fetch_class_schedule_data(self, course_id, teacher_id):
         class_schedule = ClassSchedule.objects.filter(course_id=course_id, teacher_id=teacher_id).first()
@@ -208,14 +214,26 @@ class LearningRecordForm(FormSettings):
                 'lesson_hours': None
             }
 
+    def fetch_teacher_data(self, course_id):
+        if course_id:
+            teachers = Teacher.objects.filter(classschedule__course_id=course_id).distinct()
+            return [(teacher.id, teacher.admin.full_name) for teacher in teachers]  # Return list of tuples
+        else:
+            return []
+
+    def filter_teachers_by_course(self, course_id):
+        if course_id:
+            self.fields['teacher'].queryset = Teacher.objects.filter(classschedule__course_id=course_id).distinct()
+        else:
+            self.fields['teacher'].queryset = Teacher.objects.none()  # Set queryset to empty when no course is selected
+
+
     # def set_class_schedule_data(self, course_id, teacher_id):
     #     class_schedule = ClassSchedule.objects.filter(course_id=course_id, teacher_id=teacher_id).first()
     #     if class_schedule:
     #         self.fields['start_time'].initial = class_schedule.start_time.strftime('%H:%M')
     #         self.fields['end_time'].initial = class_schedule.end_time.strftime('%H:%M')
     #         self.fields['lesson_hours'].initial = class_schedule.lesson_hours if class_schedule.lesson_hours is not None else ''
-
-
 
 class PaymentRecordForm(FormSettings):
     payee = forms.CharField(label=_('Payee'))

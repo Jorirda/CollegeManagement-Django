@@ -28,6 +28,7 @@ from django.views.generic import TemplateView
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from datetime import time
 from django.http import JsonResponse
+from django.core import serializers
 
 
 class SidebarView(TemplateView):
@@ -90,6 +91,14 @@ def fetch_class_schedule(request):
     data = form.fetch_class_schedule_data(course_id, teacher_id)
     
     return JsonResponse(data)
+
+def filter_teachers(request):
+    course_id = request.GET.get('course_id')
+    form = LearningRecordForm()
+    teachers_data = form.fetch_teacher_data(course_id)
+    print(teachers_data)
+    return JsonResponse({'teachers': teachers_data})
+
 
 # def fetch_class_schedule(request):
 #     course_id = request.GET.get('course_id')
@@ -171,7 +180,7 @@ def admin_home(request):
     student_count_list_in_course = []
 
     for course in course_all:
-        classes = Classes.objects.filter(course_id=course.id).count()
+        classes = ClassSchedule.objects.filter(course_id=course.id).count()
         students = Student.objects.filter(course_id=course.id).count()
         course_name_list.append(course.name)
         classes_count_list.append(classes)
@@ -187,9 +196,9 @@ def admin_home(request):
         student_count_list_in_classes.append(student_count)
 
     # For Students
-    student_attendance_present_list=[]
-    student_attendance_leave_list=[]
-    student_name_list=[]
+    student_attendance_present_list = []
+    student_attendance_leave_list = []
+    student_name_list = []
 
     students = Student.objects.all()
     for student in students:
@@ -208,8 +217,10 @@ def admin_home(request):
         total_hours = LearningRecord.objects.filter(teacher=teacher).aggregate(Sum('lesson_hours'))['lesson_hours__sum'] or 0
         lesson_hours.append(total_hours)
 
-    total_income = 0  # Calculate total income if you have a way to do so
+    # Calculate total income
+    total_income = PaymentRecord.objects.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
 
+    # Breakdown for Percentage of Course Participants
     course_participants_percentage = []
     for course in course_all:
         total_students_in_course = Student.objects.filter(course_id=course.id).count()
@@ -1168,7 +1179,6 @@ def edit_learning_record(request, learn_id):
             
     return render(request, 'hod_template/edit_learning_record_template.html', context)
 
-
 def delete_learning_record(request, learn_id):
     learn = get_object_or_404(LearningRecord, id=learn_id)
     learn.delete()
@@ -1446,7 +1456,7 @@ def get_admin_attendance(request):
     session_id = request.POST.get('session')
     attendance_date_id = request.POST.get('attendance_date_id')
     try:
-        classes = get_object_or_404(Classes, id=classes_id)
+        classes = get_object_or_404(ClassSchedule, id=classes_id)
         session = get_object_or_404(Session, id=session_id)
         attendance = get_object_or_404(
             Attendance, id=attendance_date_id, session=session)

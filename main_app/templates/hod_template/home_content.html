@@ -49,6 +49,19 @@
                 </div>
             </div>
             <!-- ./col -->
+            <div class="col-lg-3 col-6">
+                <!-- small box -->
+                <div class="small-box bg-dark">
+                    <div class="inner">
+                        <h3>{{ total_income }}</h3>
+                        <p>{% trans "¥ Total Income" %}</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <a href="{% url 'manage_payment_record' %}" class="small-box-footer">{% trans "More info" %} <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
         </div>
         <!-- /.row -->
         <!-- Main row -->
@@ -74,7 +87,7 @@
             <div class="col-md-6">
                 <div class="card card-dark">
                   <div class="card-header">
-                    <h3 class="card-title">{% trans "Attendance Per Classes" %}</h3>
+                    <h3 class="card-title">{% trans "Attendance Per Course" %}</h3>
                     <div class="card-tools">
                       <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
                       <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
@@ -192,22 +205,6 @@
             <!-- /.card -->
           </div>
         </div>
-
-        <!-- Total Income -->
-        <div class="row">
-          <div class="col-lg-12">
-            <!-- SMALL BOX -->
-            <div class="small-box bg-dark">
-              <div class="inner">
-                <h3>{{ total_income }}</h3>
-                <p>{% trans "Total Income" %}</p>
-              </div>
-              <div class="icon">
-                <i class="fas fa-dollar-sign"></i>
-              </div>
-            </div>
-          </div>
-        </div>
     </div><!-- /.container-fluid -->
 </section>
 {% endblock content %}
@@ -220,7 +217,7 @@
             datasets: [
               {
                 data:[{{ total_students }}, {{ total_teacher }}],
-                backgroundColor : ['#00a65a', '#f39c12'],
+                backgroundColor : ['#0071A6', '#F31212'],
               }
             ]
           }
@@ -243,7 +240,7 @@
           labels  : classes_list,
           datasets: [
             {
-              label               : 'Attendance Per Classes',
+              label               : 'Attendance Per Course',
               backgroundColor     : '#17A2B8',
               borderColor         : 'rgba(60,141,188,0.8)',
               pointRadius          : false,
@@ -286,7 +283,7 @@
           datasets: [
             {
               data: student_count_list_in_classes,
-              backgroundColor : ['#8f251f', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#894e9c', '#0b523a', '#a1156d', '#9e4603'],
+              backgroundColor : ['#FF6F22', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#894e9c', '#0b523a', '#a1156d', '#9e4603'],
             }
           ]
         }
@@ -364,7 +361,7 @@
           datasets: [
             {
               data: student_count_list_in_course,
-              backgroundColor : ['#cc0404', '#00a65a', '#f39c12', '#00A4BD', '#045c8f', '#894e9c', '#9e4603', '#71bfb2'],
+              backgroundColor : ['#FF6F22', '#BF19D5', '#1255F3', '#65BD00', '#04048F', '#1EDEC2', '#EF2020', '#FF0D72'],
             }
           ]
         }

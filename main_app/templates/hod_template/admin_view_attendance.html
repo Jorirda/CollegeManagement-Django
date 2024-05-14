@@ -39,11 +39,11 @@
                     </div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label>{% trans "Subject" %}</label>
-                            <select name="subject" class="form-control" id='subject'>
+                            <label>{% trans "Course" %}</label>
+                            <select name="course" class="form-control" id='course'>
                                 <option value="">{% trans "----" %}</option>
-                                {% for subject in subjects %}
-                                <option value="{{subject.id}}">{{subject.name}}</option>
+                                {% for course in courses %}
+                                <option value="{{course.id}}">{{course.name}}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -86,12 +86,12 @@
 <script>
     $(document).ready(function () {
         $("#fetch_attendance").click(function(){
-            var subject = $("#subject").val()
+            var course = $("#course").val()
             var session = $("#session").val()
             $("#student_data").html("")
 
-            if (session.length < 1 || subject.length < 1){
-                $("#error_attendance").html("{% trans "Kindly Choose Both Subject and Session" %}")
+            if (session.length < 1 || course.length < 1){
+                $("#error_attendance").html("{% trans "Kindly Choose Both Course and Session" %}")
                 $("#attendance_block").hide()
                 $("#error_attendance").show()
                 return false

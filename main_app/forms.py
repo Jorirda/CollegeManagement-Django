@@ -174,14 +174,14 @@ class CampusForm(FormSettings):
         model = Campus
         fields = [_('name')]
 
-class LearningRecordForm(FormSettings):
+class LearningRecordForm(forms.ModelForm):
     date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}), label=_('Date'))
     student = forms.ModelChoiceField(queryset=Student.objects.all(), required=False, label=_("Name"))
     course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, label=_("Course"))
     teacher = forms.ModelChoiceField(queryset=Teacher.objects.all(), required=False, label=_("Teacher"))
     start_time = forms.TimeField(required=False, label=_("Start Time"), widget=forms.TimeInput(attrs={'readonly': 'readonly'}))
     end_time = forms.TimeField(required=False, label=_("End Time"), widget=forms.TimeInput(attrs={'readonly': 'readonly'}))
-    lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"))
+    lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"), disabled=True)
 
     class Meta:
         model = LearningRecord
@@ -191,6 +191,30 @@ class LearningRecordForm(FormSettings):
         super().__init__(*args, **kwargs)
         self.fields['start_time'].widget.attrs['readonly'] = True
         self.fields['end_time'].widget.attrs['readonly'] = True
+
+    def fetch_class_schedule_data(self, course_id, teacher_id):
+        class_schedule = ClassSchedule.objects.filter(course_id=course_id, teacher_id=teacher_id).first()
+        if class_schedule:
+            return {
+                'start_time': class_schedule.start_time.strftime('%H:%M') if class_schedule.start_time else None,
+                'end_time': class_schedule.end_time.strftime('%H:%M') if class_schedule.end_time else None,
+                'lesson_hours': class_schedule.lesson_hours if class_schedule.lesson_hours is not None else None
+            }
+        else:
+            # If no class schedule is found, return default values or an empty dictionary
+            return {
+                'start_time': None,
+                'end_time': None,
+                'lesson_hours': None
+            }
+
+    # def set_class_schedule_data(self, course_id, teacher_id):
+    #     class_schedule = ClassSchedule.objects.filter(course_id=course_id, teacher_id=teacher_id).first()
+    #     if class_schedule:
+    #         self.fields['start_time'].initial = class_schedule.start_time.strftime('%H:%M')
+    #         self.fields['end_time'].initial = class_schedule.end_time.strftime('%H:%M')
+    #         self.fields['lesson_hours'].initial = class_schedule.lesson_hours if class_schedule.lesson_hours is not None else ''
+
 
 
 class PaymentRecordForm(FormSettings):

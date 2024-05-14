@@ -79,6 +79,7 @@ class Course(models.Model):
     overview = models.TextField(default="")
     level_start = models.IntegerField(default=1)
     level_end = models.IntegerField(default=4)
+    # semester = models.ForeignKey(Session, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.name
@@ -189,7 +190,7 @@ class StudentResult(models.Model):
 #Payment Record
 class PaymentRecord(models.Model):
     date = models.DateField()
-    # next_payment_date = models.DateField()
+    next_payment_date = models.DateField(null=True)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     lesson_unit_price = models.DecimalField(max_digits=10, decimal_places=2)

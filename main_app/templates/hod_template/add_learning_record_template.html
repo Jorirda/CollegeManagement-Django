@@ -14,7 +14,7 @@
                     <div class="card-header">
                         <h3 class="card-title">{% trans page_title %}</h3>
                     </div>
-                    {% include "main_app/form_template.html" with messages=messages  form=form button_text=_("Add Record")%}
+                    {% include "main_app/form_template.html" with messages=messages  form=form button_text=_("Update Record")%}
                 </div>
                 <!-- /.card -->
 
@@ -25,44 +25,39 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
-        $('#id_course').change(function () {
-            var courseId = $(this).val();
-            
-            // Check if a course is selected
-            if (courseId) {
+        $('#id_course, #id_teacher').change(function () {
+            var courseId = $('#id_course').val();
+            var teacherId = $('#id_teacher').val();
+
+            // Check if both course and teacher are selected
+            if (courseId && teacherId) {
                 $.ajax({
-                    url: '/fetch-teachers-by-course/',
+                    url: '/fetch-class-schedule/',
                     method: 'GET',
                     data: {
-                        'course_id': courseId
+                        'course_id': courseId,
+                        'teacher_id': teacherId
                     },
-                    dataType: 'json',
+                    dataType: 'json', // Ensure proper JSON handling
                     success: function (data) {
-                        if (data && data.teachers) {
-                            var teachersSelect = $('#id_teacher');
-                            teachersSelect.empty();
-                            $.each(data.teachers, function (index, teacher) {
-                                teachersSelect.append('<option value="' + teacher.id + '">' + teacher.admin.full_name + '</option>');
-                            });
+                        if (data) {
+                            $('#id_start_time').val(data.start_time || '');
+                            $('#id_end_time').val(data.end_time || '');
+                            $('#id_lesson_hours').val(data.lesson_hours || '');
                         } else {
-                            $('#id_teacher').empty();
+                            $('#id_start_time').val('');
+                            $('#id_end_time').val('');
+                            $('#id_lesson_hours').val('');
                         }
                     },
                     error: function (xhr, status, error) {
                         console.error(xhr.responseText);
-                        alert("Failed to fetch teachers. Please try again later.");
+                        // Handle errors here, for example, show an alert to the user
+                        alert("Failed to fetch class schedule. Please try again later.");
                     }
                 });
-            } else {
-                $('#id_teacher').empty();
             }
-        });
-
-        // Prevent form submission on page reload
-        $('#learning-record-form').submit(function (e) {
-            e.preventDefault();
         });
     });
 </script>
-
 {% endblock content %}

@@ -83,7 +83,6 @@ urlpatterns = [
     path("learn/edit/<int:learn_id>",hod_views.edit_learning_record, name='edit_learning_record'),
     path("schedule/edit/<int:schedule_id>",hod_views.edit_class_schedule, name='edit_class_schedule'),
     path('fetch-class-schedule/', hod_views.fetch_class_schedule, name='fetch_class_schedule'),
-    path('fetch-teachers-by-course/', hod_views.fetch_teachers_by_course, name='fetch_teachers_by_course'),
 
     #delete
     path("teacher/delete/<int:teacher_id>",hod_views.delete_teacher, name='delete_teacher'),
@@ -112,7 +111,6 @@ urlpatterns = [
     path("teacher/result/add/", teacher_views.teacher_add_result, name='teacher_add_result'),
     path("teacher/result/edit/", EditResultView.as_view(),name='edit_student_result'),
     path('teacher/result/fetch/', teacher_views.fetch_student_result,name='fetch_student_result'),
-    
 
 
 

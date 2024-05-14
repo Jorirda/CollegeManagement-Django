@@ -174,7 +174,7 @@ class CampusForm(FormSettings):
         model = Campus
         fields = [_('name')]
 
-class LearningRecordForm(forms.ModelForm):
+class LearningRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}), label=_('Date'))
     student = forms.ModelChoiceField(queryset=Student.objects.all(), required=False, label=_("Name"))
     course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, label=_("Course"))

@@ -108,8 +108,6 @@ def fetch_class_schedule(request):
     
 #     return JsonResponse(data)
     
-
-
 #Refund
 def refund_records(request):
     student_query = StudentQuery.objects.all()
@@ -1146,14 +1144,7 @@ def edit_learning_record(request, learn_id):
             end_time = form.cleaned_data.get('end_time')
             lesson_hours = form.cleaned_data.get('lesson_hours')
             
-            try:
-                # Compare with ClassSchedule
-                class_schedule = ClassSchedule.objects.filter(course=course, teacher=teacher).first()
-                if class_schedule:
-                    start_time = class_schedule.start_time
-                    end_time = class_schedule.end_time
-                    lesson_hours = class_schedule.lesson_hours
-                
+            try:   
                 learningrecord.date = date
                 learningrecord.student = student
                 learningrecord.course = course
@@ -1176,6 +1167,7 @@ def edit_learning_record(request, learn_id):
             messages.error(request, "Fill Form Properly")
             
     return render(request, 'hod_template/edit_learning_record_template.html', context)
+
 
 def delete_learning_record(request, learn_id):
     learn = get_object_or_404(LearningRecord, id=learn_id)

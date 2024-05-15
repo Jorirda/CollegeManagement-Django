@@ -39,20 +39,20 @@
                     </div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label>{% trans "Course" %}</label>
-                            <select name="course" class="form-control" id='course'>
-                                <option value="">{% trans "----" %}</option>
-                                {% for course in courses %}
-                                <option value="{{course.id}}">{{course.name}}</option>
+                            <label>{% trans "Classes" %}</label>
+                            <select name="classes" class="form-control" id='classes'>
+                                <option value="">{% trans "Select Course" %}</option>
+                                {% for class in classes %}
+                                <option value="{{ class.id }}">{{ class.course }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <div class="form-group">
                             <label>{% trans "Session" %}</label>
                             <select name="session" class="form-control" id='session'>
-                                <option value="">{% trans "----" %}</option>
+                                <option value="">{% trans "Select Semester" %}</option>
                                 {% for session in sessions %}
-                                <option value="{{session.id}}">{{session}}</option>
+                                <option value="{{ session.id }}">{{ session }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -65,15 +65,13 @@
                             <div class="form-group">
                                 <label>{% trans "Attendance Date" %}</label>
                                 <select name="attendance_date" id='attendance_date' class="form-control">
+                                    <option value="">{% trans "Select Date" %}</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <div id="fetch_student_block" style="display: none;">
-                                    <button type="button" id='fetch_student' class="btn btn-success btn-block">{% trans "Fetch Students" %}</button>
-                                </div>
                                 <div id='student_data' class="card-footer"></div>
                             </div>
-                        </div>  
+                        </div>
                     </div>  
                 </div>
             </div>
@@ -85,20 +83,75 @@
 {% block custom_js %}
 <script>
     $(document).ready(function () {
-        $("#fetch_attendance").click(function(){
-            var course = $("#course").val()
-            var session = $("#session").val()
-            $("#student_data").html("")
-
-            if (session.length < 1 || course.length < 1){
-                $("#error_attendance").html("{% trans "Kindly Choose Both Course and Session" %}")
-                $("#attendance_block").hide()
-                $("#error_attendance").show()
-                return false
+        function fetchAttendance() {
+            var classes = $("#classes").val();
+            var session = $("#session").val();
+            $("#student_data").html("");
+    
+            if (session.length < 1 || classes.length < 1) {
+                $("#error_attendance").html("{% trans 'Kindly Choose Both Classes and Session' %}");
+                $("#attendance_block").hide();
+                $("#error_attendance").show();
+                return false;
             }
-            // Additional JavaScript AJAX setup and handling goes here...
-        });
-        // Additional JavaScript code for fetching students and handling other interactions...
+    
+            $.ajax({
+                url: "{% url 'get_admin_attendance' %}",
+                type: "POST",
+                data: {
+                    'classes': classes,
+                    'session': session,
+                    'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: function(response) {
+                    var data = JSON.parse(response);
+                    var dates = new Set();
+                    var html = "<table class='table table-bordered'><thead><tr><th>{% trans 'Student Name' %}</th><th>{% trans 'Status' %}</th><th>{% trans 'Date' %}</th></tr></thead><tbody>";
+                    data.forEach(function(item) {
+                        var statusText = item.status === 'True' ? '{% trans "Present" %}' : '{% trans "Absent" %}';
+                        html += "<tr data-date='" + item.date + "'><td>" + item.name + "</td><td>" + statusText + "</td><td>" + item.date + "</td></tr>";
+                        dates.add(item.date);
+                    });
+                    html += "</tbody></table>";
+                    $("#student_data").html(html);
+    
+                    var dateOptions = "<option value=''>{% trans "----" %}</option>";
+                    dates.forEach(function(date) {
+                        dateOptions += "<option value='" + date + "'>" + date + "</option>";
+                    });
+                    $("#attendance_date").html(dateOptions);
+    
+                    $("#attendance_block").show();
+                    $("#error_attendance").hide();
+                },
+                error: function() {
+                    $("#error_attendance").html("{% trans 'Error fetching attendance data. Please try again.' %}");
+                    $("#attendance_block").hide();
+                    $("#error_attendance").show();
+                }
+            });
+        }
+    
+        function filterAttendance() {
+            var selectedDate = $("#attendance_date").val();
+            if (selectedDate) {
+                $("#student_data table tbody tr").each(function() {
+                    if ($(this).data("date") === selectedDate) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            } else {
+                $("#student_data table tbody tr").show();
+            }
+        }
+    
+        {% comment %} $("#classes, #session").change(fetchAttendance); {% endcomment %}
+        $("#attendance_date").change(filterAttendance);
+        $("#fetch_attendance").click(fetchAttendance);
     });
+    
 </script>
+
 {% endblock custom_js %}

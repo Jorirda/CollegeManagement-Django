@@ -56,6 +56,7 @@ urlpatterns = [
     path("teacher/view/leave/", hod_views.view_teacher_leave, name="view_teacher_leave",),
     path("attendance/view/", hod_views.admin_view_attendance,name="admin_view_attendance",),
     path("attendance/fetch/", hod_views.get_admin_attendance,name='get_admin_attendance'),
+    path('get_attendance_dates/', hod_views.get_attendance_dates, name='get_attendance_dates'),
     path("upload", hod_views.get_upload,name='get_upload'),
     path("result", hod_views.get_result,name='get_result'),
     path('refunds', hod_views.refund_records, name='refund_records'),

@@ -1,11 +1,8 @@
 import io
 import json
-from django.db import IntegrityError
 import requests
 import pandas as pd
-import numpy as np
-import random
-import string
+import logging
 
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
@@ -29,6 +26,10 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from datetime import time
 from django.http import JsonResponse
 from django.core import serializers
+
+
+
+logger = logging.getLogger(__name__)
 
 
 class SidebarView(TemplateView):
@@ -99,23 +100,6 @@ def filter_teachers(request):
     print(teachers_data)
     return JsonResponse({'teachers': teachers_data})
 
-
-# def fetch_class_schedule(request):
-#     course_id = request.GET.get('course_id')
-#     teacher_id = request.GET.get('teacher_id')
-    
-#     class_schedule = ClassSchedule.objects.filter(course_id=course_id, teacher_id=teacher_id).first()
-    
-#     if class_schedule:
-#         data = {
-#             'start_time': class_schedule.start_time.strftime('%H:%M') if class_schedule.start_time else None,
-#             'end_time': class_schedule.end_time.strftime('%H:%M') if class_schedule.end_time else None,
-#             'lesson_hours': class_schedule.lesson_hours if class_schedule.lesson_hours is not None else None
-#         }
-#     else:
-#         data = {}
-    
-#     return JsonResponse(data)
     
 #Refund
 def refund_records(request):
@@ -289,7 +273,7 @@ def admin_view_profile(request):
     return render(request, "hod_template/admin_view_profile.html", context)
 
 def admin_view_attendance(request):
-    classes = Classes.objects.all()
+    classes = ClassSchedule.objects.all()
     sessions = Session.objects.all()
     context = {
         'classes': classes,
@@ -298,7 +282,6 @@ def admin_view_attendance(request):
     }
 
     return render(request, "hod_template/admin_view_attendance.html", context)
-
 
 #Sessions
 def add_session(request):
@@ -1455,23 +1438,53 @@ def get_admin_attendance(request):
     classes_id = request.POST.get('classes')
     session_id = request.POST.get('session')
     attendance_date_id = request.POST.get('attendance_date_id')
+    print(attendance_date_id)
+    
     try:
+        logger.info(f"Fetching attendance for Class ID: {classes_id}, Session ID: {session_id}, Attendance Date ID: {attendance_date_id}")
         classes = get_object_or_404(ClassSchedule, id=classes_id)
         session = get_object_or_404(Session, id=session_id)
-        attendance = get_object_or_404(
-            Attendance, id=attendance_date_id, session=session)
-        attendance_reports = AttendanceReport.objects.filter(
-            attendance=attendance)
+        attendances = Attendance.objects.filter(classes=classes, session=session)
+        
+        if attendance_date_id:
+            attendances = attendances.filter(date=attendance_date_id)
+
+        if not attendances.exists():
+            return JsonResponse({'error': _('No attendance records found')}, status=404)
+
         json_data = []
-        for report in attendance_reports:
-            data = {
-                _("status"):  str(report.status),
-                _("name"): str(report.student)
-            }
-            json_data.append(data)
+        for attendance in attendances:
+            attendance_reports = AttendanceReport.objects.filter(attendance=attendance)
+            for report in attendance_reports:
+                data = {
+                    "status": str(report.status),
+                    "name": str(report.student),
+                    "date": str(attendance.date)
+                }
+                logger.info(f"Student: {report.student}, Status: {report.status}")
+                json_data.append(data)
+
         return JsonResponse(json.dumps(json_data), safe=False)
     except Exception as e:
-        return None
+        logger.error(f"Error fetching attendance: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
+
+@csrf_exempt
+def get_attendance_dates(request):
+    classes_id = request.POST.get('classes')
+    session_id = request.POST.get('session')
+
+    try:
+        logger.info(f"Fetching attendance dates for Class ID: {classes_id}, Session ID: {session_id}")
+        classes = get_object_or_404(ClassSchedule, id=classes_id)
+        session = get_object_or_404(Session, id=session_id)
+        attendance_dates = Attendance.objects.filter(classes=classes, session=session).values('id', 'date')
+
+        json_data = [{"id": attendance['id'], "date": attendance['date'].strftime("%Y-%m-%d")} for attendance in attendance_dates]
+        return JsonResponse(json_data, safe=False)
+    except Exception as e:
+        logger.error(f"Error fetching attendance dates: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_exempt
 def send_student_notification(request):

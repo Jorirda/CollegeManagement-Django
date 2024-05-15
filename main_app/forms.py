@@ -194,9 +194,10 @@ class LearningRecordForm(FormSettings):
 
         if 'course' in self.data:
             course_id = int(self.data['course'])
-            self.filter_teachers_by_course(course_id)
+            teachers_data = self.fetch_teacher_data(course_id)  # Query two
+            self.filter_teachers_by_course(course_id, teachers_data)  # Execute query one
         elif self.instance.pk:
-            self.filter_teachers_by_course(self.instance.course_id)
+            self.filter_teachers_by_course(self.instance.course_id, [])
 
     def fetch_class_schedule_data(self, course_id, teacher_id):
         class_schedule = ClassSchedule.objects.filter(course_id=course_id, teacher_id=teacher_id).first()
@@ -221,11 +222,14 @@ class LearningRecordForm(FormSettings):
         else:
             return []
 
-    def filter_teachers_by_course(self, course_id):
+    def filter_teachers_by_course(self, course_id, teachers_data):
         if course_id:
             self.fields['teacher'].queryset = Teacher.objects.filter(classschedule__course_id=course_id).distinct()
+            # Set the teacher choices using the fetched data
+            self.fields['teacher'].choices = teachers_data
         else:
             self.fields['teacher'].queryset = Teacher.objects.none()  # Set queryset to empty when no course is selected
+
 
 
     # def set_class_schedule_data(self, course_id, teacher_id):

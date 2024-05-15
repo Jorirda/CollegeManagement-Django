@@ -218,13 +218,26 @@ def admin_home(request):
             percentage = 0
         course_participants_percentage.append(percentage)
 
-    # Calculate total income per session
+    # Calculate total income per session using LearningRecord
     sessions = Session.objects.all()
     session_names = []
     total_incomes = []
 
     for session in sessions:
-        total_income_per_session = PaymentRecord.objects.all().aggregate(total_income=Sum('amount_paid'))['total_income'] or 0
+        # Get all learning records for the current session
+        learning_records = LearningRecord.objects.filter(semester=session)
+        # print(f"Learning Records for session {session}: {learning_records}")
+
+
+        # Get all unique courses related to these learning records
+        # courses = Course.objects.filter(learningrecord__in=learning_records).distinct()
+        courses = Course.objects.all()
+        # print(f"Courses for session {session}: {courses}")
+
+        # Sum up payments for students in these courses
+        total_income_per_session = PaymentRecord.objects.filter(course__in=courses).aggregate(total_income=Sum('amount_paid'))['total_income'] or 0
+        # print(total_income_per_session)
+
         session_names.append(str(session))
         total_incomes.append(total_income_per_session)
 
@@ -1111,6 +1124,7 @@ def add_learning_record(request):
             start_time = form.cleaned_data.get('start_time')
             end_time = form.cleaned_data.get('end_time')
             lesson_hours = form.cleaned_data.get('lesson_hours')
+            semester = form.cleaned_data.get('semester')
             # Get the remark from the associated student
             remark = student.admin.remark if student and student.admin else None
             
@@ -1123,6 +1137,7 @@ def add_learning_record(request):
                 learn.start_time = start_time
                 learn.end_time = end_time
                 learn.lesson_hours = lesson_hours
+                learn.semester = semester
                 learn.remark = remark  # Assign the remark here
                 learn.save()
                 

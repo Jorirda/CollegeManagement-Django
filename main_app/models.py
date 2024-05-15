@@ -74,6 +74,7 @@ class Admin(models.Model):
 
     def __str__(self):
         return str(self.admin)
+    
 class Course(models.Model):
     name = models.CharField(max_length=120)
     overview = models.TextField(default="")
@@ -104,8 +105,6 @@ class Teacher(models.Model):
     def __str__(self):
         return self.admin.full_name
 
-#Learning Record
-
 class Classes(models.Model):
     name = models.CharField(max_length=120)
     teacher = models.ForeignKey(Teacher,on_delete=models.CASCADE)
@@ -113,7 +112,6 @@ class Classes(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class ClassSchedule(models.Model):
     course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)
@@ -131,13 +129,14 @@ class LearningRecord(models.Model):
     course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Teacher, null=True, on_delete=models.CASCADE)
     schedule = models.ForeignKey(ClassSchedule, null=True, on_delete=models.CASCADE)
+    semester = models.ForeignKey(Session, null=True, on_delete=models.CASCADE)
     start_time = models.TimeField(null=True)  # Add start_time field
     end_time = models.TimeField(null=True)    # Add end_time field
     lesson_hours = models.CharField(max_length=10, null=True)  # Add lesson_hours field
+    
 
     def __str__(self):
         return f'{self.student} - {self.course} - {self.date}'
-
 
 class Attendance(models.Model):
     session = models.ForeignKey(Session, on_delete=models.DO_NOTHING)
@@ -179,15 +178,12 @@ class NotificationStudent(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     message = models.TextField()
 
-
 class StudentResult(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     classes = models.ForeignKey(Classes, on_delete=models.CASCADE)
     test = models.FloatField(default=0)
     exam = models.FloatField(default=0)
 
-
-#Payment Record
 class PaymentRecord(models.Model):
     date = models.DateField()
     next_payment_date = models.DateField(null=True)
@@ -316,6 +312,7 @@ def create_or_update_student_query(sender, instance, created, **kwargs):
             print(f"StudentQuery for {student} updated successfully.")
         except IntegrityError as e:
             print(f"Error saving StudentQuery for {student}: {str(e)}")
+
 # Register signal handlers
 post_save.connect(create_or_update_student_query, sender=Student)
 
@@ -378,6 +375,38 @@ def create_or_update_teacher_query(sender, instance, created, **kwargs):
 
 # Register signal handlers
 post_save.connect(create_or_update_teacher_query, sender=Teacher)
+
+
+# @receiver(post_save, sender=PaymentRecord)
+# def associate_learning_record_with_payment(sender, instance, created, **kwargs):
+#     """
+#     Signal handler to associate a LearningRecord with a PaymentRecord when the PaymentRecord is created or updated,
+#     ensuring the student has paid in full.
+#     """
+#     payment_record = instance
+#     student = payment_record.student
+
+#     # Check if the payment record is newly created or updated
+#     if created or (payment_record.learning_record is None and payment_record.amount_paid >= payment_record.amount_due):
+#         # Fetch the learning record for the student
+#         learning_record = LearningRecord.objects.filter(student=student).first()
+#         if learning_record:
+#             # Check if the learning record is not already associated with another payment record
+#             if not learning_record.payment_record:
+#                 payment_record.learning_record = learning_record
+#                 payment_record.save()
+#                 learning_record.payment_record = payment_record
+#                 learning_record.save()
+#         else:
+#             # Check if there's any existing learning record associated with the student
+#             existing_learning_record = LearningRecord.objects.filter(student=student).first()
+#             if existing_learning_record and not existing_learning_record.payment_record:
+#                 payment_record.learning_record = existing_learning_record
+#                 payment_record.save()
+#                 existing_learning_record.payment_record = payment_record
+#                 existing_learning_record.save()
+
+
 
 
 @receiver(post_save, sender=CustomUser)

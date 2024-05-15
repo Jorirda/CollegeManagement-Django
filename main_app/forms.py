@@ -179,13 +179,14 @@ class LearningRecordForm(FormSettings):
     student = forms.ModelChoiceField(queryset=Student.objects.all(), required=False, label=_("Name"))
     course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, label=_("Course"))
     teacher = forms.ModelChoiceField(queryset=Teacher.objects.none(), required=False, label=_("Teacher"))
+    semester = forms.ModelChoiceField(queryset=Session.objects.all(), required=False, label=_("Semester"))
     start_time = forms.TimeField(required=False, label=_("Start Time"), widget=forms.TimeInput(attrs={'readonly': 'readonly'}))
     end_time = forms.TimeField(required=False, label=_("End Time"), widget=forms.TimeInput(attrs={'readonly': 'readonly'}))
     lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"), disabled=True)
 
     class Meta:
         model = LearningRecord
-        fields = ['date', 'student', 'course', 'teacher', 'start_time', 'end_time', 'lesson_hours']
+        fields = ['date', 'student', 'course', 'teacher', 'start_time', 'end_time', 'lesson_hours', 'semester']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -255,13 +256,7 @@ class LearningRecordForm(FormSettings):
         print(f"Cleaned lesson_hours: {cleaned_data['lesson_hours']}")  # Debug statement
         return cleaned_data
 
-    # def set_class_schedule_data(self, course_id, teacher_id):
-    #     class_schedule = ClassSchedule.objects.filter(course_id=course_id, teacher_id=teacher_id).first()
-    #     if class_schedule:
-    #         self.fields['start_time'].initial = class_schedule.start_time.strftime('%H:%M')
-    #         self.fields['end_time'].initial = class_schedule.end_time.strftime('%H:%M')
-    #         self.fields['lesson_hours'].initial = class_schedule.lesson_hours if class_schedule.lesson_hours is not None else ''
-
+    
 class PaymentRecordForm(FormSettings):
     payee = forms.CharField(label=_('Payee'))
     remark = forms.CharField(required=True, label=_('Remark'))

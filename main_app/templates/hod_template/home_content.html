@@ -206,12 +206,13 @@
           </div>
         </div>
 
-        <!-- Comparison of Monthly Contributions -->
+        <!-- Monthly Contributions Chart -->
         <div class="row">
           <div class="col-lg-12">
+            <!-- BAR CHART -->
             <div class="card card-dark">
               <div class="card-header">
-                <h3 class="card-title">{% trans "Comparison of Monthly Contributions" %}</h3>
+                <h3 class="card-title">{% trans "Monthly Contributions" %}</h3>
                 <div class="card-tools">
                   <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
                   <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
@@ -222,14 +223,25 @@
                   <canvas id="monthlyContributionsChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                 </div>
               </div>
+              <!-- /.card-body -->
             </div>
+            <!-- /.card -->
           </div>
         </div>
+
     </div><!-- /.container-fluid -->
 </section>
 {% endblock content %}
 
 {% block custom_js %}
+  <!-- Include Summernote CSS/JS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-bs4.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-bs4.min.js"></script>
+
+  <!-- Include Decimal.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.3.1/decimal.min.js"></script>
+
   <script>
       $(document).ready(function(){
         var donutData = {
@@ -466,13 +478,15 @@
                 {
                     label               : '{% trans "Total Income" %}',
                     backgroundColor     : '#FF6F22',
-                    borderColor         : '#FF6F22',
+                    borderColor         : '#B54E17',
                     pointRadius         : false,
                     pointColor          : '#3b8bba',
                     pointStrokeColor    : 'rgba(60,141,188,1)',
                     pointHighlightFill  : '#fff',
                     pointHighlightStroke: 'rgba(60,141,188,1)',
-                    data                : total_incomes
+                    data                : total_incomes.map(function(income) {
+                        return new Decimal(income).toNumber();
+                    })
                 }
             ]
         };
@@ -486,7 +500,13 @@
                     stacked: true,
                 }],
                 yAxes: [{
-                    stacked: true
+                    stacked: true,
+                    ticks: {
+                        beginAtZero: true,
+                        callback: function(value) {
+                            return '¥ ' + value; // Add the currency symbol
+                        }
+                    }
                 }]
             }
         };
@@ -497,5 +517,6 @@
             options: monthlyContributionsChartOptions
         });
       })
+      
   </script>
 {% endblock custom_js %}

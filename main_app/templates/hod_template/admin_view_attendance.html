@@ -43,7 +43,7 @@
                             <select name="classes" class="form-control" id='classes'>
                                 <option value="">{% trans "Select Course" %}</option>
                                 {% for class in classes %}
-                                <option value="{{ class.id }}">{{ class.course }}</option>
+                                <option value="{{ class.id }}">{{ class.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>

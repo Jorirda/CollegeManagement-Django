@@ -9,12 +9,13 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <!-- general form elements -->
+                <!-- General form elements card -->
                 <div class="card card-dark">
                     <div class="card-header">
                         <h3 class="card-title">{% trans page_title %}</h3>
                     </div>
-                    {% include "main_app/form_template.html" with messages=messages  form=form button_text=_("Update Record")%}
+                    <!-- Include the form template with form data and messages -->
+                    {% include "main_app/form_template.html" with messages=messages form=form button_text=_("Update Record") %}
                 </div>
                 <!-- /.card -->
 
@@ -22,29 +23,33 @@
         </div>
     </div>
 </section>
+
+<!-- jQuery library for making AJAX requests -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
-        $('#id_course, #id_teacher').change(function () {
+        // Function to fetch class schedule based on selected course and teacher
+        function fetchClassSchedule() {
             var courseId = $('#id_course').val();
             var teacherId = $('#id_teacher').val();
-
-            // Check if both course and teacher are selected
+            
             if (courseId && teacherId) {
                 $.ajax({
-                    url: '/fetch-class-schedule/',
+                    url: '/fetch-class-schedule/',  // URL to fetch class schedule
                     method: 'GET',
                     data: {
                         'course_id': courseId,
                         'teacher_id': teacherId
                     },
-                    dataType: 'json', // Ensure proper JSON handling
+                    dataType: 'json',
                     success: function (data) {
                         if (data) {
+                            // Update form fields with fetched schedule data
                             $('#id_start_time').val(data.start_time || '');
                             $('#id_end_time').val(data.end_time || '');
                             $('#id_lesson_hours').val(data.lesson_hours || '');
                         } else {
+                            // Clear form fields if no data is returned
                             $('#id_start_time').val('');
                             $('#id_end_time').val('');
                             $('#id_lesson_hours').val('');
@@ -52,12 +57,55 @@
                     },
                     error: function (xhr, status, error) {
                         console.error(xhr.responseText);
-                        // Handle errors here, for example, show an alert to the user
                         alert("Failed to fetch class schedule. Please try again later.");
                     }
                 });
             }
+        }
+        
+        // Function to filter teachers based on the selected course
+        function filterTeachers() {
+            var courseId = $('#id_course').val();
+            
+            $.ajax({
+                url: '/filter-teachers/',  // URL to fetch teachers for the selected course
+                method: 'GET',
+                data: {
+                    'course_id': courseId
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data) {
+                        $('#id_teacher').empty();  // Clear the existing teacher options
+                        // Populate the teacher dropdown with new options
+                        $.each(data.teachers, function(index, teacher) {
+                            $('#id_teacher').append('<option value="'+ teacher[0] + '">' + teacher[1] + '</option>');
+                        });
+                    } else {
+                        // Show a message if no teachers are available
+                        $('#id_teacher').empty().append('<option value="">No teachers available</option>');
+                    }
+                    fetchClassSchedule(); // Ensure class schedule is updated after teachers are loaded
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr.responseText);
+                    alert("Failed to fetch teachers. Please try again later.");
+                }
+            });
+        }
+
+        // Event listener for course dropdown change
+        $('#id_course').change(function () {
+            filterTeachers();
         });
+
+        // Event listener for teacher dropdown change
+        $('#id_teacher').change(function () {
+            fetchClassSchedule();
+        });
+
+        // Uncomment the following line if you want to automatically filter teachers on page load
+        filterTeachers();
     });
 </script>
 {% endblock content %}

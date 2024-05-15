@@ -205,6 +205,26 @@
             <!-- /.card -->
           </div>
         </div>
+
+        <!-- Comparison of Monthly Contributions -->
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="card card-dark">
+              <div class="card-header">
+                <h3 class="card-title">{% trans "Comparison of Monthly Contributions" %}</h3>
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart">
+                  <canvas id="monthlyContributionsChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
     </div><!-- /.container-fluid -->
 </section>
 {% endblock content %}
@@ -421,7 +441,7 @@
           datasets: [
             {
               data: course_participants_percentage,
-              backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#2ecc71', '#e74c3c', '#3498db', '#9b59b6']
+              backgroundColor : ['#FF6F22', '#BF19D5', '#1255F3', '#65BD00', '#04048F', '#1EDEC2', '#EF2020', '#FF0D72'],
             }
           ]
         };
@@ -434,6 +454,47 @@
           type: 'pie',
           data: pieDataCourseParticipants,
           options: pieOptionsCourseParticipants
+        });
+
+        // Monthly Contributions Chart
+        var session_names = {{ session_names|safe }};
+        var total_incomes = {{ total_incomes|safe }};
+        
+        var monthlyContributionsData = {
+            labels  : session_names,
+            datasets: [
+                {
+                    label               : '{% trans "Total Income" %}',
+                    backgroundColor     : '#FF6F22',
+                    borderColor         : '#FF6F22',
+                    pointRadius         : false,
+                    pointColor          : '#3b8bba',
+                    pointStrokeColor    : 'rgba(60,141,188,1)',
+                    pointHighlightFill  : '#fff',
+                    pointHighlightStroke: 'rgba(60,141,188,1)',
+                    data                : total_incomes
+                }
+            ]
+        };
+
+        var monthlyContributionsChartCanvas = $('#monthlyContributionsChart').get(0).getContext('2d');
+        var monthlyContributionsChartOptions = {
+            responsive              : true,
+            maintainAspectRatio     : false,
+            scales: {
+                xAxes: [{
+                    stacked: true,
+                }],
+                yAxes: [{
+                    stacked: true
+                }]
+            }
+        };
+
+        var monthlyContributionsChart = new Chart(monthlyContributionsChartCanvas, {
+            type: 'bar',
+            data: monthlyContributionsData,
+            options: monthlyContributionsChartOptions
         });
       })
   </script>

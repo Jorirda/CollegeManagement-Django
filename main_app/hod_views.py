@@ -13,7 +13,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import UpdateView
-from django.db.models import Sum
+from django.db.models import Sum, F
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render
 from generate import process_data
@@ -142,6 +142,10 @@ def refund_records(request):
 
 
 #Admin
+from django.shortcuts import render
+from django.utils.translation import gettext as _
+from django.db.models import Sum
+
 def admin_home(request):
     total_teacher = Teacher.objects.all().count()
     total_students = Student.objects.all().count()
@@ -152,9 +156,9 @@ def admin_home(request):
     total_attendance = attendance_list.count()
     attendance_list = []
     classes_list = []
-    for classes in classes:
-        attendance_count = Attendance.objects.filter(classes=classes).count()
-        classes_list.append(classes.course.name[:7])
+    for class_schedule in classes:
+        attendance_count = Attendance.objects.filter(classes=class_schedule).count()
+        classes_list.append(class_schedule.course.name[:7])
         attendance_list.append(attendance_count)
 
     # Total Classes and students in Each Course
@@ -164,19 +168,19 @@ def admin_home(request):
     student_count_list_in_course = []
 
     for course in course_all:
-        classes = ClassSchedule.objects.filter(course_id=course.id).count()
-        students = Student.objects.filter(course_id=course.id).count()
+        classes_count = ClassSchedule.objects.filter(course_id=course.id).count()
+        students_count = Student.objects.filter(course_id=course.id).count()
         course_name_list.append(course.name)
-        classes_count_list.append(classes)
-        student_count_list_in_course.append(students)
+        classes_count_list.append(classes_count)
+        student_count_list_in_course.append(students_count)
     
     classes_all = Classes.objects.all()
-    classes_list = []
+    class_names_list = []
     student_count_list_in_classes = []
-    for classes in classes_all:
-        course = Course.objects.get(id=classes.course.pk)
+    for class_obj in classes_all:
+        course = Course.objects.get(id=class_obj.course.pk)
         student_count = Student.objects.filter(course_id=course.id).count()
-        classes_list.append(classes.name)
+        class_names_list.append(class_obj.name)
         student_count_list_in_classes.append(student_count)
 
     # For Students
@@ -214,6 +218,16 @@ def admin_home(request):
             percentage = 0
         course_participants_percentage.append(percentage)
 
+    # Calculate total income per session
+    sessions = Session.objects.all()
+    session_names = []
+    total_incomes = []
+
+    for session in sessions:
+        total_income_per_session = PaymentRecord.objects.all().aggregate(total_income=Sum('amount_paid'))['total_income'] or 0
+        session_names.append(str(session))
+        total_incomes.append(total_income_per_session)
+
     context = {
         'page_title': _("Administrative Dashboard"),
         'total_students': total_students,
@@ -232,9 +246,12 @@ def admin_home(request):
         'lesson_hours': lesson_hours,
         'total_income': total_income,
         'course_participants_percentage': course_participants_percentage,
+        'session_names': session_names,
+        'total_incomes': total_incomes,
     }
 
     return render(request, 'hod_template/home_content.html', context)
+
 
 def admin_view_profile(request):
     admin = get_object_or_404(Admin, admin=request.user)
@@ -273,7 +290,7 @@ def admin_view_profile(request):
     return render(request, "hod_template/admin_view_profile.html", context)
 
 def admin_view_attendance(request):
-    classes = ClassSchedule.objects.all()
+    classes = Course.objects.all()
     sessions = Session.objects.all()
     context = {
         'classes': classes,
@@ -1442,7 +1459,7 @@ def get_admin_attendance(request):
     
     try:
         logger.info(f"Fetching attendance for Class ID: {classes_id}, Session ID: {session_id}, Attendance Date ID: {attendance_date_id}")
-        classes = get_object_or_404(ClassSchedule, id=classes_id)
+        classes = get_object_or_404(ClassSchedule, course=classes_id)
         session = get_object_or_404(Session, id=session_id)
         attendances = Attendance.objects.filter(classes=classes, session=session)
         

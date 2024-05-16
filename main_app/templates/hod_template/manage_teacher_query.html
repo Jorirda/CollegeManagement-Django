@@ -29,86 +29,125 @@
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="card">
-          <div class="card-body">
-            <!-- First Table -->
-            <table class="table table-bordered table-hover">
-              <thead class="thead-dark">
+    
+    {% if teacher_query_info %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <table class="table table-bordered">
+                <tbody>
+                  {% for query in teacher_query_info %}
+                    <tr>
+                      <th class="table-dark">{% trans "Name" %}</th>
+                      <td>{{ query.teacher_name }}</td>
+                    </tr>
+                </tbody>
+              </table>
+              <!-- Details Table -->
+              <table class="table table-bordered table-hover table-sm">
                 <tr>
-                  <th>{% trans "Name" %}</th>
-                  <th>{% trans "Gender" %}</th>
-                  <th>{% trans "Home Number" %}</th>
-                  <th>{% trans "Cell Number" %}</th>
-                  <th>{% trans "Institution" %}</th>
-                  <th>{% trans "Campus" %}</th>
-                  <th>{% trans "Assigned Course" %}</th>
-                  <th>{% trans "Contract" %}</th>
+                  <th class="table-dark">{% trans "Gender" %}</th>
+                  <td>{{ query.gender }}</td>
+                  <th class="table-dark">{% trans "Telephone number" %}</th>
+                  <td>{{ query.phone_number }}</td>
+                  <th class="table-dark">{% trans "Teaching Course" %}</th>
+                  <td>{{ query.course }}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {% for query in teacher_query_info %}
+                <tr>
+                  <th class="table-dark">{% trans "Contract Type" %}</th>
+                  <td>{{ query.contract }}</td>
+                  <th class="table-dark">{% trans "Residential address" %}</th>
+                  <td colspan="3">{{ query.address }}</td>
+                </tr>
+                <tr>
+                  <th class="table-dark">{% trans "Lesson Hours Completed" %}</th>
+                  <td>{{ query.completed_hours }}</td>
+                  <th class="table-dark">{% trans "Number of classes" %}</th>
+                  <td colspan="3">{{ query.num_of_classes }}</td>
+                </tr>
+              </table>
+              <!-- Class Details Table -->
+              <table class="table table-bordered table-hover">
+                <thead class="thead-dark">
                   <tr>
-                    <td>{{ query.teacher_name }}</td>
-                    <td>{{ query.gender }}</td>
-                    <td>{{ query.home_number }}</td>
-                    <td>{{ query.cell_number }}</td>
-                    <td>{{ query.institution }}</td>
-                    <td>{{ query.campus}}</td>
-                    <td>{{ query.course }}</td>
-                    <td>{{ query.contract }}</td>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Course" %}</th>
+                    <th>{% trans "Lecturer" %}</th>
+                    <th>{% trans "Start Time" %}</th>
+                    <th>{% trans "End Time" %}</th>
+                    <th>{% trans "Class Hours" %}</th>
                   </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {% for query in teacher_query_info %}
+                    <tr class="table-row">
+                      <td>{{ query.date }}</td>
+                      <td>{{ query.course }}</td>
+                      <td>{{ query.teacher_name }}</td>
+                      <td>{{ query.start_time }}</td>
+                      <td>{{ query.end_time }}</td>
+                      <td>{{ query.lesson_hours }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              {% endfor %}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="card">
-          <div class="card-body">
-            <!-- Third Table -->
-            <table class="table table-bordered table-hover">
-              <thead class="thead-dark">
-                <tr>
-                  <th>{% trans "Address" %}</th>
-                  <th>{% trans "Completed Hours" %}</th>
-                  <th>{% trans "Number of Classes" %}</th>
-                  <th>{% trans "Date" %}</th>
-                  <th>{% trans "Lecturer" %}</th>
-                  <th>{% trans "Start Time" %}</th>
-                  <th>{% trans "End Time" %}</th>
-                  <!-- <th>{% trans "Class" %}</th> -->
-                </tr>
-              </thead>
-              <tbody>
-                {% for query in teacher_query_info %}
-                  <tr>
-                    <td>{{ query.address }}</td>
-                    <td>{{ query.completed_hours }}</td>
-                    <td>{{ query.num_of_classes }}</td>
-                    <td>{{ query.date }}</td>
-                    <td>{{ query.teacher_name }}</td>
-                    <td>{{ query.start_time }}</td>
-                    <td>{{ query.end_time }}</td>
-                    <!-- <td>{{ query.class }}</td> -->
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+    {% else %}
+      <p>{% trans "No teacher queries found." %}</p>
+    {% endif %}
   </div>
 </section>
 
 {% block custom_js %}
 <script>
-  // Your custom JavaScript here
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effect to table rows
+    const rows = document.querySelectorAll('.table-row');
+    rows.forEach(row => {
+      row.addEventListener('mouseover', function() {
+        this.style.backgroundColor = '#f1f1f1';
+        this.style.transition = 'background-color 0.3s ease';
+      });
+      row.addEventListener('mouseout', function() {
+        this.style.backgroundColor = '';
+        this.style.transition = 'background-color 0.3s ease';
+      });
+    });
+
+    // Add transition to form elements
+    const formElements = document.querySelectorAll('.form-control, .btn-primary');
+    formElements.forEach(element => {
+      element.style.transition = 'all 0.3s ease';
+    });
+    const button = document.querySelector('.btn-primary');
+    button.addEventListener('mouseover', function() {
+      this.style.backgroundColor = '#0056b3';
+    });
+    button.addEventListener('mouseout', function() {
+      this.style.backgroundColor = '';
+    });
+  });
 </script>
 {% endblock custom_js %}
 {% endblock content %}
+
+<style>
+  .card {
+    transition: box-shadow 0.3s ease;
+  }
+  .card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  .form-control:focus, .btn-primary:focus {
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  .table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+    transition: background-color 0.3s ease;
+  }
+</style>

@@ -103,36 +103,34 @@ def filter_teachers(request):
     
 #Refund
 def refund_records(request):
-    student_query = StudentQuery.objects.all()
-
+    student_queries = StudentQuery.objects.all()
 
     # Initialize a list to hold student query information
     student_query_info = []
 
     # Iterate over each student query
-    for student_query in student_query:
-    # Your code here for handling the case where the payment has been refunded
-
+    for student_query in student_queries:
         # Check if the student_query has an associated payment_records object and refund condition is met
         if student_query.payment_records:  # Assuming 'Refunded' is a status
-            print(student_query.payment_records.status)
-            # Get related student information
-            # refund_amt = student_query.payment_records.amount_paid - ()
-            student_info = {
-                'student_name': student_query.admin.get_full_name(),
-                'date_of_birth': student_query.student_records.date_of_birth,
-                'course': student_query.learning_records.course,
-                'total_hours' : student_query.payment_records.lesson_hours,  # Assuming there's a field for total hours
-                'hours_spent': student_query.completed_hours,
-                'hours_remaining': student_query.remaining_hours,
-                'lesson_price': student_query.payment_records.lesson_unit_price,  # Assuming there's a field for lesson price
-                'refund_amount': student_query.payment_records.amount_paid,  # Assuming a function to calculate
-                'amount_refunded': ((student_query.payment_records.amount_paid - student_query.payment_records.lesson_unit_price)+((student_query.payment_records.lesson_unit_price / student_query.payment_records.lesson_hours)*(student_query.remaining_hours))),  # Assuming this field exists
-                'refund_reason': student_query.payment_records.remark,  # Assuming this field exists
-            }
-            # Append student query information to the list
-            student_query_info.append(student_info)
- 
+            if student_query.payment_records.status == 'Pending':
+                student_info = {
+                    'student_name': student_query.student_records.admin.full_name if student_query.student_records.admin else 'Unknown',
+                    'date_of_birth': student_query.student_records.date_of_birth if student_query.student_records else 'Unknown',
+                    'course': student_query.learning_records.course if student_query.learning_records else 'Unknown',
+                    'total_hours': student_query.payment_records.lesson_hours if student_query.payment_records.lesson_hours else 'Unknown',
+                    'hours_spent': student_query.completed_hours if student_query.completed_hours is not None else 'Unknown',
+                    'hours_remaining': student_query.remaining_hours if student_query.remaining_hours is not None else 'Unknown',
+                    'lesson_price': student_query.payment_records.lesson_unit_price if student_query.payment_records.lesson_unit_price else 'Unknown',
+                    'refund_amount': student_query.payment_records.amount_paid if student_query.payment_records.amount_paid else 'Unknown',
+                    'amount_refunded': (
+                        (student_query.payment_records.amount_paid - student_query.payment_records.lesson_unit_price) +
+                        ((student_query.payment_records.lesson_unit_price / student_query.payment_records.lesson_hours) * student_query.remaining_hours)
+                    ) if student_query.payment_records.amount_paid and student_query.payment_records.lesson_unit_price and student_query.payment_records.lesson_hours and student_query.remaining_hours else 'Unknown',
+                    'refund_reason': student_query.payment_records.remark if student_query.payment_records.remark else 'Unknown',
+                }
+                # Append student query information to the list
+                student_query_info.append(student_info)
+
     context = {
         'refund_info': student_query_info,
         'page_title': 'Manage Refund Records'
@@ -518,7 +516,7 @@ def manage_teacher_query(request):
         for teacher_query in teacher_queries:
             # Get related teacher information
             teacher_info = {
-                'teacher_name': teacher_query.admin.get_full_name(),
+                'teacher_name': teacher_query.teacher_records.admin.full_name,
                 'gender': teacher_query.admin.gender,
                 'phone_number': teacher_query.teacher_records.admin.phone_number,
                 'campus': teacher_query.teacher_records.campus,
@@ -532,34 +530,35 @@ def manage_teacher_query(request):
                 'instructor': teacher_query.learning_records.teacher if teacher_query.learning_records else None,
                 'start_time': teacher_query.learning_records.start_time if teacher_query.learning_records else None,
                 'end_time': teacher_query.learning_records.end_time if teacher_query.learning_records else None,
+                'lesson_hours': teacher_query.learning_records.lesson_hours
                 # 'class': teacher_query.learning_records.class_name if teacher_query.learning_records else None,
             }
             # Append teacher query information to the list
             teacher_query_info.append(teacher_info)
-    else:
-        # If no teacher is selected, retrieve all teacher queries
-        # Iterate over each teacher query
-        for teacher_query in TeacherQuery.objects.all():
-            # Get related teacher information
-            teacher_info = {
-                'teacher_name': teacher_query.admin.get_full_name(),
-                'gender': teacher_query.admin.gender,
-                'phone_number': teacher_query.teacher_records.admin.phone_number,
-                'campus': teacher_query.teacher_records.campus,
-                'address': teacher_query.teacher_records.admin.address,
-                'num_of_classes': teacher_query.num_of_classes,
-                'contract': teacher_query.teacher_records.work_type,
-                'completed_hours': teacher_query.completed_hours,
-                'remaining_hours': teacher_query.remaining_hours,
-                'date': teacher_query.learning_records.date if teacher_query.learning_records else None,
-                'course': teacher_query.learning_records.course if teacher_query.learning_records else None,
-                'instructor': teacher_query.learning_records.teacher if teacher_query.learning_records else None,
-                'start_time': teacher_query.learning_records.start_time if teacher_query.learning_records else None,
-                'end_time': teacher_query.learning_records.end_time if teacher_query.learning_records else None,
-                # 'class': teacher_query.learning_records.class_name if teacher_query.learning_records else None,
-            }
-            # Append teacher query information to the list
-            teacher_query_info.append(teacher_info)
+    # else:
+        # # If no teacher is selected, retrieve all teacher queries
+        # # Iterate over each teacher query
+        # for teacher_query in TeacherQuery.objects.all():
+        #     # Get related teacher information
+        #     teacher_info = {
+        #         'teacher_name': teacher_query.teacher_records.admin.full_name,
+        #         'gender': teacher_query.admin.gender,
+        #         'phone_number': teacher_query.teacher_records.admin.phone_number,
+        #         'campus': teacher_query.teacher_records.campus,
+        #         'address': teacher_query.teacher_records.admin.address,
+        #         'num_of_classes': teacher_query.num_of_classes,
+        #         'contract': teacher_query.teacher_records.work_type,
+        #         'completed_hours': teacher_query.completed_hours,
+        #         'remaining_hours': teacher_query.remaining_hours,
+        #         'date': teacher_query.learning_records.date if teacher_query.learning_records else None,
+        #         'course': teacher_query.learning_records.course if teacher_query.learning_records else None,
+        #         'instructor': teacher_query.learning_records.teacher if teacher_query.learning_records else None,
+        #         'start_time': teacher_query.learning_records.start_time if teacher_query.learning_records else None,
+        #         'end_time': teacher_query.learning_records.end_time if teacher_query.learning_records else None,
+        #         # 'class': teacher_query.learning_records.class_name if teacher_query.learning_records else None,
+        #     }
+        #     # Append teacher query information to the list
+        #     teacher_query_info.append(teacher_info)
 
     # Prepare the context to pass to the template
     context = {
@@ -700,44 +699,43 @@ def manage_student_query(request):
     # If a student is selected, filter student queries by that student
     if selected_student_id:
         # Retrieve the selected student's queries
-        student_queries = StudentQuery.objects.filter(admin_id=selected_student_id)
+        student_queries = StudentQuery.objects.filter(student_records__admin=selected_student_id)
 
         # Iterate over each student query
         for student_query in student_queries:
             # Check if the student_query has an associated payment_records object
             if student_query.payment_records:
                 priceper = (student_query.payment_records.amount_paid / student_query.payment_records.lesson_hours)
-                # Get related student information
+
+                # Safely get related student information with fallback values
                 student_info = {
-                    'student_name': student_query.admin.get_full_name(),
-                    'gender': student_query.admin.gender,
-                    'date_of_birth': student_query.student_records.date_of_birth,
-                    'phone_number': student_query.student_records.admin.phone_number,
-                    # 'institution': student_query.student_records.institution,
-                    'campus': student_query.student_records.campus,
-                    # 'grade': student_query.student_records.grade,
-                    'state': student_query.student_records.status,
-                    'payment_status': student_query.payment_records.status,
-                    'refunded': student_query.refund,
-                    'reg_date': student_query.student_records.reg_date,
-                    'num_of_classes': student_query.num_of_classes,
-                    'registered_courses': student_query.registered_courses,
-                    'completed_hours': student_query.completed_hours,
-                    'remaining_hours': student_query.remaining_hours,
-                    'date': student_query.learning_records.date,
-                    'course': student_query.learning_records.course,
-                    'instructor': student_query.learning_records.teacher,
-                    'start_time': student_query.learning_records.start_time,
-                    'end_time': student_query.learning_records.end_time,
-                    'paid': student_query.payment_records.amount_paid,
-                    'lesson_hours': student_query.learning_records.lesson_hours,
-                    'paid_class_hours': student_query.payment_records.lesson_hours,
-                    # 'class': student_query.learning_records.class_name,
+                    'student_name': student_query.student_records.admin.full_name if student_query.student_records and student_query.student_records.admin else 'Unknown',
+                    'gender': student_query.admin.gender if student_query.admin else 'Unknown',
+                    'date_of_birth': student_query.student_records.date_of_birth if student_query.student_records else 'Unknown',
+                    'phone_number': student_query.student_records.admin.phone_number if student_query.student_records and student_query.student_records.admin else 'Unknown',
+                    'campus': student_query.student_records.campus if student_query.student_records else 'Unknown',
+                    'state': student_query.student_records.status if student_query.student_records else 'Unknown',
+                    'payment_status': student_query.payment_records.status if student_query.payment_records else 'Unknown',
+                    'refunded': student_query.refund if student_query.refund is not None else 'Unknown',
+                    'reg_date': student_query.student_records.reg_date if student_query.student_records else 'Unknown',
+                    'num_of_classes': student_query.num_of_classes if student_query.num_of_classes is not None else 'Unknown',
+                    'registered_courses': student_query.registered_courses if student_query.registered_courses else 'Unknown',
+                    'completed_hours': student_query.completed_hours if student_query.completed_hours is not None else 'Unknown',
+                    'remaining_hours': student_query.remaining_hours if student_query.remaining_hours is not None else 'Unknown',
+                    'date': student_query.learning_records.date if student_query.learning_records else 'Unknown',
+                    'course': student_query.learning_records.course if student_query.learning_records else 'Unknown',
+                    'instructor': student_query.learning_records.teacher if student_query.learning_records else 'Unknown',
+                    'start_time': student_query.learning_records.start_time if student_query.learning_records else 'Unknown',
+                    'end_time': student_query.learning_records.end_time if student_query.learning_records else 'Unknown',
+                    'paid': student_query.payment_records.amount_paid if student_query.payment_records else 'Unknown',
+                    'lesson_hours': student_query.learning_records.lesson_hours if student_query.learning_records else 'Unknown',
+                    'paid_class_hours': student_query.payment_records.lesson_hours if student_query.payment_records else 'Unknown',
                 }
                 # Append student query information to the list
                 student_query_info.append(student_info)
 
-
+    # Debugging: Print the student query information
+    print(student_query_info)
 
     # Prepare the context to pass to the template
     context = {

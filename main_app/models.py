@@ -291,9 +291,10 @@ def create_or_update_student_query(sender, instance, created, **kwargs):
 
         if payment_record_instance:
             student_query.payment_records = payment_record_instance
+            student_query.paid_class_hours = payment_record_instance.lesson_hours
+        else:
+            student_query.paid_class_hours = 0  # Handle the case where there is no payment record
 
-        student_query.paid_class_hours =  (student_query.payment_records.lesson_hours)
-        
         # Retrieve the student's learning records as a queryset
         learning_records_query = LearningRecord.objects.filter(student=student)
 
@@ -304,9 +305,9 @@ def create_or_update_student_query(sender, instance, created, **kwargs):
         # Use the aggregated hours in your calculation
         attendance_count = AttendanceReport.objects.filter(student_id=student_query.pk).count()
         student_query.remaining_hours = student_query.paid_class_hours - (total_lesson_hours * attendance_count)
-        student_query.completed_hours = (total_lesson_hours * attendance_count)
+        student_query.completed_hours = total_lesson_hours * attendance_count
         
-        # Assuming you want to save the student_query after modifications
+        # Save the student_query after modifications
         try:
             student_query.save()
             print(f"StudentQuery for {student} updated successfully.")

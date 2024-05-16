@@ -256,7 +256,7 @@ class LearningRecordForm(FormSettings):
         print(f"Cleaned lesson_hours: {cleaned_data['lesson_hours']}")  # Debug statement
         return cleaned_data
 
-    
+
 class PaymentRecordForm(FormSettings):
     payee = forms.CharField(label=_('Payee'))
     remark = forms.CharField(required=True, label=_('Remark'))
@@ -280,7 +280,7 @@ class PaymentRecordForm(FormSettings):
     other_fee = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Other Fee'))
     amount_due = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Amount Due'))
     amount_paid = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Amount Paid'))
-    lesson_hours = forms.DecimalField(required=True, decimal_places=0, max_digits=10, initial=0, label=_("Total Lesson Hours"))
+    lesson_hours = forms.DecimalField(required=False, decimal_places=0, max_digits=10, initial=0, label=_("Total Lesson Hours"))
 
     class Meta:
         model = PaymentRecord

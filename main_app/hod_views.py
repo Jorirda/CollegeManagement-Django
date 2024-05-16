@@ -26,6 +26,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from datetime import time
 from django.http import JsonResponse
 from django.core import serializers
+from dateutil.relativedelta import relativedelta
 
 
 
@@ -572,6 +573,8 @@ def manage_teacher_query(request):
 
 
 #Students
+import uuid
+
 def add_student(request):
     form = StudentForm(request.POST or None, request.FILES or None)
     context = {'form': form, 'page_title': _('Add Student')}
@@ -581,20 +584,22 @@ def add_student(request):
             gender = form.cleaned_data.get('gender')
             date_of_birth = form.cleaned_data.get('date_of_birth')
             address = form.cleaned_data.get('address')
-            email = form.cleaned_data.get('email')
             phone_number = form.cleaned_data.get('phone_number')
             password = form.cleaned_data.get('password')
             grade = form.cleaned_data.get('grade')
             reg_date = form.cleaned_data.get('reg_date')
             status = form.cleaned_data.get('status')
             remark = form.cleaned_data.get('remark')
-            passport = request.FILES['profile_pic']
-            fs = FileSystemStorage()
-            filename = fs.save(passport.name, passport)
-            passport_url = fs.url(filename)
+            
+            # Generate a unique placeholder email if none is provided
+            email = form.cleaned_data.get('email')
+            if not email:
+                unique_id = uuid.uuid4()
+                email = f"{full_name.replace(' ', '').lower()}_{unique_id}@placeholder.com"
+
             try:
                 user = CustomUser.objects.create_user(
-                    email=email, password=password, user_type=3, full_name=full_name, profile_pic=passport_url)
+                    email=email, password=password, user_type=3, full_name=full_name, profile_pic=None)
                 user.gender = gender
                 user.student.date_of_birth = date_of_birth
                 user.address = address
@@ -612,6 +617,7 @@ def add_student(request):
         else:
             messages.error(request, "Could Not Add: ")
     return render(request, 'hod_template/add_student_template.html', context)
+
 
 def edit_student(request, student_id):
     student = get_object_or_404(Student, id=student_id)
@@ -985,19 +991,20 @@ def add_payment_record(request):
             other_fee = form.cleaned_data.get('other_fee')
             amount_due = form.cleaned_data.get('amount_due')
             amount_paid = form.cleaned_data.get('amount_paid')
-            total_lesson_hours = form.cleaned_data.get('total_lesson_hours')
+            total_lesson_hours = form.cleaned_data.get('lesson_hours') or 0  # Ensure a default value if not provided
             payment_method = form.cleaned_data.get('payment_method')
             status = form.cleaned_data.get('status')
             payee = form.cleaned_data.get('payee')
             remark = form.cleaned_data.get('remark')
-           
+
             try:
                 payment = PaymentRecord()
                 payment.date = date
+                payment.next_payment_date = date + relativedelta(months=1)
                 payment.student = student
                 payment.course = course
                 payment.learning = learning
-                payment.lesson_unit_price= lesson_unit_price
+                payment.lesson_unit_price = lesson_unit_price
                 payment.discounted_price = discounted_price
                 payment.lesson_hours = total_lesson_hours
                 payment.book_costs = book_costs

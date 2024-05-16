@@ -32,9 +32,9 @@
                 <div class="card">
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="d-flex align-items-center">
-                            <img src="/media/edit.png" alt="Teacher Image" class="rounded-circle mr-3" style="width: 50px; height: 50px;">
+                            <i class="nav-icon fas fa-pencil-alt" style="font-size: 24px; margin-right: 10px;"></i>
                             <h3 class="card-title">{% trans "Student's Learning Record" %}</h3>
-                        </div>
+                        </div>                        
                         <div class="ml-auto">
                             <form method="get" action="{% url 'manage_learning_record' %}" class="form-inline">
                                 <select name="grade" id="gradeFilter" class="form-control">

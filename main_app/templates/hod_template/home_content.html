@@ -343,7 +343,7 @@
           datasets: [
             {
               label               : 'Absent/Leave',
-              backgroundColor     : '#b50a04',
+              backgroundColor     : '#FFDF2E',
               borderColor         : '#b50a04',
               pointRadius          : false,
               pointColor          : '#3b8bba',
@@ -354,7 +354,7 @@
             },
             {
               label               : 'Attendance',
-              backgroundColor     : '#5a615c',
+              backgroundColor     : '#2D8F49',
               borderColor         : 'rgba(210, 214, 222, 1)',
               pointRadius         : false,
               pointColor          : 'rgba(210, 214, 222, 1)',
@@ -469,22 +469,22 @@
         });
 
         // Monthly Contributions Chart
-        var session_names = {{ session_names|safe }};
-        var total_incomes = {{ total_incomes|safe }};
+        var all_months = {{ all_months|safe }};
+        var all_incomes = {{ all_incomes|safe }};
         
         var monthlyContributionsData = {
-            labels  : session_names,
+            labels  : all_months,
             datasets: [
                 {
                     label               : '{% trans "Total Income" %}',
-                    backgroundColor     : '#22FF47',
+                    backgroundColor     : '#FF2222',
                     borderColor         : '#B54E17',
                     pointRadius         : false,
                     pointColor          : '#3b8bba',
                     pointStrokeColor    : 'rgba(60,141,188,1)',
                     pointHighlightFill  : '#fff',
                     pointHighlightStroke: 'rgba(60,141,188,1)',
-                    data                : total_incomes.map(function(income) {
+                    data                : all_incomes.map(function(income) {
                         return new Decimal(income).toNumber();
                     })
                 }

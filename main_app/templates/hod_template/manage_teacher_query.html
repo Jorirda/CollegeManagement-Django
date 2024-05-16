@@ -12,6 +12,14 @@
     <div class="row">
       <div class="col-md-12">
         <div class="card">
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="d-flex align-items-center">
+              <i class="nav-icon fas fa-search" style="font-size: 24px; margin-right: 10px;"></i>
+              <h3 class="card-title">{% trans page_title %}</h3>
+            </div>                                      
+          </div>
+        </div>
+        <div class="card">
           <div class="card-body">
             <form method="GET" class="teacher-selector-form">
               <div class="form-group d-flex align-items-center mb-0">
@@ -22,7 +30,7 @@
                     <option value="{{ teacher.id }}">{{ teacher.first_name }} {{ teacher.last_name }}</option>
                   {% endfor %}
                 </select>
-                <button type="submit" class="btn btn-primary">{% trans "Search" %}</button>
+                <button type="submit" class="btn btn-success">{% trans "Search" %}</button>
               </div>
             </form>
           </div>

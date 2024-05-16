@@ -12,6 +12,14 @@
     <div class="row">
       <div class="col-md-12">
         <div class="card">
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="d-flex align-items-center">
+              <i class="nav-icon fas fa-search" style="font-size: 24px; margin-right: 10px;"></i>
+                <h3 class="card-title">{% trans page_title %}</h3>
+            </div>                                      
+          </div>
+        </div>
+        <div class="card">
           <div class="card-body">
             <form method="GET" class="student-selector-form">
               <div class="form-group d-flex align-items-center mb-0">
@@ -29,6 +37,7 @@
         </div>
       </div>
     </div>
+    {% if student_query_info %}
     <div class="row">
       <div class="col-md-12">
         <div class="card">
@@ -110,13 +119,16 @@
                   <td>{{ query.lesson_hours }}</td>
                 </tr>
               {% endfor %}
+
             </tbody>
           </table>
         </div>
       </div>
     </div>
   </div>
-  
+  {% else %}
+      <p>{% trans "No Student queries found." %}</p>
+    {% endif %}
 </section>
 
 {% block custom_js %}

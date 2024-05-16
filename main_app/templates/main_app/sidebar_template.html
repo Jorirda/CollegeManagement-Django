@@ -133,7 +133,7 @@
                     {% url 'manage_student' as manage_student %}
                     {% url 'edit_student' student_id as edit_student %}
                     <a href="#" class="nav-link {% if request.path == add_student or request.path == manage_student or request.path == edit_student %}active{% endif %}">
-                        <i class="nav-icon fas fa-user"></i>
+                        <i class="nav-icon fas fa-user-graduate"></i>
                         <p>
                             {% trans "Student" %}
                             <i class="fas fa-angle-right right"></i>

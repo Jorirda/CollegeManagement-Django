@@ -12,8 +12,11 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">{{ page_title }}</h3>
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="d-flex align-items-center">
+                            <i class="nav-icon fas fa-bell" style="font-size: 24px; margin-right: 10px;"></i>
+                            <h3 class="card-title">{% trans page_title %}</h3>
+                        </div>                                               
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">

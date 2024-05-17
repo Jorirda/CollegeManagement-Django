@@ -72,7 +72,7 @@ class Campus(models.Model):
         return self.name
 
 class Admin(models.Model):
-    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    admin = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     remark = models.TextField(default="")
 
     def __str__(self):

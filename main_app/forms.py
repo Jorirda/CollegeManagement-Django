@@ -405,15 +405,22 @@ class StudentEditForm(CustomUserForm):
         model = Student
         fields = CustomUserForm.Meta.fields 
 
-class TeacherEditForm(CustomUserForm):
+class TeacherEditForm(FormSettings):
     full_name = forms.CharField(required=True, label=_('Full Name'))
     email = forms.EmailField(required=True, label=_('Email'))
-    gender = forms.ChoiceField(choices=[('male', _('Male')), ('female', _('Female'))], label=_('Gender'))
+    gender = forms.ChoiceField(choices=[('男', _('Male')), ('女', _('Female'))], label=_('Gender'))
     password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
-    profile_pic = forms.ImageField(label=_('Profile Picture'))
+    profile_pic = forms.ImageField(label=_('Profile Picture'), required=False)
 
     def __init__(self, *args, **kwargs):
         super(TeacherEditForm, self).__init__(*args, **kwargs)
+        # Reorder fields as requested
+        field_order = ['full_name', 'email', 'gender', 'password', 'profile_pic']
+        self.fields = {k: self.fields[k] for k in field_order}
+
+    class Meta:
+        model = Teacher
+        fields = ['full_name', 'email', 'gender', 'password', 'profile_pic']
 
 class EditResultForm(FormSettings):
     session_list = Session.objects.all()

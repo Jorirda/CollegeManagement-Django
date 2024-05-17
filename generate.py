@@ -5,7 +5,7 @@ from faker import Faker
 from django.contrib.auth.hashers import make_password
 from django.utils.crypto import get_random_string
 from django.db import IntegrityError
-
+from django.utils.translation import gettext as _
 # Import your models
 from main_app.models import CustomUser, Campus, Course, LearningRecord, PaymentRecord, Student, Teacher, ClassSchedule
 
@@ -75,8 +75,7 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
 
     for index, row in df.iterrows():
         try:
-            first_name = row['Full Name'].split()[0]
-            last_name = row['Full Name'].split()[-1]
+            full_name = row['Full Name']
             email = row['Email'] if not is_chinese_data else fake.email()
 
             if is_teacher:
@@ -106,22 +105,24 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
                     grade_level = grade
                     break
 
-            courses = []
             if course_name and grade_level:
                 for grade in range(1, grade_level + 1):
-                    # Check for duplicate course
-                    course = Course.objects.filter(name=course_name, level_end=grade).first()
-                    if not course:
-                        course = Course.objects.create(name=course_name, level_end=grade)
+                    # Check for existing course and update or create
+                    course, created = Course.objects.update_or_create(
+                        name=course_name,
+                        level_end=grade,
+                        defaults={'name': course_name, 'level_end': grade}
+                    )
+                    if created:
                         print(f"Created new course: {course_name} with grade {grade}")
-                    courses.append(course)
+                    else:
+                        print(f"Updated existing course: {course_name} with grade {grade}")
             else:
                 print(f"Failed to parse course name and grade from: {class_full_name}")
 
             # Create CustomUser
             user_data = {
-                'first_name': first_name,
-                'last_name': last_name,
+                'full_name': full_name,
                 'email': email,
                 'password': hashed_password,
                 'profile_pic': '/media/default.jpg',
@@ -130,7 +131,8 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
                 'phone_number': row['Phone Number'] if not is_chinese_data else fake.phone_number(),
                 'is_teacher': is_teacher,
                 'user_type': 2 if is_teacher else 3,  # Assuming 2 is for teachers and 3 is for students
-                'fcm_token': ''
+                'remark': _('Salesperson:') + row['Salesperson'],
+                'fcm_token': '' #default
             }
 
             try:
@@ -147,36 +149,31 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
                 if created:
                     print(f"Created new teacher profile for {email}")
             else:
-                student, created = Student.objects.get_or_create(user=user, campus=campus)
+                student, created = Student.objects.get_or_create(user=user, campus=campus, admin=user.admin)
                 if created:
                     print(f"Created new student profile for {email}")
 
-            # Create or update PaymentRecords
-            payment_amount = row['Payment']
-            next_payment_date = row['Next Payment Date']
-            salesperson = row['Salesperson']
-            
-            # Create or update LearningRecords and ClassSchedule
-            for course in courses:
-                learning_record, created = LearningRecord.objects.get_or_create(
-                    student=student,
-                    course=course,
-                    defaults={
-                        'total_lessons': row['Total Lessons'],
-                        'lessons_taken': row['Lessons Taken'],
-                        'remaining_lessons': row['Remaining Lessons']
-                    }
-                )
-                if created:
-                    print(f"Created new learning record for {email} and course {course.name}")
+                # Create LearningRecords and PaymentRecords for each course
+                for course in course:
+                    learning_record, created = LearningRecord.objects.get_or_create(
+                        student=student,
+                        course=course,
+                        defaults={
+                            'total_lessons': row['Total Lessons'],
+                            'lessons_taken': row['Lessons Taken'],
+                            'remaining_lessons': row['Remaining Lessons']
+                        }
+                    )
+                    if created:
+                        print(f"Created new learning record for {email} and course {course.name}")
 
-                payment_record, created = PaymentRecord.objects.get_or_create(
-                    student=student,
-                    learning_record=learning_record,
-                    defaults={'amount_due': payment_amount, 'next_payment_date': next_payment_date, 'remark': salesperson}
-                )
-                if created:
-                    print(f"Created new payment record for {email} and learning record {learning_record.id}")
+                    payment_record, created = PaymentRecord.objects.get_or_create(
+                        student=student,
+                        learning_record=learning_record,
+                        defaults={'amount_due': row['Payment'], 'next_payment_date': row['Next Payment Date'], 'remark': row['Salesperson']}
+                    )
+                    if created:
+                        print(f"Created new payment record for {email} and learning record {learning_record.id}")
 
         except KeyError as e:
             print(f"Missing expected column: {str(e)}")

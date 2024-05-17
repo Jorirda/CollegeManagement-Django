@@ -1,9 +1,10 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
 {% load i18n %}
-{% block page_title %}{{ page_title }}{% endblock page_title %}
+{% block page_title %}{% trans page_title %}{% endblock page_title %}
 
 {% block content %}
+
 <section class="content">
     <div class="container-fluid">
         <div class="row">
@@ -11,29 +12,12 @@
                 <!-- general form elements -->
                 <div class="card card-dark">
                     <div class="card-header">
-                        <h3 class="card-title">{{ page_title }}</h3>
+                        <h3 class="card-title">{% trans page_title %}</h3>
                     </div>
-                    <div class="card-body">
-                        <form method="post" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            {% if messages %}
-                                <div class="alert alert-dismissible">
-                                    {% for message in messages %}
-                                        <div class="alert alert-{{ message.tags }}">
-                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                                            {{ message }}
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            {{ form.as_p }}
-                            <div class="card-footer">
-                                <button type="submit" class="btn btn-primary">{% trans "Update Teacher" %}</button>
-                            </div>
-                        </form>
-                    </div>
+                    {% include "main_app/form_template.html" with messages=messages  form=form button_text=_("Update Teacher")%}
                 </div>
                 <!-- /.card -->
+
             </div>
         </div>
     </div>

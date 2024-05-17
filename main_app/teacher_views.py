@@ -45,6 +45,46 @@ def teacher_home(request):
     }
     return render(request, 'teacher_template/home_content.html', context)
 
+def teacher_view_profile(request):
+    teacher = get_object_or_404(Teacher, admin=request.user)
+    form = TeacherEditForm(request.POST or None, request.FILES or None,instance=teacher)
+    context = {'form': form, 'page_title': 'View/Update Profile'}
+    if request.method == 'POST':
+        try:
+            if form.is_valid():
+                # first_name = form.cleaned_data.get('first_name')
+                # last_name = form.cleaned_data.get('last_name')
+                full_name = form.cleaned_data.get('full_name')
+                password = form.cleaned_data.get('password') or None
+                gender = form.cleaned_data.get('gender')
+                passport = request.FILES.get('profile_pic') or None
+                admin = teacher.admin
+                if password != None:
+                    admin.set_password(password)
+                if passport != None:
+                    fs = FileSystemStorage()
+                    filename = fs.save(passport.name, passport)
+                    passport_url = fs.url(filename)
+                    admin.profile_pic = passport_url
+                # admin.first_name = first_name
+                # admin.last_name = last_name
+                admin.full_name = full_name
+                # admin.address = address
+                admin.gender = gender
+                admin.save()
+                teacher.save()
+                messages.success(request, "Profile Updated!")
+                return redirect(reverse('teacher_view_profile'))
+            else:
+                messages.error(request, "Invalid Data Provided")
+                return render(request, "teacher_template/teacher_view_profile.html", context)
+        except Exception as e:
+            messages.error(
+                request, "Error Occured While Updating Profile " + str(e))
+            return render(request, "teacher_template/teacher_view_profile.html", context)
+
+    return render(request, "teacher_template/teacher_view_profile.html", context)
+
 def teacher_take_attendance(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
     print(teacher)
@@ -115,45 +155,6 @@ def teacher_feedback(request):
             messages.error(request, "Form has errors!")
     return render(request, "teacher_template/teacher_feedback.html", context)
 
-def teacher_view_profile(request):
-    teacher = get_object_or_404(Teacher, admin=request.user)
-    form = TeacherEditForm(request.POST or None, request.FILES or None,instance=teacher)
-    context = {'form': form, 'page_title': 'View/Update Profile'}
-    if request.method == 'POST':
-        try:
-            if form.is_valid():
-                first_name = form.cleaned_data.get('first_name')
-                last_name = form.cleaned_data.get('last_name')
-                password = form.cleaned_data.get('password') or None
-                address = form.cleaned_data.get('address')
-                gender = form.cleaned_data.get('gender')
-                passport = request.FILES.get('profile_pic') or None
-                admin = teacher.admin
-                if password != None:
-                    admin.set_password(password)
-                if passport != None:
-                    fs = FileSystemStorage()
-                    filename = fs.save(passport.name, passport)
-                    passport_url = fs.url(filename)
-                    admin.profile_pic = passport_url
-                admin.first_name = first_name
-                admin.last_name = last_name
-                admin.address = address
-                admin.gender = gender
-                admin.save()
-                teacher.save()
-                messages.success(request, "Profile Updated!")
-                return redirect(reverse('teacher_view_profile'))
-            else:
-                messages.error(request, "Invalid Data Provided")
-                return render(request, "teacher_template/teacher_view_profile.html", context)
-        except Exception as e:
-            messages.error(
-                request, "Error Occured While Updating Profile " + str(e))
-            return render(request, "teacher_template/teacher_view_profile.html", context)
-
-    return render(request, "teacher_template/teacher_view_profile.html", context)
-
 def teacher_view_notification(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
     notifications = NotificationTeacher.objects.filter(teacher=teacher)
@@ -195,6 +196,7 @@ def teacher_add_result(request):
             messages.warning(request, "Error Occured While Processing Form")
     return render(request, "teacher_template/teacher_add_result.html", context)
 
+#Exempts
 @csrf_exempt
 def get_students(request):
     classes_id = request.POST.get('classes')

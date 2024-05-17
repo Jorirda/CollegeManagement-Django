@@ -132,10 +132,10 @@ def get_total_income_by_months(start_year, end_year, start_month_name, end_month
                 current_end_date = date(year, month + 1, 1) - timedelta(days=1)
             
             # Filter payment records that fall within the current month's date range
-            total_income = PaymentRecord.objects.filter(
+            total_income = ((PaymentRecord.objects.filter(
                 date__gte=current_start_date,
                 date__lte=current_end_date
-            ).aggregate(total_income=Sum('amount_paid'))['total_income'] or 0
+            ).aggregate(total_income=Sum('amount_paid'))['total_income'] or 0)/2)
             
             # Add the result to the dictionary
             income_by_month[month_key] = total_income
@@ -212,12 +212,6 @@ def refund_records(request):
     }
 
     return render(request, 'hod_template/refund_records.html', context)
-
-
-
-
-
-
 
 #Admin
 def admin_home(request):
@@ -526,66 +520,18 @@ def edit_teacher(request, teacher_id):
 
     if request.method == 'POST':
         if form.is_valid():
-            # Extract cleaned data from the form
-            cleaned_data = form.cleaned_data
-
-            # Extract required data
-            full_name = cleaned_data.get('full_name')
-            email = cleaned_data.get('email')
-            gender = cleaned_data.get('gender')
-            password = cleaned_data.get('password') or None
-            address = cleaned_data.get('address')  # Extract address here
-            phone_number = cleaned_data.get('phone_number')
-            # institution = cleaned_data.get('institution')
-            campus = cleaned_data.get('campus')
-            course = cleaned_data.get('course')
-            work_type = cleaned_data.get('work_type')
-            remark = cleaned_data.get('remark')
-            # passport = request.FILES.get('profile_pic')
-
             try:
-                # Get the related CustomUser object directly from the teacher's admin attribute
-                user = teacher.admin
-                # user.email = email
-                user.remark = remark
-                user.full_name = full_name
-                user.gender = gender
-                user.address = address  # Set the address here
-                user.phone_number = phone_number
-
-                # If password is provided, set it
-                if password is not None:
-                    user.set_password(password)
-
-                # If profile pic is provided, save it
-                # if passport is not None:
-                #     fs = FileSystemStorage()
-                #     filename = fs.save(passport.name, passport)
-                #     passport_url = fs.url(filename)
-                #     user.profile_pic = passport_url
-
-                # Update teacher details 
-                # teacher.institution = institution
-                teacher.campus = campus
-                teacher.course = course
-                teacher.work_type = work_type
-              
-                # Save changes
-                user.save()
-                teacher.save()
-
+                form.save()
                 messages.success(request, "Successfully Updated")
                 return redirect(reverse('edit_teacher', args=[teacher_id]))
             except Exception as e:
                 messages.error(request, "Could Not Update: " + str(e))
         else:
             messages.error(request, "Please fill the form properly")
-    else:
-        # For GET request, render the form template
-        return render(request, "hod_template/edit_teacher_template.html", context)
 
-    # If the request is POST or if there's an error, render the form template with errors
     return render(request, "hod_template/edit_teacher_template.html", context)
+
+
 
 def delete_teacher(request, teacher_id):
     teacher = get_object_or_404(CustomUser, teacher__id=teacher_id)
@@ -610,7 +556,7 @@ def manage_teacher_query(request):
     # Get the selected teacher ID from the form submission
     selected_teacher_id = request.GET.get('teacher_id')
 
-    # Initialize teacher_query_info list
+    # Initialize the teacher_query_info list outside the if block
     teacher_query_info = []
 
     # If a teacher is selected, filter teacher queries by that teacher
@@ -620,51 +566,28 @@ def manage_teacher_query(request):
 
         # Iterate over each teacher query
         for teacher_query in teacher_queries:
-            # Get related teacher information
+            # Safely get related teacher information with fallback values
+            learning_record = teacher_query.learning_records
             teacher_info = {
-                'teacher_name': teacher_query.teacher_records.admin.full_name,
-                'gender': teacher_query.admin.gender,
-                'phone_number': teacher_query.teacher_records.admin.phone_number,
-                'campus': teacher_query.teacher_records.campus,
-                'address': teacher_query.teacher_records.admin.address,
-                'num_of_classes': teacher_query.num_of_classes,
-                'contract': teacher_query.teacher_records.work_type,
-                'completed_hours': teacher_query.completed_hours,
-                'remaining_hours': teacher_query.remaining_hours,
-                'date': teacher_query.learning_records.date if teacher_query.learning_records else None,
-                'course': teacher_query.learning_records.course if teacher_query.learning_records else None,
-                'instructor': teacher_query.learning_records.teacher if teacher_query.learning_records else None,
-                'start_time': teacher_query.learning_records.start_time if teacher_query.learning_records else None,
-                'end_time': teacher_query.learning_records.end_time if teacher_query.learning_records else None,
-                'lesson_hours': teacher_query.learning_records.lesson_hours
-                # 'class': teacher_query.learning_records.class_name if teacher_query.learning_records else None,
+                'teacher_name': teacher_query.admin.full_name if teacher_query.teacher_records and teacher_query.teacher_records.admin else 'Unknown',
+                'gender': teacher_query.admin.gender if teacher_query.admin else 'Unknown',
+                'phone_number': teacher_query.teacher_records.admin.phone_number if teacher_query.teacher_records and teacher_query.teacher_records.admin else 'Unknown',
+                'campus': teacher_query.teacher_records.campus if teacher_query.teacher_records else 'Unknown',
+                'address': teacher_query.teacher_records.admin.address if teacher_query.teacher_records and teacher_query.teacher_records.admin else 'Unknown',
+                'num_of_classes': teacher_query.num_of_classes if teacher_query.num_of_classes is not None else 'Unknown',
+                'contract': teacher_query.teacher_records.work_type if teacher_query.teacher_records else 'Unknown',
+                'completed_hours': teacher_query.completed_hours if teacher_query.completed_hours is not None else 'Unknown',
+                'remaining_hours': teacher_query.remaining_hours if teacher_query.remaining_hours is not None else 'Unknown',
+                'date': learning_record.date if learning_record else 'Unknown',
+                'course': learning_record.course if learning_record else 'Unknown',
+                'instructor': learning_record.teacher if learning_record else 'Unknown',
+                'start_time': learning_record.start_time if learning_record else 'Unknown',
+                'end_time': learning_record.end_time if learning_record else 'Unknown',
+                'lesson_hours': learning_record.lesson_hours if learning_record else 'Unknown',
+                # 'class': learning_record.class_name if learning_record else None,
             }
             # Append teacher query information to the list
             teacher_query_info.append(teacher_info)
-    # else:
-        # # If no teacher is selected, retrieve all teacher queries
-        # # Iterate over each teacher query
-        # for teacher_query in TeacherQuery.objects.all():
-        #     # Get related teacher information
-        #     teacher_info = {
-        #         'teacher_name': teacher_query.teacher_records.admin.full_name,
-        #         'gender': teacher_query.admin.gender,
-        #         'phone_number': teacher_query.teacher_records.admin.phone_number,
-        #         'campus': teacher_query.teacher_records.campus,
-        #         'address': teacher_query.teacher_records.admin.address,
-        #         'num_of_classes': teacher_query.num_of_classes,
-        #         'contract': teacher_query.teacher_records.work_type,
-        #         'completed_hours': teacher_query.completed_hours,
-        #         'remaining_hours': teacher_query.remaining_hours,
-        #         'date': teacher_query.learning_records.date if teacher_query.learning_records else None,
-        #         'course': teacher_query.learning_records.course if teacher_query.learning_records else None,
-        #         'instructor': teacher_query.learning_records.teacher if teacher_query.learning_records else None,
-        #         'start_time': teacher_query.learning_records.start_time if teacher_query.learning_records else None,
-        #         'end_time': teacher_query.learning_records.end_time if teacher_query.learning_records else None,
-        #         # 'class': teacher_query.learning_records.class_name if teacher_query.learning_records else None,
-        #     }
-        #     # Append teacher query information to the list
-        #     teacher_query_info.append(teacher_info)
 
     # Prepare the context to pass to the template
     context = {
@@ -675,6 +598,7 @@ def manage_teacher_query(request):
 
     # Render the template with the context
     return render(request, 'hod_template/manage_teacher_query.html', context)
+
 
 
 #Students

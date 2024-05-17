@@ -103,6 +103,7 @@ class Teacher(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
+    # date_of_birth = models.DateField(blank=True, null=True)
     work_type = models.CharField(max_length=30, blank=True)  # Special/Temporary
 
     def __str__(self):
@@ -201,7 +202,7 @@ class PaymentRecord(models.Model):
     status = models.CharField(max_length=100)
     payee = models.CharField(max_length=255)
     remark = models.TextField(default="")
-    lesson_hours = models.DecimalField(max_digits=10, default=0, decimal_places=2)
+    lesson_hours = models.IntegerField()
     learning_record = models.OneToOneField(
         LearningRecord, 
         null=True, 
@@ -380,8 +381,10 @@ def create_or_update_teacher_query(sender, instance, created, **kwargs):
 # Register signal handlers
 post_save.connect(create_or_update_teacher_query, sender=Teacher)
 
+#Linking Payment Records and Learning Records
 @receiver(post_save, sender=PaymentRecord)
 @receiver(post_save, sender=LearningRecord)
+
 def link_records(sender, instance, created, **kwargs):
     """
     Signal handler for linking LearningRecord and PaymentRecord instances based on course, student, and date.
@@ -422,7 +425,7 @@ def link_records(sender, instance, created, **kwargs):
 post_save.connect(link_records, sender=PaymentRecord)
 post_save.connect(link_records, sender=LearningRecord)
 
-#CLASS Schedule 
+#Linking Learning Records and Class Schedule 
 @receiver(post_save, sender=LearningRecord)
 @receiver(post_save, sender=ClassSchedule)
 def link_learning_record_and_class_schedule(sender, instance, created, **kwargs):

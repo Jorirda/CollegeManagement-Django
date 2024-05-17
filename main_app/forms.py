@@ -21,13 +21,12 @@ class CustomUserForm(FormSettings):
     password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
     profile_pic = forms.ImageField(label=_('Profile Picture')) 
     address = forms.CharField(widget=forms.Textarea, label=_('Address'))
-    home_number = forms.CharField(required=True, label=_('Home Number'))
-    cell_number = forms.CharField(required=True, label=_('Cell Number'))
+    phone_number = forms.CharField(max_length=20, required=False, label=_("Phone Number"))
     remark = forms.CharField(required=True, label=_('Remark'))
 
     class Meta:
         model = CustomUser
-        fields = ['full_name', 'email', 'gender', 'password', 'profile_pic', 'address', 'home_number', 'cell_number', 'remark']
+        fields = ['full_name', 'email', 'gender', 'password', 'profile_pic', 'address', 'phone_number', 'remark']
 
     def __init__(self, *args, **kwargs):
         super(CustomUserForm, self).__init__(*args, **kwargs)
@@ -102,34 +101,51 @@ class AdminForm(FormSettings):
 
 class TeacherForm(FormSettings):
     full_name = forms.CharField(required=True, label=_('Full Name'))
-    gender = forms.ChoiceField(choices=[(' 男', _('Male')), ('女', _('Female'))], label=_('Gender'))
-    email = forms.CharField(widget=forms.EmailInput, label=('Email'))
-    password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
-    address = forms.CharField(widget=forms.Textarea, label=_('Address'))  # Add this line
+    gender = forms.ChoiceField(choices=[('男', _('Male')), ('女', _('Female'))], label=_('Gender'))
+    email = forms.EmailField(widget=forms.EmailInput, label=_('Email'))
+    password = forms.CharField(widget=forms.PasswordInput, required=False, label=_('Password'))
+    address = forms.CharField(widget=forms.Textarea, label=_('Address'))
     phone_number = forms.CharField(max_length=20, required=False, label=_("Phone Number"))
-    # institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False, label=_("Institution"))
     campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False, label=_("Campus"))
     course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, label=_("Course"))
     work_type = forms.ChoiceField(choices=[
         ('Full Time', _('Full Time')),
         ('Part Time', _('Part Time')),
-    ],label=_("Contract"))
-    remark = forms.CharField(required=True, label=_('Remark'))
+    ], label=_("Contract"))
+    remark = forms.CharField(widget=forms.Textarea, required=False, label=_('Remark'))
 
     def __init__(self, *args, **kwargs):
         super(TeacherForm, self).__init__(*args, **kwargs)
-       
-        # Reorder fields as requested
-        field_order = [_('full_name'), _('gender'), _('email'), _('password'), 
-                       _('address'), _('phone_number'), _('campus'), 
-                       _('course'), _('work_type'), _('remark')]
+        if self.instance.pk:  # if the instance exists (editing case)
+            self.fields['full_name'].initial = self.instance.admin.full_name
+            self.fields['gender'].initial = self.instance.admin.gender
+            self.fields['email'].initial = self.instance.admin.email
+            self.fields['address'].initial = self.instance.admin.address
+            self.fields['phone_number'].initial = self.instance.admin.phone_number
+            self.fields['remark'].initial = self.instance.admin.remark
 
-        # Set the field order
-        self.fields = {k: self.fields[k] for k in field_order}
+    def save(self, commit=True):
+        instance = super(TeacherForm, self).save(commit=False)
+        user = instance.admin
+        user.full_name = self.cleaned_data['full_name']
+        user.gender = self.cleaned_data['gender']
+        user.email = self.cleaned_data['email']
+        user.address = self.cleaned_data['address']
+        user.phone_number = self.cleaned_data['phone_number']
+        user.remark = self.cleaned_data['remark']
+        
+        password = self.cleaned_data.get('password')
+        if password:
+            user.set_password(password)
+
+        if commit:
+            user.save()
+            instance.save()
+        return instance
 
     class Meta:
         model = Teacher
-        fields = ['full_name', 'gender', 'email','password',  'address', 
+        fields = ['full_name', 'gender', 'email', 'password', 'address', 
                   'phone_number', 'campus', 'course', 'work_type', 'remark']
 
 class CourseForm(FormSettings):
@@ -282,6 +298,7 @@ class PaymentRecordForm(FormSettings):
     amount_paid = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Amount Paid'))
     lesson_hours = forms.DecimalField(required=False, decimal_places=0, max_digits=10, initial=0, label=_("Total Lesson Hours"))
 
+
     class Meta:
         model = PaymentRecord
         fields = [
@@ -389,13 +406,14 @@ class StudentEditForm(CustomUserForm):
         fields = CustomUserForm.Meta.fields 
 
 class TeacherEditForm(CustomUserForm):
+    full_name = forms.CharField(required=True, label=_('Full Name'))
+    email = forms.EmailField(required=True, label=_('Email'))
+    gender = forms.ChoiceField(choices=[('male', _('Male')), ('female', _('Female'))], label=_('Gender'))
+    password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
+    profile_pic = forms.ImageField(label=_('Profile Picture'))
+
     def __init__(self, *args, **kwargs):
         super(TeacherEditForm, self).__init__(*args, **kwargs)
-        self.fields['work_type'].required = False  # Make 'work_type' field optional
-
-    class Meta(CustomUserForm.Meta):
-        model = Teacher
-        fields = CustomUserForm.Meta.fields + [_('work_type')]  # Add 'work_type' to the fields list
 
 class EditResultForm(FormSettings):
     session_list = Session.objects.all()

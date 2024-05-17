@@ -27,7 +27,7 @@
                 <select id="student_selector" name="student_id" class="form-control mr-3">
                   <option value="">{% trans "Select a Student" %}</option>
                   {% for student in students %}
-                    <option value="{{ student.id }}">{{ student.first_name }} {{ student.last_name }}</option>
+                    <option value="{{ student.id }}">{{ student.full_name }}</option>
                   {% endfor %}
                 </select>
                 <button type="submit" class="btn btn-success">{% trans "Search" %}</button>

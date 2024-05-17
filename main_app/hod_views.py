@@ -113,7 +113,7 @@ def refund_records(request):
     for student_query in student_queries:
         # Check if the student_query has an associated payment_records object and refund condition is met
         if student_query.payment_records:  # Assuming 'Refunded' is a status
-            if student_query.payment_records.status == 'Pending':
+            if student_query.payment_records.status == 'Refund': #WORK ON THIS NIGGA
                 student_info = {
                     'student_name': student_query.student_records.admin.full_name if student_query.student_records.admin else 'Unknown',
                     'date_of_birth': student_query.student_records.date_of_birth if student_query.student_records else 'Unknown',
@@ -200,20 +200,6 @@ def get_total_income_by_months(start_year, end_year, start_month_name, end_month
     return income_by_month
 
 def admin_home(request):
-    month_dict = {
-        "January": 1,
-        "February": 2,
-        "March": 3,
-        "April": 4,
-        "May": 5,
-        "June": 6,
-        "July": 7,
-        "August": 8,
-        "September": 9,
-        "October": 10,
-        "November": 11,
-        "December": 12
-    }
     total_teacher = Teacher.objects.all().count()
     total_students = Student.objects.all().count()
     classes = ClassSchedule.objects.all()
@@ -290,11 +276,15 @@ def admin_home(request):
     total_incomes = []
     income_by_months = {}
     all_months = []
+    available_years = set()
 
     for session in sessions:
         # Get the start and end years for the current session (semester)
         start_year = session.start_year.year
         end_year = session.end_year.year
+
+        # Add years to the set of available years
+        available_years.update(range(start_year, end_year + 1))
 
         # Filter payment records that fall within the session's date range
         total_income_per_session = PaymentRecord.objects.filter(
@@ -314,7 +304,21 @@ def admin_home(request):
             income_by_months[month_year] += income
 
     # Sort months by year and month
-    sorted_income_by_months = {k: income_by_months[k] for k in sorted(income_by_months, key=lambda x: (int(x.split()[1]), list(month_dict.keys()).index(x.split()[0])))}
+    month_dict = {
+        "January": 1,
+        "February": 2,
+        "March": 3,
+        "April": 4,
+        "May": 5,
+        "June": 6,
+        "July": 7,
+        "August": 8,
+        "September": 9,
+        "October": 10,
+        "November": 11,
+        "December": 12
+    }
+    sorted_income_by_months = {k: income_by_months[k] for k in sorted(income_by_months, key=lambda x: (int(x.split()[1]), month_dict[x.split()[0]]))}
     all_months = list(sorted_income_by_months.keys())
     all_incomes = list(sorted_income_by_months.values())
 
@@ -340,9 +344,11 @@ def admin_home(request):
         'total_incomes': total_incomes,
         'all_months': all_months,
         'all_incomes': all_incomes,
+        'available_years': sorted(available_years),
     }
 
     return render(request, 'hod_template/home_content.html', context)
+
 
 def admin_view_profile(request):
     admin = get_object_or_404(Admin, admin=request.user)
@@ -1121,6 +1127,7 @@ def edit_payment_record(request, payment_id):
             date = form.cleaned_data.get('date')
             student = form.cleaned_data.get('student')
             course = form.cleaned_data.get('course')
+            learning = form.cleaned_data.get('learning')
             lesson_unit_price = form.cleaned_data.get('lesson_unit_price')
             discounted_price = form.cleaned_data.get('discounted_price')
             book_costs = form.cleaned_data.get('book_costs')
@@ -1128,6 +1135,7 @@ def edit_payment_record(request, payment_id):
             amount_due = form.cleaned_data.get('amount_due')
             amount_paid = form.cleaned_data.get('amount_paid')
             lesson_hours = form.cleaned_data.get('lesson_hours')
+            print(lesson_hours)
             payment_method = form.cleaned_data.get('payment_method')
             status = form.cleaned_data.get('status')
             payee = form.cleaned_data.get('payee')
@@ -1137,6 +1145,7 @@ def edit_payment_record(request, payment_id):
                 paymentrecord.date = date
                 paymentrecord.student = student
                 paymentrecord.course = course
+                paymentrecord.learning = learning
                 paymentrecord.lesson_unit_price = lesson_unit_price
                 paymentrecord.discounted_price = discounted_price
                 paymentrecord.book_costs = book_costs
@@ -1149,15 +1158,17 @@ def edit_payment_record(request, payment_id):
                 paymentrecord.payee = payee
                 paymentrecord.remark = remark
 
-                # Retrieve the LearningRecord associated with the student and course
-                try:
-                    learning_record = LearningRecord.objects.get(student=student, course=course)
-                    paymentrecord.learning_record = learning_record
-                except LearningRecord.DoesNotExist:
-                    messages.error(request, "No learning record found for this student and course combination.")
-                    return render(request, 'hod_template/edit_payment_record_template.html', context)
-
                 paymentrecord.save()
+
+                # Check if lesson hours are retrieved properly
+                # if paymentrecord.learning_record:
+                #     # lesson_hours = paymentrecord.calculate_lesson_hours()
+                #     if lesson_hours is not None:
+                #         messages.success(request, _("Lesson hours retrieved successfully"))
+                #     else:
+                #         messages.error(request, _("Lesson hours are called but not being shown"))
+                # else:
+                #     messages.error(request, _("Lesson hours are not being retrieved"))
 
                 messages.success(request, "Successfully Updated")
                 return redirect(reverse('edit_payment_record', args=[payment_id]))

@@ -1,3 +1,4 @@
+import logging
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import UserManager
 from django.dispatch import receiver
@@ -7,6 +8,8 @@ from django.contrib.auth.models import AbstractUser
 from datetime import datetime, timedelta, date
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Sum
+
+logger = logging.getLogger(__name__)
 
 
 
@@ -128,13 +131,12 @@ class LearningRecord(models.Model):
     student = models.ForeignKey(Student, null=True, on_delete=models.DO_NOTHING)
     course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Teacher, null=True, on_delete=models.CASCADE)
-    schedule = models.ForeignKey(ClassSchedule, null=True, on_delete=models.CASCADE)
+    schedule_record = models.ForeignKey(ClassSchedule, null=True, on_delete=models.CASCADE)
     semester = models.ForeignKey(Session, null=True, on_delete=models.CASCADE)
     start_time = models.TimeField(null=True)  # Add start_time field
     end_time = models.TimeField(null=True)    # Add end_time field
     lesson_hours = models.CharField(max_length=10, null=True)  # Add lesson_hours field
     
-
     def __str__(self):
         return f'{self.student} - {self.course} - {self.date}'
 
@@ -256,6 +258,12 @@ class TeacherQuery(models.Model):
     completed_hours = models.IntegerField(null=True)
     remaining_hours = models.IntegerField(null=True, default=0)  # Default value for remaining_hours
 
+class PaymentQuery(models.Model):
+    admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
+    payment_records = models.ForeignKey(PaymentRecord, null=True, on_delete=models.CASCADE)
+    learning_records = models.ForeignKey(LearningRecord, null=True, on_delete=models.CASCADE)
+
+
 @receiver(post_save, sender=Attendance)
 @receiver(post_save, sender=Student)
 @receiver(post_save, sender=LearningRecord)
@@ -339,7 +347,7 @@ def create_or_update_teacher_query(sender, instance, created, **kwargs):
             # If TeacherQuery instance does not exist, create a new one
             teacher_query = TeacherQuery.objects.create(teacher_records=teacher)
 
-    # Update the fields of the TeacherQuery instance
+        # Update the fields of the TeacherQuery instance
         teacher_query.admin = teacher.admin
        
         # Get related learning records 
@@ -377,38 +385,160 @@ def create_or_update_teacher_query(sender, instance, created, **kwargs):
 # Register signal handlers
 post_save.connect(create_or_update_teacher_query, sender=Teacher)
 
+# @receiver(post_save, sender=PaymentRecord)
+# @receiver(post_save, sender=LearningRecord)
+# def create_or_update_payment_query(sender, instance, created, **kwargs):
+#     """
+#     Signal handler for creating or updating PaymentQuery instance when a Teacher instance is created or updated.
+
+#     """
+#     payment = None
+#     if isinstance(instance, PaymentRecord):
+#         payment = instance
+#         print("Payment")
+#     elif isinstance(instance, LearningRecord):
+#         payment = instance.payment
+#         print("Payment Checking")
+
+#     if payment:
+#         try:
+#             # Attempt to retrieve the existing PaymentQuery instance related to a payment
+#             payment_query = PaymentQuery.objects.get(payment_records=payment)
+#         except PaymentQuery.DoesNotExist:
+#             # If PaymentQuery instance does not exist, create a new one
+#             payment_query = PaymentQuery.objects.create(payment_records=payment)
+    
+#     # Update the fields of the PaymentQuery instance
+#     payment_query.admin = payment.admin
+
+#     # Get related learning records 
+#     related_learning_records = payment.learningrecord_set.all()
+   
+#     # Update learning records fields in PaymentQuery
+#     learning_record_instance = related_learning_records.first()
+            
+#     if learning_record_instance:
+#         payment_query.learning_records = learning_record_instance
+  
+#     # Set learning record id
+#     payment_query.learning_records_id = learning_record_instance.id if learning_record_instance else None
+    
+#     # Save the updated TeacherQuery instance
+#     payment_query.save()
+
+# # Register signal handlers
+# post_save.connect(create_or_update_payment_query, sender=PaymentRecord)        
+             
+# @receiver(post_save, sender=LearningRecord)
+# def link_learning_record_to_payment(sender, instance, created, **kwargs):
+#     if created:
+#         # Find the payment record that matches the student and course of the learning record
+#         try:
+#             payment_record = PaymentRecord.objects.get(student=instance.student, course=instance.course)
+#             payment_record.learning_record = instance
+#             payment_record.save()
+#             print("Has a Learning Record")
+#         except PaymentRecord.DoesNotExist:
+#             # Handle the case where no payment record is found, if necessary
+#             pass
 
 # @receiver(post_save, sender=PaymentRecord)
-# def associate_learning_record_with_payment(sender, instance, created, **kwargs):
-#     """
-#     Signal handler to associate a LearningRecord with a PaymentRecord when the PaymentRecord is created or updated,
-#     ensuring the student has paid in full.
-#     """
-#     payment_record = instance
-#     student = payment_record.student
+# def update_payment_with_learning_record(sender, instance, created, **kwargs):
+#     if created and instance.learning_record is None:
+#         # Find the learning record that matches the student and course of the payment record
+#         try:
+#             learning_record = LearningRecord.objects.get(student=instance.student, course=instance.course)
+#             instance.learning_record = learning_record
+#             instance.save()
+#         except LearningRecord.DoesNotExist:
+#             # Handle the case where no learning record is found, if necessary
+#             pass
 
-#     # Check if the payment record is newly created or updated
-#     if created or (payment_record.learning_record is None and payment_record.amount_paid >= payment_record.amount_due):
-#         # Fetch the learning record for the student
-#         learning_record = LearningRecord.objects.filter(student=student).first()
-#         if learning_record:
-#             # Check if the learning record is not already associated with another payment record
-#             if not learning_record.payment_record:
-#                 payment_record.learning_record = learning_record
-#                 payment_record.save()
-#                 learning_record.payment_record = payment_record
-#                 learning_record.save()
-#         else:
-#             # Check if there's any existing learning record associated with the student
-#             existing_learning_record = LearningRecord.objects.filter(student=student).first()
-#             if existing_learning_record and not existing_learning_record.payment_record:
-#                 payment_record.learning_record = existing_learning_record
-#                 payment_record.save()
-#                 existing_learning_record.payment_record = payment_record
-#                 existing_learning_record.save()
+# # Register the signal handlers
+# post_save.connect(link_learning_record_to_payment, sender=LearningRecord)
+# post_save.connect(update_payment_with_learning_record, sender=PaymentRecord)
 
+@receiver(post_save, sender=PaymentRecord)
+@receiver(post_save, sender=LearningRecord)
+def link_records(sender, instance, created, **kwargs):
+    """
+    Signal handler for linking LearningRecord and PaymentRecord instances based on course, student, and date.
+    """
+    if isinstance(instance, PaymentRecord):
+        payment = instance
+        print("Payment Record Created/Updated")
+        
+        # Find related learning records based on course, student, and date
+        related_learning_records = LearningRecord.objects.filter(
+            course=payment.course,
+            student=payment.student,
+            date=payment.date
+        )
 
+        # Update the PaymentRecord with the first related LearningRecord ID
+        if related_learning_records.exists():
+            learning_record_instance = related_learning_records.first()
+            PaymentRecord.objects.filter(id=payment.id).update(learning_record=learning_record_instance)
 
+    elif isinstance(instance, LearningRecord):
+        learning_record = instance
+        print("Learning Record Created/Updated")
+        
+        # Find related payment records based on course, student, and date
+        related_payments = PaymentRecord.objects.filter(
+            course=learning_record.course,
+            student=learning_record.student,
+            date=learning_record.date
+        )
+
+        # Update the first related PaymentRecord with the LearningRecord ID
+        if related_payments.exists():
+            payment = related_payments.first()
+            PaymentRecord.objects.filter(id=payment.id).update(learning_record=learning_record)
+
+# Register signal handlers
+post_save.connect(link_records, sender=PaymentRecord)
+post_save.connect(link_records, sender=LearningRecord)
+
+#CLASS Schedule 
+@receiver(post_save, sender=LearningRecord)
+@receiver(post_save, sender=ClassSchedule)
+def link_learning_record_and_class_schedule(sender, instance, created, **kwargs):
+    """
+    Signal handler for linking LearningRecord and ClassSchedule instances based on course and teacher.
+    """
+    if isinstance(instance, LearningRecord):
+        learning = instance
+        logger.info("Learning Record Created/Updated: %s", learning.id)
+        
+        # Find related schedule based on course and teacher
+        related_schedule_records = ClassSchedule.objects.filter(
+            course=learning.course,
+            teacher=learning.teacher
+        )
+        # Update the LearningRecord with the first related ClassSchedule ID
+        if related_schedule_records.exists():
+            schedule_record_instance = related_schedule_records.first()
+            LearningRecord.objects.filter(id=learning.id).update(schedule_record=schedule_record_instance)
+   
+    elif isinstance(instance, ClassSchedule):
+        scheduling_record = instance
+        logger.info("Class Schedule Record Created/Updated: %s", scheduling_record.id)
+
+        # Find related learning records based on course and teacher
+        related_learning = LearningRecord.objects.filter(
+            course=scheduling_record.course,
+            teacher=scheduling_record.teacher
+        )
+
+        # Update the first related Learning Record with the Class schedule ID
+        if related_learning.exists():
+            learning = related_learning.first()
+            LearningRecord.objects.filter(id=learning.id).update(schedule_record=scheduling_record)
+
+# Register signal handlers
+post_save.connect(link_learning_record_and_class_schedule, sender=LearningRecord)
+post_save.connect(link_learning_record_and_class_schedule, sender=ClassSchedule)
 
 @receiver(post_save, sender=CustomUser)
 def create_user_profile(sender, instance, created, **kwargs):

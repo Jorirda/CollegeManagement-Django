@@ -219,6 +219,14 @@
                 </div>
               </div>
               <div class="card-body">
+                <div class="form-group">
+                  <label for="yearSelect">{% trans "Select Year" %}</label>
+                  <select id="yearSelect" class="form-control">
+                    {% for year in available_years %}
+                      <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
                 <div class="chart">
                   <canvas id="monthlyContributionsChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                 </div>
@@ -516,7 +524,30 @@
             data: monthlyContributionsData,
             options: monthlyContributionsChartOptions
         });
-      })
-      
+
+        // Handle year selection
+        $('#yearSelect').change(function() {
+          var selectedYear = $(this).val();
+          var filteredMonths = [];
+          var filteredIncomes = [];
+
+          // Filter data based on selected year
+          for (var i = 0; i < all_months.length; i++) {
+            var year = all_months[i].split(' ')[1];
+            if (year == selectedYear) {
+              filteredMonths.push(all_months[i]);
+              filteredIncomes.push(all_incomes[i]);
+            }
+          }
+
+          // Update chart data
+          monthlyContributionsChart.data.labels = filteredMonths;
+          monthlyContributionsChart.data.datasets[0].data = filteredIncomes;
+          monthlyContributionsChart.update();
+        });
+
+        // Trigger change to initialize chart with default selected year
+        $('#yearSelect').trigger('change');
+      });
   </script>
 {% endblock custom_js %}

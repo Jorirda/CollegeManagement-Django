@@ -63,13 +63,15 @@ class StudentForm(CustomUserForm):
     ], label=_("Status"), widget=forms.Select(attrs={'class': 'hideable'}))
     phone_number = forms.CharField(max_length=20, required=False, label=_("Phone Number"))
     remark = forms.CharField(label=_('Remark'))
+    campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False, label=_("Campus"))
     
 
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
-       
+        if self.instance.pk:  # if the instance exists (editing case)
+            self.fields['campus'].initial = self.instance.campus
         # Reorder fields as requested
-        field_order = [_('full_name'), _('gender'), _('date_of_birth'), _('address'), _('phone_number'), _('reg_date'),_('status'), _('remark')]
+        field_order = [_('full_name'), _('gender'), _('date_of_birth'), _('address'), _('phone_number'),_('campus'), _('reg_date'),_('status'), _('remark')]
                          
         # Set the field order
         self.fields = {k: self.fields[k] for k in field_order}
@@ -210,6 +212,7 @@ class LearningRecordForm(FormSettings):
         self.fields['start_time'].widget.attrs['readonly'] = True
         self.fields['end_time'].widget.attrs['readonly'] = True
         self.fields['lesson_hours'].widget.attrs['readonly'] = True  # Ensure lesson_hours is read-only
+
 
         if 'course' in self.data and 'teacher' in self.data:
             course_id = int(self.data['course'])

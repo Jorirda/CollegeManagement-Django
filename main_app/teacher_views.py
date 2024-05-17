@@ -14,17 +14,20 @@ from .models import *
 
 def teacher_home(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
-    total_students = Student.objects.all().count()
-    total_leave = LeaveReportTeacher.objects.filter(teacher=teacher).count()
-    total_courses = teacher.courses.count()
+    total_students = LearningRecord.objects.filter(teacher_id=teacher).count() #SLIGHT TWEAKS
+    total_leave = LeaveReportTeacher.objects.filter(teacher=teacher).count() 
+    total_courses = ClassSchedule.objects.filter(teacher=teacher).values('course').distinct().count() #FIXED IT, COUNTS ATTENDEES
     
     # Initialize attendance variables
-    total_attendance = Attendance.objects.c
+    total_attendance = 0
     attendance_per_course = []
 
     # Collecting attendance data per course
-    for course in teacher.courses.all():
-        course_schedules = ClassSchedule.objects.filter(course=course, teacher=teacher)
+    class_schedules = ClassSchedule.objects.filter(teacher=teacher)
+    courses = set(schedule.course for schedule in class_schedules)
+
+    for course in courses:
+        course_schedules = class_schedules.filter(course=course)
         course_attendance_count = Attendance.objects.filter(classes__in=course_schedules).count()
         total_attendance += course_attendance_count
         attendance_per_course.append({
@@ -33,7 +36,7 @@ def teacher_home(request):
         })
 
     context = {
-        'page_title': 'Teacher Panel - ' + str(teacher.admin.last_name) + ' (' + str(teacher.course) + ')',
+        'page_title': f'Teacher Panel - {teacher.admin.full_name} ({", ".join(course.name for course in courses)})',
         'total_students': total_students,
         'total_attendance': total_attendance,
         'total_leave': total_leave,

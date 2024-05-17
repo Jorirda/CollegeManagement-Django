@@ -89,11 +89,11 @@ class Course(models.Model):
 
 class Student(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
+    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     date_of_birth = models.DateField(blank=True, null=True)
     reg_date = models.DateField(blank=True, null=True)
-    status = models.CharField(max_length=30, blank=True,default='Currently Learning') 
+    status = models.CharField(max_length=30, blank=True,default='Currently Learning')
 
     def __str__(self):
         return self.admin.full_name

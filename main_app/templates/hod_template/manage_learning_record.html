@@ -24,6 +24,35 @@
             flex-basis: 100%;
         }
     }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    th, td {
+        white-space: nowrap;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+    .pagination a, .pagination span {
+        margin: 0 5px;
+        padding: 8px 16px;
+        text-decoration: none;
+        color: #5FC032;
+        border: 1px solid #DEE2E600;
+        border-radius: 4px;
+    }
+    .pagination a:hover {
+        background-color: #e9ecef;
+    }
+    .pagination .current {
+        background-color: #5FC032;
+        color: white;
+    }
 </style>
 <section class="content">
     <div class="container-fluid">
@@ -46,7 +75,7 @@
                                 <select name="teacher_name" class="form-control">
                                     <option value="" {% if not request.GET.teacher_name %}selected{% endif %}>{% trans "Select Teacher" %}</option>
                                     {% for teacher in teachers %}
-                                    <option value="{{ teacher.admin.id }}" {% if request.GET.teacher_name == teacher.admin.id|stringformat:"s" %}selected{% endif %}>
+                                    <option value="{{ teacher.admin.id }}" {% if request.GET.teacher_name == teacher.admin.id %}selected{% endif %}>
                                         {{ teacher.admin.full_name }}
                                     </option>
                                     {% endfor %}
@@ -56,7 +85,7 @@
                         </div>
                     </div>
                     <!-- /.card-header -->
-                    <div class="card-body">
+                    <div class="card-body table-container">
                         <table id="example2" class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
@@ -92,6 +121,23 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                        <div class="pagination">
+                            <span class="step-links">
+                                {% if learningrecords.has_previous %}
+                                    <a href="?page=1">&laquo; first</a>
+                                    <a href="?page={{ learningrecords.previous_page_number }}">previous</a>
+                                {% endif %}
+                                
+                                <span class="current">
+                                    Page {{ learningrecords.number }} of {{ learningrecords.paginator.num_pages }}.
+                                </span>
+                                
+                                {% if learningrecords.has_next %}
+                                    <a href="?page={{ learningrecords.next_page_number }}">next</a>
+                                    <a href="?page={{ learningrecords.paginator.num_pages }}">last &raquo;</a>
+                                {% endif %}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

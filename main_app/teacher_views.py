@@ -58,68 +58,6 @@ def teacher_take_attendance(request):
 
     return render(request, 'teacher_template/teacher_take_attendance.html', context)
 
-
-@csrf_exempt
-def get_students(request):
-    classes_id = request.POST.get('classes')
-    session_id = request.POST.get('session')
-    try:
-        classes = get_object_or_404(ClassSchedule, id=classes_id)
-        print("hi")
-        print(classes)
-        session = get_object_or_404(Session, id=session_id)
-        students = Student.objects.filter(
-            course_id=classes.course)
-        student_data = []
-        for student in students:
-            data = {
-                    "id": student.id,
-                    "name":  student.admin.full_name
-                    }
-            student_data.append(data)
-        return JsonResponse(json.dumps(student_data), content_type='application/json', safe=False)
-    except Exception as e:
-        return e
-
-
-@csrf_exempt
-def save_attendance(request):
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Invalid request'}, status=405)
-
-    student_data = request.POST.get('student_ids')
-    date = request.POST.get('date')
-    classes_id = request.POST.get('classes')
-    session_id = request.POST.get('session')
-
-    if not (student_data and date and classes_id and session_id):
-        return JsonResponse({'error': 'Missing data'}, status=400)
-
-    try:
-        students = json.loads(student_data)
-        session = get_object_or_404(Session, id=session_id)
-        classes = get_object_or_404(ClassSchedule, id=classes_id)
-        attendance = Attendance(session=session, classes=classes, date=date)
-        attendance.save()
-
-        for student_dict in students:
-            student = get_object_or_404(Student, id=student_dict.get('id'))
-            status = student_dict.get('status', 0)  # Assuming '0' as default status if not provided
-            attendance_report = AttendanceReport(student=student, attendance=attendance, status=status)
-            attendance_report.save()
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON'}, status=400)
-    except ObjectDoesNotExist as e:
-        return JsonResponse({'error': str(e)}, status=404)
-    except Exception as e:
-        # Log the exception for debugging purposes
-        # Consider using logging here instead of printing
-        print("An error occurred:", e)
-        return JsonResponse({'error': 'Server error'}, status=500)
-
-    return HttpResponse("OK")
-
-
 def teacher_update_attendance(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
     classess = Course.objects.filter(teacher_id=teacher)
@@ -131,44 +69,6 @@ def teacher_update_attendance(request):
     }
 
     return render(request, 'teacher_template/teacher_update_attendance.html', context)
-
-
-@csrf_exempt
-def get_student_attendance(request):
-    attendance_date_id = request.POST.get('attendance_date_id')
-    try:
-        date = get_object_or_404(Attendance, id=attendance_date_id)
-        attendance_data = AttendanceReport.objects.filter(attendance=date)
-        student_data = []
-        for attendance in attendance_data:
-            data = {"id": attendance.student.admin.id,
-                    "name": attendance.student.admin.last_name + " " + attendance.student.admin.first_name,
-                    "status": attendance.status}
-            student_data.append(data)
-        return JsonResponse(json.dumps(student_data), content_type='application/json', safe=False)
-    except Exception as e:
-        return e
-
-
-@csrf_exempt
-def update_attendance(request):
-    student_data = request.POST.get('student_ids')
-    date = request.POST.get('date')
-    students = json.loads(student_data)
-    try:
-        attendance = get_object_or_404(Attendance, id=date)
-
-        for student_dict in students:
-            student = get_object_or_404(
-                Student, admin_id=student_dict.get('id'))
-            attendance_report = get_object_or_404(AttendanceReport, student=student, attendance=attendance)
-            attendance_report.status = student_dict.get('status')
-            attendance_report.save()
-    except Exception as e:
-        return None
-
-    return HttpResponse("OK")
-
 
 def teacher_apply_leave(request):
     form = LeaveReportTeacherForm(request.POST or None)
@@ -193,7 +93,6 @@ def teacher_apply_leave(request):
             messages.error(request, "Form has errors!")
     return render(request, "teacher_template/teacher_apply_leave.html", context)
 
-
 def teacher_feedback(request):
     form = FeedbackTeacherForm(request.POST or None)
     teacher = get_object_or_404(Teacher, admin_id=request.user.id)
@@ -215,7 +114,6 @@ def teacher_feedback(request):
         else:
             messages.error(request, "Form has errors!")
     return render(request, "teacher_template/teacher_feedback.html", context)
-
 
 def teacher_view_profile(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
@@ -256,19 +154,6 @@ def teacher_view_profile(request):
 
     return render(request, "teacher_template/teacher_view_profile.html", context)
 
-
-@csrf_exempt
-def teacher_fcmtoken(request):
-    token = request.POST.get('token')
-    try:
-        teacher_user = get_object_or_404(CustomUser, id=request.user.id)
-        teacher_user.fcm_token = token
-        teacher_user.save()
-        return HttpResponse("True")
-    except Exception as e:
-        return HttpResponse("False")
-
-
 def teacher_view_notification(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
     notifications = NotificationTeacher.objects.filter(teacher=teacher)
@@ -277,7 +162,6 @@ def teacher_view_notification(request):
         'page_title': "View Notifications"
     }
     return render(request, "teacher_template/teacher_view_notification.html", context)
-
 
 def teacher_add_result(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
@@ -311,6 +195,110 @@ def teacher_add_result(request):
             messages.warning(request, "Error Occured While Processing Form")
     return render(request, "teacher_template/teacher_add_result.html", context)
 
+@csrf_exempt
+def get_students(request):
+    classes_id = request.POST.get('classes')
+    session_id = request.POST.get('session')
+    try:
+        classes = get_object_or_404(ClassSchedule, id=classes_id)
+        print("hi")
+        print(classes)
+        session = get_object_or_404(Session, id=session_id)
+        students = Student.objects.filter(
+            course_id=classes.course)
+        student_data = []
+        for student in students:
+            data = {
+                    "id": student.id,
+                    "name":  student.admin.full_name
+                    }
+            student_data.append(data)
+        return JsonResponse(json.dumps(student_data), content_type='application/json', safe=False)
+    except Exception as e:
+        return e
+    
+@csrf_exempt
+def save_attendance(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid request'}, status=405)
+
+    student_data = request.POST.get('student_ids')
+    date = request.POST.get('date')
+    classes_id = request.POST.get('classes')
+    session_id = request.POST.get('session')
+
+    if not (student_data and date and classes_id and session_id):
+        return JsonResponse({'error': 'Missing data'}, status=400)
+
+    try:
+        students = json.loads(student_data)
+        session = get_object_or_404(Session, id=session_id)
+        classes = get_object_or_404(ClassSchedule, id=classes_id)
+        attendance = Attendance(session=session, classes=classes, date=date)
+        attendance.save()
+
+        for student_dict in students:
+            student = get_object_or_404(Student, id=student_dict.get('id'))
+            status = student_dict.get('status', 0)  # Assuming '0' as default status if not provided
+            attendance_report = AttendanceReport(student=student, attendance=attendance, status=status)
+            attendance_report.save()
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except ObjectDoesNotExist as e:
+        return JsonResponse({'error': str(e)}, status=404)
+    except Exception as e:
+        # Log the exception for debugging purposes
+        # Consider using logging here instead of printing
+        print("An error occurred:", e)
+        return JsonResponse({'error': 'Server error'}, status=500)
+
+    return HttpResponse("OK")
+
+@csrf_exempt
+def get_student_attendance(request):
+    attendance_date_id = request.POST.get('attendance_date_id')
+    try:
+        date = get_object_or_404(Attendance, id=attendance_date_id)
+        attendance_data = AttendanceReport.objects.filter(attendance=date)
+        student_data = []
+        for attendance in attendance_data:
+            data = {"id": attendance.student.admin.id,
+                    "name": attendance.student.admin.last_name + " " + attendance.student.admin.first_name,
+                    "status": attendance.status}
+            student_data.append(data)
+        return JsonResponse(json.dumps(student_data), content_type='application/json', safe=False)
+    except Exception as e:
+        return e
+
+@csrf_exempt
+def update_attendance(request):
+    student_data = request.POST.get('student_ids')
+    date = request.POST.get('date')
+    students = json.loads(student_data)
+    try:
+        attendance = get_object_or_404(Attendance, id=date)
+
+        for student_dict in students:
+            student = get_object_or_404(
+                Student, admin_id=student_dict.get('id'))
+            attendance_report = get_object_or_404(AttendanceReport, student=student, attendance=attendance)
+            attendance_report.status = student_dict.get('status')
+            attendance_report.save()
+    except Exception as e:
+        return None
+
+    return HttpResponse("OK")
+
+@csrf_exempt
+def teacher_fcmtoken(request):
+    token = request.POST.get('token')
+    try:
+        teacher_user = get_object_or_404(CustomUser, id=request.user.id)
+        teacher_user.fcm_token = token
+        teacher_user.save()
+        return HttpResponse("True")
+    except Exception as e:
+        return HttpResponse("False")
 
 @csrf_exempt
 def fetch_student_result(request):

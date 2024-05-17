@@ -50,6 +50,7 @@
                                     <th>Index No.</th>
                                     <th>{% trans "Full Name" %}</th>
                                     <th>{% trans "Gender" %}</th>
+                                    <th>{% trans "Email" %}</th>
                                     <th>{% trans "Address" %}</th>
                                     <th>{% trans "Phone Number" %}</th>
                                     <th>{% trans "Teaching Courses" %}</th>
@@ -64,6 +65,7 @@
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{teacher.full_name}}</td>
                                     <td>{{teacher.gender}}</td>
+                                    <td>{{teacher.email}}</td>
                                     <td>{{teacher.address}}</td>
                                     <td>{{teacher.phone_number}}</td>
                                     <td>{{teacher.teacher.course.name}}</td>

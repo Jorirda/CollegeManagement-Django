@@ -103,6 +103,7 @@ class AdminForm(FormSettings):
 class TeacherForm(FormSettings):
     full_name = forms.CharField(required=True, label=_('Full Name'))
     gender = forms.ChoiceField(choices=[(' 男', _('Male')), ('女', _('Female'))], label=_('Gender'))
+    email = forms.CharField(widget=forms.EmailInput, label=('Email'))
     password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
     address = forms.CharField(widget=forms.Textarea, label=_('Address'))  # Add this line
     phone_number = forms.CharField(max_length=20, required=False, label=_("Phone Number"))
@@ -119,7 +120,7 @@ class TeacherForm(FormSettings):
         super(TeacherForm, self).__init__(*args, **kwargs)
        
         # Reorder fields as requested
-        field_order = [_('full_name'), _('gender'), _('password'), 
+        field_order = [_('full_name'), _('gender'), _('email'), _('password'), 
                        _('address'), _('phone_number'), _('campus'), 
                        _('course'), _('work_type'), _('remark')]
 
@@ -128,7 +129,7 @@ class TeacherForm(FormSettings):
 
     class Meta:
         model = Teacher
-        fields = ['full_name', 'gender', 'password',  'address', 
+        fields = ['full_name', 'gender', 'email','password',  'address', 
                   'phone_number', 'campus', 'course', 'work_type', 'remark']
 
 class CourseForm(FormSettings):
@@ -256,7 +257,6 @@ class LearningRecordForm(FormSettings):
         print(f"Cleaned lesson_hours: {cleaned_data['lesson_hours']}")  # Debug statement
         return cleaned_data
 
-
 class PaymentRecordForm(FormSettings):
     payee = forms.CharField(label=_('Payee'))
     remark = forms.CharField(required=True, label=_('Remark'))
@@ -323,40 +323,6 @@ class ClassScheduleForm(FormSettings):
     class Meta:
         model = ClassSchedule
         fields = ['course', 'lesson_unit_price', 'teacher', 'grade', 'start_time', 'end_time', 'lesson_hours', 'remark']
-
-
-# class StudentQueryForm(FormSettings):
-#     gender = forms.ChoiceField(choices=[
-#         ('Male', _('Male')), 
-#         ('Female', _('Female'))
-#     ], label=_('Gender'))
-#     date_of_birth = forms.DateField(required=False, widget=DateInput(attrs={'type': 'date'}), label=_('Date of Birth'))
-#     contact_num = forms.CharField(required=True, widget=TextInput(attrs={'placeholder': _('Contact Number')}), label=_('Contact Number'))
-#     state = forms.ChoiceField(choices=[
-#         ('Currently Learning', _('Currently Learning')), 
-#         ('Completed', _('Completed')), 
-#         ('Refund', _('Refund'))
-#     ], label=_('State'))
-#     payment_status = forms.CharField(required=False, widget=TextInput(attrs={'placeholder': _('Payment Status')}), label=_('Payment Status'))
-#     refund_situation = forms.CharField(required=False, widget=TextInput(attrs={'placeholder': _('Refund Situation')}), label=_('Refund Situation'))
-#     reg_date = forms.DateField(required=False, widget=DateInput(attrs={'type': 'date'}), label=_('Registration Date'))
-#     num_classes = forms.CharField(required=False, widget=TextInput(attrs={'placeholder': _('Number of Classes')}), label=_('Number of Classes'))
-#     registered_courses = forms.CharField(required=False, widget=TextInput(attrs={'placeholder': _('Already Registered for Courses')}), label=_('Registered Courses'))
-#     completed_hours = forms.CharField(required=False, widget=TextInput(attrs={'placeholder': _('Course Hours Completed')}), label=_('Completed Hours'))
-#     paid_hours = forms.CharField(required=False, widget=TextInput(attrs={'placeholder': _('Paid Class Hours')}), label=_('Paid Hours'))
-#     remaining_hours = forms.CharField(required=False, widget=TextInput(attrs={'placeholder': _('Remaining Class Hours')}), label=_('Remaining Hours'))
-#     course = forms.CharField(required=False, widget=TextInput(attrs={'placeholder': _('Course')}), label=_('Course'))
-#     session = forms.CharField(required=False, widget=TextInput(attrs={'placeholder': _('Session')}), label=_('Session'))
-
-#     def __init__(self, *args, **kwargs):
-#         super(StudentQueryForm, self).__init__(*args, **kwargs)
-#         self.fields['remark'] = self.fields.pop('remark')
-
-#     class Meta(CustomUserForm.Meta):  
-#         model = StudentQuery
-#         fields = ['gender', 'date_of_birth', 'contact_num', 'state', 'payment_status', 
-#                                                'refund_situation', 'reg_date', 'num_classes', 'registered_courses', 'completed_hours', 
-#                                                'paid_hours', 'remaining_hours', 'course', 'session']
 
 class SessionForm(FormSettings):
     def __init__(self, *args, **kwargs):

@@ -18,14 +18,22 @@ def teacher_home(request):
     total_leave = LeaveReportTeacher.objects.filter(teacher=teacher).count()
     classess = Classes.objects.filter(teacher=teacher)
     total_classes = classess.count()
-    attendance_list = Attendance.objects.filter(classes__in=classess)
+
+    # Retrieve ClassSchedule objects related to the classes taught by the teacher
+    class_schedule_list = ClassSchedule.objects.filter(course__in=classess.values('course'))
+    attendance_list = Attendance.objects.filter(classes__in=class_schedule_list)
     total_attendance = attendance_list.count()
+
+    # Collecting attendance data per class
     attendance_list = []
     classes_list = []
     for classes in classess:
-        attendance_count = Attendance.objects.filter(classes=classes).count()
+        # Get ClassSchedule objects for each class
+        class_schedules = ClassSchedule.objects.filter(course=classes.course, teacher=classes.teacher)
+        attendance_count = Attendance.objects.filter(classes__in=class_schedules).count()
         classes_list.append(classes.name)
         attendance_list.append(attendance_count)
+
     context = {
         'page_title': 'Teacher Panel - ' + str(teacher.admin.last_name) + ' (' + str(teacher.course) + ')',
         'total_students': total_students,
@@ -36,7 +44,6 @@ def teacher_home(request):
         'attendance_list': attendance_list
     }
     return render(request, 'teacher_template/home_content.html', context)
-
 
 def teacher_take_attendance(request):
     teacher = get_object_or_404(Teacher, admin=request.user)

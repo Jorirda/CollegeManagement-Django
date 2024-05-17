@@ -209,11 +209,6 @@ class PaymentRecord(models.Model):
         on_delete=models.SET_NULL
     )
 
-# class LessonHours(models.Model):
-#     learning_record = models.ForeignKey(LearningRecord, on_delete=models.CASCADE)
-#     hours = models.DecimalField(max_digits=10, decimal_places=2)
-
-
 #Refund page
 class RefundRecord(models.Model):
     # admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
@@ -384,79 +379,6 @@ def create_or_update_teacher_query(sender, instance, created, **kwargs):
 
 # Register signal handlers
 post_save.connect(create_or_update_teacher_query, sender=Teacher)
-
-# @receiver(post_save, sender=PaymentRecord)
-# @receiver(post_save, sender=LearningRecord)
-# def create_or_update_payment_query(sender, instance, created, **kwargs):
-#     """
-#     Signal handler for creating or updating PaymentQuery instance when a Teacher instance is created or updated.
-
-#     """
-#     payment = None
-#     if isinstance(instance, PaymentRecord):
-#         payment = instance
-#         print("Payment")
-#     elif isinstance(instance, LearningRecord):
-#         payment = instance.payment
-#         print("Payment Checking")
-
-#     if payment:
-#         try:
-#             # Attempt to retrieve the existing PaymentQuery instance related to a payment
-#             payment_query = PaymentQuery.objects.get(payment_records=payment)
-#         except PaymentQuery.DoesNotExist:
-#             # If PaymentQuery instance does not exist, create a new one
-#             payment_query = PaymentQuery.objects.create(payment_records=payment)
-    
-#     # Update the fields of the PaymentQuery instance
-#     payment_query.admin = payment.admin
-
-#     # Get related learning records 
-#     related_learning_records = payment.learningrecord_set.all()
-   
-#     # Update learning records fields in PaymentQuery
-#     learning_record_instance = related_learning_records.first()
-            
-#     if learning_record_instance:
-#         payment_query.learning_records = learning_record_instance
-  
-#     # Set learning record id
-#     payment_query.learning_records_id = learning_record_instance.id if learning_record_instance else None
-    
-#     # Save the updated TeacherQuery instance
-#     payment_query.save()
-
-# # Register signal handlers
-# post_save.connect(create_or_update_payment_query, sender=PaymentRecord)        
-             
-# @receiver(post_save, sender=LearningRecord)
-# def link_learning_record_to_payment(sender, instance, created, **kwargs):
-#     if created:
-#         # Find the payment record that matches the student and course of the learning record
-#         try:
-#             payment_record = PaymentRecord.objects.get(student=instance.student, course=instance.course)
-#             payment_record.learning_record = instance
-#             payment_record.save()
-#             print("Has a Learning Record")
-#         except PaymentRecord.DoesNotExist:
-#             # Handle the case where no payment record is found, if necessary
-#             pass
-
-# @receiver(post_save, sender=PaymentRecord)
-# def update_payment_with_learning_record(sender, instance, created, **kwargs):
-#     if created and instance.learning_record is None:
-#         # Find the learning record that matches the student and course of the payment record
-#         try:
-#             learning_record = LearningRecord.objects.get(student=instance.student, course=instance.course)
-#             instance.learning_record = learning_record
-#             instance.save()
-#         except LearningRecord.DoesNotExist:
-#             # Handle the case where no learning record is found, if necessary
-#             pass
-
-# # Register the signal handlers
-# post_save.connect(link_learning_record_to_payment, sender=LearningRecord)
-# post_save.connect(update_payment_with_learning_record, sender=PaymentRecord)
 
 @receiver(post_save, sender=PaymentRecord)
 @receiver(post_save, sender=LearningRecord)

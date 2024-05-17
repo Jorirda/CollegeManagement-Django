@@ -64,6 +64,7 @@
         <img src="/media/logo.png" alt="Brand Logo" class="elevation-3" style="border-radius: 50%; width: 3rem; height: 3rem;">
         <span class="brand-text font-weight-dark" style="padding-left: 0.5rem;">中之有限公司</span>
     </a>
+     <!-- User Name -->
     <div class="profile-section">
         <a href="{% url 'admin_view_profile' %}" style="color: lightgray; display: flex; align-items: center;">
             <img src="{{ user.profile_pic }}" alt="User Image" class="elevation-3" style="border-radius: 50%; width: 3rem; height: 3rem;">
@@ -427,6 +428,7 @@
         <!-- /.sidebar-menu -->
     </div>
     <!-- /.sidebar -->
+    
     {% comment %} {% endif %}
 </aside> {% endcomment %}
 

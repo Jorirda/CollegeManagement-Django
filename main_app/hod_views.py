@@ -27,6 +27,9 @@ from datetime import time
 from django.http import JsonResponse
 from django.core import serializers
 from dateutil.relativedelta import relativedelta
+from django.shortcuts import render
+from django.utils.translation import gettext as _
+from django.db.models import Sum
 
 
 
@@ -85,66 +88,6 @@ def get_result(excel_file, is_teacher):
     html_table = df.to_html(index=False, classes='table table-bordered table-striped')  # Convert DataFrame to HTML table
     return html_table
 
-def fetch_class_schedule(request):
-    course_id = request.GET.get('course_id')
-    teacher_id = request.GET.get('teacher_id')
-    
-    form = LearningRecordForm()
-    data = form.fetch_class_schedule_data(course_id, teacher_id)
-    
-    return JsonResponse(data)
-
-def filter_teachers(request):
-    course_id = request.GET.get('course_id')
-    form = LearningRecordForm()
-    teachers_data = form.fetch_teacher_data(course_id)
-    print(teachers_data)
-    return JsonResponse({'teachers': teachers_data})
-
-    
-#Refund
-def refund_records(request):
-    student_queries = StudentQuery.objects.all()
-
-    # Initialize a list to hold student query information
-    student_query_info = []
-
-    # Iterate over each student query
-    for student_query in student_queries:
-        # Check if the student_query has an associated payment_records object and refund condition is met
-        if student_query.payment_records:  # Assuming 'Refunded' is a status
-            if student_query.payment_records.status == 'Refund': #WORK ON THIS NIGGA
-                student_info = {
-                    'student_name': student_query.student_records.admin.full_name if student_query.student_records.admin else 'Unknown',
-                    'date_of_birth': student_query.student_records.date_of_birth if student_query.student_records else 'Unknown',
-                    'course': student_query.learning_records.course if student_query.learning_records else 'Unknown',
-                    'total_hours': student_query.payment_records.lesson_hours if student_query.payment_records.lesson_hours else 'Unknown',
-                    'hours_spent': student_query.completed_hours if student_query.completed_hours is not None else 'Unknown',
-                    'hours_remaining': student_query.remaining_hours if student_query.remaining_hours is not None else 'Unknown',
-                    'lesson_price': student_query.payment_records.lesson_unit_price if student_query.payment_records.lesson_unit_price else 'Unknown',
-                    'refund_amount': student_query.payment_records.amount_paid if student_query.payment_records.amount_paid else 'Unknown',
-                    'amount_refunded': (
-                        (student_query.payment_records.amount_paid - student_query.payment_records.lesson_unit_price) +
-                        ((student_query.payment_records.lesson_unit_price / student_query.payment_records.lesson_hours) * student_query.remaining_hours)
-                    ) if student_query.payment_records.amount_paid and student_query.payment_records.lesson_unit_price and student_query.payment_records.lesson_hours and student_query.remaining_hours else 'Unknown',
-                    'refund_reason': student_query.payment_records.remark if student_query.payment_records.remark else 'Unknown',
-                }
-                # Append student query information to the list
-                student_query_info.append(student_info)
-
-    context = {
-        'refund_info': student_query_info,
-        'page_title': 'Manage Refund Records'
-    }
-
-    return render(request, 'hod_template/refund_records.html', context)
-
-
-#Admin
-from django.shortcuts import render
-from django.utils.translation import gettext as _
-from django.db.models import Sum
-
 def get_total_income_by_months(start_year, end_year, start_month_name, end_month_name):
     # Dictionary to correlate month names to their numeric values
     month_dict = {
@@ -199,6 +142,84 @@ def get_total_income_by_months(start_year, end_year, start_month_name, end_month
 
     return income_by_month
 
+def fetch_class_schedule(request):
+    course_id = request.GET.get('course_id')
+    teacher_id = request.GET.get('teacher_id')
+    
+    form = LearningRecordForm()
+    data = form.fetch_class_schedule_data(course_id, teacher_id)
+    
+    return JsonResponse(data)
+
+def filter_teachers(request):
+    course_id = request.GET.get('course_id')
+    form = LearningRecordForm()
+    teachers_data = form.fetch_teacher_data(course_id)
+    print(teachers_data)
+    return JsonResponse({'teachers': teachers_data})
+
+    
+#Refund
+def refund_records(request):
+    # Fetch all payment records
+    payment_records = PaymentRecord.objects.filter(status='Refund')
+
+    # Initialize the list to hold payment record information
+    payment_record_info = []
+
+    # Iterate over each payment record
+    for payment_record in payment_records:
+        student_record = payment_record.student
+        learning_record = payment_record.learning_record
+
+        # Attempt to find a corresponding StudentQuery record
+        student_query = StudentQuery.objects.filter(payment_records=payment_record).first()
+        
+
+        # Debugging information
+        print(f"Processing payment record: {payment_record.id}")
+        print(f"Payment record: {payment_record}")
+        print(f"Student record: {student_record}")
+        print(f"Learning record: {learning_record}")
+        print(f"Student query: {student_query}")
+
+        payment_info = {
+            'student_name': student_record.admin.full_name if student_record and student_record.admin else 'Unknown',
+            'date_of_birth': student_record.date_of_birth if student_record else 'Unknown',
+            'course': learning_record.course if learning_record else 'Unknown',
+            'total_hours': payment_record.lesson_hours if payment_record.lesson_hours is not None else 'Unknown',
+            'hours_spent': student_query.completed_hours if student_query and student_query.completed_hours is not None else 'Unknown',
+            'hours_remaining': student_query.remaining_hours if student_query and student_query.remaining_hours is not None else 'Unknown',
+            'lesson_price': payment_record.lesson_unit_price if payment_record.lesson_unit_price is not None else 'Unknown',
+            'refund_amount': payment_record.amount_paid if payment_record.amount_paid is not None else 'Unknown',
+            'amount_refunded': (
+                (payment_record.amount_paid - payment_record.lesson_unit_price) +
+                ((payment_record.lesson_unit_price / payment_record.lesson_hours) * student_query.remaining_hours)
+            ) if all([
+                payment_record.amount_paid is not None,
+                payment_record.lesson_unit_price is not None,
+                payment_record.lesson_hours is not None,
+                student_query and student_query.remaining_hours is not None
+            ]) else 'Unknown',
+            'refund_reason': payment_record.remark if payment_record.remark else 'Unknown',
+        }
+        # Append payment record information to the list
+        payment_record_info.append(payment_info)
+
+    context = {
+        'refund_info': payment_record_info,
+        'page_title': 'Manage Refund Records'
+    }
+
+    return render(request, 'hod_template/refund_records.html', context)
+
+
+
+
+
+
+
+#Admin
 def admin_home(request):
     total_teacher = Teacher.objects.all().count()
     total_students = Student.objects.all().count()
@@ -349,7 +370,6 @@ def admin_home(request):
 
     return render(request, 'hod_template/home_content.html', context)
 
-
 def admin_view_profile(request):
     admin = get_object_or_404(Admin, admin=request.user)
     form = AdminForm(request.POST or None, request.FILES or None,
@@ -468,14 +488,15 @@ def add_teacher(request):
             password = form.cleaned_data.get('password')
             course = form.cleaned_data.get('course')
             work_type = form.cleaned_data.get('work_type')
-            passport = request.FILES.get('profile_pic')
-            fs = FileSystemStorage()
-            filename = fs.save(passport.name, passport)
-            passport_url = fs.url(filename)
+            # passport = request.FILES.get('profile_pic')
+            # fs = FileSystemStorage()
+            # filename = fs.save(passport.name, passport)
+            # passport_url = fs.url(filename)
             try:
                 user = CustomUser.objects.create_user(
-                    email=email, password=password, user_type=2, full_name=full_name, profile_pic=passport_url)
+                    email=email, password=password, user_type=2, full_name=full_name, profile_pic=None)
                 user.gender = gender
+                user.email = email
                 user.address = address
                 user.phone_number = phone_number
                 # user.teacher.institution = institution
@@ -486,7 +507,6 @@ def add_teacher(request):
                 user.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_teacher'))
-
 
             except Exception as e:
                 messages.error(request, "Could Not Add " + str(e))
@@ -511,7 +531,7 @@ def edit_teacher(request, teacher_id):
 
             # Extract required data
             full_name = cleaned_data.get('full_name')
-            # email = cleaned_data.get('email')
+            email = cleaned_data.get('email')
             gender = cleaned_data.get('gender')
             password = cleaned_data.get('password') or None
             address = cleaned_data.get('address')  # Extract address here

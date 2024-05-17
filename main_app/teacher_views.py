@@ -14,34 +14,31 @@ from .models import *
 
 def teacher_home(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
-    total_students = Student.objects.filter(course=teacher.course).count()
+    total_students = Student.objects.all().count()
     total_leave = LeaveReportTeacher.objects.filter(teacher=teacher).count()
-    classess = Classes.objects.filter(teacher=teacher)
-    total_classes = classess.count()
+    total_courses = teacher.courses.count()
+    
+    # Initialize attendance variables
+    total_attendance = Attendance.objects.c
+    attendance_per_course = []
 
-    # Retrieve ClassSchedule objects related to the classes taught by the teacher
-    class_schedule_list = ClassSchedule.objects.filter(course__in=classess.values('course'))
-    attendance_list = Attendance.objects.filter(classes__in=class_schedule_list)
-    total_attendance = attendance_list.count()
-
-    # Collecting attendance data per class
-    attendance_list = []
-    classes_list = []
-    for classes in classess:
-        # Get ClassSchedule objects for each class
-        class_schedules = ClassSchedule.objects.filter(course=classes.course, teacher=classes.teacher)
-        attendance_count = Attendance.objects.filter(classes__in=class_schedules).count()
-        classes_list.append(classes.name)
-        attendance_list.append(attendance_count)
+    # Collecting attendance data per course
+    for course in teacher.courses.all():
+        course_schedules = ClassSchedule.objects.filter(course=course, teacher=teacher)
+        course_attendance_count = Attendance.objects.filter(classes__in=course_schedules).count()
+        total_attendance += course_attendance_count
+        attendance_per_course.append({
+            'course_name': course.name,
+            'attendance_count': course_attendance_count
+        })
 
     context = {
         'page_title': 'Teacher Panel - ' + str(teacher.admin.last_name) + ' (' + str(teacher.course) + ')',
         'total_students': total_students,
         'total_attendance': total_attendance,
         'total_leave': total_leave,
-        'total_classes': total_classes,
-        'classes_list': classes_list,
-        'attendance_list': attendance_list
+        'total_courses': total_courses,
+        'attendance_per_course': attendance_per_course
     }
     return render(request, 'teacher_template/home_content.html', context)
 

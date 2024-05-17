@@ -11,14 +11,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='learningrecord',
-            name='campus',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='main_app.campus'),
-        ),
-        migrations.AddField(
-            model_name='learningrecord',
-            name='institution',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='main_app.institution'),
-        ),
+        
+        
     ]

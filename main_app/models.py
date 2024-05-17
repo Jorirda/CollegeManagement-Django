@@ -72,7 +72,7 @@ class Campus(models.Model):
         return self.name
 
 class Admin(models.Model):
-    admin = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE) #DONT CHANGE THIS, THANKS
     remark = models.TextField(default="")
 
     def __str__(self):
@@ -83,8 +83,7 @@ class Course(models.Model):
     overview = models.TextField(default="")
     level_start = models.IntegerField(default=1)
     level_end = models.IntegerField(default=4)
-    # semester = models.ForeignKey(Session, on_delete=models.CASCADE, null=True)
-
+   
     def __str__(self):
         return self.name
 
@@ -94,7 +93,7 @@ class Student(models.Model):
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     date_of_birth = models.DateField(blank=True, null=True)
     reg_date = models.DateField(blank=True, null=True)
-    status = models.CharField(max_length=30, blank=True) 
+    status = models.CharField(max_length=30, blank=True,default='Currently Learning') 
 
     def __str__(self):
         return self.admin.full_name

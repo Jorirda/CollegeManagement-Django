@@ -10,9 +10,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='learningrecord',
-            name='lesson_hours',
-            field=models.TextField(default=''),
-        ),
+        
     ]

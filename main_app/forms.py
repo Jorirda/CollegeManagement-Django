@@ -409,7 +409,7 @@ class TeacherEditForm(FormSettings):
     full_name = forms.CharField(required=True, label=_('Full Name'))
     email = forms.EmailField(required=True, label=_('Email'))
     gender = forms.ChoiceField(choices=[('男', _('Male')), ('女', _('Female'))], label=_('Gender'))
-    password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
+    password = forms.CharField(widget=forms.PasswordInput, label=_('Password'), required=False)
     profile_pic = forms.ImageField(label=_('Profile Picture'), required=False)
 
     def __init__(self, *args, **kwargs):
@@ -417,11 +417,16 @@ class TeacherEditForm(FormSettings):
         # Reorder fields as requested
         field_order = ['full_name', 'email', 'gender', 'password', 'profile_pic']
         self.fields = {k: self.fields[k] for k in field_order}
-
+        # Initialize the fields with existing data
+        if self.instance:
+            self.fields['full_name'].initial = self.instance.admin.full_name
+            self.fields['email'].initial = self.instance.admin.email
+            self.fields['gender'].initial = self.instance.admin.gender
+          
     class Meta:
         model = Teacher
         fields = ['full_name', 'email', 'gender', 'password', 'profile_pic']
-
+        
 class EditResultForm(FormSettings):
     session_list = Session.objects.all()
     session_year = forms.ModelChoiceField(

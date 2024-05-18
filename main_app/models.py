@@ -181,10 +181,9 @@ class NotificationStudent(models.Model):
     message = models.TextField()
 
 class StudentResult(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    classes = models.ForeignKey(Classes, on_delete=models.CASCADE)
-    test = models.FloatField(default=0)
-    exam = models.FloatField(default=0)
+    course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
+    classes = models.ForeignKey(Classes, on_delete=models.CASCADE, null=True, blank=False)
+    
 
 class PaymentRecord(models.Model):
     date = models.DateField()
@@ -209,7 +208,6 @@ class PaymentRecord(models.Model):
         on_delete=models.SET_NULL
     )
 
-#Refund page
 class RefundRecord(models.Model):
     # admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
     student = models.ForeignKey(Student,null=True, on_delete=models.CASCADE)

@@ -182,22 +182,15 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'logfile.log',
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
         },
     },
     'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'college_management_system': {  # Replace 'your_app_name' with the name of your Django app
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
+        'django.utils.autoreload': {
+            'handlers': ['console'],
+            'level': 'INFO',
         },
     },
 }

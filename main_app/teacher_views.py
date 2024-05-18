@@ -162,36 +162,20 @@ def teacher_view_notification(request):
     return render(request, "teacher_template/teacher_view_notification.html", context)
 
 def teacher_add_result(request):
-    teacher = get_object_or_404(Teacher, admin=request.user)
-    classess = Classes.objects.filter(teacher=teacher)
-    sessions = Session.objects.all()
-    context = {
-        'page_title': 'Result Upload',
-        'classess': classess,
-        'sessions': sessions
-    }
+    form = ResultForm(request.POST or None)
+    context = {'form': form, 'page_title': 'Add Result'}
     if request.method == 'POST':
-        try:
-            student_id = request.POST.get('student_list')
-            classes_id = request.POST.get('classes')
-            test = request.POST.get('test')
-            exam = request.POST.get('exam')
-            student = get_object_or_404(Student, id=student_id)
-            classes = get_object_or_404(Classes, id=classes_id)
+        if form.is_valid():
             try:
-                data = StudentResult.objects.get(
-                    student=student, classes=classes)
-                data.exam = exam
-                data.test = test
-                data.save()
-                messages.success(request, "Scores Updated")
-            except:
-                result = StudentResult(student=student, classes=classes, test=test, exam=exam)
-                result.save()
-                messages.success(request, "Scores Saved")
-        except Exception as e:
-            messages.warning(request, "Error Occured While Processing Form")
-    return render(request, "teacher_template/teacher_add_result.html", context)
+                form.save()
+                messages.success(request, "Result Added")
+                return redirect(reverse('teacher_add_result'))
+            except Exception as e:
+                messages.error(request, 'Could Not Add ' + str(e))
+        else:
+            messages.error(request, 'Fill Form Properly ')
+    return render(request, "teacher_template/teacher_view_profile.html", context)
+
 
 #Exempts
 @csrf_exempt

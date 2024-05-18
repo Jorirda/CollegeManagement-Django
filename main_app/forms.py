@@ -429,15 +429,14 @@ class TeacherEditForm(FormSettings):
     class Meta:
         model = Teacher
         fields = ['full_name', 'email', 'gender', 'password', 'profile_pic']
-        
-class EditResultForm(FormSettings):
-    session_list = Session.objects.all()
-    session_year = forms.ModelChoiceField(
-        queryset=session_list, label=_("Session Year"), required=True)
+
+class ResultForm(FormSettings):
+    course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False,  widget=forms.Select(attrs={'class': 'form-control'}), label=_('Course'))
+    session = forms.ModelChoiceField(queryset=Session.objects.all(), required=False, widget=forms.Select(attrs={'class': 'form-control'}), label=_('Session'))
 
     def __init__(self, *args, **kwargs):
-        super(EditResultForm, self).__init__(*args, **kwargs)
+        super(ResultForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = StudentResult
-        fields = [_('session_year'), _('classes'), _('student'), _('test'), _('exam')]
+        fields = [_('course'), _('session')]

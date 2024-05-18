@@ -1,6 +1,7 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+{% load i18n %}
+{% block page_title %}{% trans page_title %}{% endblock page_title %}
 {% block content %}
 <section class="content">
     <div class="container-fluid">
@@ -42,7 +43,7 @@
                     <div class="inner">
                         <h3>{{total_leave}}</h3>
 
-                        <p>Total Leave Applied</p>
+                        <p>Total Leave Applications</p>
                     </div>
                     <div class="icon">
                       <i class="nav-icon fas fa-sign-out-alt"></i>
@@ -50,20 +51,19 @@
                    
                 </div>
             </div>
-            <!-- ./col -->
             <div class="col-lg-3 col-6">
-                <!-- small box -->
-                <div class="small-box bg-danger">
-                    <div class="inner">
-                        <h3>{{total_subject}}</h3>
+              <!-- small box -->
+              <div class="small-box bg-red">
+                  <div class="inner">
+                      <h3>{{total_courses}}</h3>
 
-                        <p>Total Subjects</p>
-                    </div>
-                    <div class="icon">
-                      <i class="nav-icon fas fa-book"></i>
-                    </div>
-                   
-                </div>
+                      <p>Total Courses</p>
+                  </div>
+                  <div class="icon">
+                    <i class="nav-icon fas fa-books"></i>
+                  </div>
+                 
+              </div>
             </div>
             <!-- ./col -->
         </div>

@@ -19,75 +19,72 @@ logger = logging.getLogger(__name__)
 
 def teacher_home(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
-    total_students = Student.objects.filter(course=teacher.course).count()
-    total_leave = LeaveReportTeacher.objects.filter(teacher=teacher).count()
-    classess = Classes.objects.filter(teacher=teacher)
-    total_classes = classess.count()
+    total_students = LearningRecord.objects.filter(teacher_id=teacher).count() #SLIGHT TWEAKS
+    total_leave = LeaveReportTeacher.objects.filter(teacher=teacher).count() 
+    total_courses = ClassSchedule.objects.filter(teacher=teacher).values('course').distinct().count() #FIXED IT, COUNTS ATTENDEES
+    
+    # Initialize attendance variables
+    total_attendance = 0
+    attendance_per_course = []
 
-    # Retrieve ClassSchedule objects related to the classes taught by the teacher
-    class_schedule_list = ClassSchedule.objects.filter(course__in=classess.values('course'))
-    attendance_list = Attendance.objects.filter(classes__in=class_schedule_list)
-    total_attendance = attendance_list.count()
+    # Collecting attendance data per course
+    class_schedules = ClassSchedule.objects.filter(teacher=teacher)
+    courses = set(schedule.course for schedule in class_schedules)
 
-    # Collecting attendance data per class
-    attendance_list = []
-    classes_list = []
-    for classes in classess:
-        # Get ClassSchedule objects for each class
-        class_schedules = ClassSchedule.objects.filter(course=classes.course, teacher=classes.teacher)
-        attendance_count = Attendance.objects.filter(classes__in=class_schedules).count()
-        classes_list.append(classes.name)
-        attendance_list.append(attendance_count)
+    for course in courses:
+        course_schedules = class_schedules.filter(course=course)
+        course_attendance_count = Attendance.objects.filter(classes__in=course_schedules).count()
+        total_attendance += course_attendance_count
+        attendance_per_course.append({
+            'course_name': course.name,
+            'attendance_count': course_attendance_count
+        })
 
     context = {
-        'page_title': 'Teacher Panel - ' + str(teacher.admin.last_name) + ' (' + str(teacher.course) + ')',
+        'page_title': f'Teacher Panel - {teacher.admin.full_name} ({", ".join(course.name for course in courses)})',
         'total_students': total_students,
         'total_attendance': total_attendance,
         'total_leave': total_leave,
-        'total_classes': total_classes,
-        'classes_list': classes_list,
-        'attendance_list': attendance_list
+        'total_courses': total_courses,
+        'attendance_per_course': attendance_per_course
     }
     return render(request, 'teacher_template/home_content.html', context)
 
 def teacher_view_profile(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
-    form = TeacherEditForm(request.POST or None, request.FILES or None,instance=teacher)
+    form = TeacherEditForm(request.POST or None, request.FILES or None, instance=teacher)
     context = {'form': form, 'page_title': 'View/Update Profile'}
+
     if request.method == 'POST':
         try:
             if form.is_valid():
-                # first_name = form.cleaned_data.get('first_name')
-                # last_name = form.cleaned_data.get('last_name')
                 full_name = form.cleaned_data.get('full_name')
-                password = form.cleaned_data.get('password') or None
+                password = form.cleaned_data.get('password')
                 gender = form.cleaned_data.get('gender')
-                passport = request.FILES.get('profile_pic') or None
+                passport = request.FILES.get('profile_pic')
+
                 admin = teacher.admin
-                if password != None:
+
+                if password:
                     admin.set_password(password)
-                if passport != None:
+                if passport:
                     fs = FileSystemStorage()
                     filename = fs.save(passport.name, passport)
                     passport_url = fs.url(filename)
                     admin.profile_pic = passport_url
-                # admin.first_name = first_name
-                # admin.last_name = last_name
+                
                 admin.full_name = full_name
-                # admin.address = address
                 admin.gender = gender
                 admin.save()
                 teacher.save()
+
                 messages.success(request, "Profile Updated!")
                 return redirect(reverse('teacher_view_profile'))
             else:
                 messages.error(request, "Invalid Data Provided")
-                return render(request, "teacher_template/teacher_view_profile.html", context)
         except Exception as e:
-            messages.error(
-                request, "Error Occured While Updating Profile " + str(e))
-            return render(request, "teacher_template/teacher_view_profile.html", context)
-
+            messages.error(request, f"Error Occurred While Updating Profile: {e}")
+    
     return render(request, "teacher_template/teacher_view_profile.html", context)
 
 def teacher_take_attendance(request):
@@ -203,14 +200,8 @@ def teacher_delete_notification(request, notification_id):
     return redirect(reverse('teacher_view_notification'))
 
 def teacher_add_result(request):
-    teacher = get_object_or_404(Teacher, admin=request.user)
-    classess = Classes.objects.filter(teacher=teacher)
-    sessions = Session.objects.all()
-    context = {
-        'page_title': 'Result Upload',
-        'classess': classess,
-        'sessions': sessions
-    }
+    form = ResultForm(request.POST or None)
+    context = {'form': form, 'page_title': 'Add Result'}
     if request.method == 'POST':
         if form.is_valid():
             try:
@@ -328,18 +319,18 @@ def teacher_fcmtoken(request):
     except Exception as e:
         return HttpResponse("False")
 
-# @csrf_exempt
-# def fetch_student_result(request):
-#     try:
-#         classes_id = request.POST.get('classes')
-#         student_id = request.POST.get('student')
-#         student = get_object_or_404(Student, id=student_id)
-#         classes = get_object_or_404(Classes, id=classes_id)
-#         result = StudentResult.objects.get(student=student, classes=classes)
-#         result_data = {
-#             'exam': result.exam,
-#             'test': result.test
-#         }
-#         return HttpResponse(json.dumps(result_data))
-#     except Exception as e:
-#         return HttpResponse('False')
+@csrf_exempt
+def fetch_student_result(request):
+    try:
+        classes_id = request.POST.get('classes')
+        student_id = request.POST.get('student')
+        student = get_object_or_404(Student, id=student_id)
+        classes = get_object_or_404(Classes, id=classes_id)
+        result = StudentResult.objects.get(student=student, classes=classes)
+        result_data = {
+            'exam': result.exam,
+            'test': result.test
+        }
+        return HttpResponse(json.dumps(result_data))
+    except Exception as e:
+        return HttpResponse('False')

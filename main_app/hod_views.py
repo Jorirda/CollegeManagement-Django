@@ -4,6 +4,7 @@ import requests
 import pandas as pd
 import logging
 
+from django.core.paginator import Paginator
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse, JsonResponse
@@ -16,7 +17,7 @@ from django.views.generic import UpdateView
 from django.db.models import Sum, F
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render
-from generate import process_data
+from generate import generate_html_table, process_data
 from .forms import *
 from .models import *
 from .forms import ExcelUploadForm
@@ -73,7 +74,15 @@ def get_upload(request):
                 # Process the uploaded Excel file
                 processed_data = process_data(excel_file, is_teacher, is_chinese_data)
                 message = 'Data processed successfully!'
-                context = {'message': message, 'processed_data': processed_data}
+
+                # Generate HTML table from processed_data
+                html_table = generate_html_table(processed_data)
+
+                context = {
+                    'message': message,
+                    'processed_data': processed_data,
+                    'html_table': html_table
+                }
             except Exception as e:
                 message = f"Failed to process data: {str(e)}"
                 context = {'message': message}
@@ -81,6 +90,8 @@ def get_upload(request):
     else:
         form = ExcelUploadForm()
     return render(request, 'hod_template/upload.html', {'form': form})
+
+
 
 def get_result(excel_file, is_teacher):
     # Assuming excel_file is an InMemoryUploadedFile object from the form
@@ -135,7 +146,7 @@ def get_total_income_by_months(start_year, end_year, start_month_name, end_month
             total_income = ((PaymentRecord.objects.filter(
                 date__gte=current_start_date,
                 date__lte=current_end_date
-            ).aggregate(total_income=Sum('amount_paid'))['total_income'] or 0)/2)
+            ).aggregate(total_income=Sum('amount_paid'))['total_income'] or 0))
             
             # Add the result to the dictionary
             income_by_month[month_key] = total_income
@@ -161,7 +172,7 @@ def filter_teachers(request):
     
 #Refund
 def refund_records(request):
-    # Fetch all payment records
+    # Fetch all payment records with status 'Refund'
     payment_records = PaymentRecord.objects.filter(status='Refund')
 
     # Initialize the list to hold payment record information
@@ -174,14 +185,6 @@ def refund_records(request):
 
         # Attempt to find a corresponding StudentQuery record
         student_query = StudentQuery.objects.filter(payment_records=payment_record).first()
-        
-
-        # Debugging information
-        print(f"Processing payment record: {payment_record.id}")
-        print(f"Payment record: {payment_record}")
-        print(f"Student record: {student_record}")
-        print(f"Learning record: {learning_record}")
-        print(f"Student query: {student_query}")
 
         payment_info = {
             'student_name': student_record.admin.full_name if student_record and student_record.admin else 'Unknown',
@@ -206,8 +209,13 @@ def refund_records(request):
         # Append payment record information to the list
         payment_record_info.append(payment_info)
 
+    # Paginate the payment record information
+    paginator = Paginator(payment_record_info, 10)  # Show 10 records per page
+    page_number = request.GET.get('page')
+    paginated_records = paginator.get_page(page_number)
+
     context = {
-        'refund_info': payment_record_info,
+        'refund_info': paginated_records,
         'page_title': 'Manage Refund Records'
     }
 
@@ -236,8 +244,8 @@ def admin_home(request):
     student_count_list_in_course = []
 
     for course in course_all:
-        classes_count = ClassSchedule.objects.filter(course_id=course.id).count()
-        students_count = Student.objects.filter(course_id=course.id).count()
+        classes_count = ClassSchedule.objects.filter(course_id=course.pk).count()
+        students_count = Student.objects.filter(course_id=course.pk).count()
         course_name_list.append(course.name)
         classes_count_list.append(classes_count)
         student_count_list_in_course.append(students_count)
@@ -247,7 +255,7 @@ def admin_home(request):
     student_count_list_in_classes = []
     for class_obj in classes_all:
         course = Course.objects.get(id=class_obj.course.pk)
-        student_count = Student.objects.filter(course_id=course.id).count()
+        student_count = Student.objects.filter(course_id=course.pk).count()
         class_names_list.append(class_obj.name)
         student_count_list_in_classes.append(student_count)
 
@@ -279,7 +287,7 @@ def admin_home(request):
     # Breakdown for Percentage of Course Participants
     course_participants_percentage = []
     for course in course_all:
-        total_students_in_course = Student.objects.filter(course_id=course.id).count()
+        total_students_in_course = Student.objects.filter(course_id=course.pk).count()
         if total_students > 0:
             percentage = (total_students_in_course / total_students) * 100
         else:
@@ -302,10 +310,10 @@ def admin_home(request):
         available_years.update(range(start_year, end_year + 1))
 
         # Filter payment records that fall within the session's date range
-        total_income_per_session = PaymentRecord.objects.filter(
+        total_income_per_session = ((PaymentRecord.objects.filter(
             date__gte=session.start_year,
             date__lte=session.end_year
-        ).aggregate(total_income=Sum('amount_paid'))['total_income'] or 0
+        ).aggregate(total_income=Sum('amount_paid'))['total_income'] or 0) * 2)
 
         session_names.append(f"{start_year} - {end_year}")
         total_incomes.append(total_income_per_session)
@@ -541,10 +549,14 @@ def delete_teacher(request, teacher_id):
 
 def manage_teacher(request):
     allteacher = CustomUser.objects.filter(user_type=2)
-    total_teacher_count = allteacher.count()
+    paginator = Paginator(allteacher, 10)  # Show 10 teachers per page
+
+    page_number = request.GET.get('page')
+    teachers_page = paginator.get_page(page_number)
+
     context = {
-        'allteacher': allteacher,
-        'total_teacher_count': total_teacher_count,
+        'allteacher': teachers_page,
+        'total_teacher_count': allteacher.count(),
         'page_title': _('Manage Teachers')
     }
     return render(request, "hod_template/manage_teacher.html", context)
@@ -619,6 +631,7 @@ def add_student(request):
             reg_date = form.cleaned_data.get('reg_date')
             status = form.cleaned_data.get('status')
             remark = form.cleaned_data.get('remark')
+            campus = form.cleaned_data.get('campus')
             
             # Generate a unique placeholder email if none is provided
             email = form.cleaned_data.get('email')
@@ -637,6 +650,7 @@ def add_student(request):
                 user.student.grade = grade
                 user.student.reg_date = reg_date
                 user.remark = remark
+                user.student.campus = campus
                 user.save()
               
                 messages.success(request, "Successfully Added")
@@ -648,7 +662,7 @@ def add_student(request):
     return render(request, 'hod_template/add_student_template.html', context)
 
 def edit_student(request, student_id):
-    student = get_object_or_404(Student, id=student_id)
+    student = get_object_or_404(Student, admin=student_id)
     form = StudentForm(request.POST or None, instance=student)
     context = {
         'form': form,
@@ -667,6 +681,7 @@ def edit_student(request, student_id):
             password = cleaned_data.get('password') or None
             status = cleaned_data.get('status')
             remark = cleaned_data.get('remark')
+            campus = form.cleaned_data.get('campus')
 
             try:
                 user = student.admin
@@ -689,6 +704,7 @@ def edit_student(request, student_id):
 
                 student.status = status
                 student.grade = grade
+                student.campus = campus
            
                 user.save()
                 student.save()
@@ -705,17 +721,37 @@ def edit_student(request, student_id):
     return render(request, "hod_template/edit_student_template.html", context)
 
 def delete_student(request, student_id):
-    student = get_object_or_404(CustomUser, student__id=student_id)
+    student = get_object_or_404(CustomUser, id=student_id)
     student.delete()
     messages.success(request, "Student deleted successfully!")
     return redirect(reverse('manage_student'))
 
 def manage_student(request):
     students = CustomUser.objects.filter(user_type=3)
-    total_student_count = students.count()
+    studentextra = Student.objects.filter(admin__user_type=3)
+    
+    combined_students = []
+    for student in students:
+        student_extra = studentextra.filter(admin=student).first()
+        combined_students.append({
+            'id': student.id ,
+            'full_name': student.full_name,
+            'gender': student.gender,
+            'date_of_birth': student_extra.date_of_birth if student_extra else None,
+            'address': student.address,
+            'phone_number': student.phone_number,
+            'reg_date': student_extra.reg_date if student_extra else None,
+            'status': student_extra.status if student_extra else None,
+            'remark': student.remark if student_extra else None,
+        })
+
+    paginator = Paginator(combined_students, 10)  # Show 10 students per page
+    page_number = request.GET.get('page')
+    students_page = paginator.get_page(page_number)
+    
     context = {
-        'students': students,
-        'total_student_count':total_student_count,
+        'students': students_page,
+        'total_student_count': len(combined_students),
         'page_title': _('Manage Students')
     }
     return render(request, "hod_template/manage_student.html", context)
@@ -1044,6 +1080,9 @@ def add_payment_record(request):
                 payment.status = status
                 payment.payee = payee
                 payment.remark = remark
+                
+                student.course_id = course
+                student.save()
                 payment.save()
                 
                 messages.success(request, "Successfully Added")
@@ -1089,7 +1128,7 @@ def edit_payment_record(request, payment_id):
                 paymentrecord.date = date
                 paymentrecord.student = student
                 paymentrecord.course = course
-                paymentrecord.learning = learning
+                paymentrecord.learning_record = learning
                 paymentrecord.lesson_unit_price = lesson_unit_price
                 paymentrecord.discounted_price = discounted_price
                 paymentrecord.book_costs = book_costs
@@ -1101,6 +1140,9 @@ def edit_payment_record(request, payment_id):
                 paymentrecord.status = status
                 paymentrecord.payee = payee
                 paymentrecord.remark = remark
+                
+                student.course_id = course
+                student.save()
 
                 paymentrecord.save()
 
@@ -1130,12 +1172,15 @@ def delete_payment_record(request, payment_id):
 
 def manage_payment_record(request):
     payments = PaymentRecord.objects.all().select_related('learning_record')
+    paginator = Paginator(payments, 10)  # Show 10 records per page
+
+    page_number = request.GET.get('page')
+    paginated_payments = paginator.get_page(page_number)
+
     total_amount_paid = payments.aggregate(Sum('amount_paid'))['amount_paid__sum']
-    # for payment in payments:
-        # lesson_hours = payment.learning_record.lesson_hours if payment.learning_record else None
-        # print(f"Payment ID: {payment.id}, LearningRecord: {lesson_hours}")
+
     context = {
-        'payments': payments,
+        'payments': paginated_payments,
         'total_amount_paid': total_amount_paid if total_amount_paid else 0,
         'page_title': _('Manage Payment Records')
     }
@@ -1204,7 +1249,13 @@ def edit_learning_record(request, learn_id):
             end_time = form.cleaned_data.get('end_time')
             lesson_hours = form.cleaned_data.get('lesson_hours')
             
-            try:   
+            try:
+                # Check if the course exists
+                if not Course.objects.filter(id=course.id).exists():
+                    messages.error(request, "Selected course does not exist.")
+                    return render(request, 'hod_template/edit_learning_record_template.html', context)
+                
+                # Update learning record fields
                 learningrecord.date = date
                 learningrecord.student = student
                 learningrecord.course = course
@@ -1214,9 +1265,10 @@ def edit_learning_record(request, learn_id):
                 learningrecord.lesson_hours = lesson_hours
                 
                 # Get the remark from the associated student
+                student.course_id = course
                 remark = student.admin.remark if student and student.admin else None
                 learningrecord.remark = remark
-                
+                student.save()
                 learningrecord.save()
               
                 messages.success(request, "Successfully Updated")
@@ -1248,14 +1300,26 @@ def manage_learning_record(request):
     if selected_grade:
         learningrecords = learningrecords.filter(course__level_end=selected_grade)
 
+    paginator = Paginator(learningrecords, 10)  # Show 10 records per page
+    page_number = request.GET.get('page')
+    paginated_learningrecords = paginator.get_page(page_number)
+
+    # Log the session ID for debugging
+    session_id = request.session.get('session_id', None)
+    logger.debug(f'Session ID: {session_id}')
+
     context = {
-        'learningrecords': learningrecords,
+        'learningrecords': paginated_learningrecords,
         'teachers': teachers,
         'grades': [(str(i), chr(64 + i)) for i in range(1, 8)],  # Assuming grades are from 1 to 7
         'selected_teacher': selected_teacher,
         'selected_grade': selected_grade,
-        'page_title': _('Manage Learning Records')
+        'page_title': _('Manage Learning Records'),
+        'session_id': session_id  # Add session_id to context
     }
+
+    # Log the entire context for debugging
+    logger.debug(f'Context: {context}')
 
     return render(request, 'hod_template/manage_learning_record.html', context)
 

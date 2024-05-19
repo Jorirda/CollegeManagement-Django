@@ -8,6 +8,7 @@ from django.contrib.auth.models import AbstractUser
 from datetime import datetime, timedelta, date
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Sum
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +73,7 @@ class Campus(models.Model):
         return self.name
 
 class Admin(models.Model):
-    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE) #DONT CHANGE THIS, THANKS
     remark = models.TextField(default="")
 
     def __str__(self):
@@ -83,18 +84,17 @@ class Course(models.Model):
     overview = models.TextField(default="")
     level_start = models.IntegerField(default=1)
     level_end = models.IntegerField(default=4)
-    # semester = models.ForeignKey(Session, on_delete=models.CASCADE, null=True)
-
+   
     def __str__(self):
         return self.name
 
 class Student(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
+    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     date_of_birth = models.DateField(blank=True, null=True)
     reg_date = models.DateField(blank=True, null=True)
-    status = models.CharField(max_length=30, blank=True) 
+    status = models.CharField(max_length=30, blank=True,default='Currently Learning')
 
     def __str__(self):
         return self.admin.full_name
@@ -174,18 +174,23 @@ class FeedbackTeacher(models.Model):
     reply = models.TextField()
 
 class NotificationTeacher(models.Model):
+    date = models.DateField(default=timezone.now)
+    time = models.TimeField(default=timezone.now)  
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     message = models.TextField()
+    is_read = models.BooleanField(default=False)  # New field for marking notifications as read
+
+    def __str__(self):
+        return self.message
 
 class NotificationStudent(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     message = models.TextField()
 
 class StudentResult(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    classes = models.ForeignKey(Classes, on_delete=models.CASCADE)
-    test = models.FloatField(default=0)
-    exam = models.FloatField(default=0)
+    course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
+    classes = models.ForeignKey(Classes, on_delete=models.CASCADE, null=True, blank=False)
+    
 
 class PaymentRecord(models.Model):
     date = models.DateField()
@@ -210,7 +215,6 @@ class PaymentRecord(models.Model):
         on_delete=models.SET_NULL
     )
 
-#Refund page
 class RefundRecord(models.Model):
     # admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
     student = models.ForeignKey(Student,null=True, on_delete=models.CASCADE)

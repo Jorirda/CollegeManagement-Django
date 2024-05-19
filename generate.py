@@ -6,8 +6,7 @@ from django.contrib.auth.hashers import make_password
 from django.utils.crypto import get_random_string
 from django.db import IntegrityError
 from django.utils.translation import gettext as _
-# Import your models
-from main_app.models import CustomUser, Campus, Course, LearningRecord, PaymentRecord, Student, Teacher, ClassSchedule
+from main_app.models import CustomUser, Campus, Course, LearningRecord, PaymentRecord, Student, Teacher
 
 # Set up Django settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'college_management_system.settings')
@@ -25,11 +24,17 @@ grade_mapping = {
 }
 
 def process_data(excel_file, is_teacher, is_chinese_data=False):
+    import logging
+    from django.conf import settings
+
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', handlers=[logging.StreamHandler()])
+    logger = logging.getLogger(__name__)
+
     try:
         df = pd.read_excel(excel_file)
-        print("Dataframe loaded successfully with {} rows.".format(len(df)))
+        logger.info(f"Dataframe loaded successfully with {len(df)} rows.")
     except Exception as e:
-        print(f"Failed to read Excel file: {str(e)}")
+        logger.error(f"Failed to read Excel file: {str(e)}")
         return None  # Return early if the file cannot be processed
 
     if is_chinese_data:
@@ -48,30 +53,27 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
             '下次缴费时间\n（课程结束前1月）': 'Next Payment Date', 
             '授课老师': 'Teacher'
         }
-        
-        # Debug: Print original column names
-        print("Original columns:", df.columns)
-        
+
+        logger.info(f"Original columns: {df.columns}")
         try:
             df.rename(columns=column_mapping, inplace=True)
-            # Debug: Print columns after renaming
-            print("Columns after renaming:", df.columns)
+            logger.info(f"Columns after renaming: {df.columns}")
         except KeyError as e:
-            print(f"Column not found during renaming: {str(e)}")
+            logger.error(f"Column not found during renaming: {str(e)}")
             return None
 
     # Check if required columns are present after renaming
     required_columns = ['Full Name', 'Class', 'Campus', 'Payment', 'Next Payment Date', 'Total Lessons', 'Lessons Taken', 'Remaining Lessons']
     for column in required_columns:
         if column not in df.columns:
-            print(f"Missing expected column after renaming: {column}")
+            logger.error(f"Missing expected column after renaming: {column}")
             return None
 
     fake_data = []
 
     if is_teacher:
         file = open('fake_users.txt', 'w')
-        print("Opened file for writing teacher login information.")
+        logger.info("Opened file for writing teacher login information.")
 
     for index, row in df.iterrows():
         try:
@@ -82,22 +84,22 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
                 password = get_random_string(12)
                 hashed_password = make_password(password)
                 file.write(f"Email: {email}, Password: {password}\n")
-                print(f"Processed teacher {email} - login info written to file.")
+                logger.info(f"Processed teacher {email} - login info written to file.")
             else:
                 password = None
                 hashed_password = None
-                print(f"Processed student {email} - no login info required.")
+                logger.info(f"Processed student {email} - no login info required.")
 
             # Create or update Campus
             campus_name = row['Campus']
             campus, created = Campus.objects.get_or_create(name=campus_name)
             if created:
-                print(f"Created new campus: {campus_name}")
+                logger.info(f"Created new campus: {campus_name}")
 
             # Create or update Course
             class_full_name = row['Class']
             course_name, grade_level = None, None
-            
+
             # Extract course name and grade level
             for chinese_grade, grade in grade_mapping.items():
                 if chinese_grade in class_full_name:
@@ -105,20 +107,21 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
                     grade_level = grade
                     break
 
-            if course_name and grade_level:
-                for grade in range(1, grade_level + 1):
-                    # Check for existing course and update or create
-                    course, created = Course.objects.update_or_create(
-                        name=course_name,
-                        level_end=grade,
-                        defaults={'name': course_name, 'level_end': grade}
-                    )
-                    if created:
-                        print(f"Created new course: {course_name} with grade {grade}")
+            if course_name:
+                course, created = Course.objects.get_or_create(name=course_name)
+                if created:
+                    course.level_end = grade_level
+                    course.save()
+                    logger.info(f"Created new course: {course_name} with grade {grade_level}")
+                else:
+                    if course.level_end < grade_level:
+                        course.level_end = grade_level
+                        course.save()
+                        logger.info(f"Updated existing course: {course_name} to grade {grade_level}")
                     else:
-                        print(f"Updated existing course: {course_name} with grade {grade}")
+                        logger.info(f"Existing course: {course_name} already has grade {course.level_end}")
             else:
-                print(f"Failed to parse course name and grade from: {class_full_name}")
+                logger.warning(f"Failed to parse course name and grade from: {class_full_name}")
 
             # Create CustomUser
             user_data = {
@@ -131,30 +134,32 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
                 'phone_number': row['Phone Number'] if not is_chinese_data else fake.phone_number(),
                 'is_teacher': is_teacher,
                 'user_type': 2 if is_teacher else 3,  # Assuming 2 is for teachers and 3 is for students
-                'remark': _('Salesperson:') + row['Salesperson'],
-                'fcm_token': '' #default
+                'remark': _('Salesperson:') + " " + row['Salesperson'],
+                'fcm_token': ''  # default
             }
 
             try:
                 user = CustomUser.objects.create_user(**user_data)
                 fake_data.append(user_data)
-                print(f"User {email} created and added to fake data.")
+                logger.info(f"User {email} created and added to fake data.")
             except IntegrityError as e:
-                print(f"Error: Duplicate or invalid data for email {email} - {str(e)}")
+                logger.error(f"Error: Duplicate or invalid data for email {email} - {str(e)}")
                 continue
 
             # Create or update Student or Teacher
             if is_teacher:
                 teacher, created = Teacher.objects.get_or_create(user=user)
                 if created:
-                    print(f"Created new teacher profile for {email}")
+                    logger.info(f"Created new teacher profile for {full_name}")
             else:
-                student, created = Student.objects.get_or_create(user=user, campus=campus, admin=user.admin)
+                student, created = Student.objects.get_or_create(campus_id=campus, admin=user, course_id=course)
                 if created:
-                    print(f"Created new student profile for {email}")
+                    logger.info(f"Created new student profile for {full_name}")
+                else:
+                    logger.info(f"Updated existing student profile for {full_name}")
 
-                # Create LearningRecords and PaymentRecords for each course
-                for course in course:
+                # Create LearningRecords and PaymentRecords for each student
+                try:
                     learning_record, created = LearningRecord.objects.get_or_create(
                         student=student,
                         course=course,
@@ -165,7 +170,9 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
                         }
                     )
                     if created:
-                        print(f"Created new learning record for {email} and course {course.name}")
+                        logger.info(f"Created new learning record for {email} and course {course.name}")
+                    else:
+                        logger.info(f"Updated existing learning record for {email} and course {course.name}")
 
                     payment_record, created = PaymentRecord.objects.get_or_create(
                         student=student,
@@ -173,21 +180,44 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
                         defaults={'amount_due': row['Payment'], 'next_payment_date': row['Next Payment Date'], 'remark': row['Salesperson']}
                     )
                     if created:
-                        print(f"Created new payment record for {email} and learning record {learning_record.id}")
+                        logger.info(f"Created new payment record for {email} and learning record {learning_record.id}")
+                    else:
+                        logger.info(f"Updated existing payment record for {email} and learning record {learning_record.id}")
+
+                except Exception as e:
+                    logger.error(f"Error creating learning or payment record for {email}: {str(e)}")
 
         except KeyError as e:
-            print(f"Missing expected column: {str(e)}")
+            logger.error(f"Missing expected column: {str(e)}")
             continue
         except Exception as e:
-            print(f"Unexpected error: {str(e)}")
+            logger.error(f"Unexpected error: {str(e)}")
             continue
 
     if is_teacher:
         file.close()
-        print("Teacher login file closed.")
+        logger.info("Teacher login file closed.")
 
-    print("Data processing complete for", "teachers" if is_teacher else "students")
+    logger.info("Data processing complete for %s", "teachers" if is_teacher else "students")
     return fake_data  # Returning fake_data could be more useful than just the file path
 
-# Example usage
-# process_data('path_to_excel_file.xlsx', is_teacher=True, is_chinese_data=True)
+def generate_html_table(data):
+    """
+    Generates an HTML table from the processed data.
+    :param data: List of dictionaries containing processed data.
+    :return: String containing HTML table.
+    """
+    if not data:
+        return "<p>No data available</p>"
+
+    table = "<table border='1'>"
+    # Add table headers
+    headers = data[0].keys()
+    table += "<tr>" + "".join([f"<th>{header}</th>" for header in headers]) + "</tr>"
+
+    # Add table rows
+    for row in data:
+        table += "<tr>" + "".join([f"<td>{value}</td>" for value in row.values()]) + "</tr>"
+
+    table += "</table>"
+    return table

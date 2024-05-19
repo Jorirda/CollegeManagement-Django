@@ -8,26 +8,41 @@
 
 {% block content %}
 <style>
-    /* Flex container for responsive button alignment */
     .responsive-buttons {
         display: flex;
-        justify-content: space-around; /* Distributes space around items */
-        flex-wrap: wrap; /* Allows items to wrap onto the next line as needed */
+        justify-content: space-around;
+        flex-wrap: wrap;
     }
-
-    /* Responsive button styling */
     .btn-responsive {
-        flex: 1 1 auto; /* Allows the button to grow and shrink as needed */
-        margin: 2px; /* Adds margin around buttons */
-        min-width: 68px; /* Minimum width of each button */
-        text-align: center; /* Centers button text */
+        flex: 1 1 auto;
+        margin: 2px;
+        min-width: 68px;
+        text-align: center;
     }
-
-    /* Media query for smaller screens */
     @media (max-width: 576px) {
         .btn-responsive {
-            flex-basis: 100%; /* Each button takes full width of the container on small screens */
+            flex-basis: 100%;
         }
+    }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+    .pagination a, .pagination span {
+        margin: 0 5px;
+        padding: 8px 16px;
+        text-decoration: none;
+        color: #5FC032;
+        border: 1px solid #DEE2E600;
+        border-radius: 4px;
+    }
+    .pagination a:hover {
+        background-color: #e9ecef;
+    }
+    .pagination .current {
+        background-color: #5FC032;
+        color: white;
     }
 </style>
 <section class="content">
@@ -39,12 +54,11 @@
                         <div class="d-flex align-items-center">
                             <i class="nav-icon fas fa-user-graduate" style="font-size: 24px; margin-right: 10px;"></i>
                             <h3 class="card-title">{% trans page_title %}</h3>
-                        </div>                          
+                        </div>
                         <h3 class="card-title">{% blocktrans %}Total Students: {{ total_student_count }} 人 {% endblocktrans %}</h3>
-                    </div>         
-                    <!-- /.card-header -->
+                    </div>
                     <div class="card-body">
-                        <table id="example2" class="table table-bordered table-hover ">
+                        <table id="example2" class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
                                     <th>Index No.</th>
@@ -63,28 +77,41 @@
                                 {% for student in students %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{student.full_name}}</td>
-                                    <td>{{student.gender}}</td>
-                                    <td>{{student.student.date_of_birth}}</td>
-                                    <td>{{student.address}}</td>
-                                    <td>{{student.phone_number}}</td>
-                                    <td>{{student.student.reg_date}}</td>
-                                    <td>{{student.student.status}}</td>
-                                    <td>{{student.remark}}</td>
+                                    <td>{{ student.full_name }}</td>
+                                    <td>{{ student.gender }}</td>
+                                    <td>{{ student.date_of_birth }}</td>
+                                    <td>{{ student.address }}</td>
+                                    <td>{{ student.phone_number }}</td>
+                                    <td>{{ student.reg_date }}</td>
+                                    <td>{{ student.status }}</td>
+                                    <td>{{ student.remark }}</td>
                                     <td>
-                                        <a href="{% url 'edit_student' student.student.id %}" class="btn btn-info btn-responsive">{% trans "Edit" %}</a>
-                                        <a href="{% url 'delete_student' student.student.id %}" class="btn btn-danger btn-responsive" onclick="return confirm('{% trans 'Are you sure about this ?' %}')">{% trans "Delete" %}</a>
+                                        <a href="{% url 'edit_student' student.id %}" class="btn btn-info btn-responsive">{% trans "Edit" %}</a>
+                                        <a href="{% url 'delete_student' student.id %}" class="btn btn-danger btn-responsive" onclick="return confirm('{% trans 'Are you sure about this ?' %}')">{% trans "Delete" %}</a>
                                     </td>
-                                    
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
+                        <div class="pagination">
+                            <span class="step-links">
+                                {% if students.has_previous %}
+                                    <a href="?page=1">&laquo; first</a>
+                                    <a href="?page={{ students.previous_page_number }}">previous</a>
+                                {% endif %}
+                                <span class="current">
+                                    Page {{ students.number }} of {{ students.paginator.num_pages }}.
+                                </span>
+                                {% if students.has_next %}
+                                    <a href="?page={{ students.next_page_number }}">next</a>
+                                    <a href="?page={{ students.paginator.num_pages }}">last &raquo;</a>
+                                {% endif %}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
 {% endblock content %}

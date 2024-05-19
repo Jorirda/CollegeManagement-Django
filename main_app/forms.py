@@ -63,13 +63,15 @@ class StudentForm(CustomUserForm):
     ], label=_("Status"), widget=forms.Select(attrs={'class': 'hideable'}))
     phone_number = forms.CharField(max_length=20, required=False, label=_("Phone Number"))
     remark = forms.CharField(label=_('Remark'))
+    campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False, label=_("Campus"))
     
 
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
-       
+        if self.instance.pk:  # if the instance exists (editing case)
+            self.fields['campus'].initial = self.instance.campus
         # Reorder fields as requested
-        field_order = [_('full_name'), _('gender'), _('date_of_birth'), _('address'), _('phone_number'), _('reg_date'),_('status'), _('remark')]
+        field_order = [_('full_name'), _('gender'), _('date_of_birth'), _('address'), _('phone_number'),_('campus'), _('reg_date'),_('status'), _('remark')]
                          
         # Set the field order
         self.fields = {k: self.fields[k] for k in field_order}
@@ -80,15 +82,26 @@ class StudentForm(CustomUserForm):
                    'status', 'address', 'phone_number', 'remark'] 
 
 class AdminForm(FormSettings):
-    full_name = forms.CharField(required=True, label=_('Full Name'))
-    email = forms.EmailField(required=True, label=_('Email'))
+    full_name = forms.CharField(required=False, label=_('Full Name'))
+    email = forms.EmailField(required=False, label=_('Email'))
     gender = forms.ChoiceField(choices=[('male', _('Male')), ('female', _('Female'))], label=_('Gender'))
-    password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
+    password = forms.CharField(widget=forms.PasswordInput, label=_('Password'), required=False)
     profile_pic = forms.ImageField(label=_('Profile Picture'))
 
     def __init__(self, *args, **kwargs):
         super(AdminForm, self).__init__(*args, **kwargs)
-
+        if self.instance.pk:  # if the instance exists (editing case)
+            self.fields['full_name'].initial = self.instance.admin.full_name
+            self.fields['gender'].initial = self.instance.admin.gender
+            self.fields['email'].initial = self.instance.admin.email
+      
+    def save(self, commit=True):
+        instance = super(TeacherForm, self).save(commit=False)
+        user = instance.admin
+        user.full_name = self.cleaned_data['full_name']
+        user.gender = self.cleaned_data['gender']
+        user.email = self.cleaned_data['email']
+        
         # Reorder fields as requested
         field_order = [_('full_name'), _('email'), _('gender'), _('password'), _('profile_pic')]
 
@@ -210,6 +223,7 @@ class LearningRecordForm(FormSettings):
         self.fields['start_time'].widget.attrs['readonly'] = True
         self.fields['end_time'].widget.attrs['readonly'] = True
         self.fields['lesson_hours'].widget.attrs['readonly'] = True  # Ensure lesson_hours is read-only
+
 
         if 'course' in self.data and 'teacher' in self.data:
             course_id = int(self.data['course'])
@@ -405,24 +419,35 @@ class StudentEditForm(CustomUserForm):
         model = Student
         fields = CustomUserForm.Meta.fields 
 
-class TeacherEditForm(CustomUserForm):
+class TeacherEditForm(FormSettings):
     full_name = forms.CharField(required=True, label=_('Full Name'))
     email = forms.EmailField(required=True, label=_('Email'))
-    gender = forms.ChoiceField(choices=[('male', _('Male')), ('female', _('Female'))], label=_('Gender'))
-    password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
-    profile_pic = forms.ImageField(label=_('Profile Picture'))
+    gender = forms.ChoiceField(choices=[('男', _('Male')), ('女', _('Female'))], label=_('Gender'))
+    password = forms.CharField(widget=forms.PasswordInput, label=_('Password'), required=False)
+    profile_pic = forms.ImageField(label=_('Profile Picture'), required=False)
 
     def __init__(self, *args, **kwargs):
         super(TeacherEditForm, self).__init__(*args, **kwargs)
+        # Reorder fields as requested
+        field_order = ['full_name', 'email', 'gender', 'password', 'profile_pic']
+        self.fields = {k: self.fields[k] for k in field_order}
+        # Initialize the fields with existing data
+        if self.instance:
+            self.fields['full_name'].initial = self.instance.admin.full_name
+            self.fields['email'].initial = self.instance.admin.email
+            self.fields['gender'].initial = self.instance.admin.gender
+          
+    class Meta:
+        model = Teacher
+        fields = ['full_name', 'email', 'gender', 'password', 'profile_pic']
 
-class EditResultForm(FormSettings):
-    session_list = Session.objects.all()
-    session_year = forms.ModelChoiceField(
-        queryset=session_list, label=_("Session Year"), required=True)
+class ResultForm(FormSettings):
+    course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False,  widget=forms.Select(attrs={'class': 'form-control'}), label=_('Course'))
+    session = forms.ModelChoiceField(queryset=Session.objects.all(), required=False, widget=forms.Select(attrs={'class': 'form-control'}), label=_('Session'))
 
     def __init__(self, *args, **kwargs):
-        super(EditResultForm, self).__init__(*args, **kwargs)
+        super(ResultForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = StudentResult
-        fields = [_('session_year'), _('classes'), _('student'), _('test'), _('exam')]
+        fields = [_('course'), _('session')]

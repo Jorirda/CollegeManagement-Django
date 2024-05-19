@@ -1,4 +1,5 @@
 import json
+import logging
 
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
@@ -7,10 +8,14 @@ from django.shortcuts import (HttpResponseRedirect, get_object_or_404,redirect, 
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 
 from .forms import *
 from .models import *
 
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 def teacher_home(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
@@ -152,6 +157,7 @@ def teacher_feedback(request):
             messages.error(request, "Form has errors!")
     return render(request, "teacher_template/teacher_feedback.html", context)
 
+#Notifications
 def teacher_view_notification(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
     notifications = NotificationTeacher.objects.filter(teacher=teacher)
@@ -160,6 +166,38 @@ def teacher_view_notification(request):
         'page_title': "View Notifications"
     }
     return render(request, "teacher_template/teacher_view_notification.html", context)
+
+@login_required
+def teacher_view_notification_count(request):
+    try:
+        teacher = request.user.teacher
+        unread_notifications_count = NotificationTeacher.objects.filter(teacher=teacher, is_read=False).count()
+        return JsonResponse({'count': unread_notifications_count})
+    except Exception as e:
+        logger.error(f"Error fetching notification count: {e}")
+        return JsonResponse({'count': 0})
+
+# View to fetch the count of unread notifications for the teacher
+@login_required
+def mark_notification_as_read(request, notification_id):
+    try:
+        notification = get_object_or_404(NotificationTeacher, id=notification_id, teacher=request.user.teacher)
+        notification.is_read = True
+        notification.save()
+        return redirect('teacher_view_notification')
+    except Exception as e:
+        logger.error(f"Error marking notification as read: {e}")
+        return redirect('teacher_view_notification')
+
+def teacher_delete_notification(request, notification_id):
+    try:
+        notification = get_object_or_404(NotificationTeacher, id=notification_id)
+        notification.delete()
+        messages.success(request, "Notification Deleted Successfully!")
+    except Exception as e:
+        logger.error(f"An error occurred while deleting the notification with ID {notification_id}: {e}")
+        messages.error(request, "An error occurred while deleting the notification.")
+    return redirect(reverse('teacher_view_notification'))
 
 def teacher_add_result(request):
     form = ResultForm(request.POST or None)
@@ -176,8 +214,6 @@ def teacher_add_result(request):
             messages.error(request, 'Fill Form Properly ')
     return render(request, "teacher_template/teacher_view_profile.html", context)
 
-
-#Exempts
 @csrf_exempt
 def get_students(request):
     classes_id = request.POST.get('classes')
@@ -283,18 +319,18 @@ def teacher_fcmtoken(request):
     except Exception as e:
         return HttpResponse("False")
 
-@csrf_exempt
-def fetch_student_result(request):
-    try:
-        classes_id = request.POST.get('classes')
-        student_id = request.POST.get('student')
-        student = get_object_or_404(Student, id=student_id)
-        classes = get_object_or_404(Classes, id=classes_id)
-        result = StudentResult.objects.get(student=student, classes=classes)
-        result_data = {
-            'exam': result.exam,
-            'test': result.test
-        }
-        return HttpResponse(json.dumps(result_data))
-    except Exception as e:
-        return HttpResponse('False')
+# @csrf_exempt
+# def fetch_student_result(request):
+#     try:
+#         classes_id = request.POST.get('classes')
+#         student_id = request.POST.get('student')
+#         student = get_object_or_404(Student, id=student_id)
+#         classes = get_object_or_404(Classes, id=classes_id)
+#         result = StudentResult.objects.get(student=student, classes=classes)
+#         result_data = {
+#             'exam': result.exam,
+#             'test': result.test
+#         }
+#         return HttpResponse(json.dumps(result_data))
+#     except Exception as e:
+#         return HttpResponse('False')

@@ -82,15 +82,26 @@ class StudentForm(CustomUserForm):
                    'status', 'address', 'phone_number', 'remark'] 
 
 class AdminForm(FormSettings):
-    full_name = forms.CharField(required=True, label=_('Full Name'))
-    email = forms.EmailField(required=True, label=_('Email'))
+    full_name = forms.CharField(required=False, label=_('Full Name'))
+    email = forms.EmailField(required=False, label=_('Email'))
     gender = forms.ChoiceField(choices=[('male', _('Male')), ('female', _('Female'))], label=_('Gender'))
-    password = forms.CharField(widget=forms.PasswordInput, label=_('Password'))
+    password = forms.CharField(widget=forms.PasswordInput, label=_('Password'), required=False)
     profile_pic = forms.ImageField(label=_('Profile Picture'))
 
     def __init__(self, *args, **kwargs):
         super(AdminForm, self).__init__(*args, **kwargs)
-
+        if self.instance.pk:  # if the instance exists (editing case)
+            self.fields['full_name'].initial = self.instance.admin.full_name
+            self.fields['gender'].initial = self.instance.admin.gender
+            self.fields['email'].initial = self.instance.admin.email
+      
+    def save(self, commit=True):
+        instance = super(TeacherForm, self).save(commit=False)
+        user = instance.admin
+        user.full_name = self.cleaned_data['full_name']
+        user.gender = self.cleaned_data['gender']
+        user.email = self.cleaned_data['email']
+        
         # Reorder fields as requested
         field_order = [_('full_name'), _('email'), _('gender'), _('password'), _('profile_pic')]
 

@@ -8,6 +8,7 @@ from django.contrib.auth.models import AbstractUser
 from datetime import datetime, timedelta, date
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Sum
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -173,8 +174,14 @@ class FeedbackTeacher(models.Model):
     reply = models.TextField()
 
 class NotificationTeacher(models.Model):
+    date = models.DateField(default=timezone.now)
+    time = models.TimeField(default=timezone.now)  
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     message = models.TextField()
+    is_read = models.BooleanField(default=False)  # New field for marking notifications as read
+
+    def __str__(self):
+        return self.message
 
 class NotificationStudent(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)

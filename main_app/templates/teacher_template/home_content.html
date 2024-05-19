@@ -3,94 +3,76 @@
 {% block page_title %}{{page_title}}{% endblock page_title %}
 {% block content %}
 <section class="content">
-    <div class="container-fluid">
-        <!-- Small boxes (Stat box) -->
-        <div class="row">
-            <div class="col-lg-3 col-6">
-                <!-- small box -->
-                <div class="small-box bg-info">
-                    <div class="inner">
-                        <h3>{{total_students}}</h3>
+  <div class="container-fluid">
+    <!-- Small boxes (Stat box) -->
+    <div class="row">
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-teal">
+                <div class="inner">
+                    <h3>{{total_students}}</h3>
 
-                        <p>Total Students</p>
-                    </div>
-                    <div class="icon">
-                      <i class="nav-icon fas fa-user-graduate"></i>
-                    </div>
-                   
+                    <p>Total Students</p>
                 </div>
-            </div>
-            <!-- ./col -->
-            <div class="col-lg-3 col-6">
-                <!-- small box -->
-                <div class="small-box bg-success">
-                    <div class="inner">
-                        <h3>{{total_attendance}}</h3>
-
-                        <p>Total Attendance Taken</p>
-                    </div>
-                    <div class="icon">
-                      <i class="nav-icon fas fa-calendar-alt"></i>
-                    </div>
-                   
+                <div class="icon">
+                  <i class="nav-icon fas fa-user-graduate"></i>
                 </div>
+                
             </div>
-            <!-- ./col -->
-            <div class="col-lg-3 col-6">
-                <!-- small box -->
-                <div class="small-box bg-maroon">
-                    <div class="inner">
-                        <h3>{{total_leave}}</h3>
-
-                        <p>Total Leave Applied</p>
-                    </div>
-                    <div class="icon">
-                      <i class="nav-icon fas fa-sign-out-alt"></i>
-                    </div>
-                   
-                </div>
-            </div>
-            <!-- ./col -->
-            <div class="col-lg-3 col-6">
-                <!-- small box -->
-                <div class="small-box bg-danger">
-                    <div class="inner">
-                        <h3>{{total_subject}}</h3>
-
-                        <p>Total Subjects</p>
-                    </div>
-                    <div class="icon">
-                      <i class="nav-icon fas fa-book"></i>
-                    </div>
-                   
-                </div>
-            </div>
-            <!-- ./col -->
         </div>
-        <!-- /.row -->
-        <!-- Main row -->
-        <div class="row">
-            <div class="col-md-6">
-                <!-- LINE CHART -->
-                <div class="card card-secondary">
-                  <div class="card-header">
-                    <h3 class="card-title">{{page_title}}</h3>
-    
-                    <div class="card-tools">
-                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
-                      </button>
-                      <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-                    </div>
-                  </div>
-                  <div class="card-body">
-                    <div class="chart">
-                      <canvas id="pieChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                    </div>
-                  </div></div>
-                  <!-- /.card-body -->
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3>{{total_attendance}}</h3>
+
+                    <p>Total Attendance Taken</p>
                 </div>
-                <div class="col-md-6">
-                    <div class="card card-secondary">
+                <div class="icon">
+                  <i class="nav-icon fas fa-calendar-alt"></i>
+                </div>
+                
+            </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-blue">
+                <div class="inner">
+                    <h3>{{total_leave}}</h3>
+
+                    <p>Total Leave Applications</p>
+                </div>
+                <div class="icon">
+                  <i class="nav-icon fas fa-sign-out-alt"></i>
+                </div>
+                
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+          <!-- small box -->
+          <div class="small-box bg-pink">
+              <div class="inner">
+                  <h3>{{total_courses}}</h3>
+
+                  <p>Total Teaching Courses</p>
+              </div>
+              <div class="icon">
+                <i class="nav-icon fas fa-book"></i>
+              </div>
+              
+          </div>
+        </div>
+    </div>
+        <!-- ./col -->
+    </div>
+    <!-- /.row -->
+    <!-- Main row -->
+    <div class="row">
+        <div class="col-md-6">
+            <!-- LINE CHART -->
+            <div class="card card-secondary">
               <div class="card-header">
                 <h3 class="card-title">{{page_title}}</h3>
 
@@ -102,16 +84,34 @@
               </div>
               <div class="card-body">
                 <div class="chart">
-                  <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                  <canvas id="pieChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                 </div>
-              </div>
+              </div></div>
               <!-- /.card-body -->
             </div>
-                </div>
-            <!-- right col -->
+            <div class="col-md-6">
+                <div class="card card-secondary">
+          <div class="card-header">
+            <h3 class="card-title">{{page_title}}</h3>
+
+            <div class="card-tools">
+              <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+              </button>
+              <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart">
+              <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            </div>
+          </div>
+          <!-- /.card-body -->
         </div>
-        <!-- /.row (main row) -->
-    </div><!-- /.container-fluid -->
+            </div>
+        <!-- right col -->
+    </div>
+    <!-- /.row (main row) -->
+  </div><!-- /.container-fluid -->
 </section>
 {% endblock content %}
 

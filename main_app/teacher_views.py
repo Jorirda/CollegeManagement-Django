@@ -174,7 +174,7 @@ def teacher_view_notification_count(request):
         unread_notifications_count = NotificationTeacher.objects.filter(teacher=teacher, is_read=False).count()
         return JsonResponse({'count': unread_notifications_count})
     except Exception as e:
-        logger.error(f"Error fetching notification count: {e}")
+        # logger.error(f"Error fetching notification count: {e}")
         return JsonResponse({'count': 0})
 
 # View to fetch the count of unread notifications for the teacher
@@ -189,15 +189,19 @@ def mark_notification_as_read(request, notification_id):
         logger.error(f"Error marking notification as read: {e}")
         return redirect('teacher_view_notification')
 
-def teacher_delete_notification(request, notification_id):
-    try:
-        notification = get_object_or_404(NotificationTeacher, id=notification_id)
-        notification.delete()
-        messages.success(request, "Notification Deleted Successfully!")
-    except Exception as e:
-        logger.error(f"An error occurred while deleting the notification with ID {notification_id}: {e}")
-        messages.error(request, "An error occurred while deleting the notification.")
-    return redirect(reverse('teacher_view_notification'))
+def teacher_delete_notification(request):
+    if request.method == 'POST' and request.is_ajax():
+        notification_id = request.POST.get('notification_id')
+        try:
+            notification = get_object_or_404(NotificationTeacher, id=notification_id)
+            notification.delete()
+            return JsonResponse({'success': True})
+        except NotificationTeacher.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Notification does not exist'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request method or not an AJAX request'})
 
 def teacher_add_result(request):
     form = ResultForm(request.POST or None)

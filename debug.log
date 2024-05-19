@@ -1,0 +1,94 @@
+INFO 2024-05-19 14:11:18,460 autoreload C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py changed, reloading.
+DEBUG 2024-05-19 14:11:18,462 proactor_events Using proactor: IocpProactor
+INFO 2024-05-19 14:11:20,086 autoreload Watching for file changes with StatReloader
+DEBUG 2024-05-19 14:11:21,540 factory Not in REPL -> leaving logger event level as is.
+DEBUG 2024-05-19 14:11:21,549 factory Looking for locale `en_US` in provider `faker.providers.address`.
+DEBUG 2024-05-19 14:11:21,586 factory Provider `faker.providers.address` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:21,592 factory Looking for locale `en_US` in provider `faker.providers.automotive`.
+DEBUG 2024-05-19 14:11:21,617 factory Provider `faker.providers.automotive` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:21,623 factory Looking for locale `en_US` in provider `faker.providers.bank`.
+DEBUG 2024-05-19 14:11:21,647 factory Specified locale `en_US` is not available for provider `faker.providers.bank`. Locale reset to `en_GB` for this provider.
+DEBUG 2024-05-19 14:11:21,651 factory Looking for locale `en_US` in provider `faker.providers.barcode`.
+DEBUG 2024-05-19 14:11:21,655 factory Provider `faker.providers.barcode` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:21,666 factory Looking for locale `en_US` in provider `faker.providers.color`.
+DEBUG 2024-05-19 14:11:21,682 factory Provider `faker.providers.color` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:21,683 factory Looking for locale `en_US` in provider `faker.providers.company`.
+DEBUG 2024-05-19 14:11:21,695 factory Provider `faker.providers.company` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:21,696 factory Looking for locale `en_US` in provider `faker.providers.credit_card`.
+DEBUG 2024-05-19 14:11:21,698 factory Provider `faker.providers.credit_card` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:21,700 factory Looking for locale `en_US` in provider `faker.providers.currency`.
+DEBUG 2024-05-19 14:11:21,705 factory Provider `faker.providers.currency` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:21,707 factory Looking for locale `en_US` in provider `faker.providers.date_time`.
+DEBUG 2024-05-19 14:11:21,714 factory Provider `faker.providers.date_time` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:21,715 factory Provider `faker.providers.emoji` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG 2024-05-19 14:11:21,716 factory Provider `faker.providers.file` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG 2024-05-19 14:11:21,716 factory Looking for locale `en_US` in provider `faker.providers.geo`.
+DEBUG 2024-05-19 14:11:21,719 factory Provider `faker.providers.geo` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:21,720 factory Looking for locale `en_US` in provider `faker.providers.internet`.
+DEBUG 2024-05-19 14:11:21,727 factory Provider `faker.providers.internet` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:21,728 factory Provider `faker.providers.isbn` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG 2024-05-19 14:11:21,729 factory Looking for locale `en_US` in provider `faker.providers.job`.
+DEBUG 2024-05-19 14:11:21,735 factory Provider `faker.providers.job` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:21,736 factory Looking for locale `en_US` in provider `faker.providers.lorem`.
+DEBUG 2024-05-19 14:11:21,741 factory Provider `faker.providers.lorem` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:21,743 factory Looking for locale `en_US` in provider `faker.providers.misc`.
+DEBUG 2024-05-19 14:11:21,745 factory Provider `faker.providers.misc` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:21,746 factory Looking for locale `en_US` in provider `faker.providers.passport`.
+DEBUG 2024-05-19 14:11:21,747 factory Provider `faker.providers.passport` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:21,749 factory Looking for locale `en_US` in provider `faker.providers.person`.
+DEBUG 2024-05-19 14:11:21,759 factory Provider `faker.providers.person` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:21,762 factory Looking for locale `en_US` in provider `faker.providers.phone_number`.
+DEBUG 2024-05-19 14:11:21,771 factory Provider `faker.providers.phone_number` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:21,772 factory Provider `faker.providers.profile` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG 2024-05-19 14:11:21,773 factory Provider `faker.providers.python` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG 2024-05-19 14:11:21,774 factory Provider `faker.providers.sbn` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG 2024-05-19 14:11:21,774 factory Looking for locale `en_US` in provider `faker.providers.ssn`.
+DEBUG 2024-05-19 14:11:21,783 factory Provider `faker.providers.ssn` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:21,784 factory Provider `faker.providers.user_agent` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+INFO 2024-05-19 14:11:25,381 autoreload C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\urls.py changed, reloading.
+DEBUG 2024-05-19 14:11:25,382 proactor_events Using proactor: IocpProactor
+INFO 2024-05-19 14:11:26,649 autoreload Watching for file changes with StatReloader
+DEBUG 2024-05-19 14:11:27,508 factory Not in REPL -> leaving logger event level as is.
+DEBUG 2024-05-19 14:11:27,512 factory Looking for locale `en_US` in provider `faker.providers.address`.
+DEBUG 2024-05-19 14:11:27,524 factory Provider `faker.providers.address` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:27,527 factory Looking for locale `en_US` in provider `faker.providers.automotive`.
+DEBUG 2024-05-19 14:11:27,535 factory Provider `faker.providers.automotive` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:27,537 factory Looking for locale `en_US` in provider `faker.providers.bank`.
+DEBUG 2024-05-19 14:11:27,544 factory Specified locale `en_US` is not available for provider `faker.providers.bank`. Locale reset to `en_GB` for this provider.
+DEBUG 2024-05-19 14:11:27,546 factory Looking for locale `en_US` in provider `faker.providers.barcode`.
+DEBUG 2024-05-19 14:11:27,547 factory Provider `faker.providers.barcode` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:27,550 factory Looking for locale `en_US` in provider `faker.providers.color`.
+DEBUG 2024-05-19 14:11:27,555 factory Provider `faker.providers.color` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:27,558 factory Looking for locale `en_US` in provider `faker.providers.company`.
+DEBUG 2024-05-19 14:11:27,567 factory Provider `faker.providers.company` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:27,569 factory Looking for locale `en_US` in provider `faker.providers.credit_card`.
+DEBUG 2024-05-19 14:11:27,571 factory Provider `faker.providers.credit_card` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:27,574 factory Looking for locale `en_US` in provider `faker.providers.currency`.
+DEBUG 2024-05-19 14:11:27,580 factory Provider `faker.providers.currency` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:27,583 factory Looking for locale `en_US` in provider `faker.providers.date_time`.
+DEBUG 2024-05-19 14:11:27,591 factory Provider `faker.providers.date_time` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:27,593 factory Provider `faker.providers.emoji` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG 2024-05-19 14:11:27,593 factory Provider `faker.providers.file` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG 2024-05-19 14:11:27,594 factory Looking for locale `en_US` in provider `faker.providers.geo`.
+DEBUG 2024-05-19 14:11:27,596 factory Provider `faker.providers.geo` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:27,598 factory Looking for locale `en_US` in provider `faker.providers.internet`.
+DEBUG 2024-05-19 14:11:27,605 factory Provider `faker.providers.internet` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:27,607 factory Provider `faker.providers.isbn` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG 2024-05-19 14:11:27,608 factory Looking for locale `en_US` in provider `faker.providers.job`.
+DEBUG 2024-05-19 14:11:27,613 factory Provider `faker.providers.job` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:27,615 factory Looking for locale `en_US` in provider `faker.providers.lorem`.
+DEBUG 2024-05-19 14:11:27,620 factory Provider `faker.providers.lorem` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:27,623 factory Looking for locale `en_US` in provider `faker.providers.misc`.
+DEBUG 2024-05-19 14:11:27,624 factory Provider `faker.providers.misc` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:27,626 factory Looking for locale `en_US` in provider `faker.providers.passport`.
+DEBUG 2024-05-19 14:11:27,627 factory Provider `faker.providers.passport` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:27,629 factory Looking for locale `en_US` in provider `faker.providers.person`.
+DEBUG 2024-05-19 14:11:27,639 factory Provider `faker.providers.person` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:27,643 factory Looking for locale `en_US` in provider `faker.providers.phone_number`.
+DEBUG 2024-05-19 14:11:27,653 factory Provider `faker.providers.phone_number` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:27,655 factory Provider `faker.providers.profile` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG 2024-05-19 14:11:27,655 factory Provider `faker.providers.python` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG 2024-05-19 14:11:27,656 factory Provider `faker.providers.sbn` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG 2024-05-19 14:11:27,656 factory Looking for locale `en_US` in provider `faker.providers.ssn`.
+DEBUG 2024-05-19 14:11:27,664 factory Provider `faker.providers.ssn` has been localized to `en_US`.
+DEBUG 2024-05-19 14:11:27,666 factory Provider `faker.providers.user_agent` does not feature localization. Specified locale `en_US` is not utilized for this provider.

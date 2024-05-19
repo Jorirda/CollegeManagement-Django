@@ -3,6 +3,7 @@ import json
 import requests
 import pandas as pd
 import logging
+import pytz
 
 from django.core.paginator import Paginator
 from django.contrib import messages
@@ -24,13 +25,13 @@ from .forms import ExcelUploadForm
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from datetime import time
 from django.http import JsonResponse
 from django.core import serializers
 from dateutil.relativedelta import relativedelta
 from django.shortcuts import render
 from django.utils.translation import gettext as _
 from django.db.models import Sum
+from django.utils import timezone
 
 
 
@@ -71,32 +72,45 @@ def get_upload(request):
             excel_file = request.FILES['excel_file']
             is_teacher = form.cleaned_data['is_teacher']
             try:
-                # Process the uploaded Excel file
-                processed_data = process_data(excel_file, is_teacher, is_chinese_data)
-                message = 'Data processed successfully!'
-
-                # Generate HTML table from processed_data
-                html_table = generate_html_table(processed_data)
+                # Get the resulting HTML table from the Excel file
+                html_table = get_result(excel_file, is_teacher)
+                message = _('Data processed successfully!')
 
                 context = {
                     'message': message,
-                    'processed_data': processed_data,
-                    'html_table': html_table
+                    'html_table': html_table,
                 }
+                return render(request, 'hod_template/result.html', context)
+
             except Exception as e:
-                message = f"Failed to process data: {str(e)}"
-                context = {'message': message}
-            return render(request, 'hod_template/result.html', context)
+                message = _('Failed to process data: ') + str(e)
+                context = {
+                    'message': message,
+                }
+                return render(request, 'hod_template/result.html', context)
+        else:
+            message = _('Form is not valid. Please correct the errors below.')
+            context = {
+                'form': form,
+                'message': message,
+            }
+            return render(request, 'hod_template/upload.html', context)
+    
+    # Handle GET request
     else:
         form = ExcelUploadForm()
-    return render(request, 'hod_template/upload.html', {'form': form})
+        context = {
+            'form': form,
+        }
+        return render(request, 'hod_template/upload.html', context)
 
 
 
 def get_result(excel_file, is_teacher):
-    # Assuming excel_file is an InMemoryUploadedFile object from the form
-    df = pd.read_excel(excel_file.file)  # Read the Excel file into a DataFrame
-    html_table = df.to_html(index=False, classes='table table-bordered table-striped')  # Convert DataFrame to HTML table
+    # Read the Excel file into a DataFrame
+    df = pd.read_excel(excel_file.file)
+    # Convert DataFrame to HTML table
+    html_table = df.to_html(index=False, classes='table table-bordered table-striped')
     return html_table
 
 def get_total_income_by_months(start_year, end_year, start_month_name, end_month_name):
@@ -166,7 +180,7 @@ def filter_teachers(request):
     course_id = request.GET.get('course_id')
     form = LearningRecordForm()
     teachers_data = form.fetch_teacher_data(course_id)
-    print(teachers_data)
+    # print(teachers_data)
     return JsonResponse({'teachers': teachers_data})
 
     
@@ -806,7 +820,7 @@ def manage_student_query(request):
                 student_query_info.append(student_info)
 
     # Debugging: Print the student query information
-    print(student_query_info)
+    # print(student_query_info)
 
     # Prepare the context to pass to the template
     context = {
@@ -1118,7 +1132,7 @@ def edit_payment_record(request, payment_id):
             amount_due = form.cleaned_data.get('amount_due')
             amount_paid = form.cleaned_data.get('amount_paid')
             lesson_hours = form.cleaned_data.get('lesson_hours')
-            print(lesson_hours)
+            # print(lesson_hours)
             payment_method = form.cleaned_data.get('payment_method')
             status = form.cleaned_data.get('status')
             payee = form.cleaned_data.get('payee')
@@ -1305,8 +1319,8 @@ def manage_learning_record(request):
     paginated_learningrecords = paginator.get_page(page_number)
 
     # Log the session ID for debugging
-    session_id = request.session.get('session_id', None)
-    logger.debug(f'Session ID: {session_id}')
+    # session_id = request.session.get('session_id', None)
+    # logger.debug(f'Session ID: {session_id}')
 
     context = {
         'learningrecords': paginated_learningrecords,
@@ -1315,11 +1329,11 @@ def manage_learning_record(request):
         'selected_teacher': selected_teacher,
         'selected_grade': selected_grade,
         'page_title': _('Manage Learning Records'),
-        'session_id': session_id  # Add session_id to context
+        # 'session_id': session_id  # Add session_id to context
     }
 
     # Log the entire context for debugging
-    logger.debug(f'Context: {context}')
+    # logger.debug(f'Context: {context}')
 
     return render(request, 'hod_template/manage_learning_record.html', context)
 
@@ -1568,10 +1582,10 @@ def get_admin_attendance(request):
     classes_id = request.POST.get('classes')
     session_id = request.POST.get('session')
     attendance_date_id = request.POST.get('attendance_date_id')
-    print(attendance_date_id)
+    # print(attendance_date_id)
     
     try:
-        logger.info(f"Fetching attendance for Class ID: {classes_id}, Session ID: {session_id}, Attendance Date ID: {attendance_date_id}")
+        # logger.info(f"Fetching attendance for Class ID: {classes_id}, Session ID: {session_id}, Attendance Date ID: {attendance_date_id}")
         classes = get_object_or_404(ClassSchedule, course=classes_id)
         session = get_object_or_404(Session, id=session_id)
         attendances = Attendance.objects.filter(classes=classes, session=session)
@@ -1591,7 +1605,7 @@ def get_admin_attendance(request):
                     "name": str(report.student),
                     "date": str(attendance.date)
                 }
-                logger.info(f"Student: {report.student}, Status: {report.status}")
+                # logger.info(f"Student: {report.student}, Status: {report.status}")
                 json_data.append(data)
 
         return JsonResponse(json.dumps(json_data), safe=False)
@@ -1605,7 +1619,7 @@ def get_attendance_dates(request):
     session_id = request.POST.get('session')
 
     try:
-        logger.info(f"Fetching attendance dates for Class ID: {classes_id}, Session ID: {session_id}")
+        # logger.info(f"Fetching attendance dates for Class ID: {classes_id}, Session ID: {session_id}")
         classes = get_object_or_404(ClassSchedule, id=classes_id)
         session = get_object_or_404(Session, id=session_id)
         attendance_dates = Attendance.objects.filter(classes=classes, session=session).values('id', 'date')
@@ -1662,11 +1676,23 @@ def send_teacher_notification(request):
                    'key=AAAA3Bm8j_M:APA91bElZlOLetwV696SoEtgzpJr2qbxBfxVBfDWFiopBWzfCfzQp2nRyC7_A2mlukZEHV4g1AmyC6P_HonvSkY2YyliKt5tT3fe_1lrKod2Daigzhb2xnYQMxUWjCAIQcUexAMPZePB',
                    'Content-Type': 'application/json'}
         data = requests.post(url, data=json.dumps(body), headers=headers)
-        notification = NotificationTeacher(teacher=teacher, message=message)
+
+        # Set the timezone to China Standard Time
+        china_tz = pytz.timezone('Asia/Shanghai')
+        now = timezone.now().astimezone(china_tz)
+
+        notification = NotificationTeacher(
+            teacher=teacher,
+            message=message,
+            date=now.date(),
+            time=now.time()
+        )
         notification.save()
         return HttpResponse("True")
     except Exception as e:
         return HttpResponse("False")
+
+
 
 
 

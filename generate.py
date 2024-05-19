@@ -1,11 +1,12 @@
 import os
 import django
 import pandas as pd
+import logging
 from faker import Faker
 from django.contrib.auth.hashers import make_password
 from django.utils.crypto import get_random_string
 from django.db import IntegrityError
-from main_app.models import CustomUser, Campus, Course, LearningRecord, Student, Teacher
+from main_app.models import CustomUser, Campus, Course, LearningRecord, Student, Teacher, PaymentRecord, StudentQuery
 
 # Set up Django settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'college_management_system.settings')
@@ -13,6 +14,16 @@ django.setup()
 
 # Create a Faker generator
 fake = Faker()
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("data_processing.log"),
+        logging.StreamHandler()
+    ]
+)
 
 # Mapping Chinese ordinal numbers to grades
 grade_mapping = {
@@ -25,8 +36,9 @@ grade_mapping = {
 def process_data(excel_file, is_teacher, is_chinese_data=False):
     try:
         df = pd.read_excel(excel_file)
+        logging.info(f"Dataframe loaded successfully with {len(df)} rows.")
     except Exception as e:
-        print(f"Error reading Excel file: {e}")
+        logging.error(f"Error reading Excel file: {e}")
         return None  # Return early if the file cannot be processed
 
     if is_chinese_data:
@@ -46,11 +58,12 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
             '授课老师': 'Teacher'
         }
         df.rename(columns=column_mapping, inplace=True)
+        logging.info("Columns renamed for Chinese data.")
 
     required_columns = ['Full Name', 'Class', 'Campus', 'Payment', 'Next Payment Date', 'Total Lessons', 'Lessons Taken', 'Remaining Lessons']
     for column in required_columns:
         if column not in df.columns:
-            print(f"Missing required column: {column}")
+            logging.error(f"Missing required column: {column}")
             return None
 
     fake_data = []
@@ -58,6 +71,7 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
 
     if is_teacher:
         file = open('fake_users.txt', 'w')
+        logging.info("Opened file for writing teacher login information.")
 
     for index, row in df.iterrows():
         try:
@@ -68,12 +82,15 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
                 password = get_random_string(12)
                 hashed_password = make_password(password)
                 file.write(f"Email: {email}, Password: {password}\n")
+                logging.info(f"Processed teacher {email} - login info written to file.")
             else:
                 password = None
                 hashed_password = None
+                logging.info(f"Processed student {email} - no login info required.")
 
             campus_name = row['Campus']
             campus, _ = Campus.objects.get_or_create(name=campus_name)
+            logging.info(f"Campus retrieved or created: {campus_name}")
 
             class_full_name = row['Class']
             course_name, grade_level = None, None
@@ -88,6 +105,7 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
                 if created or course.level_end < grade_level:
                     course.level_end = grade_level
                     course.save()
+                logging.info(f"Course retrieved or created: {course_name}")
 
             user_data = {
                 'full_name': full_name,
@@ -106,47 +124,91 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
             try:
                 user = CustomUser.objects.create_user(**user_data)
                 fake_data.append(user_data)
+                logging.info(f"User created: {email}")
             except IntegrityError:
-                print(f"IntegrityError for user: {email}")
+                logging.error(f"IntegrityError for user: {email}")
                 continue
 
             if is_teacher:
                 Teacher.objects.get_or_create(user=user)
+                logging.info(f"Teacher profile created for: {email}")
             else:
-                student, _ = Student.objects.get_or_create(campus=campus, admin=user, course=course)
+                student, created = Student.objects.get_or_create(
+                    admin=user,
+                    defaults={
+                        'campus': campus,
+                        'course': course
+                    }
+                )
+                if not created:
+                    student.campus = campus
+                    student.course = course
+                    student.save()
+                    logging.info(f"Updated student {student} with new campus and course.")
+                else:
+                    logging.info(f"Student created: {student}")
+
                 user_student_pairs.append((user, student, course, row))
-                print(f"Student created: {student}")
 
         except KeyError as e:
-            print(f"KeyError: {e}")
+            logging.error(f"KeyError: {e}")
             continue
         except Exception as e:
-            print(f"Exception: {e}")
+            logging.error(f"Exception: {e}")
             continue
 
     if is_teacher:
         file.close()
+        logging.info("Teacher login file closed.")
 
-    # Create learning records for each student
+    logging.info("User-student pairs processed: %s", user_student_pairs)
+
     for user, student, course, row in user_student_pairs:
         try:
-            # Get the remark from the associated student admin user
-            remark = student.admin.remark if student and student.admin else None
-
-            # Creating the LearningRecord instance
-            LearningRecord.objects.get_or_create(
+            remark = user.remark if student and student.admin else None
+            lesson_unit_price = row.get('Lesson Unit Price', 0)
+            ls, created = LearningRecord.objects.get_or_create(
                 student=student,
                 course=course,
                 defaults={
-                    'total_lessons': row['Total Lessons'],
-                    'lessons_taken': row['Lessons Taken'],
-                    'remaining_lessons': row['Remaining Lessons'],
-                    'remark': remark  # Assign the remark here
+                    'date': user.date_joined,
+                    # 'teacher',
+                    
                 }
             )
-            print(f"LearningRecord created for student: {student}")
+            PaymentRecord.objects.get_or_create(
+                student=student,
+                course=course,
+                defaults={
+                    'date': user.date_joined,
+                    'next_payment_date': row['Next Payment Date'],
+                    'amount_paid': row['Payment'],
+                    'payee': row['Full Name'],
+                    'status': 'Currently Learning',
+                    'lesson_hours': row['Total Lessons'],
+                    'lesson_unit_price': lesson_unit_price,
+                    'discounted_price': lesson_unit_price,
+                    'book_costs': 0,
+                    'other_fee': 0,
+                    'amount_due': 0,
+                    'remark': user.remark,
+                }
+            )
+            
+            StudentQuery.objects.get_or_create(
+                student_records=student,
+                registered_courses=course,
+                admin=user,
+                defaults={
+                    # 'num_of_classes': row['Total Periods'],
+                    'paid_class_hours': row['Total Lessons'],
+                    'completed_hours': row['Lessons Taken'],
+                    'remaining_hours': row['Remaining Lessons'],
+                }
+            )
+            logging.info(f"StudentQuery created for student: {student}")
         except Exception as e:
-            print(f"Error creating LearningRecord: {e}")
+            logging.error(f"Error creating LearningRecord: {e}")
             continue
 
     return fake_data
@@ -162,3 +224,6 @@ def generate_html_table(data):
         table += "<tr>" + "".join([f"<td>{value}</td>" for value in row.values()]) + "</tr>"
     table += "</table>"
     return table
+
+# Example usage
+# process_data('path_to_excel_file.xlsx', is_teacher=True, is_chinese_data=True)

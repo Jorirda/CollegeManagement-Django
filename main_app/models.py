@@ -191,7 +191,6 @@ class StudentResult(models.Model):
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     classes = models.ForeignKey(Classes, on_delete=models.CASCADE, null=True, blank=False)
     
-
 class PaymentRecord(models.Model):
     date = models.DateField()
     next_payment_date = models.DateField(null=True)
@@ -388,7 +387,6 @@ post_save.connect(create_or_update_teacher_query, sender=Teacher)
 #Linking Payment Records and Learning Records
 @receiver(post_save, sender=PaymentRecord)
 @receiver(post_save, sender=LearningRecord)
-
 def link_records(sender, instance, created, **kwargs):
     """
     Signal handler for linking LearningRecord and PaymentRecord instances based on course, student, and date.
@@ -465,10 +463,12 @@ def link_learning_record_and_class_schedule(sender, instance, created, **kwargs)
             learning = related_learning.first()
             LearningRecord.objects.filter(id=learning.id).update(schedule_record=scheduling_record)
 
-# Register signal handlers
+#Register signal handlers
 post_save.connect(link_learning_record_and_class_schedule, sender=LearningRecord)
 post_save.connect(link_learning_record_and_class_schedule, sender=ClassSchedule)
 
+
+#User Profiles
 @receiver(post_save, sender=CustomUser)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
@@ -478,7 +478,6 @@ def create_user_profile(sender, instance, created, **kwargs):
             Teacher.objects.create(admin=instance)
         if instance.user_type == 3:
             Student.objects.create(admin=instance)
-
 
 @receiver(post_save, sender=CustomUser)
 def save_user_profile(sender, instance, **kwargs):

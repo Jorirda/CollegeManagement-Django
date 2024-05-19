@@ -72,39 +72,18 @@ def get_upload(request):
             excel_file = request.FILES['excel_file']
             is_teacher = form.cleaned_data['is_teacher']
             try:
-                # Get the resulting HTML table from the Excel file
+                # Process the uploaded Excel file
+                processed_data = process_data(excel_file, is_teacher, is_chinese_data)
                 html_table = get_result(excel_file, is_teacher)
-                message = _('Data processed successfully!')
-
-                context = {
-                    'message': message,
-                    'html_table': html_table,
-                }
-                return render(request, 'hod_template/result.html', context)
-
+                message = 'Data processed successfully!'
+                context = {'message': message, 'processed_data': processed_data, 'html_table': html_table}
             except Exception as e:
-                message = _('Failed to process data: ') + str(e)
-                context = {
-                    'message': message,
-                }
-                return render(request, 'hod_template/result.html', context)
-        else:
-            message = _('Form is not valid. Please correct the errors below.')
-            context = {
-                'form': form,
-                'message': message,
-            }
-            return render(request, 'hod_template/upload.html', context)
-    
-    # Handle GET request
+                message = f"Failed to process data: {str(e)}"
+                context = {'message': message}
+            return render(request, 'hod_template/result.html', context)
     else:
         form = ExcelUploadForm()
-        context = {
-            'form': form,
-        }
-        return render(request, 'hod_template/upload.html', context)
-
-
+    return render(request, 'hod_template/upload.html', {'form': form})
 
 def get_result(excel_file, is_teacher):
     # Read the Excel file into a DataFrame
@@ -436,7 +415,7 @@ def admin_view_attendance(request):
 #Sessions
 def add_session(request):
     form = SessionForm(request.POST or None)
-    context = {'form': form, 'page_title': 'Add Session'}
+    context = {'form': form, 'page_title': _('Add Session')}
     if request.method == 'POST':
         if form.is_valid():
             try:
@@ -782,45 +761,49 @@ def manage_student_query(request):
 
     # If a student is selected, filter student queries by that student
     if selected_student_id:
-        # Retrieve the selected student's queries
-        student_queries = StudentQuery.objects.filter(student_records__admin=selected_student_id)
+        try:
+            # Retrieve the selected student's queries and related objects
+            student_queries = StudentQuery.objects.filter(student_records__admin__id=selected_student_id).select_related(
+                'student_records__admin', 'payment_records', 'learning_records'
+            )
+            # print(f"Student Queries: {student_queries}")
 
-        # Iterate over each student query
-        for student_query in student_queries:
-            # Check if the student_query has an associated payment_records object
-            if student_query.payment_records:
-                priceper = (student_query.payment_records.amount_paid / student_query.payment_records.lesson_hours)
+            # Iterate over each student query
+            for student_query in student_queries:
+                # Check if the student_query has an associated payment_records object
+                if student_query.payment_records:
+                    priceper = (student_query.payment_records.amount_paid / student_query.payment_records.lesson_hours) if student_query.payment_records.lesson_hours else 0
 
-                # Safely get related student information with fallback values
-                student_info = {
-                    'student_name': student_query.student_records.admin.full_name if student_query.student_records and student_query.student_records.admin else 'Unknown',
-                    # 'gender': student_query.admin.gender if student_query.admin else 'Unknown',
-                     'gender': student_query.student_records.admin.gender,
-                    'date_of_birth': student_query.student_records.date_of_birth if student_query.student_records else 'Unknown',
-                    'phone_number': student_query.student_records.admin.phone_number if student_query.student_records and student_query.student_records.admin else 'Unknown',
-                    'campus': student_query.student_records.campus if student_query.student_records else 'Unknown',
-                    'state': student_query.student_records.status if student_query.student_records else 'Unknown',
-                    'payment_status': student_query.payment_records.status if student_query.payment_records else 'Unknown',
-                    'refunded': student_query.refund if student_query.refund is not None else 'Unknown',
-                    'reg_date': student_query.student_records.reg_date if student_query.student_records else 'Unknown',
-                    'num_of_classes': student_query.num_of_classes if student_query.num_of_classes is not None else 'Unknown',
-                    'registered_courses': student_query.registered_courses if student_query.registered_courses else 'Unknown',
-                    'completed_hours': student_query.completed_hours if student_query.completed_hours is not None else 'Unknown',
-                    'remaining_hours': student_query.remaining_hours if student_query.remaining_hours is not None else 'Unknown',
-                    'date': student_query.learning_records.date if student_query.learning_records else 'Unknown',
-                    'course': student_query.learning_records.course if student_query.learning_records else 'Unknown',
-                    'instructor': student_query.learning_records.teacher if student_query.learning_records else 'Unknown',
-                    'start_time': student_query.learning_records.start_time if student_query.learning_records else 'Unknown',
-                    'end_time': student_query.learning_records.end_time if student_query.learning_records else 'Unknown',
-                    'paid': student_query.payment_records.amount_paid if student_query.payment_records else 'Unknown',
-                    'lesson_hours': student_query.learning_records.lesson_hours if student_query.learning_records else 'Unknown',
-                    'paid_class_hours': student_query.payment_records.lesson_hours if student_query.payment_records else 'Unknown',
-                }
-                # Append student query information to the list
-                student_query_info.append(student_info)
-
-    # Debugging: Print the student query information
-    # print(student_query_info)
+                    # Safely get related student information with fallback values
+                    student_info = {
+                        'student_name': student_query.student_records.admin.full_name if student_query.student_records and student_query.student_records.admin else 'Unknown',
+                        'gender': student_query.student_records.admin.gender if student_query.student_records and student_query.student_records.admin else 'Unknown',
+                        'date_of_birth': student_query.student_records.date_of_birth if student_query.student_records else 'Unknown',
+                        'phone_number': student_query.student_records.admin.phone_number if student_query.student_records and student_query.student_records.admin else 'Unknown',
+                        'campus': student_query.student_records.campus if student_query.student_records else 'Unknown',
+                        'state': student_query.student_records.status if student_query.student_records else 'Unknown',
+                        'payment_status': student_query.payment_records.status if student_query.payment_records else 'Unknown',
+                        'refunded': student_query.refund if student_query.refund is not None else 'Unknown',
+                        'reg_date': student_query.student_records.reg_date if student_query.student_records else 'Unknown',
+                        'num_of_classes': student_query.num_of_classes if student_query.num_of_classes is not None else 'Unknown',
+                        'registered_courses': student_query.registered_courses if student_query.registered_courses else 'Unknown',
+                        'completed_hours': student_query.completed_hours if student_query.completed_hours is not None else 'Unknown',
+                        'remaining_hours': student_query.remaining_hours if student_query.remaining_hours is not None else 'Unknown',
+                        'date': student_query.learning_records.date if student_query.learning_records else 'Unknown',
+                        'course': student_query.learning_records.course if student_query.learning_records else 'Unknown',
+                        'instructor': student_query.learning_records.teacher if student_query.learning_records else 'Unknown',
+                        'start_time': student_query.learning_records.start_time if student_query.learning_records else 'Unknown',
+                        'end_time': student_query.learning_records.end_time if student_query.learning_records else 'Unknown',
+                        'paid': student_query.payment_records.amount_paid if student_query.payment_records else 'Unknown',
+                        'lesson_hours': student_query.learning_records.lesson_hours if student_query.learning_records else 'Unknown',
+                        'paid_class_hours': student_query.payment_records.lesson_hours if student_query.payment_records else 'Unknown',
+                    }
+                    # Append student query information to the list
+                    student_query_info.append(student_info)
+        except Exception as e:
+            logging.error(f"Error retrieving student queries: {e}")
+    
+    # print(f"Student Query Info: {student_query_info}")
 
     # Prepare the context to pass to the template
     context = {
@@ -831,6 +814,7 @@ def manage_student_query(request):
 
     # Render the template with the context
     return render(request, 'hod_template/manage_student_query.html', context)
+
 
 
 #Courses

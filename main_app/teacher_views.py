@@ -10,6 +10,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
+from django.utils.translation import gettext as _
+
 
 from .forms import *
 from .models import *
@@ -17,6 +19,7 @@ from .models import *
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
+#teacher
 def teacher_home(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
     total_students = LearningRecord.objects.filter(teacher_id=teacher).count() #SLIGHT TWEAKS
@@ -87,6 +90,8 @@ def teacher_view_profile(request):
     
     return render(request, "teacher_template/teacher_view_profile.html", context)
 
+
+#attendance
 def teacher_take_attendance(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
     print(teacher)
@@ -102,15 +107,18 @@ def teacher_take_attendance(request):
 
 def teacher_update_attendance(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
-    classess = Course.objects.filter(teacher_id=teacher)
+    classes = ClassSchedule.objects.filter(teacher=teacher)
     sessions = Session.objects.all()
     context = {
-        'classess': classess,
+        'classes': classes,
         'sessions': sessions,
         'page_title': 'Update Attendance'
     }
 
     return render(request, 'teacher_template/teacher_update_attendance.html', context)
+
+
+
 
 def teacher_apply_leave(request):
     form = LeaveReportTeacherForm(request.POST or None)
@@ -156,6 +164,7 @@ def teacher_feedback(request):
         else:
             messages.error(request, "Form has errors!")
     return render(request, "teacher_template/teacher_feedback.html", context)
+
 
 #Notifications
 def teacher_view_notification(request):
@@ -286,7 +295,7 @@ def get_student_attendance(request):
         student_data = []
         for attendance in attendance_data:
             data = {"id": attendance.student.admin.id,
-                    "name": attendance.student.admin.last_name + " " + attendance.student.admin.first_name,
+                    "name": attendance.student.admin.full_name,
                     "status": attendance.status}
             student_data.append(data)
         return JsonResponse(json.dumps(student_data), content_type='application/json', safe=False)

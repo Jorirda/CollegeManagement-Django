@@ -451,3 +451,15 @@ class ResultForm(FormSettings):
     class Meta:
         model = StudentResult
         fields = [_('course'), _('session')]
+
+class AttendanceForm(FormSettings):
+    schedule = forms.ModelChoiceField(queryset=ClassSchedule.objects.all(), required=False, label=_("Class Schedule"))
+    session = forms.ModelChoiceField(queryset=Session.objects.all(), required=False, label=_("Session"))
+    date = forms.DateField(widget=DateInput(attrs={'type': 'date'}), label=_('Date'))
+
+    def __init__(self, *args, **kwargs):
+        super(AttendanceForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = Attendance
+        fields = [_('schedule'), _('session'), _('date')]

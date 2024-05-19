@@ -1,8 +1,12 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
-{% block content %}
+{% load i18n %}
 
+{% block page_title %}
+    <i class="nav-icon fas fa-check"></i>  {{ page_title }}
+{% endblock page_title %}
+
+{% block content %}
 <section class="content">
     <div class="container-fluid">
         <div class="row">

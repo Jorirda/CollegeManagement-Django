@@ -253,7 +253,7 @@
   <script>
       $(document).ready(function(){
         var donutData = {
-            labels: ['Students', 'Teacher'],
+            labels: ['学员', '老师'],
             datasets: [
               {
                 data:[{{ total_students }}, {{ total_teacher }}],
@@ -280,7 +280,7 @@
           labels  : classes_list,
           datasets: [
             {
-              label               : 'Attendance Per Course',
+              label               : '每门课程的出席率',
               backgroundColor     : '#17A2B8',
               borderColor         : 'rgba(60,141,188,0.8)',
               pointRadius          : false,
@@ -350,7 +350,7 @@
           labels  : student_name_list,
           datasets: [
             {
-              label               : 'Absent/Leave',
+              label               : '缺席/请假',
               backgroundColor     : '#FFDF2E',
               borderColor         : '#b50a04',
               pointRadius          : false,
@@ -361,7 +361,7 @@
               data                : student_attendance_leave_list 
             },
             {
-              label               : 'Attendance',
+              label               : '出席情况',
               backgroundColor     : '#2D8F49',
               borderColor         : 'rgba(210, 214, 222, 1)',
               pointRadius         : false,

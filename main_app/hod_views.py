@@ -4,6 +4,7 @@ import requests
 import pandas as pd
 import logging
 import pytz
+import uuid
 
 from django.core.paginator import Paginator
 from django.contrib import messages
@@ -209,7 +210,7 @@ def refund_records(request):
 
     context = {
         'refund_info': paginated_records,
-        'page_title': 'Manage Refund Records'
+        'page_title': _('Manage Refund Records')
     }
 
     return render(request, 'hod_template/refund_records.html', context)
@@ -334,6 +335,22 @@ def admin_home(request):
         "November": 11,
         "December": 12
     }
+    zh_month_dict = {
+        "一月": 1,
+        "二月": 2,
+        "三月": 3,
+        "四月": 4,
+        "五月": 5,
+        "六月": 6,
+        "七月": 7,
+        "八月": 8,
+        "九月": 9,
+        "十月": 10,
+        "十一月": 11,
+        "十二月": 12
+        }
+
+    
     sorted_income_by_months = {k: income_by_months[k] for k in sorted(income_by_months, key=lambda x: (int(x.split()[1]), month_dict[x.split()[0]]))}
     all_months = list(sorted_income_by_months.keys())
     all_incomes = list(sorted_income_by_months.values())
@@ -449,7 +466,7 @@ def edit_session(request, session_id):
 
     else:
         return render(request, "hod_template/edit_session_template.html", context)
-
+    
 def delete_session(request, session_id):
     session = get_object_or_404(Session, id=session_id)
     try:
@@ -462,7 +479,7 @@ def delete_session(request, session_id):
 
 def manage_session(request):
     sessions = Session.objects.all()
-    context = {'sessions': sessions, 'page_title': 'Manage Sessions'}
+    context = {'sessions': sessions, 'page_title': _('Manage Sessions')}
     return render(request, "hod_template/manage_session.html", context)
 
 
@@ -531,8 +548,6 @@ def edit_teacher(request, teacher_id):
             messages.error(request, "Please fill the form properly")
 
     return render(request, "hod_template/edit_teacher_template.html", context)
-
-
 
 def delete_teacher(request, teacher_id):
     teacher = get_object_or_404(CustomUser, teacher__id=teacher_id)
@@ -607,8 +622,6 @@ def manage_teacher_query(request):
 
 
 #Students
-import uuid
-
 def add_student(request):
     form = StudentForm(request.POST or None, request.FILES or None)
     context = {'form': form, 'page_title': _('Add Student')}
@@ -1499,7 +1512,7 @@ def teacher_feedback_message(request):
         feedbacks = FeedbackTeacher.objects.all()
         context = {
             'feedbacks': feedbacks,
-            'page_title': _('teacher Feedback Messages')
+            'page_title': _('Teacher Feedback Messages')
         }
         return render(request, 'hod_template/teacher_feedback_template.html', context)
     else:
@@ -1623,7 +1636,7 @@ def send_student_notification(request):
         url = "https://fcm.googleapis.com/fcm/send"
         body = {
             'notification': {
-                'title': "Student Management System",
+                'title': "中之学校管理软件",
                 'body': message,
                 'click_action': reverse('student_view_notification'),
                 'icon': static('dist/img/AdminLTELogo.png')
@@ -1649,7 +1662,7 @@ def send_teacher_notification(request):
         url = "https://fcm.googleapis.com/fcm/send"
         body = {
             'notification': {
-                'title': "Student Management System",
+                'title': "中之学校管理软件",
                 'body': message,
                 'click_action': reverse('teacher_view_notification'),
                 'icon': static('dist/img/AdminLTELogo.png')

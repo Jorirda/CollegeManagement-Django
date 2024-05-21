@@ -18,7 +18,7 @@ fake = Faker()
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
+    format='%(asctime)s - %(LEVELNAME)s - %(MESSAGE)s',
     handlers=[
         logging.FileHandler("data_processing.log"),
         logging.StreamHandler()
@@ -51,16 +51,24 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
             '期别': 'Period',
             '累计报名期次': 'Total Periods',
             '销售人员': 'Salesperson',
-            '总课次': 'Total Lessons',
-            '已上课次': 'Lessons Taken',
-            '剩余课次': 'Remaining Lessons',
+            '总课时': 'Total Lesson Hours',
+            '已完成课时': 'Completed Lesson Hours',
+            '剩余课时': 'Remaining Lesson Hours',
+            '课程数量': 'Number of Classes',
             '下次缴费时间\n（课程结束前1月）': 'Next Payment Date',
-            '授课老师': 'Teacher'
+            '授课老师': 'Teacher',
+            '书本费': 'Book Costs',
+            '其他费用': 'Other Fee',
+            '应付金额': 'Amount Due',
+            '支付方式': 'Payment Method',
+            '注册日期': 'Enrollment Date',
+            '缴费日期': 'Payment Date',
+            '性别': 'Gender'
         }
         df.rename(columns=column_mapping, inplace=True)
         logging.info("Columns renamed for Chinese data.")
 
-    required_columns = ['Full Name', 'Class', 'Campus', 'Payment', 'Next Payment Date', 'Total Lessons', 'Lessons Taken', 'Remaining Lessons']
+    required_columns = ['Full Name', 'Class', 'Campus', 'Payment', 'Next Payment Date', 'Total Lesson Hours', 'Completed Lesson Hours', 'Remaining Lesson Hours']
     for column in required_columns:
         if column not in df.columns:
             logging.error(f"Missing required column: {column}")
@@ -75,8 +83,8 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
 
     for index, row in df.iterrows():
         try:
-            full_name = row['Full Name']
-            email = row['Email'] if not is_chinese_data else fake.email()
+            full_name = row.get('Full Name', fake.name())
+            email = row.get('Email', fake.email())
 
             if is_teacher:
                 password = get_random_string(12)
@@ -88,11 +96,11 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
                 hashed_password = None
                 logging.info(f"Processed student {email} - no login info required.")
 
-            campus_name = row['Campus']
+            campus_name = row.get('Campus', 'Unknown Campus')
             campus, _ = Campus.objects.get_or_create(name=campus_name)
             logging.info(f"Campus retrieved or created: {campus_name}")
 
-            class_full_name = row['Class']
+            class_full_name = row.get('Class', 'Unknown Class')
             course_name, grade_level = None, None
             for chinese_grade, grade in grade_mapping.items():
                 if chinese_grade in class_full_name:
@@ -112,12 +120,12 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
                 'email': email,
                 'password': hashed_password,
                 'profile_pic': '/media/default.jpg',
-                'gender': row['Gender'] if not is_chinese_data else fake.random_element(elements=('男', '女')),
-                'address': row['Address'] if not is_chinese_data else fake.address().replace('\n', ', '),
-                'phone_number': row['Phone Number'] if not is_chinese_data else fake.phone_number(),
+                'gender': row.get('Gender', fake.random_element(elements=('男', '女'))),
+                'address': row.get('Address', fake.address().replace('\n', ', ')),
+                'phone_number': row.get('Phone Number', fake.phone_number()),
                 'is_teacher': is_teacher,
                 'user_type': 2 if is_teacher else 3,  
-                'remark': "Salesperson: " + row['Salesperson'],
+                'remark': "Salesperson: " + row.get('Salesperson', 'Unknown'),
                 'fcm_token': ''  
             }
 
@@ -162,54 +170,74 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
         logging.info("Teacher login file closed.")
 
     logging.info("User-student pairs processed: %s", user_student_pairs)
+    
+    if not is_teacher:
+        for user, student, course, row in user_student_pairs:
+            try:
+                remark = user.remark if student and student.admin else None
+                total_price = row.get('Amount Due', 0)
+                total_lesson_hours = row.get('Total Lesson Hours', 0)
+                
+                if total_lesson_hours > 0:
+                    lesson_unit_price = total_price / total_lesson_hours
+                else:
+                    lesson_unit_price = 2180
 
-    for user, student, course, row in user_student_pairs:
-        try:
-            remark = user.remark if student and student.admin else None
-            lesson_unit_price = row.get('Lesson Unit Price', 0)
-            ls, created = LearningRecord.objects.get_or_create(
-                student=student,
-                course=course,
-                defaults={
-                    'date': user.date_joined,
-                    # 'teacher',
-                    
-                }
-            )
-            PaymentRecord.objects.get_or_create(
-                student=student,
-                course=course,
-                defaults={
-                    'date': user.date_joined,
-                    'next_payment_date': row['Next Payment Date'],
-                    'amount_paid': row['Payment'],
-                    'payee': row['Full Name'],
-                    'status': 'Currently Learning',
-                    'lesson_hours': row['Total Lessons'],
-                    'lesson_unit_price': lesson_unit_price,
-                    'discounted_price': lesson_unit_price,
-                    'book_costs': 0,
-                    'other_fee': 0,
-                    'amount_due': 0,
-                    'remark': user.remark,
-                }
-            )
-            
-            StudentQuery.objects.get_or_create(
-                student_records=student,
-                registered_courses=course,
-                admin=user,
-                defaults={
-                    # 'num_of_classes': row['Total Periods'],
-                    'paid_class_hours': row['Total Lessons'],
-                    'completed_hours': row['Lessons Taken'],
-                    'remaining_hours': row['Remaining Lessons'],
-                }
-            )
-            logging.info(f"StudentQuery created for student: {student}")
-        except Exception as e:
-            logging.error(f"Error creating LearningRecord: {e}")
-            continue
+                discounted_price = lesson_unit_price * total_lesson_hours
+
+                ls, created = LearningRecord.objects.update_or_create(
+                    student=student,
+                    course=course,
+                    defaults={
+                        'date': user.date_joined,
+                    }
+                )
+
+                ps, created = PaymentRecord.objects.update_or_create(
+                    student=student,
+                    course=course,
+                    defaults={
+                        'date': user.date_joined,
+                        'next_payment_date': row.get('Next Payment Date', fake.date_this_year()),
+                        'amount_paid': row.get('Payment', 0),
+                        'payee': row.get('Full Name', 'Unknown'),
+                        'status': 'Currently Learning',
+                        'lesson_hours': total_lesson_hours,
+                        'lesson_unit_price': lesson_unit_price,
+                        'discounted_price': discounted_price,
+                        'book_costs': row.get('Book Costs', 0),
+                        'other_fee': row.get('Other Fee', 0),
+                        'amount_due': total_price,
+                        'payment_method': row.get('Payment Method', 'Please Update'),
+                        'remark': remark,
+                        'total_semester': row.get('Total Periods', 1)
+                    }
+                )
+
+                sq, created = StudentQuery.objects.update_or_create(
+                    student_records=student,
+                    registered_courses=course,
+                    admin=user,
+                    learning_records=ls,
+                    payment_records=ps,
+                    defaults={
+                        'num_of_classes': row.get('Number of Classes', 1),
+                        'paid_class_hours': total_lesson_hours,
+                        'completed_hours': row.get('Completed Lesson Hours', 0),
+                        'remaining_hours': row.get('Remaining Lesson Hours', 0),
+                    }
+                )
+
+            except Exception as e:
+                logging.error(f"Error creating or updating records: {e}")
+                continue
+            try:
+                student_query = StudentQuery.objects.get(student_records=student, admin_id__isnull=True)
+                student_query.delete()
+                logging.info(f"Deleted Duplicate StudentQuery with no admin_id")
+            except StudentQuery.DoesNotExist:
+                logging.error(f"StudentQuery with no admin_id does not exist")
+                logging.info(f"StudentQuery created or updated for student: {student}")
 
     return fake_data
 

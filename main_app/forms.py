@@ -169,8 +169,8 @@ class CourseForm(FormSettings):
     LEVEL_GRADE_CHOICES = [(str(i), chr(64 + i)) for i in range(1, 8)]
     level_grade = forms.ChoiceField(
         choices=LEVEL_GRADE_CHOICES,
-        label="Max Level",
-        help_text="Select a level, which corresponds to a grade."
+        label=_("Max Level"),
+        help_text=_("Select a level, which corresponds to a grade.")
     )
     def __init__(self, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)
@@ -356,12 +356,15 @@ class ClassScheduleForm(FormSettings):
         fields = ['course', 'lesson_unit_price', 'teacher', 'grade', 'start_time', 'end_time', 'lesson_hours', 'remark']
 
 class SessionForm(FormSettings):
+    start_time = forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time'}), label=_('Start Time'))
+    end_time = forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time'}), label=_('End Time'))
+
     def __init__(self, *args, **kwargs):
         super(SessionForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = Session
-        fields = '__all__'
+        fields = ['start_time', 'end_time']
         widgets = {
             _('start_year'): DateInput(attrs={'type': 'date'}),
             _('end_year'): DateInput(attrs={'type': 'date'}),
@@ -452,14 +455,14 @@ class ResultForm(FormSettings):
         model = StudentResult
         fields = [_('course'), _('session')]
 
-class AttendanceForm(FormSettings):
-    schedule = forms.ModelChoiceField(queryset=ClassSchedule.objects.all(), required=False, label=_("Class Schedule"))
+class AttendanceForm(forms.ModelForm):
     session = forms.ModelChoiceField(queryset=Session.objects.all(), required=False, label=_("Session"))
-    date = forms.DateField(widget=DateInput(attrs={'type': 'date'}), label=_('Date'))
+    date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), label=_('Date'))
+    student_data = forms.ModelMultipleChoiceField(queryset=Student.objects.all(), widget=forms.CheckboxSelectMultiple, required=False, label=_('Students'))
 
     def __init__(self, *args, **kwargs):
         super(AttendanceForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = Attendance
-        fields = [_('schedule'), _('session'), _('date')]
+        fields = ['session', 'date', 'student_data']

@@ -1,0 +1,90 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block page_title %}
+    <i class="nav-icon fas fa-check"></i> {{ page_title }}
+{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div id="success-message" class="alert alert-success" style="display: none;"></div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-dark">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ page_title }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="edit-attendance-form" method="post" action="{% url 'teacher_edit_attendance' attendance.id %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label>Course</label>
+                                <select name="classes" class="form-control" id='classes' disabled>
+                                    <option value="">----</option>
+                                    {% for class in classes %}
+                                    <option value="{{ class.id }}" {% if class.id == attendance.class_schedule.id %}selected{% endif %}>
+                                        {{ class.course }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <input type="hidden" name="classes" id="hidden-classes" value="{{ attendance.class_schedule.id }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Date</label>
+                                <input type="date" class='form-control' name="attendance_date" id='attendance_date' value="{{ attendance.date }}" disabled>
+                                <input type="hidden" name="attendance_date" id="hidden-attendance_date" value="{{ attendance.date }}">
+                            </div>
+
+                            <div class="form-group" id="student_data">
+                                <div class='row'>
+                                    {% for student in students %}
+                                    <div class='col-lg-3'>
+                                        <div class='form-check custom-control custom-checkbox'>
+                                            <input type='checkbox' class='custom-control-input' name='student_data[]' value='{{ student.id }}' id='checkbox{{ student.id }}' {% if student.attendance_status %}checked{% endif %} />
+                                            <label for='checkbox{{ student.id }}' class='custom-control-label'>{{ student.admin.full_name }}</label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-success btn-block">Save Attendance</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Function to get URL parameters
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // Get course and date parameters from the URL
+        var course = getUrlParameter('course');
+        var date = getUrlParameter('date');
+
+        // Set the course and date in the form
+        if (course) {
+            document.querySelector('#classes').value = course;
+            document.querySelector('#hidden-classes').value = course;
+        }
+        if (date) {
+            document.querySelector('#attendance_date').value = date;
+            document.querySelector('#hidden-attendance_date').value = date;
+        }
+    });
+</script>
+
+{% endblock content %}

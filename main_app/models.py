@@ -58,6 +58,7 @@ class CustomUser(AbstractUser):
     fcm_token = models.TextField(default="")  # For firebase notifications
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    total_semester = models.IntegerField(default=1)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
     objects = CustomUserManager()
@@ -172,6 +173,10 @@ class FeedbackTeacher(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     feedback = models.TextField()
     reply = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)  # Automatically sets the field to now when the object is first created
+
+    def __str__(self):
+        return self.feedback
 
 class NotificationTeacher(models.Model):
     date = models.DateField(default=timezone.now)
@@ -276,7 +281,7 @@ def create_or_update_student_query(sender, instance, created, **kwargs):
 
     if student:
         # Ensure only one StudentQuery is associated with each student, handle creation or update
-        student_query, created = StudentQuery.objects.get_or_create(student_records=student)
+        student_query, created = StudentQuery.objects.update_or_create(student_records=student)
 
         if isinstance(instance, Student):
             print("Student instance saved or updated.")

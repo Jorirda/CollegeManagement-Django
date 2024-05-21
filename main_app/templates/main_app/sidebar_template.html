@@ -507,7 +507,8 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item has-treeview">
+                {% comment %} Teacher Add Result {% endcomment %}
+                {% comment %} <li class="nav-item has-treeview">
                     {% url 'teacher_add_result' as teacher_add_result %}
                     {% url 'edit_student_result' as edit_student_result %}
                     <a href="#" class="nav-link">
@@ -531,10 +532,11 @@
                             </a>
                         </li>
                     </ul>
-                </li>
+                </li> {% endcomment %}
                 <li class="nav-item has-treeview">
                     {% url 'teacher_take_attendance' as teacher_take_attendance %}
-                    {% url 'teacher_update_attendance' as teacher_update_attendance %}
+                    <!-- {% url 'teacher_update_attendance' as teacher_update_attendance %} -->
+                    {% url 'teacher_manage_attendance' as teacher_manage_attendance %}
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-user-check"></i>
                         <p>
@@ -544,19 +546,25 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{  teacher_take_attendance }}" class="nav-link {% if request.path ==  teacher_take_attendance or request.path == teacher_take_attendance %}active{% endif %}">
+                            <a href="{{ teacher_take_attendance }}" class="nav-link {% if request.path == teacher_take_attendance %}active{% endif %}">
                                 <i class="nav-icon fas fa-edit"></i>
                                 <p>{% trans "Take Attendance" %}</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{  teacher_update_attendance }}" class="nav-link {% if request.path ==  teacher_update_attendance or request.path == teacher_update_attendance %}active{% endif %}">
+                            <a href="{{ teacher_manage_attendance }}" class="nav-link {% if request.path == teacher_manage_attendance %}active{% endif %}">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>{% trans "Manage Attendance" %}</p>
+                            </a>
+                        </li>
+                        <!-- <li class="nav-item">
+                            <a href="{{ teacher_update_attendance }}" class="nav-link {% if request.path == teacher_update_attendance %}active{% endif %}">
                                 <i class="nav-icon fas fa-calendar-alt"></i>
                                 <p>{% trans "View/Update Attendance" %}</p>
                             </a>
-                        </li>
+                        </li> -->
                     </ul>
-                </li>
+                </li>                
                 <li class="nav-item has-treeview">
                     {% url 'teacher_view_notification' as teacher_view_notification %}
                     <a href="#" class="nav-link">

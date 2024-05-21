@@ -1,0 +1,260 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block page_title %}
+    <i class="nav-icon fas fa-pencil-ruler"></i>  {{ page_title }}
+{% endblock page_title %}
+
+{% block content %}
+<style>
+    .responsive-buttons {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+
+    .btn-responsive {
+        flex: 1 1 auto;
+        margin: 5px;
+        min-width: 68px;
+        text-align: center;
+    }
+
+    @media (max-width: 576px) {
+        .btn-responsive {
+            flex-basis: 100%;
+        }
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    th, td {
+        white-space: nowrap;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+    .pagination a, .pagination span {
+        margin: 0 5px;
+        padding: 8px 16px;
+        text-decoration: none;
+        color: #5FC032;
+        border: 1px solid #DEE2E600;
+        border-radius: 4px;
+    }
+    .pagination a:hover {
+        background-color: #e9ecef;
+    }
+    .pagination .current {
+        background-color: #5FC032;
+        color: white;
+    }
+</style>
+<section class="content">
+    <div class="container-fluid">
+        <div id="success-message" class="alert alert-success" style="display: none;"></div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="d-flex align-items-center">
+                            <i class="nav-icon fas fa-pencil-alt" style="font-size: 24px; margin-right: 10px;"></i>
+                            <h3 class="card-title">{% trans "Manage Attendance" %}</h3>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body table-container">
+                        <table id="example2" class="table table-bordered table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>{% trans "Index No." %}</th>
+                                    <th>{% trans "Date" %}</th>
+                                    <th>{% trans "Class" %}</th>
+                                    <th>{% trans "Session" %}</th>
+                                    <th>{% trans "Actions" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for attendance in attendances %}
+                                <tr id="attendance-{{ attendance.id }}">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ attendance.date }}</td>
+                                    <td>{{ attendance.classes.course }}</td>
+                                    <td>{{ attendance.session }}</td>
+                                    <td class="responsive-buttons">
+                                        <a href="{% url 'teacher_edit_attendance' attendance.id %}?course={{ attendance.classes.id }}&date={{ attendance.date }}" class="btn btn-info btn-responsive">{% trans "Edit" %}</a>
+                                        <button class="btn btn-danger btn-responsive" onclick="deleteAttendance({{ attendance.id }})">{% trans "Delete" %}</button>
+                                        <button class="btn btn-primary btn-responsive" onclick="viewAttendance({{ attendance.id }})">{% trans "View" %}</button>
+                                    </td>
+                                                                     
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="10" class="text-center">{% trans "No Attendance records" %}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="pagination">
+                            <span class="step-links">
+                                {% if attendances.has_previous %}
+                                    <a href="?page=1">&laquo; first</a>
+                                    <a href="?page={{ attendances.previous_page_number }}">previous</a>
+                                {% endif %}
+                                
+                                <span class="current">
+                                    Page {{ attendances.number }} of {{ attendances.paginator.num_pages }}.
+                                </span>
+                                
+                                {% if attendances.has_next %}
+                                    <a href="?page={{ attendances.next_page_number }}">next</a>
+                                    <a href="?page={{ attendances.paginator.num_pages }}">last &raquo;</a>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal for viewing students -->
+<div class="modal fade" id="viewAttendanceModal" tabindex="-1" role="dialog" aria-labelledby="viewAttendanceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewAttendanceModalLabel">{% trans "Attendance Details" %}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>{% trans "Student Name" %}</th>
+                            <th>{% trans "Present" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceDetails">
+                        <!-- Student attendance details will be populated here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans "Close" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    // Function to delete attendance and show success message
+    function deleteAttendance(attendanceId) {
+        if (confirm('{% trans 'Are you sure about this ?' %}')) {
+            $.ajax({
+                type: 'POST',
+                url: '{% url "teacher_delete_attendance" %}',
+                data: {
+                    'attendance_id': attendanceId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(data) {
+                    if (data.success) {
+                        // Remove the table row
+                        $('#attendance-' + attendanceId).remove();
+                        // Show success message
+                        $('#success-message').text('{% trans "Attendance Deleted Successfully!" %}');
+                        $('#success-message').show();
+                        // Hide success message after 3 seconds
+                        setTimeout(function() {
+                            $('#success-message').hide();
+                        }, 3000);
+                    } else {
+                        console.error(data.error);
+                        // Show error message
+                        $('#success-message').text('{% trans "An error occurred while deleting the attendance." %}');
+                        $('#success-message').addClass('alert-danger');
+                        $('#success-message').show();
+                        // Hide error message after 3 seconds
+                        setTimeout(function() {
+                            $('#success-message').hide();
+                        }, 3000);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    // Show error message
+                    $('#success-message').text('{% trans "An error occurred while deleting the attendance." %}');
+                    $('#success-message').addClass('alert-danger');
+                    $('#success-message').show();
+                    // Hide error message after 3 seconds
+                    setTimeout(function() {
+                        $('#success-message').hide();
+                    }, 3000);
+                }
+            });
+        }
+    }
+
+    // Function to view attendance details
+    function viewAttendance(attendanceId) {
+        $.ajax({
+            type: 'GET',
+            url: '{% url "teacher_view_attendance" %}',
+            data: {
+                'attendance_id': attendanceId
+            },
+            success: function(data) {
+                if (data.success) {
+                    var attendanceDetails = data.attendance_details;
+                    var tableBody = $('#attendanceDetails');
+                    tableBody.empty(); // Clear previous data
+
+                    // Populate table with new data
+                    attendanceDetails.forEach(function(detail) {
+                        var row = '<tr>' +
+                                  '<td>' + detail.student_name + '</td>' +
+                                  '<td>' + (detail.is_present ? '{% trans "Yes" %}' : '{% trans "No" %}') + '</td>' +
+                                  '</tr>';
+                        tableBody.append(row);
+                    });
+
+                    // Show the modal
+                    $('#viewAttendanceModal').modal('show');
+                } else {
+                    console.error(data.error);
+                    // Show error message
+                    $('#success-message').text('{% trans "An error occurred while retrieving the attendance details." %}');
+                    $('#success-message').addClass('alert-danger');
+                    $('#success-message').show();
+                    // Hide error message after 3 seconds
+                    setTimeout(function() {
+                        $('#success-message').hide();
+                    }, 3000);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                // Show error message
+                $('#success-message').text('{% trans "An error occurred while retrieving the attendance details." %}');
+                $('#success-message').addClass('alert-danger');
+                $('#success-message').show();
+                // Hide error message after 3 seconds
+                setTimeout(function() {
+                    $('#success-message').hide();
+                }, 3000);
+            }
+        });
+    }
+</script>
+{% endblock content %}

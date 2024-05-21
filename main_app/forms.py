@@ -163,15 +163,14 @@ class TeacherForm(FormSettings):
 
 class CourseForm(FormSettings):
     name = forms.CharField(label=_('Course Name'))
-    overview = forms.CharField(label=_('Course Desciption'))
-    # level = forms.ChoiceField(choices=[])
-    # Combined choices where each number corresponds to a letter grade
+    overview = forms.CharField(label=_('Course Description'), widget=forms.Textarea)
     LEVEL_GRADE_CHOICES = [(str(i), chr(64 + i)) for i in range(1, 8)]
     level_grade = forms.ChoiceField(
         choices=LEVEL_GRADE_CHOICES,
         label=_("Max Level"),
         help_text=_("Select a level, which corresponds to a grade.")
     )
+    image = forms.ImageField(label=_('Course Image'), required=False)  # Added this line
     def __init__(self, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)
         # instance = kwargs.get('instance')
@@ -180,8 +179,8 @@ class CourseForm(FormSettings):
         #     self.fields['level'].choices = [(i, str(i)) for i in range(instance.level_start, instance.level_end + 1)]
 
     class Meta:
-        fields = [_('name'),'overview','level_grade']
         model = Course
+        fields = ['name', 'overview', 'level_grade', 'image']
 
 class ClassesForm(FormSettings):
     name = forms.CharField(label=_('Classes Name'))
@@ -196,13 +195,15 @@ class ClassesForm(FormSettings):
 
 class CampusForm(FormSettings):
     name = forms.CharField(label=_('Name'))
-    # institution = forms.ModelChoiceField(queryset=Institution.objects.all(), required=False, label=_("Institution"))
+    principal = forms.CharField(label=_('Principal'))  # New field
+    principal_contact_number = forms.CharField(label=_('Principal Contact Number'))  # New field
+
     def __init__(self, *args, **kwargs):
         super(CampusForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = Campus
-        fields = [_('name')]
+        fields = ['name', 'principal', 'principal_contact_number']
 
 class LearningRecordForm(FormSettings):
     date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}), label=_('Date'))
@@ -383,14 +384,14 @@ class LeaveReportTeacherForm(FormSettings):
             'date': DateInput(attrs={'type': 'date'}),
         }
 
-class FeedbackTeacherForm(FormSettings):
-    feedback = forms.CharField(widget=TextInput(), label=_('Feedback'))
+class SummaryTeacherForm(FormSettings):
+    summary = forms.CharField(widget=TextInput(), label=_('Summary'))
     def __init__(self, *args, **kwargs):
-        super(FeedbackTeacherForm, self).__init__(*args, **kwargs)
+        super(SummaryTeacherForm, self).__init__(*args, **kwargs)
 
     class Meta:
-        model = FeedbackTeacher
-        fields = ['feedback']
+        model = SummaryTeacher
+        fields = ['summary']
 
 class LeaveReportStudentForm(FormSettings):
     date = forms.DateField(widget=DateInput(attrs={'type': 'date'}), label=_('Date'))
@@ -405,14 +406,14 @@ class LeaveReportStudentForm(FormSettings):
             'date': DateInput(attrs={'type': 'date'}),
         }
 
-class FeedbackStudentForm(FormSettings):
-    feedback = forms.CharField(widget=TextInput(), label=_('Feedback'))
-    def __init__(self, *args, **kwargs):
-        super(FeedbackStudentForm, self).__init__(*args, **kwargs)
+# class SummaryStudentForm(FormSettings):
+#     summary = forms.CharField(widget=TextInput(), label=_('Summary'))
+#     def __init__(self, *args, **kwargs):
+#         super(SummaryStudentForm, self).__init__(*args, **kwargs)
 
-    class Meta:
-        model = FeedbackStudent
-        fields = [_('feedback')]
+#     class Meta:
+#         model = SummaryStudent
+#         fields = [_('Summary')]
 
 class StudentEditForm(CustomUserForm):
     def __init__(self, *args, **kwargs):

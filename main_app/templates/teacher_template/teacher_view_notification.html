@@ -123,17 +123,7 @@
                         setTimeout(function() {
                             $('#success-message').hide();
                         }, 3000);
-                    } else {
-                        console.error(data.error);
-                        // Show error message
-                        $('#success-message').text('{% trans "An error occurred while deleting the notification." %}');
-                        $('#success-message').addClass('alert-danger');
-                        $('#success-message').show();
-                        // Hide error message after 3 seconds
-                        setTimeout(function() {
-                            $('#success-message').hide();
-                        }, 3000);
-                    }
+                    } 
                 },
                 error: function(xhr, status, error) {
                     console.error(xhr.responseText);

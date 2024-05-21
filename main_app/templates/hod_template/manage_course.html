@@ -6,7 +6,6 @@
     <i class="nav-icon fas fa-bookmark"></i> {% trans page_title %}
 {% endblock page_title %}
 
-
 {% block content %}
 <style>
     /* Flex container for responsive button alignment */
@@ -18,7 +17,7 @@
 
     /* Responsive button styling */
     .btn-responsive {
-        flex: 1 1 auto; /* Allows the button to grow and shrink as needed */
+        flex: 1 1 100%; /* Allows the button to grow and shrink as needed */
         margin: 2px; /* Adds margin around buttons */
         min-width: 68px; /* Minimum width of each button */
         text-align: center; /* Centers button text */
@@ -29,6 +28,16 @@
         .btn-responsive {
             flex-basis: 100%; /* Each button takes full width of the container on small screens */
         }
+    }
+
+    /* Style for the table to ensure consistent row heights */
+    .course-image {
+        max-width: 100px; /* Limits the width of the image */
+        max-height: 100px; /* Limits the height of the image */
+    }
+
+    td, th {
+        vertical-align: middle !important; /* Ensures vertical alignment to middle for all cells */
     }
 </style>
 <section class="content">
@@ -50,6 +59,7 @@
                                     <th>#</th>
                                     <th>{% trans 'Course' %}</th>
                                     <th>{% trans 'Description' %}</th>
+                                    <th>{% trans 'Image' %}</th>
                                     <th>{% trans 'Actions' %}</th>
                                 </tr>
                             </thead>
@@ -57,8 +67,15 @@
                                 {% for course in courses %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td style="width: 50rem;">{{ course.name }}</td>
-                                    <td style="width: 50rem;">{{ course.overview }}</td>
+                                    <td>{{ course.name }}</td>
+                                    <td>{{ course.overview }}</td>
+                                    <td>
+                                        {% if course.image %}
+                                            <img src="{{ course.image.url }}" alt="{{ course.name }}" class="course-image">
+                                        {% else %}
+                                            No Image
+                                        {% endif %}
+                                    </td>
                                     <td class="responsive-buttons">
                                         <a href="{% url 'edit_course' course.id %}" class="btn btn-info btn-responsive">{% trans 'Edit' %}</a>
                                         <a href="{% url 'delete_course' course.id %}" onclick="return confirm('{% trans 'Are you sure you want to delete this course?' %}')" class="btn btn-danger btn-responsive">{% trans 'Delete' %}</a> 

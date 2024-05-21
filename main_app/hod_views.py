@@ -217,13 +217,16 @@ def refund_records(request):
 
 #Admin
 def admin_home(request):
-    total_teacher = Teacher.objects.all().count()
-    total_students = Student.objects.all().count()
+    # Aggregate counts
+    total_teacher = Teacher.objects.count()
+    total_students = Student.objects.count()
+    total_classes = ClassSchedule.objects.count()
+    total_course = Course.objects.count()
+    total_income = PaymentRecord.objects.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+    total_refunds = PaymentRecord.objects.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+
+    # Attendance per class
     classes = ClassSchedule.objects.all()
-    total_classes = classes.count()
-    total_course = Course.objects.all().count()
-    attendance_list = Attendance.objects.filter(classes__in=classes)
-    total_attendance = attendance_list.count()
     attendance_list = []
     classes_list = []
     for class_schedule in classes:
@@ -231,33 +234,34 @@ def admin_home(request):
         classes_list.append(class_schedule.course.name[:7])
         attendance_list.append(attendance_count)
 
-    # Total Classes and students in Each Course
+    # Students in each course
     course_all = Course.objects.all()
     course_name_list = []
-    classes_count_list = []
     student_count_list_in_course = []
-
     for course in course_all:
-        classes_count = ClassSchedule.objects.filter(course_id=course.pk).count()
         students_count = Student.objects.filter(course_id=course.pk).count()
         course_name_list.append(course.name)
-        classes_count_list.append(classes_count)
         student_count_list_in_course.append(students_count)
-    
-    classes_all = Classes.objects.all()
-    class_names_list = []
-    student_count_list_in_classes = []
-    for class_obj in classes_all:
-        course = Course.objects.get(id=class_obj.course.pk)
-        student_count = Student.objects.filter(course_id=course.pk).count()
-        class_names_list.append(class_obj.name)
-        student_count_list_in_classes.append(student_count)
 
-    # For Students
+    # Attendance rate for each class schedule
+    attendance_rate_list = []
+    class_schedule_names_list = []
+    for class_obj in classes:
+        total_students_in_class = Attendance.objects.filter(classes=class_obj).count()
+        print(total_students_in_class)
+        total_attendance_in_class = AttendanceReport.objects.filter(attendance__classes=class_obj, status=True).count()
+        print(total_attendance_in_class)
+        if total_students_in_class > 0:
+            attendance_rate = (total_students_in_class / total_attendance_in_class) * 100
+        else:
+            attendance_rate = 0
+        class_schedule_names_list.append(class_obj.course.name)
+        attendance_rate_list.append(attendance_rate)
+
+    # Student attendance
     student_attendance_present_list = []
     student_attendance_leave_list = []
     student_name_list = []
-
     students = Student.objects.all()
     for student in students:
         attendance = AttendanceReport.objects.filter(student_id=student.id, status=True).count()
@@ -267,7 +271,7 @@ def admin_home(request):
         student_attendance_leave_list.append(leave + absent)
         student_name_list.append(student.admin.full_name)
 
-    # Fetching lesson hours from LearningRecord model
+    # Teacher lesson hours
     teacher_names = []
     lesson_hours = []
     for teacher in Teacher.objects.all():
@@ -275,52 +279,7 @@ def admin_home(request):
         total_hours = LearningRecord.objects.filter(teacher=teacher).aggregate(Sum('lesson_hours'))['lesson_hours__sum'] or 0
         lesson_hours.append(total_hours)
 
-    # Calculate total income
-    total_income = PaymentRecord.objects.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
-
-    # Breakdown for Percentage of Course Participants
-    course_participants_percentage = []
-    for course in course_all:
-        total_students_in_course = Student.objects.filter(course_id=course.pk).count()
-        if total_students > 0:
-            percentage = (total_students_in_course / total_students) * 100
-        else:
-            percentage = 0
-        course_participants_percentage.append(percentage)
-
-    sessions = Session.objects.all()
-    session_names = []
-    total_incomes = []
-    income_by_months = {}
-    all_months = []
-    available_years = set()
-
-    for session in sessions:
-        # Get the start and end years for the current session (semester)
-        start_year = session.start_year.year
-        end_year = session.end_year.year
-
-        # Add years to the set of available years
-        available_years.update(range(start_year, end_year + 1))
-
-        # Filter payment records that fall within the session's date range
-        total_income_per_session = ((PaymentRecord.objects.filter(
-            date__gte=session.start_year,
-            date__lte=session.end_year
-        ).aggregate(total_income=Sum('amount_paid'))['total_income'] or 0) * 2)
-
-        session_names.append(f"{start_year} - {end_year}")
-        total_incomes.append(total_income_per_session)
-
-        # Calculate monthly incomes for the current session
-        monthly_income = get_total_income_by_months(start_year, end_year, "January", "December")
-        
-        for month_year, income in monthly_income.items():
-            if month_year not in income_by_months:
-                income_by_months[month_year] = 0
-            income_by_months[month_year] += income
-
-    # Sort months by year and month
+    # Monthly income breakdown
     month_dict = {
         "January": 1,
         "February": 2,
@@ -335,25 +294,36 @@ def admin_home(request):
         "November": 11,
         "December": 12
     }
-    zh_month_dict = {
-        "一月": 1,
-        "二月": 2,
-        "三月": 3,
-        "四月": 4,
-        "五月": 5,
-        "六月": 6,
-        "七月": 7,
-        "八月": 8,
-        "九月": 9,
-        "十月": 10,
-        "十一月": 11,
-        "十二月": 12
-        }
+    sessions = Session.objects.all()
+    income_by_months = {}
+    available_years = set()
+    for session in sessions:
+        start_year = session.start_year.year
+        end_year = session.end_year.year
+        available_years.update(range(start_year, end_year + 1))
+        monthly_income = get_total_income_by_months(start_year, end_year, "January", "December")
+        for month_year, income in monthly_income.items():
+            if month_year not in income_by_months:
+                income_by_months[month_year] = 0
+            income_by_months[month_year] += float(income)  # Convert Decimal to float
 
-    
     sorted_income_by_months = {k: income_by_months[k] for k in sorted(income_by_months, key=lambda x: (int(x.split()[1]), month_dict[x.split()[0]]))}
     all_months = list(sorted_income_by_months.keys())
     all_incomes = list(sorted_income_by_months.values())
+
+    # Student renewals and withdrawals
+    student_renewals = 0
+    withdrawal_count = 0
+    for student in students:
+        payment_records = PaymentRecord.objects.filter(student_id=student.id)
+        next_payment_dates = payment_records.values_list('next_payment_date', flat=True).distinct()
+        total_semesters = sum(
+            payment_records.filter(next_payment_date=next_payment_date).count()
+            for next_payment_date in next_payment_dates
+        )
+        student_renewals += total_semesters
+        if student.status == "Refund":
+            withdrawal_count += 1
 
     context = {
         'page_title': _("Administrative Dashboard"),
@@ -361,23 +331,24 @@ def admin_home(request):
         'total_teacher': total_teacher,
         'total_course': total_course,
         'total_classes': total_classes,
-        'classes_list': classes_list,
-        'attendance_list': attendance_list,
-        'student_attendance_present_list': student_attendance_present_list,
-        'student_attendance_leave_list': student_attendance_leave_list,
-        "student_name_list": student_name_list,
-        "student_count_list_in_classes": student_count_list_in_classes,
-        "student_count_list_in_course": student_count_list_in_course,
-        "course_name_list": course_name_list,
-        'teacher_names': teacher_names,
-        'lesson_hours': lesson_hours,
-        'total_income': total_income,
-        'course_participants_percentage': course_participants_percentage,
-        'session_names': session_names,
-        'total_incomes': total_incomes,
-        'all_months': all_months,
-        'all_incomes': all_incomes,
+        'classes_list': json.dumps(classes_list),
+        'attendance_list': json.dumps(attendance_list),
+        'student_attendance_present_list': json.dumps(student_attendance_present_list),
+        'student_attendance_leave_list': json.dumps(student_attendance_leave_list),
+        'student_name_list': json.dumps(student_name_list),
+        'attendance_rate_list': json.dumps(attendance_rate_list),
+        'class_schedule_names_list': json.dumps(class_schedule_names_list),
+        'student_count_list_in_course': json.dumps(student_count_list_in_course),
+        'course_name_list': json.dumps(course_name_list),
+        'teacher_names': json.dumps(teacher_names),
+        'lesson_hours': json.dumps(lesson_hours),
+        'total_income': float(total_income),  # Convert Decimal to float
+        'total_refunds': float(total_refunds),  # Convert Decimal to float
+        'all_months': json.dumps(all_months),
+        'all_incomes': json.dumps(all_incomes),
         'available_years': sorted(available_years),
+        'student_renewals': student_renewals,
+        'withdrawal_count': withdrawal_count,
     }
 
     return render(request, 'hod_template/home_content.html', context)
@@ -832,7 +803,7 @@ def manage_student_query(request):
 
 #Courses
 def add_course(request):
-    form = CourseForm(request.POST or None)
+    form = CourseForm(request.POST or None, request.FILES or None)  # Adjusted to include request.FILES
     context = {
         'form': form,
         'page_title': _('Add Course')
@@ -842,23 +813,25 @@ def add_course(request):
             name = form.cleaned_data.get('name')
             overview = form.cleaned_data.get('overview')
             level_grade = form.cleaned_data.get('level_grade')
+            image = form.cleaned_data.get('image')  # Get the image from cleaned_data
             try:
                 course = Course()
                 course.name = name
                 course.overview = overview
                 course.level_end = level_grade
+                course.image = image  # Set the image field
                 course.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_course'))
-            except:
-                messages.error(request, "Could Not Add")
+            except Exception as e:
+                messages.error(request, f"Could Not Add: {e}")
         else:
             messages.error(request, "Could Not Add")
     return render(request, 'hod_template/add_course_template.html', context)
 
 def edit_course(request, course_id):
     instance = get_object_or_404(Course, id=course_id)
-    form = CourseForm(request.POST or None, instance=instance)
+    form = CourseForm(request.POST or None, request.FILES or None, instance=instance)  # Adjusted to include request.FILES
     context = {
         'form': form,
         'course_id': course_id,
@@ -869,15 +842,18 @@ def edit_course(request, course_id):
             name = form.cleaned_data.get('name')
             overview = form.cleaned_data.get('overview')  # corrected field name
             level_grade = form.cleaned_data.get('level_grade')
+            image = form.cleaned_data.get('image')  # Get the image from cleaned_data
             try:
                 course = Course.objects.get(id=course_id)
                 course.name = name
                 course.overview = overview
                 course.level_end = level_grade
+                if image:  # Only update the image if a new one is provided
+                    course.image = image
                 course.save()
                 messages.success(request, "Successfully Updated")
-            except:
-                messages.error(request, "Could Not Update")
+            except Exception as e:
+                messages.error(request, f"Could Not Update: {e}")
         else:
             messages.error(request, "Could Not Update")
 
@@ -888,9 +864,8 @@ def delete_course(request, course_id):
     try:
         course.delete()
         messages.success(request, "Course deleted successfully!")
-    except Exception:
-        messages.error(
-            request, "Sorry, some students are assigned to this course already. Kindly change the affected student course and try again")
+    except Exception as e:
+        messages.error(request, f"Sorry, some students are assigned to this course already. Kindly change the affected student course and try again. Error: {e}")
     return redirect(reverse('manage_course'))
 
 def manage_course(request):
@@ -977,24 +952,22 @@ def add_campus(request):
     form = CampusForm(request.POST or None)
     context = {
         'form': form,
-        'page_title':  _('Add Campus')
+        'page_title': _('Add Campus')
     }
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
-            # institution = form.cleaned_data.get('institution')
-           
-         
+            principal = form.cleaned_data.get('principal')  # New field
+            principal_contact_number = form.cleaned_data.get('principal_contact_number')  # New field
+
             try:
                 campus = Campus()
                 campus.name = name
-                # campus.institution = institution
-                
-            
+                campus.principal = principal  # New field
+                campus.principal_contact_number = principal_contact_number  # New field
                 campus.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_campus'))
-
             except Exception as e:
                 messages.error(request, "Could Not Add " + str(e))
         else:
@@ -1013,21 +986,19 @@ def edit_campus(request, campus_id):
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
-            # institution = form.cleaned_data.get('institution')
-           
-           
+            principal = form.cleaned_data.get('principal')  # New field
+            principal_contact_number = form.cleaned_data.get('principal_contact_number')  # New field
+
             try:
                 campus = Campus.objects.get(id=campus_id)
                 campus.name = name
-                # campus.institution = institution
-              
-               
+                campus.principal = principal  # New field
+                campus.principal_contact_number = principal_contact_number  # New field
                 campus.save()
-                messages.success(request, "Successfully Added")
+                messages.success(request, "Successfully Updated")
                 return redirect(reverse('edit_campus', args=[campus_id]))
-
             except Exception as e:
-                messages.error(request, "Could Not Add " + str(e))
+                messages.error(request, "Could Not Update " + str(e))
         else:
             messages.error(request, "Fill Form Properly")
 
@@ -1061,8 +1032,6 @@ def add_payment_record(request):
             student = form.cleaned_data.get('student')
             course = form.cleaned_data.get('course')
             learning = form.cleaned_data.get('learning')
-            lesson_unit_price = form.cleaned_data.get('lesson_unit_price')
-            discounted_price = form.cleaned_data.get('discounted_price')
             book_costs = form.cleaned_data.get('book_costs')
             other_fee = form.cleaned_data.get('other_fee')
             amount_due = form.cleaned_data.get('amount_due')
@@ -1072,6 +1041,14 @@ def add_payment_record(request):
             status = form.cleaned_data.get('status')
             payee = form.cleaned_data.get('payee')
             remark = form.cleaned_data.get('remark')
+
+            # Calculate lesson unit price and discounted price
+            if total_lesson_hours > 0:
+                lesson_unit_price = amount_due / total_lesson_hours
+            else:
+                lesson_unit_price = 2180
+
+            discounted_price = lesson_unit_price * total_lesson_hours
 
             try:
                 payment = PaymentRecord()
@@ -1122,18 +1099,23 @@ def edit_payment_record(request, payment_id):
             student = form.cleaned_data.get('student')
             course = form.cleaned_data.get('course')
             learning = form.cleaned_data.get('learning')
-            lesson_unit_price = form.cleaned_data.get('lesson_unit_price')
-            discounted_price = form.cleaned_data.get('discounted_price')
             book_costs = form.cleaned_data.get('book_costs')
             other_fee = form.cleaned_data.get('other_fee')
             amount_due = form.cleaned_data.get('amount_due')
             amount_paid = form.cleaned_data.get('amount_paid')
-            lesson_hours = form.cleaned_data.get('lesson_hours')
-            # print(lesson_hours)
+            lesson_hours = form.cleaned_data.get('lesson_hours') or 0  # Ensure a default value if not provided
             payment_method = form.cleaned_data.get('payment_method')
             status = form.cleaned_data.get('status')
             payee = form.cleaned_data.get('payee')
             remark = form.cleaned_data.get('remark')
+
+            # Calculate lesson unit price and discounted price
+            if lesson_hours > 0:
+                lesson_unit_price = amount_due / lesson_hours
+            else:
+                lesson_unit_price = 2180
+
+            discounted_price = lesson_unit_price * lesson_hours
 
             try:
                 paymentrecord.date = date
@@ -1156,16 +1138,6 @@ def edit_payment_record(request, payment_id):
                 student.save()
 
                 paymentrecord.save()
-
-                # Check if lesson hours are retrieved properly
-                # if paymentrecord.learning_record:
-                #     # lesson_hours = paymentrecord.calculate_lesson_hours()
-                #     if lesson_hours is not None:
-                #         messages.success(request, _("Lesson hours retrieved successfully"))
-                #     else:
-                #         messages.error(request, _("Lesson hours are called but not being shown"))
-                # else:
-                #     messages.error(request, _("Lesson hours are not being retrieved"))
 
                 messages.success(request, "Successfully Updated")
                 return redirect(reverse('edit_payment_record', args=[payment_id]))
@@ -1486,45 +1458,46 @@ def check_email_availability(request):
     except Exception as e:
         return HttpResponse(False)
 
+# @csrf_exempt
+# def student_summary_message(request):
+#     if request.method != 'POST':
+#         summarys = SummaryStudent.objects.all()
+#         context = {
+#             'summarys': summarys,
+#             'page_title': _('Student Summary Messages')
+#         }
+#         return render(request, 'hod_template/student_summary_template.html', context)
+#     else:
+#         summary_id = request.POST.get('id')
+#         try:
+#             summary = get_object_or_404(SummaryStudent, id=summary_id)
+#             reply = request.POST.get('reply')
+#             summary.reply = reply
+#             summary.save()
+#             return HttpResponse(True)
+#         except Exception as e:
+#             return HttpResponse(False)
+
 @csrf_exempt
-def student_feedback_message(request):
+def teacher_summary_message(request):
     if request.method != 'POST':
-        feedbacks = FeedbackStudent.objects.all()
+        summaries = SummaryTeacher.objects.all()
         context = {
-            'feedbacks': feedbacks,
-            'page_title': _('Student Feedback Messages')
+            'summaries': summaries,
+            'page_title': _('Summaries')
         }
-        return render(request, 'hod_template/student_feedback_template.html', context)
+        return render(request, 'hod_template/teacher_summary_template.html', context)
     else:
-        feedback_id = request.POST.get('id')
+        summary_id = request.POST.get('id')
         try:
-            feedback = get_object_or_404(FeedbackStudent, id=feedback_id)
+            summary = get_object_or_404(SummaryTeacher, id=summary_id)
             reply = request.POST.get('reply')
-            feedback.reply = reply
-            feedback.save()
+            summary.reply = reply
+            summary.save()
             return HttpResponse(True)
         except Exception as e:
             return HttpResponse(False)
 
-@csrf_exempt
-def teacher_feedback_message(request):
-    if request.method != 'POST':
-        feedbacks = FeedbackTeacher.objects.all()
-        context = {
-            'feedbacks': feedbacks,
-            'page_title': _('Teacher Feedback Messages')
-        }
-        return render(request, 'hod_template/teacher_feedback_template.html', context)
-    else:
-        feedback_id = request.POST.get('id')
-        try:
-            feedback = get_object_or_404(FeedbackTeacher, id=feedback_id)
-            reply = request.POST.get('reply')
-            feedback.reply = reply
-            feedback.save()
-            return HttpResponse(True)
-        except Exception as e:
-            return HttpResponse(False)
 
 @csrf_exempt
 def view_teacher_leave(request):

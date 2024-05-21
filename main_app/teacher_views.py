@@ -283,11 +283,6 @@ def teacher_edit_attendance(request, attendance_id):
     }
     return render(request, "teacher_template/teacher_edit_attendance.html", context)
 
-
-
-
-
-
 def teacher_view_attendance(request):
     attendance_id = request.GET.get('attendance_id')
     attendance = get_object_or_404(Attendance, id=attendance_id)
@@ -342,15 +337,14 @@ def save_attendance(request):
             logging.debug('AttendanceReport object saved')
 
         logging.debug('Attendance and AttendanceReport objects saved successfully')
-        messages.success(request, 'Attendance saved successfully')
         return redirect('teacher_take_attendance')  # Replace with your attendance page URL name
     except json.JSONDecodeError:
         logging.error('Invalid JSON')
-        messages.error(request, 'Invalid JSON')
+        # messages.error(request, 'Invalid JSON')
         return redirect('teacher_take_attendance')  # Replace with your attendance page URL name
     except Exception as e:
         logging.error(f'Unexpected error: {str(e)}')
-        messages.error(request, f'An unexpected error occurred: {str(e)}')
+        # messages.error(request, f'An unexpected error occurred: {str(e)}')
         return redirect('teacher_take_attendance')  # Replace with your attendance page URL name
     
 # @csrf_exempt
@@ -455,16 +449,15 @@ def teacher_apply_leave(request):
             messages.error(request, "Form has errors!")
     return render(request, "teacher_template/teacher_apply_leave.html", context)
 
-
-#feedback
-def teacher_feedback(request):
-    form = FeedbackTeacherForm(request.POST or None)
+#Summary
+def teacher_summary(request):
+    form = SummaryTeacherForm(request.POST or None)
     teacher = get_object_or_404(Teacher, admin_id=request.user.id)
-    feedbacks = FeedbackTeacher.objects.filter(teacher=teacher).order_by('-created_at')
+    summaries = SummaryTeacher.objects.filter(teacher=teacher).order_by('-created_at')
     context = {
         'form': form,
-        'feedbacks': feedbacks,
-        'page_title': 'Add Feedback'
+        'summaries': summaries,
+        'page_title': _('Add Summary')
     }
     if request.method == 'POST':
         if form.is_valid():
@@ -472,13 +465,13 @@ def teacher_feedback(request):
                 obj = form.save(commit=False)
                 obj.teacher = teacher
                 obj.save()
-                messages.success(request, "Feedback submitted for review")
-                return redirect(reverse('teacher_feedback'))
+                messages.success(request, "summary submitted for review")
+                return redirect(reverse('teacher_summary'))
             except Exception:
                 messages.error(request, "Could not Submit!")
         else:
             messages.error(request, "Form has errors!")
-    return render(request, "teacher_template/teacher_feedback.html", context)
+    return render(request, "teacher_template/teacher_summary.html", context)
 
 
 #Notifications

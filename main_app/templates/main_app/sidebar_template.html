@@ -397,28 +397,28 @@
                     </ul>
                 </li>
                 <li class="nav-item has-treeview">
-                    {% url 'student_feedback_message' as student_feedback_message %}
-                    {% url 'teacher_feedback_message' as teacher_feedback_message %}
-                    <a href="#" class="nav-link {% if request.path == student_feedback_message or request.path == teacher_feedback_message %}active{% endif %}">
+                    {% url 'student_summary_message' as student_summary_message %}
+                    {% url 'teacher_summary_message' as teacher_summary_message %}
+                    <a href="#" class="nav-link {% if request.path == student_summary_message or request.path == teacher_summary_message %}active{% endif %}">
                         <i class="nav-icon fas fa-comment-alt"></i>
                         <p>
-                            {% trans "Feedback" %}
+                            {% trans "Summary" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
                         {% comment %}
                         <li class="nav-item">
-                            <a href="{{ student_feedback_message }}" class="nav-link {% if request.path == student_feedback_message %}active{% endif %}">
+                            <a href="{{ student_summary_message }}" class="nav-link {% if request.path == student_summary_message %}active{% endif %}">
                                 <i class="nav-icon fas fa-comment"></i>
-                                <p>{% trans "Student Feedback" %}</p>
+                                <p>{% trans "Student Summary" %}</p>
                             </a>
                         </li>
                         {% endcomment %}
                         <li class="nav-item">
-                            <a href="{{ teacher_feedback_message }}" class="nav-link {% if request.path == teacher_feedback_message %}active{% endif %}">
+                            <a href="{{ teacher_summary_message }}" class="nav-link {% if request.path == teacher_summary_message %}active{% endif %}">
                                 <i class="nav-icon fas fa-comment"></i>
-                                <p>{% trans "Teacher Feedback" %}</p>
+                                <p>{% trans "Teacher Summary" %}</p>
                             </a>
                         </li>
                     </ul>
@@ -607,19 +607,19 @@
                     </ul>
                 </li>
                 <li class="nav-item has-treeview">
-                    {% url 'teacher_feedback' as teacher_feedback %}
+                    {% url 'teacher_summary' as teacher_summary %}
                     <a href="#" class="nav-link ">
                         <i class="nav-icon fas fa-comment"></i>
                         <p>
-                            {% trans "Feedback" %}
+                            {% trans "summary" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ teacher_feedback }}" class="nav-link {% if request.path == teacher_feedback %}active{% endif %}">
+                            <a href="{{ teacher_summary }}" class="nav-link {% if request.path == teacher_summary %}active{% endif %}">
                                 <i class="nav-icon fas fa-comment-alt"></i>
-                                <p>{% trans "View Feedback" %}</p>
+                                <p>{% trans "View summary" %}</p>
                             </a>
                         </li>
                     </ul>
@@ -715,12 +715,12 @@
                         </li>
 
                         <li class="nav-item">
-                            {% url 'student_feedback' as student_feedback %}
-                            <a href="{{student_feedback}}"
-                                class="nav-link {% if student_feedback == request.path %} active {% endif %}">
+                            {% url 'student_summary' as student_summary %}
+                            <a href="{{student_summary}}"
+                                class="nav-link {% if student_summary == request.path %} active {% endif %}">
                                 <i class="nav-icon fas fa-comment-alt"></i>
                                 <p>
-                                    {% trans "Feedback" %}
+                                    {% trans "summary" %}
 
                                 </p>
                             </a>

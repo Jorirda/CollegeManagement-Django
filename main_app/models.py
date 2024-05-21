@@ -68,7 +68,8 @@ class CustomUser(AbstractUser):
 
 class Campus(models.Model):
     name = models.CharField(max_length=100)
-    # institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='campuses')
+    principal = models.CharField(max_length=100, default="principal")  # New field
+    principal_contact_number = models.CharField(max_length=15, default="")  # New field
 
     def __str__(self):
         return self.name
@@ -85,7 +86,8 @@ class Course(models.Model):
     overview = models.TextField(default="")
     level_start = models.IntegerField(default=1)
     level_end = models.IntegerField(default=4)
-   
+    image = models.ImageField(upload_to='course_images/', blank=True, null=True) 
+    
     def __str__(self):
         return self.name
 
@@ -164,19 +166,23 @@ class LeaveReportTeacher(models.Model):
     message = models.TextField()
     status = models.SmallIntegerField(default=0)
 
-class FeedbackStudent(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    feedback = models.TextField()
-    reply = models.TextField()
+# class SummaryStudent(models.Model):
+#     student = models.ForeignKey(Student, on_delete=models.CASCADE)
+#     summary = models.TextField()
+#     reply = models.TextField()
+#     created_at = models.DateTimeField(auto_now_add=True)  # Automatically sets the field to now when the object is first created
 
-class FeedbackTeacher(models.Model):
+#     def __str__(self):
+#         return self.summary
+
+class SummaryTeacher(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    feedback = models.TextField()
+    summary = models.TextField()
     reply = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)  # Automatically sets the field to now when the object is first created
 
     def __str__(self):
-        return self.feedback
+        return self.summary
 
 class NotificationTeacher(models.Model):
     date = models.DateField(default=timezone.now)

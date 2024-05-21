@@ -148,7 +148,7 @@
             <!-- PIE CHART -->
             <div class="card card-dark">
               <div class="card-header">
-                <h3 class="card-title">{% trans "Total Students in Each Classes" %}</h3>
+                <h3 class="card-title">{% trans "The Attendance Rate of Each Class Schedule" %}</h3>
                 <div class="card-tools">
                   <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
                   <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
@@ -185,24 +185,31 @@
           </div>
         </div>
 
-        <!-- Percentage of Course Participants -->
+        <!-- Student Renewals and Withdrawals -->
         <div class="row">
-          <div class="col-lg-12">
-            <!-- PIE CHART -->
-            <div class="card card-dark">
-              <div class="card-header">
-                <h3 class="card-title"> {% trans "Percentage of Course Participants" %}</h3>
-                <div class="card-tools">
-                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-                </div>
+          <div class="col-lg-6">
+            <!-- small box -->
+            <div class="small-box bg-orange">
+              <div class="inner">
+                <h3>{{ student_renewals }}</h3>
+                <p>{% trans "Total Student Renewals" %}</p>
               </div>
-              <div class="card-body">
-                <canvas id="courseParticipantsChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+              <div class="icon">
+                <i class="fas fa-redo-alt"></i>
               </div>
-              <!-- /.card-body -->
             </div>
-            <!-- /.card -->
+          </div>
+          <div class="col-lg-6">
+            <!-- small box -->
+            <div class="small-box bg-purple">
+              <div class="inner">
+                <h3>{{ withdrawal_count }}</h3>
+                <p>{% trans "Total Withdrawals" %}</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-user-times"></i>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -256,7 +263,7 @@
             labels: ['学员', '老师'],
             datasets: [
               {
-                data:[{{ total_students }}, {{ total_teacher }}],
+                data: [{{ total_students }}, {{ total_teacher }}],
                 backgroundColor : ['#0071A6', '#F31212'],
               }
             ]
@@ -273,8 +280,8 @@
           options: pieOptions      
         });
 
-        var classes_list = {{ classes_list|safe|escape }};
-        var attendance_list = {{ attendance_list }};
+        var classes_list = JSON.parse('{{ classes_list|escapejs }}');
+        var attendance_list = JSON.parse('{{ attendance_list|escapejs }}');
   
         var barChartData = {
           labels  : classes_list,
@@ -315,21 +322,20 @@
           options: stackedBarChartOptions
         })
 
-        // Total Students in Each Classes
-        var student_count_list_in_classes = {{ student_count_list_in_classes }}
-        var classes_list = {{ classes_list|safe }}
+        // The Attendance Rate of Each Class Schedule
+        var attendance_rate_list = JSON.parse('{{ attendance_rate_list|escapejs }}');
+        var class_schedule_names_list = JSON.parse('{{ class_schedule_names_list|escapejs }}');
         var pieData3 = {
-          labels: classes_list,
+          labels: class_schedule_names_list,
           datasets: [
             {
-              data: student_count_list_in_classes,
+              data: attendance_rate_list,
               backgroundColor : ['#FF6F22', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#894e9c', '#0b523a', '#a1156d', '#9e4603'],
             }
           ]
         }
 
         var pieChartCanvas3 = $('#pieChart3').get(0).getContext('2d')
-        var pieData3 = pieData3;
         var pieOptions3 = {
           maintainAspectRatio : false,
           responsive : true,
@@ -342,9 +348,9 @@
         })   
 
         // Student Attendance & Leave Overview
-        var student_attendance_present_list = {{ student_attendance_present_list }};
-        var student_attendance_leave_list = {{ student_attendance_leave_list }};
-        var student_name_list = {{ student_name_list|safe }};
+        var student_attendance_present_list = JSON.parse('{{ student_attendance_present_list|escapejs }}');
+        var student_attendance_leave_list = JSON.parse('{{ student_attendance_leave_list|escapejs }}');
+        var student_name_list = JSON.parse('{{ student_name_list|escapejs }}');
 
         var areaChartData2 = {
           labels  : student_name_list,
@@ -394,8 +400,8 @@
         })
 
         // Total Students in Each Course
-        var course_name_list = {{ course_name_list|safe }}
-        var student_count_list_in_course = {{ student_count_list_in_course }}
+        var course_name_list = JSON.parse('{{ course_name_list|escapejs }}');
+        var student_count_list_in_course = JSON.parse('{{ student_count_list_in_course|escapejs }}');
         var pieData2 = {
           labels: course_name_list,
           datasets: [
@@ -407,7 +413,6 @@
         }
 
         var pieChartCanvas2 = $('#pieChart2').get(0).getContext('2d')
-        var pieData2 = pieData2;
         var pieOptions2 = {
           maintainAspectRatio : false,
           responsive : true,
@@ -420,8 +425,8 @@
         })
 
         // Comparison of Teachers' Lesson Hours
-        var teacher_names = {{ teacher_names|safe }};
-        var lesson_hours = {{ lesson_hours|safe }};
+        var teacher_names = JSON.parse('{{ teacher_names|escapejs }}');
+        var lesson_hours = JSON.parse('{{ lesson_hours|escapejs }}');
 
         var lessonHoursChartData = {
           labels  : teacher_names,
@@ -453,32 +458,9 @@
           options: lessonHoursChartOptions
         });
 
-        // Percentage of Course Participants
-        var course_participants_percentage = {{ course_participants_percentage|safe }};
-        var pieChartCanvasCourseParticipants = $('#courseParticipantsChart').get(0).getContext('2d');
-        var pieDataCourseParticipants = {
-          labels: course_name_list,
-          datasets: [
-            {
-              data: course_participants_percentage,
-              backgroundColor : ['#FF6F22', '#BF19D5', '#1255F3', '#65BD00', '#04048F', '#1EDEC2', '#EF2020', '#FF0D72'],
-            }
-          ]
-        };
-        var pieOptionsCourseParticipants = {
-          maintainAspectRatio: false,
-          responsive: true,
-        };
-
-        var pieChartCourseParticipants = new Chart(pieChartCanvasCourseParticipants, {
-          type: 'pie',
-          data: pieDataCourseParticipants,
-          options: pieOptionsCourseParticipants
-        });
-
         // Monthly Contributions Chart
-        var all_months = {{ all_months|safe }};
-        var all_incomes = {{ all_incomes|safe }};
+        var all_months = JSON.parse('{{ all_months|escapejs }}');
+        var all_incomes = JSON.parse('{{ all_incomes|escapejs }}');
         
         var monthlyContributionsData = {
             labels  : all_months,

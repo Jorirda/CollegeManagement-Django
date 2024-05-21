@@ -81,13 +81,13 @@
                 url: "{% url 'get_students' %}",
                 type: 'POST',
                 headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
                 },
                 data: {
-                    classes: classes,
-                    session: session
+                    'classes': classes,
+                    'session': session
                 },
-                success: function(response) {
+                success: function(data) {
                     if (response.error) {
                         alert(response.error);
                         return;
@@ -135,23 +135,19 @@
                 url: "{% url 'save_attendance' %}",
                 type: 'POST',
                 headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
                 },
                 data: {
-                    date: attendance_date,
-                    student_ids: student_data,
-                    classes: classes,
-                    session: session
+                    'date': attendance_date,
+                    'student_ids': student_data,
+                    'classes': classes,
+                    'session': session
                 },
-                success: function(response) {
-                    if (response.success) {
-                        $('#success-message').text('Attendance saved successfully').addClass('alert-success').show();
-                        setTimeout(function() {
-                            $('#success-message').hide();
-                        }, 3000);
-                    } else {
-                        console.error(response.error);
-                        $('#success-message').text('{% trans "Attendance saved successfully" %}').addClass('alert-danger').show();
+                success: function(data) {
+                    if (data.success) {
+                        // Show success message
+                        $('#success-message').text('{% trans "Attendance saved successfully" %}').addClass('alert-success').show();
+                        // Hide success message after 3 seconds
                         setTimeout(function() {
                             $('#success-message').hide();
                         }, 3000);
@@ -159,7 +155,9 @@
                 },
                 error: function(xhr, status, error) {
                     console.error(xhr.responseText);
-                    $('#success-message').text('{% trans "An error occurred while saving attendance." %}').addClass('alert-danger').show();
+                    // Show error message
+                    $('#success-message').text('{% trans "An error occurred while saving the attendance." %}').addClass('alert-danger').show();
+                    // Hide error message after 3 seconds
                     setTimeout(function() {
                         $('#success-message').hide();
                     }, 3000);

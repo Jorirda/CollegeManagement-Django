@@ -1,6 +1,6 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
 
 {% block content %}
 <section class="content">
@@ -10,34 +10,36 @@
                 <!-- general form elements -->
                 <div class="card card-dark">
                     <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
+                        <h3 class="card-title">{{ page_title }}</h3>
                     </div>
 
-                    {% include "main_app/form_template.html" with messages=messages form=form button_text="Submit summary"%}
+                    {% include "main_app/form_template.html" with messages=messages form=form button_text="Submit Summary" %}
                 </div>
                 <!-- /.card -->
                 <div class="card card-dark">
-                    <div class="card-header"><h3 class="card-title">{{page_title}}</h3></div>
+                    <div class="card-header"><h3 class="card-title">Summaries</h3></div>
                     <div class="table p-2">
                         <table class="table table-bordered">
                             <tr>
                                 <th>ID</th>
+                                <th>Student</th>
                                 <th>Summary</th>
                                 <th>Reply</th>
                                 <th>Created At</th>
                             </tr>
                             {% for summary in summaries %}
                             <tr>
-                                <td>{{forloop.counter}}</td>
-                                <td>{{summary.summary}}</td>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ summary.student }}</td>
+                                <td>{{ summary.summary }}</td>
                                 <td>
                                     {% if summary.reply == "" %}
                                     <p class="badge badge-warning">No Response Yet</p>
                                     {% else %}
-                                    {{summary.reply}}
+                                    {{ summary.reply }}
                                     {% endif %}
                                 </td>
-                                <td>{{summary.created_at|date:"Y-m-d H:i:s"}}</td>  <!-- Displaying the created_at date -->
+                                <td>{{ summary.created_at|date:"Y-m-d H:i:s" }}</td>
                             </tr>
                             {% endfor %}
                         </table>

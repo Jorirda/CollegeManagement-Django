@@ -384,14 +384,20 @@ class LeaveReportTeacherForm(FormSettings):
             'date': DateInput(attrs={'type': 'date'}),
         }
 
-class SummaryTeacherForm(FormSettings):
-    summary = forms.CharField(widget=TextInput(), label=_('Summary'))
-    def __init__(self, *args, **kwargs):
-        super(SummaryTeacherForm, self).__init__(*args, **kwargs)
-
+class SummaryTeacherForm(forms.ModelForm):
     class Meta:
         model = SummaryTeacher
-        fields = ['summary']
+        fields = ['student', 'summary']
+
+    student = forms.ModelChoiceField(queryset=Student.objects.none(), label="Select Student")
+
+    def __init__(self, *args, **kwargs):
+        teacher = kwargs.pop('teacher', None)
+        super(SummaryTeacherForm, self).__init__(*args, **kwargs)
+        if teacher:
+            learning_records = LearningRecord.objects.filter(teacher=teacher)
+            student_ids = learning_records.values_list('student', flat=True)
+            self.fields['student'].queryset = Student.objects.filter(id__in=student_ids)
 
 class LeaveReportStudentForm(FormSettings):
     date = forms.DateField(widget=DateInput(attrs={'type': 'date'}), label=_('Date'))

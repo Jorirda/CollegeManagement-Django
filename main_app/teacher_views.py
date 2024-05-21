@@ -450,7 +450,7 @@ def teacher_apply_leave(request):
     return render(request, "teacher_template/teacher_apply_leave.html", context)
 
 #Summary
-def teacher_summary(request):
+def teacher_write_summary(request):
     form = SummaryTeacherForm(request.POST or None)
     teacher = get_object_or_404(Teacher, admin_id=request.user.id)
     summaries = SummaryTeacher.objects.filter(teacher=teacher).order_by('-created_at')
@@ -466,12 +466,12 @@ def teacher_summary(request):
                 obj.teacher = teacher
                 obj.save()
                 messages.success(request, "summary submitted for review")
-                return redirect(reverse('teacher_summary'))
+                return redirect(reverse('teacher_write_summary'))
             except Exception:
                 messages.error(request, "Could not Submit!")
         else:
             messages.error(request, "Form has errors!")
-    return render(request, "teacher_template/teacher_summary.html", context)
+    return render(request, "teacher_template/teacher_write_summary.html", context)
 
 
 #Notifications

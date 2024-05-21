@@ -177,6 +177,7 @@ class LeaveReportTeacher(models.Model):
 
 class SummaryTeacher(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, null=True, on_delete=models.DO_NOTHING)
     summary = models.TextField()
     reply = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)  # Automatically sets the field to now when the object is first created

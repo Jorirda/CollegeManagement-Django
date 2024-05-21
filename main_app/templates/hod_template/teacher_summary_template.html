@@ -23,26 +23,21 @@
                             <tr>
                                 <th>#</th>
                                 <th>{% trans 'Teacher' %}</th>
-                                <th>{% trans 'Course' %}</th>
-                                <th>{% trans 'Message' %}</th>
+                                <th>{% trans 'Student' %}</th>
+                                <th>{% trans 'Summary' %}</th>
                                 <th>{% trans 'Sent On' %}</th>
-                                <th>{% trans 'Replied On' %}</th>
                                 <th>{% trans 'Action' %}</th>
                             </tr>
                             {% for summary in summaries %}
                             <tr>
                                 <td>{{ forloop.counter }}</td>
                                 <td>{{ summary.teacher }}</td>
-                                <td>{{ summary.teacher.course }}</td>
+                                <td>{{ summary.student }}</td>
                                 <td>{{ summary.summary }}</td>
                                 <td>{{ summary.created_at }}</td>
-                                {% if summary.reply == "" %}
-                                    <td><span class='badge badge-warning'>{% trans 'Pending Response' %}</span></td>
-                                    <td><button data-toggle="modal" data-target="#reply_modal" value="{{ summary.id }}" class="btn btn-success reply_open_modal">{% trans 'Reply' %}</button></td>
-                                {% else %}
-                                    <td>{{ summary.updated_at }}</td>
-                                    <td>{{ summary.reply }}</td>
-                                {% endif %}
+                                <td>
+                                    <button data-toggle="modal" data-target="#delete_modal" value="{{ summary.id }}" class="btn btn-danger delete_open_modal">{% trans 'Delete' %}</button>
+                                </td>
                             </tr>
                             {% endfor %}
                         </table>
@@ -52,60 +47,58 @@
         </div>
     </div>
 </section>
-<div class="modal fade" id="reply_modal" tabindex="-1" role="dialog" 
-   aria-labelledby="myModalLabel" aria-hidden="true">
+
+<div class="modal fade" id="delete_modal" tabindex="-1" role="dialog" 
+   aria-labelledby="deleteModalLabel" aria-hidden="true">
    <div class="modal-dialog">
       <div class="modal-content">
          <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                   &times;
             </button>
-            <h4 class="modal-title" id="myModalLabel">
-               {% trans 'Reply To Summary' %}
+            <h4 class="modal-title" id="deleteModalLabel">
+               {% trans 'Confirm Delete' %}
             </h4>
          </div>
          <div class="modal-body">
-            <input type="hidden" id="id">
-            <p>{% trans 'Reply to' %} <span id="reply_name"></span></p>  
-            <textarea name="reply_message" id="reply_message" cols="30" rows="10" class="form-control"></textarea>
+            <p>{% trans 'Are you sure you want to delete this summary?' %}</p>  
+            <input type="hidden" id="delete_id">
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-dismiss="modal">
-                {% trans 'Close' %}
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                {% trans 'Cancel' %}
             </button>
-            <button id="reply_btn" class="btn btn-success btn-block">{% trans 'Reply' %}</button>
+            <button id="delete_btn" class="btn btn-danger">{% trans 'Delete' %}</button>
         </div>
       </div><!-- /.modal-content -->
    </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 {% endblock content %}
+
 {% block custom_js %}
   <script>
       $(document).ready(function(){
-          $(".reply_open_modal").click(function(){
+          $(".delete_open_modal").click(function(){
               var id = $(this).val();
-              var name = $(this).parents("tr").children("td:eq(1)").text();
-              $("#reply_name").text(name);
-              $("#id").val(id);
+              $("#delete_id").val(id);
           });
           
-          $("#reply_btn").on("click", function(){
-              var id = $("#id").val();
-              var reply = $("#reply_message").val();
+          $("#delete_btn").on("click", function(){
+              var id = $("#delete_id").val();
 
               $.ajax({
-                  url: "{% url 'teacher_summary_message' %}",
+                  url: "{% url 'delete_summary' %}",
                   type: 'POST',
                   data: {
                         id: id,
-                        reply: reply
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
                   }
               }).done(function(response){
                   if (response == "True"){
-                      alert("{% trans 'Reply Sent' %}");
+                      alert("{% trans 'Summary Deleted' %}");
                       location.reload();
                   } else {
-                      alert("{% trans 'Reply Could Not Be Sent' %}");
+                      alert("{% trans 'Summary Could Not Be Deleted' %}");
                   }
               }).fail(function(){
                   alert("{% trans 'Error Occurred.' %}");

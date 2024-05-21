@@ -248,11 +248,9 @@ def admin_home(request):
     class_schedule_names_list = []
     for class_obj in classes:
         total_students_in_class = Attendance.objects.filter(classes=class_obj).count()
-        print(total_students_in_class)
         total_attendance_in_class = AttendanceReport.objects.filter(attendance__classes=class_obj, status=True).count()
-        print(total_attendance_in_class)
         if total_students_in_class > 0:
-            attendance_rate = (total_students_in_class / total_attendance_in_class) * 100
+            attendance_rate = (total_attendance_in_class / total_students_in_class) * 100
         else:
             attendance_rate = 0
         class_schedule_names_list.append(class_obj.course.name)
@@ -262,14 +260,18 @@ def admin_home(request):
     student_attendance_present_list = []
     student_attendance_leave_list = []
     student_name_list = []
+    student_attendance_rate_list = []
     students = Student.objects.all()
     for student in students:
         attendance = AttendanceReport.objects.filter(student_id=student.id, status=True).count()
         absent = AttendanceReport.objects.filter(student_id=student.id, status=False).count()
         leave = LeaveReportStudent.objects.filter(student_id=student.id, status=1).count()
+        total_attendance = attendance + absent + leave
+        attendance_rate = (attendance / total_attendance) * 100 if total_attendance > 0 else 0
         student_attendance_present_list.append(attendance)
         student_attendance_leave_list.append(leave + absent)
         student_name_list.append(student.admin.full_name)
+        student_attendance_rate_list.append(attendance_rate)
 
     # Teacher lesson hours
     teacher_names = []
@@ -336,6 +338,7 @@ def admin_home(request):
         'student_attendance_present_list': json.dumps(student_attendance_present_list),
         'student_attendance_leave_list': json.dumps(student_attendance_leave_list),
         'student_name_list': json.dumps(student_name_list),
+        'student_attendance_rate_list': json.dumps(student_attendance_rate_list),
         'attendance_rate_list': json.dumps(attendance_rate_list),
         'class_schedule_names_list': json.dumps(class_schedule_names_list),
         'student_count_list_in_course': json.dumps(student_count_list_in_course),
@@ -1479,7 +1482,7 @@ def check_email_availability(request):
 #             return HttpResponse(False)
 
 @csrf_exempt
-def teacher_summary_message(request):
+def view_summary(request):
     if request.method != 'POST':
         summaries = SummaryTeacher.objects.all()
         context = {
@@ -1497,6 +1500,18 @@ def teacher_summary_message(request):
             return HttpResponse(True)
         except Exception as e:
             return HttpResponse(False)
+        
+@csrf_exempt
+def delete_summary(request):
+    if request.method == 'POST':
+        summary_id = request.POST.get('id')
+        try:
+            summary = get_object_or_404(StudentSummary, id=summary_id)
+            summary.delete()
+            return HttpResponse("True")
+        except Exception as e:
+            return HttpResponse("False")
+    return HttpResponse("False")
 
 
 @csrf_exempt

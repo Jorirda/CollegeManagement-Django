@@ -82,8 +82,7 @@
     }
 </style>
 
-
-
+#Admin Sidebar View
 <aside class="main-sidebar sidebar-dark-info elevation-4" style="background-color: #1e2329;">
     {% if request.user.user_type == '1' %}
     <!-- Admin -->
@@ -418,7 +417,7 @@
                         <li class="nav-item">
                             <a href="{{ teacher_summary_message }}" class="nav-link {% if request.path == teacher_summary_message %}active{% endif %}">
                                 <i class="nav-icon fas fa-comment"></i>
-                                <p>{% trans "Teacher Summary" %}</p>
+                                <p>{% trans "View Student Summaries" %}</p>
                             </a>
                         </li>
                     </ul>
@@ -460,6 +459,7 @@
     {% comment %} {% endif %}
 </aside> {% endcomment %}
 
+#Teacher Sidebar View
 <aside>
     {% elif request.user.user_type == '2' %}
     <!-- Teacher -->
@@ -607,19 +607,19 @@
                     </ul>
                 </li>
                 <li class="nav-item has-treeview">
-                    {% url 'teacher_summary' as teacher_summary %}
+                    {% url 'teacher_write_summary' as teacher_write_summary %}
                     <a href="#" class="nav-link ">
                         <i class="nav-icon fas fa-comment"></i>
                         <p>
-                            {% trans "summary" %}
+                            {% trans "Summary" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ teacher_summary }}" class="nav-link {% if request.path == teacher_summary %}active{% endif %}">
+                            <a href="{{ teacher_write_summary }}" class="nav-link {% if request.path == teacher_write_summary %}active{% endif %}">
                                 <i class="nav-icon fas fa-comment-alt"></i>
-                                <p>{% trans "View summary" %}</p>
+                                <p>{% trans "Write a Summary" %}</p>
                             </a>
                         </li>
                     </ul>

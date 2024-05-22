@@ -384,7 +384,7 @@ class LeaveReportTeacherForm(FormSettings):
             'date': DateInput(attrs={'type': 'date'}),
         }
 
-class SummaryTeacherForm(forms.ModelForm):
+class SummaryTeacherForm(FormSettings):
     class Meta:
         model = SummaryTeacher
         fields = ['student', 'summary']
@@ -396,7 +396,7 @@ class SummaryTeacherForm(forms.ModelForm):
         super(SummaryTeacherForm, self).__init__(*args, **kwargs)
         if teacher:
             learning_records = LearningRecord.objects.filter(teacher=teacher)
-            student_ids = learning_records.values_list('student', flat=True)
+            student_ids = learning_records.values_list('student_id', flat=True).distinct()
             self.fields['student'].queryset = Student.objects.filter(id__in=student_ids)
 
 class LeaveReportStudentForm(FormSettings):

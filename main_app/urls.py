@@ -21,6 +21,7 @@ from . import hod_views, teacher_views, student_views, views
 
 urlpatterns = [
 #hodviews
+    path('admin_get_student_attendance/', hod_views.admin_get_student_attendance, name='admin_get_student_attendance'),
     path('get-grade-choices/', hod_views.get_grade_choices, name='get-grade-choices'),
     path("", views.login_page, name='login_page'),
     path("get_attendance", views.get_attendance, name='get_attendance'),
@@ -51,9 +52,9 @@ urlpatterns = [
     path("session/manage/", hod_views.manage_session, name='manage_session'),
     path("session/edit/<int:session_id>",hod_views.edit_session, name='edit_session'),
     # path("student/view/summary/", hod_views.student_summary_message,name="student_summary_message",),
-    path("teacher/view/summary/", hod_views.view_summary,name="view_summary",),
-     path('teacher/delete/summary/', hod_views.delete_summary, name='delete_summary'),
-    path("student/view/leave/", hod_views.view_student_leave,name="view_student_leave",),
+    path("teacher/view/summary/", hod_views.view_teacher_summary, name="view_teacher_summary",),
+    path("teacher/delete/summary/", hod_views.delete_teacher_summary, name="delete_teacher_summary"),
+    # path("student/view/leave/", hod_views.view_student_leave,name="view_student_leave",),
     path("teacher/view/leave/", hod_views.view_teacher_leave, name="view_teacher_leave",),
     path("attendance/view/", hod_views.admin_view_attendance,name="admin_view_attendance",),
     path("attendance/fetch/", hod_views.get_admin_attendance,name='get_admin_attendance'),

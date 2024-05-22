@@ -450,28 +450,58 @@ def teacher_apply_leave(request):
     return render(request, "teacher_template/teacher_apply_leave.html", context)
 
 #Summary
+@csrf_exempt
 def teacher_write_summary(request):
-    form = SummaryTeacherForm(request.POST or None)
     teacher = get_object_or_404(Teacher, admin_id=request.user.id)
+    form = SummaryTeacherForm(request.POST or None, teacher=teacher)
     summaries = SummaryTeacher.objects.filter(teacher=teacher).order_by('-created_at')
+
+    if request.method == 'POST':
+        if 'edit' in request.POST and request.POST.get('edit') == 'true':
+            summary_id = request.POST.get('id')
+            try:
+                summary = get_object_or_404(SummaryTeacher, id=summary_id)
+                new_summary_text = request.POST.get('summary')
+                summary.summary = new_summary_text
+                summary.replied_at = timezone.now()  # Set the reply date
+                summary.save()
+                return HttpResponse("True")
+            except Exception as e:
+                return HttpResponse("False")
+        else:
+            if form.is_valid():
+                try:
+                    obj = form.save(commit=False)
+                    obj.teacher = teacher
+                    obj.save()
+                    messages.success(request, "Summary submitted for review")
+                    return redirect(reverse('teacher_write_summary'))
+                except Exception:
+                    messages.error(request, "Could not submit!")
+            else:
+                messages.error(request, "Form has errors!")
+
     context = {
         'form': form,
         'summaries': summaries,
         'page_title': _('Add Summary')
     }
+
+    return render(request, 'teacher_template/teacher_write_summary.html', context)
+
+@csrf_exempt
+def delete_summary(request):
     if request.method == 'POST':
-        if form.is_valid():
-            try:
-                obj = form.save(commit=False)
-                obj.teacher = teacher
-                obj.save()
-                messages.success(request, "summary submitted for review")
-                return redirect(reverse('teacher_write_summary'))
-            except Exception:
-                messages.error(request, "Could not Submit!")
-        else:
-            messages.error(request, "Form has errors!")
-    return render(request, "teacher_template/teacher_write_summary.html", context)
+        summary_id = request.POST.get('id')
+        try:
+            summary = SummaryTeacher.objects.get(pk=summary_id)
+            summary.delete()
+            return HttpResponse("True")
+        except SummaryTeacher.DoesNotExist:
+            return HttpResponse("False")
+    else:
+        return HttpResponse("False")
+
 
 
 #Notifications

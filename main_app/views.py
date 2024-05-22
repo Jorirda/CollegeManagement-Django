@@ -15,6 +15,7 @@ from django.utils.translation import activate, LANGUAGE_SESSION_KEY
 
 # Create your views here.
 
+
 def switch_language(request):
     if 'lang' in request.GET:
         language = request.GET['lang']

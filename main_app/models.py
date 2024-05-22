@@ -181,7 +181,8 @@ class SummaryTeacher(models.Model):
     summary = models.TextField()
     reply = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)  # Automatically sets the field to now when the object is first created
-
+    replied_at = models.DateTimeField(null=True, blank=True)  # New field for reply date
+    
     def __str__(self):
         return self.summary
 

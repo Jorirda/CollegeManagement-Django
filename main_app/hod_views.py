@@ -215,6 +215,36 @@ def refund_records(request):
 
     return render(request, 'hod_template/refund_records.html', context)
 
+def admin_get_student_attendance(request):
+    student_id = request.GET.get('student_id')
+    # logger.info(f"Fetching attendance data for student ID: {student_id}")  # Log student ID
+
+    try:
+        attendance_reports = AttendanceReport.objects.filter(student_id=student_id).select_related('attendance')
+        leave_reports = LeaveReportStudent.objects.filter(student_id=student_id)
+
+        present_count = attendance_reports.filter(status=True).count()
+        absent_count = attendance_reports.filter(status=False).count()
+        leave_count = leave_reports.count()
+
+        attendance_dates = [report.attendance.date.strftime('%Y-%m-%d') for report in attendance_reports]
+        leave_dates = [report.date.strftime('%Y-%m-%d') for report in leave_reports]
+
+        data = {
+            'present': present_count,
+            'absent': absent_count,
+            'leave': leave_count,
+            'attendance_dates': attendance_dates,
+            'leave_dates': leave_dates,
+        }
+
+        logger.info(f"Attendance data: {data}")  # Log the data
+        return JsonResponse(data)
+
+    except Exception as e:
+        logger.error(f"Error fetching attendance data: {e}")
+        return JsonResponse({'error': str(e)}, status=500)
+
 #Admin
 def admin_home(request):
     # Aggregate counts
@@ -223,7 +253,7 @@ def admin_home(request):
     total_classes = ClassSchedule.objects.count()
     total_course = Course.objects.count()
     total_income = PaymentRecord.objects.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
-    total_refunds = PaymentRecord.objects.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+    total_refunds = PaymentRecord.objects.filter(status='Refund').aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
 
     # Attendance per class
     classes = ClassSchedule.objects.all()
@@ -352,6 +382,7 @@ def admin_home(request):
         'available_years': sorted(available_years),
         'student_renewals': student_renewals,
         'withdrawal_count': withdrawal_count,
+        'students': students  # Add students to the context
     }
 
     return render(request, 'hod_template/home_content.html', context)
@@ -1482,7 +1513,7 @@ def check_email_availability(request):
 #             return HttpResponse(False)
 
 @csrf_exempt
-def view_summary(request):
+def view_teacher_summary(request):
     if request.method != 'POST':
         summaries = SummaryTeacher.objects.all()
         context = {
@@ -1496,24 +1527,25 @@ def view_summary(request):
             summary = get_object_or_404(SummaryTeacher, id=summary_id)
             reply = request.POST.get('reply')
             summary.reply = reply
+            summary.replied_at = timezone.now()  # Set the reply date
             summary.save()
             return HttpResponse(True)
         except Exception as e:
             return HttpResponse(False)
-        
+
 @csrf_exempt
-def delete_summary(request):
+def delete_teacher_summary(request):
     if request.method == 'POST':
         summary_id = request.POST.get('id')
         try:
-            summary = get_object_or_404(StudentSummary, id=summary_id)
+            summary = SummaryTeacher.objects.get(pk=summary_id)
             summary.delete()
             return HttpResponse("True")
-        except Exception as e:
+        except SummaryTeacher.DoesNotExist:
             return HttpResponse("False")
-    return HttpResponse("False")
-
-
+    else:
+        return HttpResponse("False")
+        
 @csrf_exempt
 def view_teacher_leave(request):
     if request.method != 'POST':
@@ -1538,29 +1570,29 @@ def view_teacher_leave(request):
         except Exception as e:
             return False
 
-@csrf_exempt
-def view_student_leave(request):
-    if request.method != 'POST':
-        allLeave = LeaveReportStudent.objects.all()
-        context = {
-            'allLeave': allLeave,
-            'page_title': _('Leave Applications From Students')
-        }
-        return render(request, "hod_template/student_leave_view.html", context)
-    else:
-        id = request.POST.get('id')
-        status = request.POST.get('status')
-        if (status == '1'):
-            status = 1
-        else:
-            status = -1
-        try:
-            leave = get_object_or_404(LeaveReportStudent, id=id)
-            leave.status = status
-            leave.save()
-            return HttpResponse(True)
-        except Exception as e:
-            return False
+# @csrf_exempt
+# def view_student_leave(request):
+#     if request.method != 'POST':
+#         allLeave = LeaveReportStudent.objects.all()
+#         context = {
+#             'allLeave': allLeave,
+#             'page_title': _('Leave Applications From Students')
+#         }
+#         return render(request, "hod_template/student_leave_view.html", context)
+#     else:
+#         id = request.POST.get('id')
+#         status = request.POST.get('status')
+#         if (status == '1'):
+#             status = 1
+#         else:
+#             status = -1
+#         try:
+#             leave = get_object_or_404(LeaveReportStudent, id=id)
+#             leave.status = status
+#             leave.save()
+#             return HttpResponse(True)
+#         except Exception as e:
+#             return False
 
 @csrf_exempt
 def get_admin_attendance(request):

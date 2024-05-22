@@ -5,486 +5,459 @@
 {% block content %}
 <section class="content">
     <div class="container-fluid">
-        <!-- Small boxes (Stat box) -->
-        <div class="row">
-            <div class="col-lg-3 col-6">
-                <!-- small box -->
-                <div class="small-box bg-teal">
-                    <div class="inner">
-                        <h3>{{ total_students }}</h3>
-                        <p>{% trans "Total Students" %}</p>
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs" id="statsTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="overall-stats-tab" data-toggle="tab" href="#overall-stats" role="tab" aria-controls="overall-stats" aria-selected="true">{% trans "Overall Stats" %}</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="student-attendance-tab" data-toggle="tab" href="#student-attendance" role="tab" aria-controls="student-attendance" aria-selected="false">{% trans "Student Attendance" %}</a>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="statsTabContent">
+            <!-- Overall Stats Tab -->
+            <div class="tab-pane fade show active" id="overall-stats" role="tabpanel" aria-labelledby="overall-stats-tab">
+                <div class="row mt-3">
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-teal">
+                            <div class="inner">
+                                <h3>{{ total_students }}</h3>
+                                <p>{% trans "Total Students" %}</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-user-graduate"></i>
+                            </div>
+                            <a href="{% url 'manage_student' %}" class="small-box-footer">{% trans "More info" %} <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
                     </div>
-                    <div class="icon">
-                        <i class="nav-icon fas fa-user-graduate"></i>
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-success">
+                            <div class="inner">
+                                <h3>{{ total_teacher }}</h3>
+                                <p>{% trans "Total Teachers" %}</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-users"></i>
+                            </div>
+                            <a href="{% url 'manage_teacher' %}" class="small-box-footer">{% trans "More info" %} <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
                     </div>
-                    <a href="{% url 'manage_student' %}" class="small-box-footer">{% trans "More info" %} <i class="fas fa-arrow-circle-right"></i></a>
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-blue">
+                            <div class="inner">
+                                <h3>{{ total_course }}</h3>
+                                <p>{% trans "Total Courses" %}</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-th-list"></i>
+                            </div>
+                            <a href="{% url 'manage_course' %}" class="small-box-footer">{% trans "More info" %} <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-red">
+                            <div class="inner">
+                                <h3>{{ total_income }}</h3>
+                                <p>{% trans "¥ Total Income" %}</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <a href="{% url 'manage_payment_record' %}" class="small-box-footer">{% trans "More info" %} <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <!-- ./col -->
-            <div class="col-lg-3 col-6">
-                <!-- small box -->
-                <div class="small-box bg-success">
-                    <div class="inner">
-                        <h3>{{ total_teacher }}</h3>
-                        <p>{% trans "Total Teachers" %}</p>
-                    </div>
-                    <div class="icon">
-                        <i class="nav-icon fas fa-users"></i>
-                    </div>
-                    <a href="{% url 'manage_teacher' %}" class="small-box-footer">{% trans "More info" %} <i class="fas fa-arrow-circle-right"></i></a>
-                </div>
-            </div>
-            <!-- ./col -->
-            <div class="col-lg-3 col-6">
-                <!-- small box -->
-                <div class="small-box bg-blue">
-                    <div class="inner">
-                        <h3>{{ total_course }}</h3>
-                        <p>{% trans "Total Courses" %}</p>
-                    </div>
-                    <div class="icon">
-                        <i class="nav-icon fas fa-th-list"></i>
-                    </div>
-                    <a href="{% url 'manage_course' %}" class="small-box-footer">{% trans "More info" %} <i class="fas fa-arrow-circle-right"></i></a>
-                </div>
-            </div>
-            <!-- ./col -->
-            <div class="col-lg-3 col-6">
-                <!-- small box -->
-                <div class="small-box bg-red">
-                    <div class="inner">
-                        <h3>{{ total_income }}</h3>
-                        <p>{% trans "¥ Total Income" %}</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
-                    <a href="{% url 'manage_payment_record' %}" class="small-box-footer">{% trans "More info" %} <i class="fas fa-arrow-circle-right"></i></a>
-                </div>
-            </div>
-        </div>
-        <!-- /.row -->
-        <!-- Main row -->
-        <div class="row">
-            <div class="col-md-6">
-                <!-- LINE CHART -->
-                <div class="card card-dark">
-                  <div class="card-header">
-                    <h3 class="card-title">{% trans "Teachers - Student's Overview" %}</h3>
-                    <div class="card-tools">
-                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                      <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-                    </div>
+                <div class="row">
+                  <div class="col-lg-6">
+                      <div class="small-box bg-orange">
+                          <div class="inner">
+                              <h3>{{ student_renewals }}</h3>
+                              <p>{% trans "Total Student Renewals" %}</p>
+                          </div>
+                          <div class="icon">
+                              <i class="fas fa-redo-alt"></i>
+                          </div>
+                      </div>
                   </div>
-                  <div class="card-body">
-                    <div class="chart">
-                      <canvas id="pieChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                    </div>
+                  <div class="col-lg-6">
+                      <div class="small-box bg-purple">
+                          <div class="inner">
+                              <h3>{{ withdrawal_count }}</h3>
+                              <p>{% trans "Total Withdrawals" %}</p>
+                          </div>
+                          <div class="icon">
+                              <i class="fas fa-user-times"></i>
+                          </div>
+                      </div>
                   </div>
-                </div>
-                <!-- /.card-body -->
-            </div>
-            <div class="col-md-6">
-                <div class="card card-dark">
-                  <div class="card-header">
-                    <h3 class="card-title">{% trans "Attendance Per Course" %}</h3>
-                    <div class="card-tools">
-                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                      <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+              </div>
+              <div class="row">
+                <div class="col-lg-12">
+                    <div class="card card-dark">
+                        <div class="card-header">
+                            <h3 class="card-title">{% trans "Student's Attendance & Leave Overview" %}</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart">
+                                <canvas id="barChart2" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                            </div>
+                        </div>
                     </div>
-                  </div>
-                  <div class="card-body">
-                    <div class="chart">
-                      <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                </div>
+            </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card card-dark">
+                            <div class="card-header">
+                                <h3 class="card-title">{% trans "Teachers - Student's Overview" %}</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart">
+                                    <canvas id="pieChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                  </div>
-                  <!-- /.card-body -->
+                    <div class="col-md-6">
+                        <div class="card card-dark">
+                            <div class="card-header">
+                                <h3 class="card-title">{% trans "Attendance Per Course" %}</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart">
+                                    <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card card-dark">
+                            <div class="card-header">
+                                <h3 class="card-title">{% trans "Total Students in Each Course" %}</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="pieChart2" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card card-dark">
+                            <div class="card-header">
+                                <h3 class="card-title">{% trans "The Attendance Rate of Each Class Schedule" %}</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="pieChart3" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card card-dark">
+                            <div class="card-header">
+                                <h3 class="card-title">{% trans "Comparison of Teachers' Lesson Hours" %}</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart">
+                                    <canvas id="lessonHoursChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card card-dark">
+                            <div class="card-header">
+                                <h3 class="card-title">{% trans "Monthly Contributions" %}</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="yearSelect">{% trans "Select Year" %}</label>
+                                    <select id="yearSelect" class="form-control">
+                                        {% for year in available_years %}
+                                            <option value="{{ year }}">{{ year }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="chart">
+                                    <canvas id="monthlyContributionsChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <!-- right col -->
-        </div>
-        <!-- /.row (main row) -->
-        <div class="row">
-          <div class="col-lg-12">
-            <!-- BAR CHART -->
-            <div class="card card-dark">
-              <div class="card-header">
-                <h3 class="card-title"> {% trans "Student's Attendance & Leave Overview" %}</h3>
-                <div class="card-tools">
-                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-                </div>
-              </div>
-              <div class="card-body">
-                <div class="chart">
-                  <canvas id="barChart2" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                </div>
-              </div>
-              <!-- /.card-body -->
-            </div>
-            <!-- /.card -->
-          </div>
-        </div>
 
-        <div class="row">
-          <div class="col-lg-6">
-            <!-- PIE CHART -->
-            <div class="card card-dark">
-              <div class="card-header">
-                <h3 class="card-title">{% trans "Total Students in Each Course" %}</h3>
-                <div class="card-tools">
-                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+            <!-- Student Attendance Tab -->
+            <div class="tab-pane fade" id="student-attendance" role="tabpanel" aria-labelledby="student-attendance-tab">
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="card card-dark">
+                            <div class="card-header">
+                                <h3 class="card-title">{% trans "Student Attendance Overview" %}</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="studentSelect">{% trans "Select Student" %}</label>
+                                    <select id="studentSelect" class="form-control">
+                                        {% for student in students %}
+                                            <option value="{{ student.id }}">{{ student.admin.full_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="chart">
+                                    <canvas id="studentAttendanceChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-              <div class="card-body">
-                <canvas id="pieChart2" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-              </div>
-              <!-- /.card-body -->
             </div>
-          </div>
-
-          <div class="col-lg-6">
-            <!-- PIE CHART -->
-            <div class="card card-dark">
-              <div class="card-header">
-                <h3 class="card-title">{% trans "The Attendance Rate of Each Class Schedule" %}</h3>
-                <div class="card-tools">
-                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-                </div>
-              </div>
-              <div class="card-body">
-                <canvas id="pieChart3" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-              </div>
-              <!-- /.card-body -->
-            </div>
-          </div>
         </div>
-        
-        <!-- Comparison of Teachers' Lesson Hours -->
-        <div class="row">
-          <div class="col-lg-12">
-            <!-- BAR CHART -->
-            <div class="card card-dark">
-              <div class="card-header">
-                <h3 class="card-title"> {% trans "Comparison of Teachers' Lesson Hours" %}</h3>
-                <div class="card-tools">
-                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-                </div>
-              </div>
-              <div class="card-body">
-                <div class="chart">
-                  <canvas id="lessonHoursChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                </div>
-              </div>
-              <!-- /.card-body -->
-            </div>
-            <!-- /.card -->
-          </div>
-        </div>
-
-        <!-- Student Renewals and Withdrawals -->
-        <div class="row">
-          <div class="col-lg-6">
-            <!-- small box -->
-            <div class="small-box bg-orange">
-              <div class="inner">
-                <h3>{{ student_renewals }}</h3>
-                <p>{% trans "Total Student Renewals" %}</p>
-              </div>
-              <div class="icon">
-                <i class="fas fa-redo-alt"></i>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <!-- small box -->
-            <div class="small-box bg-purple">
-              <div class="inner">
-                <h3>{{ withdrawal_count }}</h3>
-                <p>{% trans "Total Withdrawals" %}</p>
-              </div>
-              <div class="icon">
-                <i class="fas fa-user-times"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Monthly Contributions Chart -->
-        <div class="row">
-          <div class="col-lg-12">
-            <!-- BAR CHART -->
-            <div class="card card-dark">
-              <div class="card-header">
-                <h3 class="card-title">{% trans "Monthly Contributions" %}</h3>
-                <div class="card-tools">
-                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-                </div>
-              </div>
-              <div class="card-body">
-                <div class="form-group">
-                  <label for="yearSelect">{% trans "Select Year" %}</label>
-                  <select id="yearSelect" class="form-control">
-                    {% for year in available_years %}
-                      <option value="{{ year }}">{{ year }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-                <div class="chart">
-                  <canvas id="monthlyContributionsChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                </div>
-              </div>
-              <!-- /.card-body -->
-            </div>
-            <!-- /.card -->
-          </div>
-        </div>
-
     </div><!-- /.container-fluid -->
 </section>
 {% endblock content %}
 
 {% block custom_js %}
-  <!-- Include Summernote CSS/JS -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-bs4.min.css" rel="stylesheet">
-  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-bs4.min.js"></script>
-
-  <!-- Include Decimal.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.3.1/decimal.min.js"></script>
-
-  <script>
-      $(document).ready(function(){
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    $(document).ready(function() {
         var donutData = {
-            labels: ['学员', '老师'],
+            labels: ['Student', 'Teacher'],
             datasets: [
-              {
-                data: [{{ total_students }}, {{ total_teacher }}],
-                backgroundColor : ['#0071A6', '#F31212'],
-              }
+                {
+                    data: [{{ total_students }}, {{ total_teacher }}],
+                    backgroundColor: ['#0071A6', '#F31212'],
+                }
             ]
-          }
+        }
         var pieChartCanvas = $('#pieChart').get(0).getContext('2d')
         var pieData = donutData;
         var pieOptions = {
-          maintainAspectRatio : false,
-          responsive : true,
+            maintainAspectRatio: false,
+            responsive: true,
         }
         var pieChart = new Chart(pieChartCanvas, {
-          type: 'pie',
-          data: pieData,
-          options: pieOptions      
+            type: 'pie',
+            data: pieData,
+            options: pieOptions
         });
 
         var classes_list = JSON.parse('{{ classes_list|escapejs }}');
         var attendance_list = JSON.parse('{{ attendance_list|escapejs }}');
-  
+
         var barChartData = {
-          labels  : classes_list,
-          datasets: [
-            {
-              label               : '每门课程的出席率',
-              backgroundColor     : '#17A2B8',
-              borderColor         : 'rgba(60,141,188,0.8)',
-              pointRadius          : false,
-              pointColor          : '#3b8bba',
-              pointStrokeColor    : 'rgba(60,141,188,1)',
-              pointHighlightFill  : '#fff',
-              pointHighlightStroke: 'rgba(60,141,188,1)',
-              data                : attendance_list
-            }, 
-          ]
+            labels: classes_list,
+            datasets: [
+                {
+                    label: '{% trans "Attendance Per Course" %}',
+                    backgroundColor: '#17A2B8',
+                    borderColor: 'rgba(60,141,188,0.8)',
+                    pointRadius: false,
+                    pointColor: '#3b8bba',
+                    pointStrokeColor: 'rgba(60,141,188,1)',
+                    pointHighlightFill: '#fff',
+                    pointHighlightStroke: 'rgba(60,141,188,1)',
+                    data: attendance_list
+                }
+            ]
         }
         var barChartCanvas = $('#barChart').get(0).getContext('2d')
-        var temp0 = barChartData.datasets[0]
-        barChartData.datasets[0] = temp0
-    
         var stackedBarChartOptions = {
-          responsive              : true,
-          maintainAspectRatio     : false,
-          scales: {
-            xAxes: [{
-              stacked: true,
-            }],
-            yAxes: [{
-              stacked: true
-            }]
-          }
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                xAxes: [{
+                    stacked: true,
+                }],
+                yAxes: [{
+                    stacked: true
+                }]
+            }
         }
-    
         var barChart = new Chart(barChartCanvas, {
-          type: 'bar', 
-          data: barChartData,
-          options: stackedBarChartOptions
+            type: 'bar',
+            data: barChartData,
+            options: stackedBarChartOptions
         })
 
-        // The Attendance Rate of Each Class Schedule
         var attendance_rate_list = JSON.parse('{{ attendance_rate_list|escapejs }}');
         var class_schedule_names_list = JSON.parse('{{ class_schedule_names_list|escapejs }}');
         var pieData3 = {
-          labels: class_schedule_names_list,
-          datasets: [
-            {
-              data: attendance_rate_list,
-              backgroundColor : ['#FF6F22', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#894e9c', '#0b523a', '#a1156d', '#9e4603'],
-            }
-          ]
+            labels: class_schedule_names_list,
+            datasets: [
+                {
+                    data: attendance_rate_list,
+                    backgroundColor: ['#FF6F22', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#894e9c', '#0b523a', '#a1156d', '#9e4603'],
+                }
+            ]
         }
-
         var pieChartCanvas3 = $('#pieChart3').get(0).getContext('2d')
         var pieOptions3 = {
-          maintainAspectRatio : false,
-          responsive : true,
+            maintainAspectRatio: false,
+            responsive: true,
         }
-
         var pieChart3 = new Chart(pieChartCanvas3, {
-          type: 'pie',
-          data: pieData3,
-          options: pieOptions3      
-        })   
+            type: 'pie',
+            data: pieData3,
+            options: pieOptions3
+        })
 
-        // Student Attendance & Leave Overview
         var student_attendance_present_list = JSON.parse('{{ student_attendance_present_list|escapejs }}');
         var student_attendance_leave_list = JSON.parse('{{ student_attendance_leave_list|escapejs }}');
         var student_name_list = JSON.parse('{{ student_name_list|escapejs }}');
-
         var areaChartData2 = {
-          labels  : student_name_list,
-          datasets: [
-            {
-              label               : '缺席/请假',
-              backgroundColor     : '#FFDF2E',
-              borderColor         : '#b50a04',
-              pointRadius          : false,
-              pointColor          : '#3b8bba',
-              pointStrokeColor    : 'rgba(60,141,188,1)',
-              pointHighlightFill  : '#fff',
-              pointHighlightStroke: 'rgba(60,141,188,1)',
-              data                : student_attendance_leave_list 
-            },
-            {
-              label               : '出席情况',
-              backgroundColor     : '#2D8F49',
-              borderColor         : 'rgba(210, 214, 222, 1)',
-              pointRadius         : false,
-              pointColor          : 'rgba(210, 214, 222, 1)',
-              pointStrokeColor    : '#c1c7d1',
-              pointHighlightFill  : '#fff',
-              pointHighlightStroke: 'rgba(220,220,220,1)',
-              data                : student_attendance_present_list
-            },
-          ]
+            labels: student_name_list,
+            datasets: [
+                {
+                    label: '{% trans "Absent/Leave" %}',
+                    backgroundColor: '#FFDF2E',
+                    borderColor: '#b50a04',
+                    pointRadius: false,
+                    pointColor: '#3b8bba',
+                    pointStrokeColor: 'rgba(60,141,188,1)',
+                    pointHighlightFill: '#fff',
+                    pointHighlightStroke: 'rgba(60,141,188,1)',
+                    data: student_attendance_leave_list
+                },
+                {
+                    label: '{% trans "Attendance" %}',
+                    backgroundColor: '#2D8F49',
+                    borderColor: 'rgba(210, 214, 222, 1)',
+                    pointRadius: false,
+                    pointColor: 'rgba(210, 214, 222, 1)',
+                    pointStrokeColor: '#c1c7d1',
+                    pointHighlightFill: '#fff',
+                    pointHighlightStroke: 'rgba(220,220,220,1)',
+                    data: student_attendance_present_list
+                }
+            ]
         }
-
         var barChartCanvas2 = $('#barChart2').get(0).getContext('2d')
         var barChartData2 = jQuery.extend(true, {}, areaChartData2)
-        var temp02 = areaChartData2.datasets[0]
-        var temp12 = areaChartData2.datasets[1]
-        barChartData2.datasets[0] = temp12
-        barChartData2.datasets[1] = temp02
-
         var barChartOptions2 = {
-          responsive              : true,
-          maintainAspectRatio     : false,
-          datasetFill             : false
+            responsive: true,
+            maintainAspectRatio: false,
+            datasetFill: false
         }
-
         var barChart2 = new Chart(barChartCanvas2, {
-          type: 'bar', 
-          data: barChartData2,
-          options: barChartOptions2
+            type: 'bar',
+            data: barChartData2,
+            options: barChartOptions2
         })
 
-        // Total Students in Each Course
         var course_name_list = JSON.parse('{{ course_name_list|escapejs }}');
         var student_count_list_in_course = JSON.parse('{{ student_count_list_in_course|escapejs }}');
         var pieData2 = {
-          labels: course_name_list,
-          datasets: [
-            {
-              data: student_count_list_in_course,
-              backgroundColor : ['#FF6F22', '#BF19D5', '#1255F3', '#65BD00', '#04048F', '#1EDEC2', '#EF2020', '#FF0D72'],
-            }
-          ]
-        }
-
-        var pieChartCanvas2 = $('#pieChart2').get(0).getContext('2d')
-        var pieOptions2 = {
-          maintainAspectRatio : false,
-          responsive : true,
-        }
-
-        var pieChart2 = new Chart(pieChartCanvas2, {
-          type: 'pie',
-          data: pieData2,
-          options: pieOptions2      
-        })
-
-        // Comparison of Teachers' Lesson Hours
-        var teacher_names = JSON.parse('{{ teacher_names|escapejs }}');
-        var lesson_hours = JSON.parse('{{ lesson_hours|escapejs }}');
-
-        var lessonHoursChartData = {
-          labels  : teacher_names,
-          datasets: [
-            {
-              label               : 'Lesson Hours',
-              backgroundColor     : '#3c8dbc',
-              borderColor         : '#3c8dbc',
-              pointRadius         : false,
-              pointColor          : '#3c8dbc',
-              pointStrokeColor    : '#3c8dbc',
-              pointHighlightFill  : '#fff',
-              pointHighlightStroke: '#3c8dbc',
-              data                : lesson_hours
-            }
-          ]
-        };
-
-        var lessonHoursChartCanvas = $('#lessonHoursChart').get(0).getContext('2d');
-        var lessonHoursChartOptions = {
-          responsive              : true,
-          maintainAspectRatio     : false,
-          datasetFill             : false
-        };
-
-        var lessonHoursChart = new Chart(lessonHoursChartCanvas, {
-          type: 'bar',
-          data: lessonHoursChartData,
-          options: lessonHoursChartOptions
-        });
-
-        // Monthly Contributions Chart
-        var all_months = JSON.parse('{{ all_months|escapejs }}');
-        var all_incomes = JSON.parse('{{ all_incomes|escapejs }}');
-        
-        var monthlyContributionsData = {
-            labels  : all_months,
+            labels: course_name_list,
             datasets: [
                 {
-                    label               : '{% trans "Total Income" %}',
-                    backgroundColor     : '#FF2222',
-                    borderColor         : '#B54E17',
-                    pointRadius         : false,
-                    pointColor          : '#3b8bba',
-                    pointStrokeColor    : 'rgba(60,141,188,1)',
-                    pointHighlightFill  : '#fff',
+                    data: student_count_list_in_course,
+                    backgroundColor: ['#FF6F22', '#BF19D5', '#1255F3', '#65BD00', '#04048F', '#1EDEC2', '#EF2020', '#FF0D72'],
+                }
+            ]
+        }
+        var pieChartCanvas2 = $('#pieChart2').get(0).getContext('2d')
+        var pieOptions2 = {
+            maintainAspectRatio: false,
+            responsive: true,
+        }
+        var pieChart2 = new Chart(pieChartCanvas2, {
+            type: 'pie',
+            data: pieData2,
+            options: pieOptions2
+        })
+
+        var teacher_names = JSON.parse('{{ teacher_names|escapejs }}');
+        var lesson_hours = JSON.parse('{{ lesson_hours|escapejs }}');
+        var lessonHoursChartData = {
+            labels: teacher_names,
+            datasets: [
+                {
+                    label: '{% trans "Lesson Hours" %}',
+                    backgroundColor: '#3c8dbc',
+                    borderColor: '#3c8dbc',
+                    pointRadius: false,
+                    pointColor: '#3c8dbc',
+                    pointStrokeColor: '#3c8dbc',
+                    pointHighlightFill: '#fff',
+                    pointHighlightStroke: '#3c8dbc',
+                    data: lesson_hours
+                }
+            ]
+        };
+        var lessonHoursChartCanvas = $('#lessonHoursChart').get(0).getContext('2d');
+        var lessonHoursChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            datasetFill: false
+        };
+        var lessonHoursChart = new Chart(lessonHoursChartCanvas, {
+            type: 'bar',
+            data: lessonHoursChartData,
+            options: lessonHoursChartOptions
+        });
+
+        var all_months = JSON.parse('{{ all_months|escapejs }}');
+        var all_incomes = JSON.parse('{{ all_incomes|escapejs }}');
+        var monthlyContributionsData = {
+            labels: all_months,
+            datasets: [
+                {
+                    label: '{% trans "Total Income" %}',
+                    backgroundColor: '#FF2222',
+                    borderColor: '#B54E17',
+                    pointRadius: false,
+                    pointColor: '#3b8bba',
+                    pointStrokeColor: 'rgba(60,141,188,1)',
+                    pointHighlightFill: '#fff',
                     pointHighlightStroke: 'rgba(60,141,188,1)',
-                    data                : all_incomes.map(function(income) {
+                    data: all_incomes.map(function(income) {
                         return new Decimal(income).toNumber();
                     })
                 }
             ]
         };
-
         var monthlyContributionsChartCanvas = $('#monthlyContributionsChart').get(0).getContext('2d');
         var monthlyContributionsChartOptions = {
-            responsive              : true,
-            maintainAspectRatio     : false,
+            responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 xAxes: [{
                     stacked: true,
@@ -494,42 +467,91 @@
                     ticks: {
                         beginAtZero: true,
                         callback: function(value) {
-                            return '¥ ' + value; // Add the currency symbol
+                            return '¥ ' + value;
                         }
                     }
                 }]
             }
         };
-
         var monthlyContributionsChart = new Chart(monthlyContributionsChartCanvas, {
             type: 'bar',
             data: monthlyContributionsData,
             options: monthlyContributionsChartOptions
         });
 
-        // Handle year selection
         $('#yearSelect').change(function() {
-          var selectedYear = $(this).val();
-          var filteredMonths = [];
-          var filteredIncomes = [];
-
-          // Filter data based on selected year
-          for (var i = 0; i < all_months.length; i++) {
-            var year = all_months[i].split(' ')[1];
-            if (year == selectedYear) {
-              filteredMonths.push(all_months[i]);
-              filteredIncomes.push(all_incomes[i]);
+            var selectedYear = $(this).val();
+            var filteredMonths = [];
+            var filteredIncomes = [];
+            for (var i = 0; i < all_months.length; i++) {
+                var year = all_months[i].split(' ')[1];
+                if (year == selectedYear) {
+                    filteredMonths.push(all_months[i]);
+                    filteredIncomes.push(all_incomes[i]);
+                }
             }
-          }
+            monthlyContributionsChart.data.labels = filteredMonths;
+            monthlyContributionsChart.data.datasets[0].data = filteredIncomes;
+            monthlyContributionsChart.update();
+        });
+        $('#yearSelect').trigger('change');
+    });
 
-          // Update chart data
-          monthlyContributionsChart.data.labels = filteredMonths;
-          monthlyContributionsChart.data.datasets[0].data = filteredIncomes;
-          monthlyContributionsChart.update();
+    $(document).ready(function() {
+        var studentAttendanceChart;
+
+        function updateStudentAttendanceChart(studentId) {
+            console.log("Selected Student ID:", studentId); // Log student ID
+
+            $.ajax({
+                url: '{% url "admin_get_student_attendance" %}',
+                data: { student_id: studentId },
+                success: function(response) {
+                    console.log("Response:", response); // Log the response
+
+                    var ctx = $('#studentAttendanceChart').get(0).getContext('2d');
+                    if (studentAttendanceChart) {
+                        studentAttendanceChart.destroy();
+                    }
+                    studentAttendanceChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Present', 'Absent'],
+                            datasets: [{
+                                label: '{% trans "Attendance Status" %}',
+                                backgroundColor: ['#2D8F49', '#FFC300'],
+                                data: [response.present, response.absent]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true,
+                                        callback: function(value) {
+                                            return value + ' days';
+                                        }
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching student attendance data:", error);
+                }
+            });
+        }
+
+        $('#studentSelect').change(function() {
+            var studentId = $(this).val();
+            updateStudentAttendanceChart(studentId);
         });
 
-        // Trigger change to initialize chart with default selected year
-        $('#yearSelect').trigger('change');
-      });
-  </script>
+        // Initialize with the first student
+        $('#studentSelect').trigger('change');
+    });
+</script>
 {% endblock custom_js %}

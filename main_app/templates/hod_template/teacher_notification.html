@@ -1,4 +1,3 @@
-<!-- teacher_notification.html -->
 {% extends 'main_app/base.html' %}
 {% load static %}
 {% load i18n %}
@@ -45,7 +44,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <button class="btn btn-primary" data-toggle="modal" data-target="#notificationModal" data-teacher-id="{{ teacher.id }}">{% trans 'Send Notification' %}</button>
+                                        <button class="btn btn-primary show_notification" value="{{ teacher.id }}" data-toggle="modal" data-target="#notificationModal">{% trans 'Send Notification' %}</button>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -69,45 +68,72 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form method="post" action="{% url 'send_teacher_notification' %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="teacher_id" id="teacher-id">
-                    <div class="form-group">
-                        <label for="course">{% trans 'Select Course' %}</label>
-                        <select class="form-control" id="course" name="course_id">
-                            {% for course in courses %}
-                            <option value="{{ course.id }}">{{ course.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="student">{% trans 'Select Student' %}</label>
-                        <select class="form-control" id="student" name="student_id">
-                            {% for student in students %}
-                            <option value="{{ student.id }}">{{ student.admin.full_name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="message">{% trans 'Message' %}</label>
-                        <textarea class="form-control" id="message" name="message" rows="3"></textarea>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans 'Close' %}</button>
-                        <button type="submit" class="btn btn-primary">{% trans 'Send Notification' %}</button>
-                    </div>
-                </form>
+                <input type="hidden" id="teacher_id">
+                <div class="form-group">
+                    <label for="course_id">{% trans 'Select Course' %}</label>
+                    <select class="form-control" id="course_id">
+                        {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="student_id">{% trans 'Select Student' %}</label>
+                    <select class="form-control" id="student_id">
+                        {% for student in students %}
+                        <option value="{{ student.id }}">{{ student.admin.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="message">{% trans 'Message' %}</label>
+                    <textarea class="form-control" id="message" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans 'Close' %}</button>
+                    <button type="button" class="btn btn-primary send_notification">{% trans 'Send Notification' %}</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Ensure jQuery and Bootstrap JS are included -->
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+
 <script>
-    $('#notificationModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var teacherId = button.data('teacher-id');
-        var modal = $(this);
-        modal.find('#teacher-id').val(teacherId);
+    $(".show_notification").click(function(){
+        $("#teacher_id").val($(this).val());
     });
+
+    $(".send_notification").click(function(){
+        var id = $("#teacher_id").val();
+        var message = $("#message").val();
+        var course_id = $("#course_id").val();
+        sendNotification(id, message, course_id);
+    });
+
+    function sendNotification(id, message, course_id){
+        $.ajax({
+            url: "{% url 'send_teacher_notification' %}",
+            type: 'POST',
+            data: {
+                id: id,
+                message: message,
+                course_id: course_id,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            }
+        }).done(function (response) {
+            if (response == 'True'){
+                alert("{% trans 'Notification Sent' %}");
+                location.reload();
+            } else {
+                alert("{% trans 'Notification could not be saved. Please try again.' %}");
+            }
+        }).fail(function (response) {
+            alert("{% trans 'Error in sending notification' %}");
+        });
+    }
 </script>
 {% endblock content %}

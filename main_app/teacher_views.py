@@ -94,38 +94,62 @@ def fetch_student_result(request):
     except Exception as e:
         return HttpResponse('False')
 
+def get_class_schedules(request):
+    course_id = request.GET.get('course_id')
+    class_schedules = ClassSchedule.objects.filter(course_id=course_id).values('id', 'start_time', 'end_time')
+    return JsonResponse(list(class_schedules), safe=False)
 
 #teacher
 def teacher_home(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
-    total_students = LearningRecord.objects.filter(teacher_id=teacher).count() #SLIGHT TWEAKS
-    total_leave = LeaveReportTeacher.objects.filter(teacher=teacher).count() 
-    total_courses = ClassSchedule.objects.filter(teacher=teacher).values('course').distinct().count() #FIXED IT, COUNTS ATTENDEES
-    
-    # Initialize attendance variables
-    total_attendance = 0
-    attendance_per_course = []
+    total_students = LearningRecord.objects.filter(teacher_id=teacher).count()
+    total_leave = LeaveReportTeacher.objects.filter(teacher=teacher).count()
+    total_courses = ClassSchedule.objects.filter(teacher=teacher).values('course').distinct().count()
 
-    # Collecting attendance data per course
+    # Get filter values from request
+    course_id = request.GET.get('course')
+    class_schedule_id = request.GET.get('class_schedule')
+    student_id = request.GET.get('student')
+
+    # Filter class schedules by teacher and optional course and class_schedule
     class_schedules = ClassSchedule.objects.filter(teacher=teacher)
-    courses = set(schedule.course for schedule in class_schedules)
+    if course_id:
+        class_schedules = class_schedules.filter(course_id=course_id)
+    if class_schedule_id:
+        class_schedules = class_schedules.filter(id=class_schedule_id)
 
-    for course in courses:
-        course_schedules = class_schedules.filter(course=course)
-        course_attendance_count = Attendance.objects.filter(classes__in=course_schedules).count()
-        total_attendance += course_attendance_count
-        attendance_per_course.append({
-            'course_name': course.name,
-            'attendance_count': course_attendance_count
-        })
+    # Filter students by learning records and optional student_id
+    students = Student.objects.filter(learningrecord__teacher=teacher).distinct()
+    if student_id:
+        students = students.filter(id=student_id)
+
+    # Collect attendance data per class schedule
+    total_attendance = Attendance.objects.filter(classes__in=class_schedules).count()
+    attendance_per_schedule = [
+        {
+            'schedule_name': schedule.course.name,
+            'attendance_count': Attendance.objects.filter(classes=schedule).count()
+        }
+        for schedule in class_schedules
+    ]
+
+    if request.is_ajax():
+        data = {
+            'labels': [item['schedule_name'] for item in attendance_per_schedule],
+            'attendance_counts': [item['attendance_count'] for item in attendance_per_schedule]
+        }
+        return JsonResponse({'data': data})
 
     context = {
-        'page_title': f'Teacher Panel - {teacher.admin.full_name} ({", ".join(course.name for course in courses)})',
+        'page_title': f'Teacher Panel - {teacher.admin.full_name}',
         'total_students': total_students,
         'total_attendance': total_attendance,
         'total_leave': total_leave,
         'total_courses': total_courses,
-        'attendance_per_course': attendance_per_course
+        'attendance_per_schedule': attendance_per_schedule,
+        'students': students,  # Pass the students to the context
+        'courses': Course.objects.all(),
+        'class_schedules': class_schedules,
     }
     return render(request, 'teacher_template/home_content.html', context)
 
@@ -425,6 +449,22 @@ def teacher_manage_attendance(request):
     }
     return render(request, 'teacher_template/teacher_manage_attendance.html', context)
 
+@login_required
+def teacher_courses(request):
+    # Filter learning records based on the current teacher logged in
+    current_teacher = request.user.teacher
+    learningrecords = LearningRecord.objects.filter(teacher=current_teacher)
+
+    paginator = Paginator(learningrecords, 10)  # Show 10 records per page
+    page_number = request.GET.get('page')
+    paginated_records = paginator.get_page(page_number)
+    
+    context = {
+        'learningrecords': paginated_records,  # Pass the paginated queryset to the template
+        'page_title': _('Teacher Courses'),
+    }
+    return render(request, 'teacher_template/teacher_courses.html', context)
+
 #leave
 def teacher_apply_leave(request):
     form = LeaveReportTeacherForm(request.POST or None)
@@ -453,6 +493,7 @@ def teacher_apply_leave(request):
     return render(request, "teacher_template/teacher_apply_leave.html", context)
 
 
+#Summary
 @csrf_exempt
 def teacher_write_summary(request):
     teacher = get_object_or_404(Teacher, admin_id=request.user.id)
@@ -504,29 +545,27 @@ def teacher_write_summary(request):
 #Notifications
 def teacher_view_notification(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
-    notifications = NotificationTeacher.objects.filter(teacher=teacher)
     
-    annotated_notifications = []
-    for notification in notifications:
-        payment_record = notification.payment_record
-        student = notification.student if notification.student else None
-        course = notification.course if notification.course else None
-        
-        learning_record = payment_record.learning_record if payment_record and payment_record.learning_record else None
-        
-        notification_data = {
+    # Fetch notifications and related objects in fewer queries
+    notifications = NotificationTeacher.objects.filter(teacher=teacher).select_related(
+        'payment_record__learning_record', 'student__admin', 'course'
+    )
+    
+    annotated_notifications = [
+        {
             'id': notification.id,
             'date': notification.date,
             'time': notification.time,
             'message': notification.message,
             'is_read': notification.is_read,
-            'course_name': course.name if course else 'N/A',
-            'course_start': learning_record.start_time if learning_record else 'N/A',
-            'course_end': learning_record.end_time if learning_record else 'N/A',
-            'student_name': student.admin.full_name if student else 'N/A',
-            'next_payment_date': payment_record.next_payment_date if payment_record else 'N/A'
+            'course_name': notification.course.name if notification.course else 'N/A',
+            'course_start': notification.payment_record.learning_record.start_time if notification.payment_record and notification.payment_record.learning_record else 'N/A',
+            'course_end': notification.payment_record.learning_record.end_time if notification.payment_record and notification.payment_record.learning_record else 'N/A',
+            'student_name': notification.student.admin.full_name if notification.student else 'N/A',
+            'next_payment_date': notification.payment_record.next_payment_date if notification.payment_record else 'N/A'
         }
-        annotated_notifications.append(notification_data)
+        for notification in notifications
+    ]
 
     context = {
         'notifications': annotated_notifications,

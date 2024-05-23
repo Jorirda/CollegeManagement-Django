@@ -102,6 +102,7 @@ urlpatterns = [
    
     # teacher
     path("teacher/home/", teacher_views.teacher_home, name='teacher_home'),
+    path('teacher/get_class_schedules/', teacher_views.get_class_schedules, name='get_class_schedules'),
     path("teacher/apply/leave/", teacher_views.teacher_apply_leave,name='teacher_apply_leave'),
     path("teacher/view/profile/", teacher_views.teacher_view_profile,name='teacher_view_profile'),
     path("teacher/attendance/take/", teacher_views.teacher_take_attendance,name='teacher_take_attendance'),
@@ -115,6 +116,7 @@ urlpatterns = [
     path('teacher/view_attendance/', teacher_views.teacher_view_attendance, name='teacher_view_attendance'),
     path('teacher/attendance/edit/<int:attendance_id>/', teacher_views.teacher_edit_attendance, name='teacher_edit_attendance'),
     path('teacher/attendance/delete/', teacher_views.teacher_delete_attendance, name='teacher_delete_attendance'),
+    path("teacher/courses/", teacher_views.teacher_courses, name='teacher_courses'),
     path("teacher/fcmtoken/", teacher_views.teacher_fcmtoken, name='teacher_fcmtoken'),
     path("teacher/view/notification/", teacher_views.teacher_view_notification,name="teacher_view_notification"),
     path("teacher/view/notification/count/", teacher_views.teacher_view_notification_count, name="teacher_view_notification_count"),
@@ -126,9 +128,6 @@ urlpatterns = [
     path("teacher/result/edit/", teacher_views.teacher_edit_result,name='edit_student_result'),
     path('teacher/result/fetch/', teacher_views.fetch_student_result,name='fetch_student_result'),
     
-
-
-
     # Student
     path("student/home/", student_views.student_home, name='student_home'),
     path("student/payment/", student_views.student_payment_records, name = "student_payment_records"),

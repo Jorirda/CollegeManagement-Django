@@ -1,0 +1,54 @@
+.login-page{
+  background-color: #000;
+}
+
+.iconimage{
+  height: 110px;
+  width: auto;   
+}
+.img_container{
+  display: flex;
+  justify-content: space-evenly;
+  padding-bottom: 10px;
+}
+
+.cardcustom, .cardloginbodycustom, .formctrlcustom {
+  background-color: black;
+  padding-bottom: 30px;
+}
+
+.login-logo2,
+.register-logo2 {
+  font-size: 1rem;
+  /* font-weight: 300; */
+  margin-bottom: .9rem;
+  text-align: center;
+  color: #fff;
+}
+
+.login-logo2{
+  padding-top: 30px;
+}
+
+.custom{
+  background: #000;
+  color: #fff;
+}
+
+h1 {
+  font-size: 2.2rem;
+}
+
+.custom-border{
+  border: 1px solid green;
+}
+
+
+.form-control:focus,
+.form-control:not(:placeholder-shown) {
+  border-color: green;
+}
+
+.btn-space {
+  padding: 3rem 3rem;
+}

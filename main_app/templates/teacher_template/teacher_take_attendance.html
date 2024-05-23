@@ -72,6 +72,8 @@
             var session = $("#session").val();
             $("#student_data").html(null);
 
+            console.log("Fetching students for class:", classes, "and session:", session); // Debugging log
+
             if (!classes || !session) {
                 alert("Please select classes and session");
                 return false;
@@ -87,7 +89,8 @@
                     'classes': classes,
                     'session': session
                 },
-                success: function(data) {
+                success: function(response) {
+                    console.log("Received response:", response); // Debugging log
                     if (response.error) {
                         alert(response.error);
                         return;
@@ -104,7 +107,7 @@
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
+                    console.error("Error fetching students:", xhr.responseText); // Debugging log
                     $('#success-message').text('{% trans "An error occurred while fetching students." %}').addClass('alert-danger').show();
                     setTimeout(function() {
                         $('#success-message').hide();
@@ -131,6 +134,8 @@
 
             student_data = JSON.stringify(student_data);
 
+            console.log("Saving attendance for date:", attendance_date, "with data:", student_data); // Debugging log
+
             $.ajax({
                 url: "{% url 'save_attendance' %}",
                 type: 'POST',
@@ -144,6 +149,7 @@
                     'session': session
                 },
                 success: function(data) {
+                    console.log("Attendance saved successfully:", data); // Debugging log
                     if (data.success) {
                         // Show success message
                         $('#success-message').text('{% trans "Attendance saved successfully" %}').addClass('alert-success').show();
@@ -151,10 +157,17 @@
                         setTimeout(function() {
                             $('#success-message').hide();
                         }, 3000);
+                    } else {
+                        // Show error message
+                        $('#success-message').text(data.error).addClass('alert-danger').show();
+                        // Hide error message after 3 seconds
+                        setTimeout(function() {
+                            $('#success-message').hide();
+                        }, 3000);
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
+                    console.error("Error saving attendance:", xhr.responseText); // Debugging log
                     // Show error message
                     $('#success-message').text('{% trans "An error occurred while saving the attendance." %}').addClass('alert-danger').show();
                     // Hide error message after 3 seconds
@@ -174,4 +187,3 @@
     });
 </script>
 {% endblock custom_js %}
-

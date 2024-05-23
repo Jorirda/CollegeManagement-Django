@@ -82,7 +82,7 @@
     }
 </style>
 
-<!-- #Admin Sidebar View -->
+<!-- Admin Sidebar View -->
 <aside class="main-sidebar sidebar-dark-info elevation-4" style="background-color: #1e2329;">
     {% if request.user.user_type == '1' %}
     <!-- Admin -->
@@ -450,7 +450,7 @@
     {% comment %} {% endif %}
 </aside> {% endcomment %}
 
-<!-- #Teacher Sidebar View -->
+<!-- Teacher Sidebar View -->
 <aside>
     {% elif request.user.user_type == '2' %}
     <!-- Teacher -->
@@ -491,7 +491,7 @@
                     {% url 'teacher_home' as teacher_home %}
                     <a href="{{teacher_home}}"
                         class="nav-link {% if teacher_home == request.path %} active {% endif %}">
-                        <i class="nav-icon fas fa-home"></i>
+                        <i class="nav-icon fas fa-home" style="padding-left: 2px;"></i>
                         <p>
                             {% trans "Home" %}
 
@@ -529,7 +529,7 @@
                     <!-- {% url 'teacher_update_attendance' as teacher_update_attendance %} -->
                     {% url 'teacher_manage_attendance' as teacher_manage_attendance %}
                     <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-user-check"></i>
+                        <i class="nav-icon fas fa-user-check" style="padding-left: 5px;"></i>
                         <p>
                             {% trans "Attendance" %}
                             <i class="fas fa-angle-right right"></i>
@@ -555,7 +555,25 @@
                             </a>
                         </li> -->
                     </ul>
-                </li>                
+                </li>
+                <li class="nav-item has-treeview">
+                    {% url 'teacher_courses' as teacher_courses %}
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-bookmark"></i>
+                        <p>
+                            {% trans "Current Courses" %}
+                            <i class="fas fa-angle-right right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ teacher_courses }}" class="nav-link {% if request.path == teacher_courses %}active{% endif %}">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>{% trans "View Course Information" %}</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>               
                 <li class="nav-item has-treeview">
                     {% url 'teacher_view_notification' as teacher_view_notification %}
                     <a href="#" class="nav-link">
@@ -571,7 +589,7 @@
                             <a href="{{ teacher_view_notification }}"
                                class="nav-link {% if teacher_view_notification == request.path %} active {% endif %}">
                                 <div style="position: relative; display: inline-block;">
-                                    <i id="notification-icon" class="nav-icon fas fa-bell"></i>
+                                    <i id="notification-icon" class="nav-icon fas fa-bell" style="padding-left: 2px;"></i>
                                     <span id="notification-count" class="badge badge-danger">3</span> <!-- Example count -->
                                 </div>
                                 <p>{% trans "View Notifications" %}</p>

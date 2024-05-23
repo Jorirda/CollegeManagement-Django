@@ -1748,25 +1748,45 @@ def send_student_notification(request):
 @csrf_exempt
 def send_teacher_notification(request):
     id = request.POST.get('id')
+    print(f"Teacher ID received: {id}")
     message = request.POST.get('message')
     course_id = request.POST.get('course_id')
+    print(f"Course ID received: {course_id}")
+
+    # Fetch the teacher and course objects
     teacher = get_object_or_404(Teacher, admin_id=id)
     course = get_object_or_404(Course, id=course_id)
+
+    # Fetch students enrolled in the course
     students = Student.objects.filter(course=course)
-    print(course)
-    print(students)
+    print(f"Course: {course}")
+    print(f"Students: {students}")
+
+    # Find the first student with a valid birthdate
+    studentFirst = None
     for student in students:
-        studentFirst = student
+        print(f"Checking student: {student.admin.full_name}, Birthdate: {student.date_of_birth}")
+        if student.date_of_birth:
+            studentFirst = student
+            break
+
+    if not studentFirst:
+        print("No student with a valid birthdate found.")
+        return HttpResponse("False")
+
     def calculate_age(birthdate):
+        if birthdate == None:
+            age = 0
         today = datetime.today()
         age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
         return age
 
-    student_info = "\n".join([f"{studentFirst.admin.full_name} (Age: {calculate_age(studentFirst.date_of_birth)})"])
-
+    # Create detailed message with student info
+    student_info = f"{studentFirst.admin.full_name} (Age: {calculate_age(studentFirst.date_of_birth)})"
     detailed_message = f"Course: {course.name}\nStudents:\n{student_info}\n\nMessage: {message}"
 
     try:
+        # Prepare the notification body
         url = "https://fcm.googleapis.com/fcm/send"
         body = {
             'notification': {
@@ -1782,11 +1802,12 @@ def send_teacher_notification(request):
             'Content-Type': 'application/json'
         }
         data = requests.post(url, data=json.dumps(body), headers=headers)
-
+        
         # Set the timezone to China Standard Time
         china_tz = pytz.timezone('Asia/Shanghai')
         now = timezone.now().astimezone(china_tz)
-
+        
+        # Save the notification
         notification = NotificationTeacher(
             teacher=teacher,
             message=detailed_message,
@@ -1798,22 +1819,5 @@ def send_teacher_notification(request):
         notification.save()
         return HttpResponse("True")
     except Exception as e:
+        print(f"Error: {e}")
         return HttpResponse("False")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

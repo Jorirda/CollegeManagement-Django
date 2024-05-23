@@ -1,0 +1,130 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block page_title %}
+    {{ page_title }}
+{% endblock page_title %}
+
+{% block content %}
+<style>
+    .responsive-buttons {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+
+    .btn-responsive {
+        flex: 1 1 auto;
+        margin: 5px;
+        min-width: 68px;
+        text-align: center;
+    }
+
+    @media (max-width: 576px) {
+        .btn-responsive {
+            flex-basis: 100%;
+        }
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    th, td {
+        white-space: nowrap;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+    .pagination a, .pagination span {
+        margin: 0 5px;
+        padding: 8px 16px;
+        text-decoration: none;
+        color: #5FC032;
+        border: 1px solid #DEE2E600;
+        border-radius: 4px;
+    }
+    .pagination a:hover {
+        background-color: #e9ecef;
+    }
+    .pagination .current {
+        background-color: #5FC032;
+        color: white;
+    }
+</style>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="d-flex align-items-center">
+                            <i class="nav-icon fas fa-chalkboard-teacher" style="font-size: 24px; margin-right: 10px;"></i>
+                            <h3 class="card-title">{% trans "Courses Taught By You" %}</h3>
+                        </div>
+                    </div>                    
+                    <!-- /.card-header -->
+                    <div class="card-body table-container">
+                        <table id="example1" class="table table-bordered table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>{% trans "Date" %}</th>
+                                    <th>{% trans "Student Name" %}</th>
+                                    <th>{% trans "Course" %}</th>
+                                    <th>{% trans "Start Time" %}</th>
+                                    <th>{% trans "End Time" %}</th>
+                                    <th>{% trans "Lesson Hours" %}</th>
+                                    <th>{% trans "Remark" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for learn in learningrecords %}
+                                <tr>
+                                    <td>{{ learn.date }}</td>
+                                    <td>{{ learn.student }}</td>
+                                    <td>{{ learn.course }}</td>
+                                    <td>{{ learn.start_time }}</td>
+                                    <td>{{ learn.end_time }}</td>
+                                    <td>{{ learn.lesson_hours }}</td>
+                                    <td>{{ learn.student.admin.remark }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                    
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <span class="step-links">
+                            {% if learningrecords.has_previous %}
+                                <a href="?page=1">&laquo; first</a>
+                                <a href="?page={{ learningrecords.previous_page_number }}">previous</a>
+                            {% endif %}
+
+                            <span class="current">
+                                Page {{ learningrecords.number }} of {{ learningrecords.paginator.num_pages }}.
+                            </span>
+
+                            {% if learningrecords.has_next %}
+                                <a href="?page={{ learningrecords.next_page_number }}">next</a>
+                                <a href="?page={{ learningrecords.paginator.num_pages }}">last &raquo;</a>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <!-- End Pagination -->
+                    
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+{% endblock %}

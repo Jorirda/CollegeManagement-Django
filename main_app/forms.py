@@ -462,14 +462,13 @@ class ResultForm(FormSettings):
         model = StudentResult
         fields = [_('course'), _('session')]
 
-class AttendanceForm(forms.ModelForm):
-    session = forms.ModelChoiceField(queryset=Session.objects.all(), required=False, label=_("Session"))
-    date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), label=_('Date'))
-    student_data = forms.ModelMultipleChoiceField(queryset=Student.objects.all(), widget=forms.CheckboxSelectMultiple, required=False, label=_('Students'))
-
+class TeacherEditAttendanceForm(FormSettings):
+    classes = forms.ModelChoiceField(queryset=ClassSchedule.objects.all(), required=False,  widget=forms.Select(attrs={'class': 'form-control'}), label=_('Course'))
+    date = forms.DateField(widget=DateInput(attrs={'type': 'date'}), label=_('Date'), disabled=True)
+ 
     def __init__(self, *args, **kwargs):
-        super(AttendanceForm, self).__init__(*args, **kwargs)
+        super(TeacherEditAttendanceForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = Attendance
-        fields = ['session', 'date', 'student_data']
+        fields = [_('classes'), _('date')]

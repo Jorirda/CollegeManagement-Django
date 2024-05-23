@@ -14,8 +14,8 @@ from django.contrib.auth.decorators import login_required
 from django.utils.translation import gettext as _
 
 
-from .forms import *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
-from .models import *                                   
+from .forms import *
+from .models import *
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -94,10 +94,10 @@ def fetch_student_result(request):
     except Exception as e:
         return HttpResponse('False')
 
-def get_class_schedules(request):
-    course_id = request.GET.get('course_id')
-    class_schedules = ClassSchedule.objects.filter(course_id=course_id).values('id', 'start_time', 'end_time')
-    return JsonResponse(list(class_schedules), safe=False)
+# def get_class_schedules(request):
+#     course_id = request.GET.get('course_id')
+#     class_schedules = ClassSchedule.objects.filter(course_id=course_id).values('id', 'start_time', 'end_time')
+#     return JsonResponse(list(class_schedules), safe=False)
 
 #teacher
 def teacher_home(request):
@@ -119,7 +119,7 @@ def teacher_home(request):
         class_schedules = class_schedules.filter(id=class_schedule_id)
 
     # Filter students by learning records and optional student_id
-    students = Student.objects.filter(learningrecord__teacher=teacher).distinct()
+    students = Student.objects.filter(learningrecord__schedule_record__in=class_schedules).distinct()
     if student_id:
         students = students.filter(id=student_id)
 
@@ -128,15 +128,35 @@ def teacher_home(request):
     attendance_per_schedule = [
         {
             'schedule_name': schedule.course.name,
-            'attendance_count': Attendance.objects.filter(classes=schedule).count()
+            'attendance_count': AttendanceReport.objects.filter(attendance__classes=schedule).count()
         }
         for schedule in class_schedules
     ]
 
     if request.is_ajax():
+        # Return students if requested
+        if 'get_students' in request.GET:
+            student_data = [
+                {'id': student.id, 'full_name': student.admin.full_name}
+                for student in students
+            ]
+            return JsonResponse({'students': student_data})
+
+        # Return attendance data
+        if student_id:
+            attendance_data = [
+                {
+                    'schedule_name': schedule.course.name,
+                    'attendance_count': AttendanceReport.objects.filter(attendance__classes=schedule, student_id=student_id).count()
+                }
+                for schedule in class_schedules
+            ]
+        else:
+            attendance_data = attendance_per_schedule
+
         data = {
-            'labels': [item['schedule_name'] for item in attendance_per_schedule],
-            'attendance_counts': [item['attendance_count'] for item in attendance_per_schedule]
+            'labels': [item['schedule_name'] for item in attendance_data],
+            'attendance_counts': [item['attendance_count'] for item in attendance_data]
         }
         return JsonResponse({'data': data})
 
@@ -147,11 +167,37 @@ def teacher_home(request):
         'total_leave': total_leave,
         'total_courses': total_courses,
         'attendance_per_schedule': attendance_per_schedule,
-        'students': students,  # Pass the students to the context
+        'students': students,
         'courses': Course.objects.all(),
-        'class_schedules': class_schedules,
+        'class_schedules': ClassSchedule.objects.filter(teacher=teacher),
     }
     return render(request, 'teacher_template/home_content.html', context)
+
+def get_class_schedules(request):
+    course_id = request.GET.get('course_id')
+    class_schedules = ClassSchedule.objects.filter(course_id=course_id)
+    response = [
+        {
+            'id': schedule.id,
+            'start_time': schedule.start_time.strftime('%H:%M'),
+            'end_time': schedule.end_time.strftime('%H:%M')
+        }
+        for schedule in class_schedules
+    ]
+    return JsonResponse(response, safe=False)
+
+def get_students(request):
+    course_id = request.GET.get('course')
+    class_schedule_id = request.GET.get('class_schedule')
+    students = Student.objects.filter(learningrecord__schedule_record__id=class_schedule_id).distinct()
+    response = [
+        {
+            'id': student.id,
+            'full_name': student.admin.full_name
+        }
+        for student in students
+    ]
+    return JsonResponse({'students': response})
 
 def teacher_view_profile(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
@@ -253,59 +299,32 @@ def teacher_take_attendance(request):
 #     }
 #     return render(request, "teacher_template/teacher_edit_attendance.html", context)
 
+
 def teacher_edit_attendance(request, attendance_id):
-    teacher = get_object_or_404(Teacher, admin=request.user)
-    classes = ClassSchedule.objects.filter(teacher=teacher)
-    sessions = Session.objects.all()
-    attendance = get_object_or_404(Attendance, id=attendance_id)
-    attendance_reports = AttendanceReport.objects.filter(attendance=attendance)
-
-    # Get the class/course for the attendance record
-    selected_class = attendance.classes
-    learning_records = LearningRecord.objects.filter(course=selected_class.course)
-    students = Student.objects.filter(id__in=learning_records.values('student'))
-
-    # Create a dictionary to hold student statuses
-    student_statuses = {report.student.id: report.status for report in attendance_reports}
-
-    # Attach status to each student
-    for student in students:
-        student.attendance_status = student_statuses.get(student.id, False)
-
-    if request.method == 'POST':
-        session_id = request.POST.get('session')
-        student_ids = request.POST.getlist('student_data[]')
-
-        try:
-            attendance.session_id = session_id
-            attendance.save()
-
-            # Update existing attendance reports
-            for report in attendance_reports:
-                student_id = report.student.id
-                new_status = student_id in student_ids
-                if report.status != new_status:
-                    report.status = new_status
-                    report.save()
-
-            # Handle new attendance reports for students not previously reported
-            for student in students:
-                if student.id not in student_statuses and student.id in student_ids:
-                    AttendanceReport.objects.create(student=student, attendance=attendance, status=True)
-
-            return JsonResponse({'success': True, 'message': "Attendance Updated"})
-        except Exception as e:
-            return JsonResponse({'success': False, 'message': f"Attendance Could Not Be Updated: {str(e)}"})
-
+    instance = get_object_or_404(Attendance, id=attendance_id)
+    form = TeacherEditAttendanceForm(request.POST or None, request.FILES or None, instance=instance)  # Adjusted to include request.FILES
     context = {
-        'classes': classes,
-        'sessions': sessions,
-        'attendance': attendance,
-        'attendance_reports': attendance_reports,
-        'students': students,
+        'form': form,
+        'attendance_id': attendance_id,
         'page_title': _('Edit Attendance')
     }
+    if request.method == 'POST':
+        if form.is_valid():
+            classes = form.cleaned_data.get('classes')
+            date = form.cleaned_data.get('date')  # corrected field name
+            
+            try:
+                attendance = Attendance.objects.get(id=attendance_id)
+                attendance.classes = classes
+                attendance.date = date
+                messages.success(request, "Successfully Updated")
+            except Exception as e:
+                messages.error(request, f"Could Not Update: {e}")
+        else:
+            messages.error(request, "Could Not Update")
+
     return render(request, "teacher_template/teacher_edit_attendance.html", context)
+
 
 def teacher_view_attendance(request):
     attendance_id = request.GET.get('attendance_id')
@@ -326,8 +345,7 @@ def teacher_view_attendance(request):
 def save_attendance(request):
     if request.method != 'POST':
         logging.error('Invalid request method')
-        messages.error(request, 'Invalid request method')
-        return redirect('attendance_page')  # Replace with your attendance page URL name
+        return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
 
     logging.debug('Processing POST request')
     student_data = request.POST.get('student_ids')
@@ -339,8 +357,7 @@ def save_attendance(request):
 
     if not (student_data and date and classes_id and session_id):
         logging.error('Missing data')
-        messages.error(request, 'Missing data')
-        return redirect('attendance_page')  # Replace with your attendance page URL name
+        return JsonResponse({'success': False, 'error': 'Missing data'}, status=400)
 
     try:
         students = json.loads(student_data)
@@ -361,66 +378,14 @@ def save_attendance(request):
             logging.debug('AttendanceReport object saved')
 
         logging.debug('Attendance and AttendanceReport objects saved successfully')
-        return redirect('teacher_take_attendance')  # Replace with your attendance page URL name
+        return JsonResponse({'success': True, 'message': 'Attendance saved successfully'})
     except json.JSONDecodeError:
         logging.error('Invalid JSON')
-        # messages.error(request, 'Invalid JSON')
-        return redirect('teacher_take_attendance')  # Replace with your attendance page URL name
+        return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
     except Exception as e:
         logging.error(f'Unexpected error: {str(e)}')
-        # messages.error(request, f'An unexpected error occurred: {str(e)}')
-        return redirect('teacher_take_attendance')  # Replace with your attendance page URL name
-    
-# @csrf_exempt
-# def save_attendance(request):
-#     if request.method != 'POST':
-#         logging.error('Invalid request method')
-#         messages.error(request, 'Invalid request method')
-#         return redirect('teacher_take_attendance')
+        return JsonResponse({'success': False, 'error': f'An unexpected error occurred: {str(e)}'}, status=500)
 
-#     logging.debug('Processing POST request')
-#     student_data = request.POST.get('student_ids')
-#     date = request.POST.get('date')
-#     classes_id = request.POST.get('classes')
-#     session_id = request.POST.get('session')
-
-#     logging.debug(f'Received data: student_data={student_data}, date={date}, classes_id={classes_id}, session_id={session_id}')
-
-#     if not (student_data and date and classes_id and session_id):
-#         logging.error('Missing data')
-#         messages.error(request, 'Missing data')
-#         return redirect('teacher_take_attendance')
-
-#     try:
-#         students = json.loads(student_data)
-#         session = get_object_or_404(Session, id=session_id)
-#         classes = get_object_or_404(ClassSchedule, id=classes_id)
-#         attendance = Attendance(session=session, classes=classes, date=date)
-#         logging.debug(f'Created Attendance object: {attendance}')
-#         attendance.save()
-#         logging.debug('Attendance object saved')
-
-#         for student_dict in students:
-#             student_id = student_dict.get('id')
-#             student_status = student_dict.get('status', 0)
-#             student = get_object_or_404(Student, id=student_id)
-#             attendance_report = AttendanceReport(student=student, attendance=attendance, status=student_status)
-#             logging.debug(f'Creating AttendanceReport object: {attendance_report}')
-#             attendance_report.save()
-#             logging.debug('AttendanceReport object saved')
-
-#         logging.debug('Attendance and AttendanceReport objects saved successfully')
-#         messages.success(request, 'Attendance added')
-#         return redirect('teacher_manage_attendance')
-#     except json.JSONDecodeError:
-#         logging.error('Invalid JSON')
-#         messages.error(request, 'Invalid JSON')
-#         return redirect('teacher_take_attendance')
-#     except Exception as e:
-#         logging.error(f'Unexpected error: {str(e)}')
-#         # messages.error(request, 'An unexpected error occurred')
-#         return redirect('teacher_take_attendance')
-    
 def teacher_delete_attendance(request):
     if request.method == 'POST' and request.is_ajax():
         attendance_id = request.POST.get('attendance_id')

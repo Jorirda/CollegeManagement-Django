@@ -21,6 +21,9 @@ from . import hod_views, teacher_views, student_views, views
 
 urlpatterns = [
 #hodviews
+    path('teacher_home/', teacher_views.teacher_home, name='teacher_home'),
+    path('get_class_schedules/', teacher_views.get_class_schedules, name='get_class_schedules'),
+    path('get_students/', teacher_views.get_students, name='get_students'),
     path('admin_get_teacher_class_schedules_count/', hod_views.admin_get_teacher_class_schedules_count, name='admin_get_teacher_class_schedules_count'),
     path('admin_get_student_attendance/', hod_views.admin_get_student_attendance, name='admin_get_student_attendance'),
     path('get-grade-choices/', hod_views.get_grade_choices, name='get-grade-choices'),
@@ -102,7 +105,6 @@ urlpatterns = [
    
     # teacher
     path("teacher/home/", teacher_views.teacher_home, name='teacher_home'),
-    path('teacher/get_class_schedules/', teacher_views.get_class_schedules, name='get_class_schedules'),
     path("teacher/apply/leave/", teacher_views.teacher_apply_leave,name='teacher_apply_leave'),
     path("teacher/view/profile/", teacher_views.teacher_view_profile,name='teacher_view_profile'),
     path("teacher/attendance/take/", teacher_views.teacher_take_attendance,name='teacher_take_attendance'),
@@ -127,6 +129,8 @@ urlpatterns = [
     path("teacher/result/add/", teacher_views.teacher_add_result, name='teacher_add_result'),
     path("teacher/result/edit/", teacher_views.teacher_edit_result,name='edit_student_result'),
     path('teacher/result/fetch/', teacher_views.fetch_student_result,name='fetch_student_result'),
+     path('teacher/attendance/edit/', teacher_views.teacher_edit_attendance,name='teacher_edit_attendance'),
+
     
     # Student
     path("student/home/", student_views.student_home, name='student_home'),

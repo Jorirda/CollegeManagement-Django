@@ -1495,8 +1495,8 @@ def manage_class_schedule(request):
 
 #Notifications
 def admin_notify_teacher(request):
-    teachers = CustomUser.objects.filter(user_type=2).select_related('teacher')
-    courses = Course.objects.all()
+    teachers = Teacher.objects.all()
+    courses = LearningRecord.objects.filter(teacher=(teacher for teacher in teachers)) 
     students = Student.objects.all()
     context = {
         'page_title': "Send Notifications To Teachers",

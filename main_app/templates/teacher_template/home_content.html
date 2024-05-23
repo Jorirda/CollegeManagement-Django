@@ -102,12 +102,12 @@
 
 {% block custom_js %}
 <script>
-  $(document).ready(function(){
+$(document).ready(function(){
     function updateChart(data) {
-        console.log("Updating chart with data:", data); // Debugging log
-        
+        console.log("Updating chart with data:", data);
+
         if (data.labels.length === 0 || data.attendance_counts.length === 0) {
-            console.warn("No data available to display on the chart."); // Warning log
+            console.warn("No data available to display on the chart.");
             return;
         }
 
@@ -141,7 +141,7 @@
         var course = $('#course-filter').val();
         var class_schedule = $('#class-schedule-filter').val();
         var student = $('#student-filter').val();
-        console.log("Fetching attendance data for course:", course, "class schedule:", class_schedule, "student:", student); // Debugging log
+        console.log("Fetching attendance data for course:", course, "class schedule:", class_schedule, "student:", student);
         $.ajax({
             url: "{% url 'teacher_home' %}",
             data: {
@@ -150,24 +150,24 @@
                 student: student
             },
             success: function(response) {
-                console.log("AJAX response data:", response); // Debugging log
+                console.log("AJAX response data:", response);
                 updateChart(response.data);
             },
             error: function(xhr, status, error) {
-                console.error("AJAX request failed:", status, error); // Debugging log
+                console.error("AJAX request failed:", status, error);
             }
         });
     }
 
     function fetchClassSchedules(course_id) {
-        console.log("Fetching class schedules for course:", course_id); // Debugging log
+        console.log("Fetching class schedules for course:", course_id);
         $.ajax({
             url: "{% url 'get_class_schedules' %}",
             data: {
                 course_id: course_id
             },
             success: function(response) {
-                console.log("Class schedules:", response); // Debugging log
+                console.log("Class schedules:", response);
                 var scheduleSelect = $('#class-schedule-filter');
                 scheduleSelect.empty();
                 scheduleSelect.append('<option value="">Select Class Schedule</option>');
@@ -176,7 +176,31 @@
                 });
             },
             error: function(xhr, status, error) {
-                console.error("Failed to fetch class schedules:", status, error); // Debugging log
+                console.error("Failed to fetch class schedules:", status, error);
+            }
+        });
+    }
+
+    function fetchStudents(course_id, class_schedule_id) {
+        console.log("Fetching students for course:", course_id, "and class schedule:", class_schedule_id);
+        $.ajax({
+            url: "{% url 'teacher_home' %}",
+            data: {
+                course: course_id,
+                class_schedule: class_schedule_id,
+                get_students: true
+            },
+            success: function(response) {
+                console.log("Students:", response);
+                var studentSelect = $('#student-filter');
+                studentSelect.empty();
+                studentSelect.append('<option value="">Select Student</option>');
+                $.each(response.students, function(index, student) {
+                    studentSelect.append('<option value="'+student.id+'">'+student.full_name+'</option>');
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("Failed to fetch students:", status, error);
             }
         });
     }
@@ -185,10 +209,12 @@
         var course_id = $(this).val();
         fetchClassSchedules(course_id);
         fetchAttendanceData();
+        fetchStudents(course_id, $('#class-schedule-filter').val());
     });
 
     $('#class-schedule-filter').change(function(){
         fetchAttendanceData();
+        fetchStudents($('#course-filter').val(), $(this).val());
     });
 
     $('#student-filter').change(function(){
@@ -198,6 +224,8 @@
     // Initial load
     fetchAttendanceData();
 });
-
 </script>
 {% endblock custom_js %}
+
+
+

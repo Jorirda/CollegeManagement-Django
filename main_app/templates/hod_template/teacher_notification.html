@@ -1,6 +1,6 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% load i18n %}  <!-- Load the internationalization tag library -->
+{% load i18n %}
 
 {% block page_title %}
   {{ page_title }}
@@ -18,7 +18,6 @@
                             <h3 class="card-title">{% trans page_title %}</h3>
                         </div>                                               
                     </div>
-                    <!-- /.card-header -->
                     <div class="card-body">
                         <table id="example2" class="table table-bordered table-hover">
                             <thead class="thead-dark">
@@ -44,12 +43,12 @@
                                         {% if teacher.profile_pic == "" %}
                                         {% trans 'No Image' %}
                                         {% else %}
-                                        <img class="img img-fluid mb-2" height="56" width="56"
-                                            src="{{ teacher.profile_pic }}" alt="{% trans 'Teacher Image' %}">
+                                        <img class="img img-fluid mb-2" height="56" width="56" src="{{ teacher.profile_pic }}" alt="{% trans 'Teacher Image' %}">
                                         {% endif %}
                                     </td>
-                                    <td><button data-toggle="modal" data-target="#myModal" class="btn btn-primary show_notification" value="{{ teacher.id }}"> {% trans 'Send Notification' %} </button></td>
-
+                                    <td>
+                                        <button data-toggle="modal" data-target="#myModal" class="btn btn-primary show_notification" value="{{ teacher.id }}"> {% trans 'Send Notification' %} </button>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -60,61 +59,68 @@
         </div>
     </div>
 </section>
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
-   aria-labelledby="myModalLabel" aria-hidden="true">
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
    <div class="modal-dialog">
       <div class="modal-content">
          <div class="modal-header">{% trans 'Send Notification' %}
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                  &times;
-            </button>
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
          </div>
          <div class="modal-body">
             <div class="form-group">
-                <input type="text" id="message" class="form-control" placeholder="{% trans 'Type your message here...' %}">
+                <label>{% trans 'Select Course' %}</label>
+                <select id="course_id" class="form-control">
+                    {% for course in courses %}
+                    <option value="{{ course.id }}">{{ course.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>{% trans 'Message' %}</label>
+                <textarea id="message" class="form-control" placeholder="{% trans 'Type your message here...' %}"></textarea>
                 <input type="hidden" id="teacher_id" class="form-control">
             </div>
          </div>
          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-dismiss="modal">
-               {% trans 'Close' %}
-            </button>
-            <button type="button" id='send' class="btn btn-success send_notification">
-               {% trans 'Send Notification' %}
-            </button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans 'Close' %}</button>
+            <button type="button" id='send' class="btn btn-success send_notification">{% trans 'Send Notification' %}</button>
          </div>
-      </div><!-- /.modal-content -->
-   </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+      </div>
+   </div>
+</div>
 {% endblock content %}
+
 {% block custom_js %}
-  <script>
-      $(".show_notification").click(function(){
-          $("#teacher_id").val($(this).val());
-      });
-      $(".send_notification").click(function(){
-          var id = $("#teacher_id").val();
-          var message = $("#message").val();
-          sendNotification(id, message);
-      });
-    function sendNotification(id, message){
+<script>
+    $(".show_notification").click(function(){
+        $("#teacher_id").val($(this).val());
+    });
+    $(".send_notification").click(function(){
+        var id = $("#teacher_id").val();
+        var message = $("#message").val();
+        var course_id = $("#course_id").val();
+        sendNotification(id, message, course_id);
+    });
+    function sendNotification(id, message, course_id){
         $.ajax({
             url: "{% url 'send_teacher_notification' %}",
             type: 'POST',
             data: {
                 id: id,
-                message: message
+                message: message,
+                course_id: course_id,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
             }
         }).done(function (response) {
-          if (response == 'True'){
-            alert("{% trans 'Notification Sent' %}");
-            location.reload();
-          } else {
-            alert("{% trans 'Notification could not be saved. Please try again.' %}");
-          }
+            if (response == 'True'){
+                alert("{% trans 'Notification Sent' %}");
+                location.reload();
+            } else {
+                alert("{% trans 'Notification could not be saved. Please try again.' %}");
+            }
         }).fail(function (response) {
-            alert("{% trans 'Error in saving token' %}");
+            alert("{% trans 'Error in sending notification' %}");
         });
     }
-  </script>
+</script>
 {% endblock custom_js %}

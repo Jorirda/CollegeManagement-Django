@@ -43,7 +43,6 @@
             {% endfor %}
         </div>
         <script>
-            // Hide each message after 1 second and log a message to the console
             setTimeout(function() {
                 var alerts = document.getElementsByClassName('message-alert');
                 for (var i = 0; i < alerts.length; i++) {
@@ -70,6 +69,11 @@
                                     <th>#</th>
                                     <th>{% trans 'Date' %}</th>
                                     <th>{% trans 'Time' %}</th>
+                                    <th>{% trans 'Course' %}</th>
+                                    <th>{% trans 'Start Time' %}</th>
+                                    <th>{% trans 'End Time' %}</th>
+                                    <th>{% trans 'Student' %}</th>
+                                    <th>{% trans 'Next Payment Date' %}</th>
                                     <th>{% trans 'Message' %}</th>
                                     <th>{% trans 'Actions' %}</th>
                                 </tr>
@@ -80,6 +84,11 @@
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ notification.date|date:"Y-m-d" }}</td>
                                     <td>{{ notification.time|date:"g:i A" }}</td>
+                                    <td>{{ notification.course_name }}</td>
+                                    <td>{{ notification.course_start }}</td>
+                                    <td>{{ notification.course_end }}</td>
+                                    <td>{{ notification.student_name }}</td>
+                                    <td>{{ notification.next_payment_date|date:"Y-m-d" }}</td>
                                     <td>{{ notification.message }}</td>
                                     <td>
                                         <a href="{% url 'mark_notification_as_read' notification.id %}" class="btn btn-success">{% trans 'Mark as Read' %}</a>
@@ -102,7 +111,6 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
-    // Function to delete notification and show success message
     function deleteNotification(notificationId) {
         if (confirm('{% trans 'Are you sure you want to delete this notification?' %}')) {
             $.ajax({
@@ -114,24 +122,19 @@
                 },
                 success: function(data) {
                     if (data.success) {
-                        // Remove the table row
                         $('#notification-' + notificationId).remove();
-                        // Show success message
                         $('#success-message').text('{% trans "Notification Deleted Successfully!" %}');
                         $('#success-message').show();
-                        // Hide success message after 3 seconds
                         setTimeout(function() {
                             $('#success-message').hide();
                         }, 3000);
-                    } 
+                    }
                 },
                 error: function(xhr, status, error) {
                     console.error(xhr.responseText);
-                    // Show error message
                     $('#success-message').text('{% trans "An error occurred while deleting the notification." %}');
                     $('#success-message').addClass('alert-danger');
                     $('#success-message').show();
-                    // Hide error message after 3 seconds
                     setTimeout(function() {
                         $('#success-message').hide();
                     }, 3000);

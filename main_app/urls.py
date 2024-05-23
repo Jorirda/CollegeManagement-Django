@@ -21,6 +21,7 @@ from . import hod_views, teacher_views, student_views, views
 
 urlpatterns = [
 #hodviews
+    path('admin_get_teacher_class_schedules_count/', hod_views.admin_get_teacher_class_schedules_count, name='admin_get_teacher_class_schedules_count'),
     path('admin_get_student_attendance/', hod_views.admin_get_student_attendance, name='admin_get_student_attendance'),
     path('get-grade-choices/', hod_views.get_grade_choices, name='get-grade-choices'),
     path("", views.login_page, name='login_page'),
@@ -98,11 +99,11 @@ urlpatterns = [
     path("payment/delete/<int:payment_id>",hod_views.delete_payment_record, name='delete_payment_record'),
     path("learn/delete/<int:learn_id>",hod_views.delete_learning_record, name='delete_learning_record'),
     path("schedule/delete/<int:schedule_id>",hod_views.delete_class_schedule, name='delete_class_schedule'),
-
+   
     # teacher
     path("teacher/home/", teacher_views.teacher_home, name='teacher_home'),
     path("teacher/apply/leave/", teacher_views.teacher_apply_leave,name='teacher_apply_leave'),
-    path("teacher/write/summary/", teacher_views.teacher_write_summary, name='teacher_write_summary'),
+   
     path("teacher/view/profile/", teacher_views.teacher_view_profile,name='teacher_view_profile'),
     path("teacher/attendance/take/", teacher_views.teacher_take_attendance,name='teacher_take_attendance'),
     # path("teacher/attendance/update/", teacher_views.teacher_update_attendance,name='teacher_update_attendance'),
@@ -120,9 +121,12 @@ urlpatterns = [
     path("teacher/view/notification/count/", teacher_views.teacher_view_notification_count, name="teacher_view_notification_count"),
     path('teacher/view/notification/read/<int:notification_id>/', teacher_views.mark_notification_as_read, name='mark_notification_as_read'),
     path('teacher/delete/notification/', teacher_views.teacher_delete_notification, name='teacher_delete_notification'),
+    path("teacher/write/summary/", teacher_views.teacher_write_summary, name='teacher_write_summary'),
+    # path('teacher/delete/summary/', teacher_views.delete_summary, name='delete_summary'),
     path("teacher/result/add/", teacher_views.teacher_add_result, name='teacher_add_result'),
     path("teacher/result/edit/", teacher_views.teacher_edit_result,name='edit_student_result'),
     path('teacher/result/fetch/', teacher_views.fetch_student_result,name='fetch_student_result'),
+    
 
 
 

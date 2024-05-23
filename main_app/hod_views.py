@@ -31,7 +31,7 @@ from django.core import serializers
 from dateutil.relativedelta import relativedelta
 from django.shortcuts import render
 from django.utils.translation import gettext as _
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.utils import timezone
 
 
@@ -54,7 +54,7 @@ class SidebarView(TemplateView):
             context['first_name'] = 'Guest'
             context['last_name'] = ''
         return context
-    
+
 #Get and Fetch Functions
 def get_grade_choices(request):
     course_id = request.GET.get('course_id')
@@ -215,6 +215,28 @@ def refund_records(request):
 
     return render(request, 'hod_template/refund_records.html', context)
 
+def get_classes_taken_by_teachers(request):
+    current_month = datetime.now().month
+    current_year = datetime.now().year
+    teachers = Teacher.objects.all()
+    teacher_names = []
+    classes_taken = []
+    
+    for teacher in teachers:
+        count = LearningRecord.objects.filter(
+            teacher=teacher,
+            date__year=current_year,
+            date__month=current_month
+        ).count()
+        teacher_names.append(teacher.full_name)  # Adjust based on your Teacher model
+        classes_taken.append(count)
+    
+    data = {
+        'teachers': teacher_names,
+        'classes_taken': classes_taken
+    }
+    return JsonResponse(data)
+
 def admin_get_student_attendance(request):
     student_id = request.GET.get('student_id')
     # logger.info(f"Fetching attendance data for student ID: {student_id}")  # Log student ID
@@ -244,6 +266,12 @@ def admin_get_student_attendance(request):
     except Exception as e:
         logger.error(f"Error fetching attendance data: {e}")
         return JsonResponse({'error': str(e)}, status=500)
+
+def admin_get_teacher_class_schedules_count(request):
+    teacher_id = request.GET.get('teacher_id')
+    print(teacher_id)
+    class_schedules_count = ClassSchedule.objects.filter(learningrecord__teacher_id=teacher_id).count()
+    return JsonResponse({'class_schedules_count': class_schedules_count})
 
 #Admin
 def admin_home(request):
@@ -357,6 +385,8 @@ def admin_home(request):
         if student.status == "Refund":
             withdrawal_count += 1
 
+    teachers = Teacher.objects.all()
+
     context = {
         'page_title': _("Administrative Dashboard"),
         'total_students': total_students,
@@ -382,7 +412,8 @@ def admin_home(request):
         'available_years': sorted(available_years),
         'student_renewals': student_renewals,
         'withdrawal_count': withdrawal_count,
-        'students': students  # Add students to the context
+        'students': students,  # Add students to the context
+        'teachers': teachers  # Add teachers to the context
     }
 
     return render(request, 'hod_template/home_content.html', context)
@@ -1464,10 +1495,13 @@ def manage_class_schedule(request):
 
 #Notifications
 def admin_notify_teacher(request):
-    teacher = CustomUser.objects.filter(user_type=2)
+    teachers = CustomUser.objects.filter(user_type=2).select_related('teacher')
+    courses = Course.objects.all()
+
     context = {
         'page_title': _("Send Notifications To Teachers"),
-        'teachers': teacher
+        'teachers': teachers,
+        'courses': courses,
     }
     return render(request, "hod_template/teacher_notification.html", context)
 
@@ -1673,25 +1707,70 @@ def send_student_notification(request):
     except Exception as e:
         return HttpResponse("False")
 
+# @csrf_exempt
+# def send_teacher_notification(request):
+#     id = request.POST.get('id')
+#     message = request.POST.get('message')
+#     teacher = get_object_or_404(Teacher, admin_id=id)
+#     try:
+#         url = "https://fcm.googleapis.com/fcm/send"
+#         body = {
+#             'notification': {
+#                 'title': "中之学校管理软件",
+#                 'body': message,
+#                 'click_action': reverse('teacher_view_notification'),
+#                 'icon': static('dist/img/AdminLTELogo.png')
+#             },
+#             'to': teacher.admin.fcm_token
+#         }
+#         headers = {'Authorization':
+#                    'key=AAAA3Bm8j_M:APA91bElZlOLetwV696SoEtgzpJr2qbxBfxVBfDWFiopBWzfCfzQp2nRyC7_A2mlukZEHV4g1AmyC6P_HonvSkY2YyliKt5tT3fe_1lrKod2Daigzhb2xnYQMxUWjCAIQcUexAMPZePB',
+#                    'Content-Type': 'application/json'}
+#         data = requests.post(url, data=json.dumps(body), headers=headers)
+
+#         # Set the timezone to China Standard Time
+#         china_tz = pytz.timezone('Asia/Shanghai')
+#         now = timezone.now().astimezone(china_tz)
+
+#         notification = NotificationTeacher(
+#             teacher=teacher,
+#             message=message,
+#             date=now.date(),
+#             time=now.time()
+#         )
+#         notification.save()
+#         return HttpResponse("True")
+#     except Exception as e:
+#         return HttpResponse("False")
+
 @csrf_exempt
 def send_teacher_notification(request):
     id = request.POST.get('id')
     message = request.POST.get('message')
+    course_id = request.POST.get('course_id')
     teacher = get_object_or_404(Teacher, admin_id=id)
+    course = get_object_or_404(Course, id=course_id)
+    students = Student.objects.filter(course=course)
+
+    student_info = "\n".join([f"{student.admin.full_name} (Age: {student.date_of_birth})" for student in students])
+
+    detailed_message = f"Course: {course.name}\nStudents:\n{student_info}\n\nMessage: {message}"
+
     try:
         url = "https://fcm.googleapis.com/fcm/send"
         body = {
             'notification': {
                 'title': "中之学校管理软件",
-                'body': message,
+                'body': detailed_message,
                 'click_action': reverse('teacher_view_notification'),
                 'icon': static('dist/img/AdminLTELogo.png')
             },
             'to': teacher.admin.fcm_token
         }
-        headers = {'Authorization':
-                   'key=AAAA3Bm8j_M:APA91bElZlOLetwV696SoEtgzpJr2qbxBfxVBfDWFiopBWzfCfzQp2nRyC7_A2mlukZEHV4g1AmyC6P_HonvSkY2YyliKt5tT3fe_1lrKod2Daigzhb2xnYQMxUWjCAIQcUexAMPZePB',
-                   'Content-Type': 'application/json'}
+        headers = {
+            'Authorization': 'key=YOUR_SERVER_KEY',
+            'Content-Type': 'application/json'
+        }
         data = requests.post(url, data=json.dumps(body), headers=headers)
 
         # Set the timezone to China Standard Time
@@ -1700,7 +1779,7 @@ def send_teacher_notification(request):
 
         notification = NotificationTeacher(
             teacher=teacher,
-            message=message,
+            message=detailed_message,
             date=now.date(),
             time=now.time()
         )
@@ -1708,7 +1787,6 @@ def send_teacher_notification(request):
         return HttpResponse("True")
     except Exception as e:
         return HttpResponse("False")
-
 
 
 

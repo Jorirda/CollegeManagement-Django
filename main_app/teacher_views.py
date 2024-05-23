@@ -449,7 +449,6 @@ def teacher_apply_leave(request):
             messages.error(request, "Form has errors!")
     return render(request, "teacher_template/teacher_apply_leave.html", context)
 
-#Summary
 @csrf_exempt
 def teacher_write_summary(request):
     teacher = get_object_or_404(Teacher, admin_id=request.user.id)
@@ -463,8 +462,16 @@ def teacher_write_summary(request):
                 summary = get_object_or_404(SummaryTeacher, id=summary_id)
                 new_summary_text = request.POST.get('summary')
                 summary.summary = new_summary_text
-                summary.replied_at = timezone.now()  # Set the reply date
+                summary.replied_at = timezone.now()
                 summary.save()
+                return HttpResponse("True")
+            except Exception as e:
+                return HttpResponse("False")
+        if 'delete' in request.POST and request.POST.get('delete') == 'true':
+            summary_id = request.POST.get('id')
+            try:
+                summary = get_object_or_404(SummaryTeacher, id=summary_id)
+                summary.delete()
                 return HttpResponse("True")
             except Exception as e:
                 return HttpResponse("False")
@@ -489,27 +496,35 @@ def teacher_write_summary(request):
 
     return render(request, 'teacher_template/teacher_write_summary.html', context)
 
-@csrf_exempt
-def delete_summary(request):
-    if request.method == 'POST':
-        summary_id = request.POST.get('id')
-        try:
-            summary = SummaryTeacher.objects.get(pk=summary_id)
-            summary.delete()
-            return HttpResponse("True")
-        except SummaryTeacher.DoesNotExist:
-            return HttpResponse("False")
-    else:
-        return HttpResponse("False")
-
-
 
 #Notifications
 def teacher_view_notification(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
     notifications = NotificationTeacher.objects.filter(teacher=teacher)
+    
+    # Annotate notifications with related payment records
+    annotated_notifications = []
+    for notification in notifications:
+        payment_record = notification.payment_record
+        student = notification.student
+        course = notification.course
+        
+        notification_data = {
+            'id': notification.id,
+            'date': notification.date,
+            'time': notification.time,
+            'message': notification.message,
+            'is_read': notification.is_read,
+            # 'course_name': course.name,
+            'course_start': course.level_start, #this might mean starttime/endtime, will test tmr
+            'course_end': course.level_end,
+            'student_name': student.admin.full_name,
+            'next_payment_date': payment_record.next_payment_date if payment_record else None
+        }
+        annotated_notifications.append(notification_data)
+
     context = {
-        'notifications': notifications,
+        'notifications': annotated_notifications,
         'page_title': "View Notifications"
     }
     return render(request, "teacher_template/teacher_view_notification.html", context)

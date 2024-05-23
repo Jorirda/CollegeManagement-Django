@@ -186,15 +186,7 @@ class SummaryTeacher(models.Model):
     def __str__(self):
         return self.summary
 
-class NotificationTeacher(models.Model):
-    date = models.DateField(default=timezone.now)
-    time = models.TimeField(default=timezone.now)  
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    message = models.TextField()
-    is_read = models.BooleanField(default=False)  # New field for marking notifications as read
 
-    def __str__(self):
-        return self.message
 
 class NotificationStudent(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -226,7 +218,18 @@ class PaymentRecord(models.Model):
         related_name='payment_record', 
         on_delete=models.SET_NULL
     )
+class NotificationTeacher(models.Model):
+    date = models.DateField(default=timezone.now)
+    time = models.TimeField(default=timezone.now)  
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)  # New field for marking notifications as read
+    course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True, blank=False)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True)
+    payment_record = models.ForeignKey(PaymentRecord, on_delete=models.CASCADE, null=True)
 
+    def __str__(self):
+        return self.message
 class RefundRecord(models.Model):
     # admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
     student = models.ForeignKey(Student,null=True, on_delete=models.CASCADE)

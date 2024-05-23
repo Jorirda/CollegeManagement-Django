@@ -218,6 +218,28 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <!-- New small box for class schedules count -->
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-info">
+                            <div class="inner">
+                                <h3 id="class-schedules-count">0</h3>
+                                <p>{% trans "Class Schedules for Selected Teacher" %}</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="small-box-footer">
+                                <select id="teacherSelect" class="form-control">
+                                    {% for teacher in teachers %}
+                                        <option value="{{ teacher.id }}">{{ teacher.admin.full_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
 
             <!-- Student Attendance Tab -->
@@ -552,6 +574,30 @@
 
         // Initialize with the first student
         $('#studentSelect').trigger('change');
+    });
+
+    $(document).ready(function() {
+        // Function to update class schedules count
+        function updateClassSchedulesCount(teacherId) {
+            $.ajax({
+                url: '{% url "admin_get_teacher_class_schedules_count" %}',
+                data: { teacher_id: teacherId },
+                success: function(response) {
+                    $('#class-schedules-count').text(response.class_schedules_count);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching class schedules count:", error);
+                }
+            });
+        }
+
+        $('#teacherSelect').change(function() {
+            var teacherId = $(this).val();
+            updateClassSchedulesCount(teacherId);
+        });
+
+        // Initialize with the first teacher
+        $('#teacherSelect').trigger('change');
     });
 </script>
 {% endblock custom_js %}

@@ -7,6 +7,87 @@
 {% endblock page_title %}
 
 {% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- General form elements -->
+                <div class="card card-dark">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ page_title }}</h3>
+                    </div>
+
+                    {% include "main_app/form_template.html" with messages=messages form=form button_text="Submit Summary" %}
+                </div>
+                <!-- /.card -->
+                <div class="card card-dark">
+                    <div class="card-header"><h3 class="card-title">Summaries</h3></div>
+                    <div class="table-container p-2">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>ID</th>
+                                <th>{% trans 'Student' %}</th>
+                                <th>{% trans 'Summary' %}</th>
+                                <th>{% trans 'Sent On' %}</th>
+                                <th>{% trans 'Status' %}</th>
+                                <th>{% trans 'Reply' %}</th>
+                                <th>{% trans 'Replied Date' %}</th>
+                                <th>{% trans 'Action' %}</th>
+                            </tr>
+                            {% for summary in summaries %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ summary.student.admin.full_name }}</td>
+                                <td>{{ summary.summary }}</td>
+                                <td>{{ summary.created_at|date:"Y-m-d H:i:s" }}</td>
+                                {% if not summary.reply %}
+                                    <td><span class='badge badge-warning'>{% trans 'pending' %}</span></td>
+                                    <td><span class='badge badge-warning'>{% trans 'pending' %}</span></td>
+                                    <td><span class='badge badge-warning'>{% trans 'pending' %}</span></td>
+                                {% else %}
+                                    <td><span class='badge badge-success'>{% trans 'seen' %}</span></td>
+                                    <td>{{ summary.reply }}</td>
+                                    <td>{{ summary.replied_at }}</td>
+                                {% endif %}
+                                <td class="responsive-buttons">
+                                    <a href="#" class="btn btn-info btn-responsive edit_button" data-id="{{ summary.id }}" data-summary="{{ summary.summary }}">{% trans 'Edit' %}</a>
+                                    <button class="btn btn-danger btn-responsive delete_button" data-id="{{ summary.id }}">{% trans 'Delete' %}</button>
+                                </td>         
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="edit_modal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="editModalLabel">
+                    {% trans 'Edit Summary' %}
+                </h4>
+            </div>            
+            <div class="modal-body">
+                <input type="hidden" id="edit_id">
+                <p>{% trans 'Edit summary for' %} <span id="edit_summary_name"></span></p>  
+                <textarea name="edit_summary_message" id="edit_summary_message" cols="30" rows="10" class="form-control"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button id="edit_btn" class="btn btn-success btn-block">{% trans 'Edit' %}</button>
+                <button type="button" class="btn btn-danger btn-block" data-dismiss="modal">{% trans 'Cancel' %}</button>          
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block custom_css %}
 <style>
     .responsive-buttons {
         display: flex;
@@ -60,92 +141,18 @@
         font-size: 30px; /* Adjust the size as needed */
         position: absolute; /* Positions the close (x) icon absolutely */
         right: 20px; /* Adjust the distance from the right side */
-        top: 5; /* Aligns the close (x) icon with the top of the modal header */
+        top: 5px; /* Aligns the close (x) icon with the top of the modal header */
     }
 </style>
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <!-- general form elements -->
-                <div class="card card-dark">
-                    <div class="card-header">
-                        <h3 class="card-title">{{ page_title }}</h3>
-                    </div>
-
-                    {% include "main_app/form_template.html" with messages=messages form=form button_text="Submit Summary" %}
-                </div>
-                <!-- /.card -->
-                <div class="card card-dark">
-                    <div class="card-header"><h3 class="card-title">Summaries</h3></div>
-                    <div class="table-container p-2">
-                        <table class="table table-bordered">
-                            <tr>
-                                <th>ID</th>
-                                <th>{% trans 'Student' %}</th>
-                                <th>{% trans 'Summary' %}</th>
-                                <th>{% trans 'Sent On' %}</th>
-                                <th>{% trans 'Status' %}</th>
-                                <th>{% trans 'Replied Date' %}</th>
-                                <th>{% trans 'Reply' %}</th>
-                                <th>{% trans 'Action' %}</th>
-                            </tr>
-                            {% for summary in summaries %}
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ summary.student.admin.full_name }}</td>
-                                <td>{{ summary.summary }}</td>
-                                <td>{{ summary.created_at|date:"Y-m-d H:i:s" }}</td>
-                                {% if summary.reply == "" %}
-                                    <td><span class='badge badge-warning'>{% trans 'pending' %}</span></td>
-                                    <td><span class='badge badge-warning'>{% trans 'pending' %}</span></td>
-                                    <td><button data-toggle="modal" data-target="#reply_modal" value="{{ summary.id }}" class="btn btn-success reply_open_modal">{% trans 'Reply' %}</button></td>
-                                {% else %}
-                                    <td><span class='badge badge-success'>{% trans 'seen' %}</span></td>
-                                    <td>{{ summary.replied_at }}</td>
-                                    <td>{{ summary.reply }}</td>
-                                {% endif %}
-                                <td class="responsive-buttons">
-                                    <a href="#" class="btn btn-info btn-responsive edit_button" data-id="{{ summary.id }}" data-summary="{{ summary.summary }}">{% trans 'Edit' %}</a>
-                                    <button class="btn btn-danger btn-responsive delete_button" data-id="{{ summary.id }}">{% trans 'Delete' %}</button>
-                                </td>         
-                            </tr>
-                            {% endfor %}
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Edit Modal -->
-<div class="modal fade" id="edit_modal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="editModalLabel">
-                    {% trans 'Edit Summary' %}
-                </h4>
-            </div>            
-            <div class="modal-body">
-                <input type="hidden" id="edit_id">
-                <p>{% trans 'Edit summary for' %} <span id="edit_summary_name"></span></p>  
-                <textarea name="edit_summary_message" id="edit_summary_message" cols="30" rows="10" class="form-control"></textarea>
-            </div>
-            <div class="modal-footer">
-                <button id="edit_btn" class="btn btn-success btn-block">{% trans 'Edit' %}</button>
-                <button type="button" class="btn btn-danger btn-block" data-dismiss="modal">{% trans 'Cancel' %}</button>          
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock content %}
+{% endblock custom_css %}
 
 {% block custom_js %}
 <script>
-    $(document).ready(function(){
+   $(document).ready(function(){
+        function getCSRFToken() {
+            return $('meta[name="csrf-token"]').attr('content');
+        }
+
         function openEditModal() {
             $(".edit_button").click(function() {
                 var id = $(this).data("id");
@@ -170,9 +177,12 @@
                         id: id,
                         summary: summary,
                         edit: true
+                    },
+                    headers: {
+                        'X-CSRFToken': getCSRFToken()
                     }
                 }).done(function(response) {
-                    if (response == "True") {
+                    if (response === "True") {
                         alert("{% trans 'Summary Updated' %}");
                         location.reload();
                     } else {
@@ -189,26 +199,29 @@
                 var id = $(this).data("id");
                 if (confirm("{% trans 'Are you sure you want to delete this summary?' %}")) {
                     $.ajax({
-                        url: "{% url 'delete_summary' %}",
+                        url: "{% url 'teacher_write_summary' %}",
                         type: 'POST',
                         data: {
-                            id: id
+                            id: id,
+                            delete: true
+                        },
+                        headers: {
+                            'X-CSRFToken': getCSRFToken()
                         }
                     }).done(function(response) {
                         if (response == "True") {
-                            alert("{% trans 'Summary deleted successfully' %}");
+                            alert("{% trans 'Summary Deleted Successfully' %}");
                             location.reload();
                         } else {
-                            alert("{% trans 'Failed to delete summary' %}");
+                            alert("{% trans 'Failed to Delete Summary' %}");
                         }
                     }).fail(function() {
-                        alert("{% trans 'Error occurred while deleting summary' %}");
+                        alert("{% trans 'Error Occurred While Deleting Summary' %}");
                     });
                 }
             });
         }
 
-        // Initialize functions
         openEditModal();
         updateSummary();
         deleteSummary();

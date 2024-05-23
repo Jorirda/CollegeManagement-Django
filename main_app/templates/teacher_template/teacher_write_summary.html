@@ -79,9 +79,11 @@
                 <textarea name="edit_summary_message" id="edit_summary_message" cols="30" rows="10" class="form-control"></textarea>
             </div>
             <div class="modal-footer">
-                <button id="edit_btn" class="btn btn-success btn-block">{% trans 'Edit' %}</button>
-                <button type="button" class="btn btn-danger btn-block" data-dismiss="modal">{% trans 'Cancel' %}</button>          
-            </div>
+                <div class="button-group">
+                    <button id="edit_btn" class="btn btn-success">{% trans 'Edit' %}</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans 'Cancel' %}</button>
+                </div>
+            </div>        
         </div>
     </div>
 </div>
@@ -121,6 +123,7 @@
         justify-content: center;
         margin: 20px 0;
     }
+
     .pagination a, .pagination span {
         margin: 0 5px;
         padding: 8px 16px;
@@ -129,19 +132,38 @@
         border: 1px solid #DEE2E600;
         border-radius: 4px;
     }
+
     .pagination a:hover {
         background-color: #e9ecef;
     }
+
     .pagination .current {
         background-color: #5FC032;
         color: white;
     }
-     /* Custom style for close (x) icon */
-     .modal-header .close {
+
+    /* Custom style for close (x) icon */
+    .modal-header .close {
         font-size: 30px; /* Adjust the size as needed */
         position: absolute; /* Positions the close (x) icon absolutely */
         right: 20px; /* Adjust the distance from the right side */
-        top: 5px; /* Aligns the close (x) icon with the top of the modal header */
+        top: 5; /* Aligns the close (x) icon with the top of the modal header */
+    }
+
+    /* Styles for modal footer buttons */
+    .modal-footer .button-group {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .modal-footer .button-group .btn {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .modal-footer .button-group .btn:last-child {
+        margin-bottom: 0;
     }
 </style>
 {% endblock custom_css %}

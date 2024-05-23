@@ -1,60 +1,124 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
 
 {% block content %}
-
 <section class="content">
     <div class="container-fluid">
+        <div id="success-message" class="alert alert-success" style="display: none;"></div>
+
+        {% if messages %}
+        <div id="message-box">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} message-alert" id="message-{{ forloop.counter }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        <script>
+            setTimeout(function() {
+                var alerts = document.getElementsByClassName('message-alert');
+                for (var i = 0; i < alerts.length; i++) {
+                    console.log('Hiding message:', alerts[i].innerText);
+                    alerts[i].style.display = 'none';
+                }
+            }, 1000); // 1000 milliseconds = 1 second
+        </script>
+        {% endif %}
         <div class="row">
             <div class="col-md-12">
                 <!-- general form elements -->
                 <div class="card card-dark">
                     <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
+                        <h3 class="card-title">{{ page_title }}</h3>
                     </div>
 
-                    {% include "main_app/form_template.html" with messages=messages  form=form button_text="Apply For Leave"%}
+                    <form id="leave-application-form" method="POST" action="{% url 'teacher_apply_leave' %}">
+                        {% csrf_token %}
+                        {% include "main_app/form_template.html" with messages=messages form=form button_text="Apply For Leave" %}
+                    </form>
                 </div>
                 <!-- /.card -->
-<div class="card card-default">
-    <div class="card-header"><h3 class="card-title"><b>Leave History</b></h3>
-   <div class="table">
-
-       <table class="table table-bordered table-hover">
-           <thead class="thead-dark">
-            <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Message</th>
-             <th>Status</th>
-         </tr>
-           </thead>
-        {% for leave in leave_history %}
-        <tr>
-            <td>{{forloop.counter}}</td>
-            <td>{{leave.date}}</td>
-              <td>{{leave.message}}</td>
-              <td>
-                  
-                  {% if leave.status == 0 %}
-                  <span class="badge badge-warning">Pending</span>
-                  {% elif leave.status == 1 %}
-                  <span class="badge badge-success">Accepted</span>
-                  
-                    {% else %}
-                    <span class="badge badge-danger">Rejected</span>
-                    
-                    {% endif %}
-                    
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-    </div>
+                <div class="card card-default">
+                    <div class="card-header">
+                        <h3 class="card-title"><b>Leave History</b></h3>
+                    </div>
+                    <div class="table">
+                        <table class="table table-bordered table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Date</th>
+                                    <th>Message</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            {% for leave in leave_history %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ leave.date }}</td>
+                                <td>{{ leave.message }}</td>
+                                <td>
+                                    {% if leave.status == 0 %}
+                                    <span class="badge badge-warning">Pending</span>
+                                    {% elif leave.status == 1 %}
+                                    <span class="badge badge-success">Accepted</span>
+                                    {% else %}
+                                    <span class="badge badge-danger">Rejected</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </section>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Function to handle form submission via AJAX
+        $('#leave-application-form').submit(function(event) {
+            event.preventDefault(); // Prevent default form submission
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                success: function(data) {
+                    if (data.success) {
+                        // Show success message
+                        $('#success-message').removeClass('alert-danger').addClass('alert-success');
+                        $('#success-message').text(data.message);
+                        $('#success-message').show();
+                        // Hide success message after 3 seconds
+                        setTimeout(function() {
+                            $('#success-message').hide();
+                        }, 3000);
+                    } else {
+                        console.error(data.errors || data.message);
+                        // Show error message
+                        $('#success-message').removeClass('alert-success').addClass('alert-danger');
+                        $('#success-message').text(data.errors || data.message);
+                        $('#success-message').show();
+                        // Hide error message after 3 seconds
+                        setTimeout(function() {
+                            $('#success-message').hide();
+                        }, 3000);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    // Show error message
+                    $('#success-message').removeClass('alert-success').addClass('alert-danger');
+                    $('#success-message').text('An error occurred while applying for leave.');
+                    $('#success-message').show();
+                    // Hide error message after 3 seconds
+                    setTimeout(function() {
+                        $('#success-message').hide();
+                    }, 3000);
+                }
+            });
+        });
+    });
+</script>
 {% endblock content %}

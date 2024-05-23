@@ -32,7 +32,7 @@
                         </div>
                     </div>
                     <div class="col-lg-3 col-6">
-                        <div class="small-box bg-success">
+                        <div class="small-box bg-warning">
                             <div class="inner">
                                 <h3>{{ total_teacher }}</h3>
                                 <p>{% trans "Total Teachers" %}</p>
@@ -67,9 +67,10 @@
                             <a href="{% url 'manage_payment_record' %}" class="small-box-footer">{% trans "More info" %} <i class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
+                    
                 </div>
                 <div class="row">
-                  <div class="col-lg-6">
+                  <div class="col-lg-3">
                       <div class="small-box bg-orange">
                           <div class="inner">
                               <h3>{{ student_renewals }}</h3>
@@ -80,7 +81,7 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col-lg-6">
+                  <div class="col-lg-3">
                       <div class="small-box bg-purple">
                           <div class="inner">
                               <h3>{{ withdrawal_count }}</h3>
@@ -91,6 +92,37 @@
                           </div>
                       </div>
                   </div>
+                  <!-- New small box for class schedules count -->
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-info">
+                        <div class="inner">
+                            <h3 id="class-schedules-count">0</h3>
+                            <p>{% trans "Class Schedules for Selected Teacher" %}</p>
+                        </div>
+                        <div class="icon">
+                            <i class="nav-icon fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="small-box-footer">
+                            <select id="teacherSelect" class="form-control">
+                                {% for teacher in teachers %}
+                                    <option value="{{ teacher.id }}">{{ teacher.admin.full_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-success">
+                        <div class="inner">
+                            <h3>{{ total_refunds }}</h3>
+                            <p>{% trans "¥ Total Refund Amount" %}</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-undo"></i>
+                        </div>
+                        <a href="{% url 'refund_records' %}" class="small-box-footer">{% trans "More info" %} <i class="fas fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
               </div>
               <div class="row">
                 <div class="col-lg-12">
@@ -214,27 +246,6 @@
                                 <div class="chart">
                                     <canvas id="monthlyContributionsChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <!-- New small box for class schedules count -->
-                    <div class="col-lg-3 col-6">
-                        <div class="small-box bg-info">
-                            <div class="inner">
-                                <h3 id="class-schedules-count">0</h3>
-                                <p>{% trans "Class Schedules for Selected Teacher" %}</p>
-                            </div>
-                            <div class="icon">
-                                <i class="nav-icon fas fa-calendar-alt"></i>
-                            </div>
-                            <div class="small-box-footer">
-                                <select id="teacherSelect" class="form-control">
-                                    {% for teacher in teachers %}
-                                        <option value="{{ teacher.id }}">{{ teacher.admin.full_name }}</option>
-                                    {% endfor %}
-                                </select>
                             </div>
                         </div>
                     </div>

@@ -270,7 +270,7 @@ def admin_get_student_attendance(request):
 def admin_get_teacher_class_schedules_count(request):
     teacher_id = request.GET.get('teacher_id')
     print(teacher_id)
-    class_schedules_count = ClassSchedule.objects.filter(learningrecord__teacher_id=teacher_id).count()
+    class_schedules_count = ClassSchedule.objects.filter(teacher_id=teacher_id).count()
     return JsonResponse({'class_schedules_count': class_schedules_count})
 
 #Admin
@@ -1497,12 +1497,14 @@ def manage_class_schedule(request):
 def admin_notify_teacher(request):
     teachers = CustomUser.objects.filter(user_type=2).select_related('teacher')
     courses = Course.objects.all()
-
+    students = Student.objects.all()
     context = {
-        'page_title': _("Send Notifications To Teachers"),
+        'page_title': "Send Notifications To Teachers",
         'teachers': teachers,
         'courses': courses,
+        'students': students,
     }
+
     return render(request, "hod_template/teacher_notification.html", context)
 
 def admin_notify_student(request):
@@ -1751,8 +1753,16 @@ def send_teacher_notification(request):
     teacher = get_object_or_404(Teacher, admin_id=id)
     course = get_object_or_404(Course, id=course_id)
     students = Student.objects.filter(course=course)
+    print(course)
+    print(students)
+    for student in students:
+        studentFirst = student
+    def calculate_age(birthdate):
+        today = datetime.today()
+        age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+        return age
 
-    student_info = "\n".join([f"{student.admin.full_name} (Age: {student.date_of_birth})" for student in students])
+    student_info = "\n".join([f"{studentFirst.admin.full_name} (Age: {calculate_age(studentFirst.date_of_birth)})"])
 
     detailed_message = f"Course: {course.name}\nStudents:\n{student_info}\n\nMessage: {message}"
 
@@ -1780,6 +1790,8 @@ def send_teacher_notification(request):
         notification = NotificationTeacher(
             teacher=teacher,
             message=detailed_message,
+            course=course,
+            student=studentFirst,
             date=now.date(),
             time=now.time()
         )

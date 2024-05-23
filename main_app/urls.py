@@ -103,7 +103,6 @@ urlpatterns = [
     # teacher
     path("teacher/home/", teacher_views.teacher_home, name='teacher_home'),
     path("teacher/apply/leave/", teacher_views.teacher_apply_leave,name='teacher_apply_leave'),
-   
     path("teacher/view/profile/", teacher_views.teacher_view_profile,name='teacher_view_profile'),
     path("teacher/attendance/take/", teacher_views.teacher_take_attendance,name='teacher_take_attendance'),
     # path("teacher/attendance/update/", teacher_views.teacher_update_attendance,name='teacher_update_attendance'),

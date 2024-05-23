@@ -27,8 +27,8 @@
                                 <th>{% trans 'Summary' %}</th>
                                 <th>{% trans 'Sent On' %}</th>
                                 <th>{% trans 'Status' %}</th>
-                                <th>{% trans 'Replied Date' %}</th>
                                 <th>{% trans 'Reply' %}</th>
+                                <th>{% trans 'Replied Date' %}</th>
                                 <th>{% trans 'Action' %}</th>
                             </tr>
                             {% for summary in summaries %}
@@ -40,12 +40,12 @@
                                 <td>{{ summary.created_at }}</td>
                                 {% if summary.reply == "" %}
                                     <td><span class='badge badge-warning'>{% trans 'Pending Response' %}</span></td>
-                                    <td><span class='badge badge-warning'>{% trans 'Pending Response' %}</span></td>
                                     <td><button data-toggle="modal" data-target="#reply_modal" value="{{ summary.id }}" class="btn btn-success reply_open_modal">{% trans 'Reply' %}</button></td>
+                                    <td><span class='badge badge-warning'>{% trans 'Pending Response' %}</span></td>
                                 {% else %}
                                     <td><span class='badge badge-success'>{% trans 'Response Sent' %}</span></td>
-                                    <td>{{ summary.replied_at }}</td>
                                     <td>{{ summary.reply }}</td>
+                                    <td>{{ summary.replied_at }}</td>
                                 {% endif %}
                                 <td class="responsive-buttons">
                                     <a href="#" class="btn btn-info btn-responsive edit_button" data-id="{{ summary.id }}" data-reply="{{ summary.reply }}">{% trans 'Edit' %}</a>
@@ -65,12 +65,9 @@
 <div class="modal fade" id="reply_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header" style="text-align: left;">
+            <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel" style="display: flex; align-items: center;">
-                    <i class="fa fa-comment-alt" style="font-size: 24px; margin-right: 10px;"></i>
-                    {% trans 'Reply To Summary' %}
-                </h4>
+                <h4 class="modal-title" id="myModalLabel">{% trans 'Reply To Summary' %}</h4>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="id">
@@ -78,8 +75,8 @@
                 <textarea name="reply_message" id="reply_message" cols="30" rows="10" class="form-control"></textarea>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans 'Close' %}</button>
                 <button id="reply_btn" class="btn btn-success btn-block">{% trans 'Reply' %}</button>
-                <button type="button" class="btn btn-danger btn-block" data-dismiss="modal">{% trans 'Close' %}</button>  
             </div>
         </div>
     </div>
@@ -89,22 +86,21 @@
 <div class="modal fade" id="edit_modal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header" style="margin-left: 0;">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="color: red;">&times;</button>
-                <h4 class="modal-title" id="editModalLabel" style="display: flex; align-items: center;">
-                    <!-- <i class="fa fa-pencil-alt" style="font-size: 24px; margin-right: 10px;"></i> -->
-                    {% trans 'Edit Reply' %}
-                </h4>
-            </div>            
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="editModalLabel">{% trans 'Edit Reply' %}</h4>
+            </div>
             <div class="modal-body">
                 <input type="hidden" id="edit_id">
                 <p>{% trans 'Edit reply for' %} <span id="edit_reply_name"></span></p>  
                 <textarea name="edit_reply_message" id="edit_reply_message" cols="30" rows="10" class="form-control"></textarea>
             </div>
             <div class="modal-footer">
-                <button id="edit_btn" class="btn btn-success btn-block">{% trans 'Edit' %}</button>
-                <button type="button" class="btn btn-danger btn-block" data-dismiss="modal">{% trans 'Cancel' %}</button>          
-            </div>
+                <div class="button-group">
+                    <button id="edit_btn" class="btn btn-success">{% trans 'Edit' %}</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">{% trans 'Cancel' %}</button>
+                </div>
+            </div>            
         </div>
     </div>
 </div>
@@ -170,8 +166,26 @@
         right: 20px; /* Adjust the distance from the right side */
         top: 5; /* Aligns the close (x) icon with the top of the modal header */
     }
+
+    /* Styles for modal footer buttons */
+    .modal-footer .button-group {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .modal-footer .button-group .btn {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .modal-footer .button-group .btn:last-child {
+        margin-bottom: 0;
+    }
 </style>
 {% endblock custom_css %}
+
+
 
 {% block custom_js %}
 <script>

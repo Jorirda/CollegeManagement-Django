@@ -429,25 +429,29 @@ def teacher_manage_attendance(request):
 def teacher_apply_leave(request):
     form = LeaveReportTeacherForm(request.POST or None)
     teacher = get_object_or_404(Teacher, admin_id=request.user.id)
+    leave_history = LeaveReportTeacher.objects.filter(teacher=teacher)
     context = {
         'form': form,
-        'leave_history': LeaveReportTeacher.objects.filter(teacher=teacher),
+        'leave_history': leave_history,
         'page_title': 'Apply for Leave'
     }
-    if request.method == 'POST':
+    
+    if request.method == 'POST' and request.is_ajax():
+        form = LeaveReportTeacherForm(request.POST)
         if form.is_valid():
             try:
                 obj = form.save(commit=False)
                 obj.teacher = teacher
                 obj.save()
-                messages.success(
-                    request, "Application for leave has been submitted for review")
-                return redirect(reverse('teacher_apply_leave'))
-            except Exception:
-                messages.error(request, "Could not apply!")
+                return JsonResponse({'success': True, 'message': 'Application for leave has been submitted for review'})
+            except Exception as e:
+                return JsonResponse({'success': False, 'message': 'Could not apply. Error: {}'.format(str(e))})
         else:
-            messages.error(request, "Form has errors!")
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'errors': errors})
+
     return render(request, "teacher_template/teacher_apply_leave.html", context)
+
 
 @csrf_exempt
 def teacher_write_summary(request):
@@ -502,12 +506,13 @@ def teacher_view_notification(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
     notifications = NotificationTeacher.objects.filter(teacher=teacher)
     
-    # Annotate notifications with related payment records
     annotated_notifications = []
     for notification in notifications:
         payment_record = notification.payment_record
-        student = notification.student
-        course = notification.course
+        student = notification.student if notification.student else None
+        course = notification.course if notification.course else None
+        
+        learning_record = payment_record.learning_record if payment_record and payment_record.learning_record else None
         
         notification_data = {
             'id': notification.id,
@@ -515,11 +520,11 @@ def teacher_view_notification(request):
             'time': notification.time,
             'message': notification.message,
             'is_read': notification.is_read,
-            # 'course_name': course.name,
-            'course_start': course.level_start, #this might mean starttime/endtime, will test tmr
-            'course_end': course.level_end,
-            'student_name': student.admin.full_name,
-            'next_payment_date': payment_record.next_payment_date if payment_record else None
+            'course_name': course.name if course else 'N/A',
+            'course_start': learning_record.start_time if learning_record else 'N/A',
+            'course_end': learning_record.end_time if learning_record else 'N/A',
+            'student_name': student.admin.full_name if student else 'N/A',
+            'next_payment_date': payment_record.next_payment_date if payment_record else 'N/A'
         }
         annotated_notifications.append(notification_data)
 

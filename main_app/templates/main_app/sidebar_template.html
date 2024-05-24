@@ -400,7 +400,7 @@
                     <a href="#" class="nav-link {% if request.path == view_teacher_summary %}active{% endif %}">
                         <i class="nav-icon fas fa-comment-alt"></i>
                         <p>
-                            {% trans "Summary" %}
+                            {% trans "Feedback" %}
                             <i class="fas fa-angle-right right"></i>
                         </p>
                     </a>
@@ -629,6 +629,24 @@
                             <a href="{{ teacher_write_summary }}" class="nav-link {% if request.path == teacher_write_summary %}active{% endif %}">
                                 <i class="nav-icon fas fa-comment-alt"></i>
                                 <p>{% trans "Write a Summary" %}</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item has-treeview">
+                    {% url 'student_renewals' as student_renewals %}
+                    <a href="#" class="nav-link ">
+                        <i class="nav-icon fas fa-credit-card"></i>
+                        <p>
+                            {% trans "Student Renewals" %}
+                            <i class="fas fa-angle-right right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ student_renewals }}" class="nav-link {% if request.path == student_renewals %}active{% endif %}">
+                                <i class="nav-icon fas fa-redo-alt"></i>
+                                <p>{% trans "Student Renewals" %}</p>
                             </a>
                         </li>
                     </ul>

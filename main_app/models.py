@@ -122,13 +122,16 @@ class Classes(models.Model):
 
 class ClassSchedule(models.Model):
     course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)
-    lesson_unit_price = models.DecimalField(max_digits=10,default=0, decimal_places=2)
-    teacher = models.ForeignKey(Teacher,null=True, on_delete=models.CASCADE)
-    grade = models.CharField(max_length=3, blank=True,null=True)  
+    lesson_unit_price = models.DecimalField(max_digits=10, default=0, decimal_places=2)
+    teacher = models.ForeignKey(Teacher, null=True, on_delete=models.CASCADE)
+    grade = models.CharField(max_length=3, blank=True, null=True)  
     start_time = models.TimeField(null=True)
     end_time = models.TimeField(null=True)
     lesson_hours = models.CharField(max_length=10, null=True)
     remark = models.TextField(default="")
+
+    def __str__(self):
+        return self.course.name
 
 class LearningRecord(models.Model):
     date = models.DateField()
@@ -178,15 +181,13 @@ class LeaveReportTeacher(models.Model):
 class SummaryTeacher(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, null=True, on_delete=models.DO_NOTHING)
-    summary = models.TextField()
+    summary = models.TextField(_('Summary'))
     reply = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)  # Automatically sets the field to now when the object is first created
     replied_at = models.DateTimeField(null=True, blank=True)  # New field for reply date
     
     def __str__(self):
         return self.summary
-
-
 
 class NotificationStudent(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -212,12 +213,13 @@ class PaymentRecord(models.Model):
     payee = models.CharField(max_length=255)
     remark = models.TextField(default="")
     lesson_hours = models.IntegerField()
-    learning_record = models.OneToOneField(
+    learning_record = models.ForeignKey(
         LearningRecord, 
         null=True, 
         related_name='payment_record', 
         on_delete=models.SET_NULL
     )
+
 class NotificationTeacher(models.Model):
     date = models.DateField(default=timezone.now)
     time = models.TimeField(default=timezone.now)  
@@ -230,6 +232,7 @@ class NotificationTeacher(models.Model):
 
     def __str__(self):
         return self.message
+    
 class RefundRecord(models.Model):
     # admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
     student = models.ForeignKey(Student,null=True, on_delete=models.CASCADE)

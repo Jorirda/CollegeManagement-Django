@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block page_title %}
-  {{ page_title }}
+    {% trans page_title %}
 {% endblock page_title %}
 
 {% block content %}
@@ -64,7 +64,7 @@
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="d-flex align-items-center">
                             <i class="nav-icon fas fa-bell" style="font-size: 24px; margin-right: 10px;"></i>
-                            <h3 class="card-title">{{ page_title }}</h3>
+                            <h3 class="card-title">{% trans page_title %}</h3>
                         </div>
                     </div>
                     <div class="card-body">

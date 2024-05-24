@@ -22,7 +22,6 @@
                                     <th>#</th>
                                     <th>{% trans 'Full Name' %}</th>
                                     <th>{% trans 'Email' %}</th>
-                                    <th>{% trans 'Gender' %}</th>
                                     <th>{% trans 'Course' %}</th>
                                     <th>{% trans 'Avatar' %}</th>
                                     <th>{% trans 'Action' %}</th>
@@ -32,19 +31,18 @@
                                 {% for teacher in teachers %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{ teacher.full_name }}</td>
-                                    <td>{{ teacher.email }}</td>
-                                    <td>{{ teacher.gender }}</td>
-                                    <li>{{ course.name }}</li>
+                                    <td>{{ teacher.admin.full_name }}</td>
+                                    <td>{{ teacher.admin.email }}</td>
+                                    <td>{{ teacher.course.name }}</td>
                                     <td>
-                                        {% if teacher.avatar %}
-                                        <img src="{{ teacher.avatar.url }}" alt="Avatar" width="50">
+                                        {% if teacher.admin.avatar %}
+                                            <img src="{{ teacher.admin.avatar.url }}" alt="Avatar" width="50">
                                         {% else %}
-                                        {% trans 'No Image' %}
+                                            {% trans 'No Image' %}
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <button class="btn btn-primary show_notification" value="{{ teacher.id }}" data-toggle="modal" data-target="#notificationModal">{% trans 'Send Notification' %}</button>
+                                        <button class="btn btn-primary show_notification" value="{{ teacher.admin.id }}" data-toggle="modal" data-target="#notificationModal">{% trans 'Send Notification' %}</button>
                                     </td>
                                 </tr>
                                 {% endfor %}

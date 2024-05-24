@@ -1,6 +1,7 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+{% load i18n %}
+{% block page_title %}{% trans page_title %}{% endblock page_title %}
 {% block content %}
 <section class="content">
   <div class="container-fluid">
@@ -10,7 +11,7 @@
             <div class="small-box bg-teal">
                 <div class="inner">
                     <h3>{{total_students}}</h3>
-                    <p>Total Students</p>
+                    <p>{% trans "Total Students" %}</p>
                 </div>
                 <div class="icon">
                   <i class="nav-icon fas fa-user-graduate"></i>
@@ -21,7 +22,7 @@
             <div class="small-box bg-success">
                 <div class="inner">
                     <h3>{{total_attendance}}</h3>
-                    <p>Total Attendance Taken</p>
+                    <p>{% trans "Total Attendance Taken" %}</p>
                 </div>
                 <div class="icon">
                   <i class="nav-icon fas fa-calendar-alt"></i>
@@ -32,7 +33,7 @@
             <div class="small-box bg-blue">
                 <div class="inner">
                     <h3>{{total_leave}}</h3>
-                    <p>Total Leave Applications</p>
+                    <p>{% trans "Total Leave Applications" %}</p>
                 </div>
                 <div class="icon">
                   <i class="nav-icon fas fa-sign-out-alt"></i>
@@ -43,7 +44,7 @@
           <div class="small-box bg-pink">
               <div class="inner">
                   <h3>{{total_courses}}</h3>
-                  <p>Total Teaching Courses</p>
+                  <p>{% trans "Total Teaching Courses" %}</p>
               </div>
               <div class="icon">
                 <i class="nav-icon fas fa-book"></i>
@@ -54,7 +55,7 @@
     <div class="row mt-4">
         <div class="col-md-4">
             <select id="course-filter" class="form-control">
-                <option value="">Select Course</option>
+                <option value="">{% trans "Select Course" %}</option>
                 {% for course in courses %}
                     <option value="{{ course.id }}">{{ course.name }}</option>
                 {% endfor %}
@@ -62,7 +63,7 @@
         </div>
         <div class="col-md-4">
             <select id="class-schedule-filter" class="form-control">
-                <option value="">Select Class Schedule</option>
+                <option value="">{% trans "Select Class Schedule" %}</option>
                 {% for schedule in class_schedules %}
                     <option value="{{ schedule.id }}">{{ schedule.start_time }} to {{ schedule.end_time }}</option>
                 {% endfor %}
@@ -70,7 +71,7 @@
         </div>
         <div class="col-md-4">
             <select id="student-filter" class="form-control">
-                <option value="">Select Student</option>
+                <option value="">{% trans "Select Student" %}</option>
                 {% for student in students %}
                     <option value="{{ student.id }}">{{ student.admin.full_name }}</option>
                 {% endfor %}
@@ -81,7 +82,7 @@
         <div class="col-md-12">
             <div class="card card-secondary">
                 <div class="card-header">
-                    <h3 class="card-title">Attendance Statistics</h3>
+                    <h3 class="card-title">{% trans "Attendance Statistics" %}</h3>
                     <div class="card-tools">
                       <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
                       </button>
@@ -115,7 +116,7 @@ $(document).ready(function(){
         var chartData = {
             labels: data.labels,
             datasets: [{
-                label: 'Attendance Count',
+                label: ('出席人数'),
                 backgroundColor: '#17A2B8',
                 borderColor: 'rgba(60,141,188,0.8)',
                 data: data.attendance_counts
@@ -170,7 +171,7 @@ $(document).ready(function(){
                 console.log("Class schedules:", response);
                 var scheduleSelect = $('#class-schedule-filter');
                 scheduleSelect.empty();
-                scheduleSelect.append('<option value="">Select Class Schedule</option>');
+                scheduleSelect.append('<option value="">{% trans "Select Class Schedule" %}</option>');
                 $.each(response, function(index, schedule) {
                     scheduleSelect.append('<option value="'+schedule.id+'">'+schedule.start_time+' to '+schedule.end_time+'</option>');
                 });
@@ -194,7 +195,7 @@ $(document).ready(function(){
                 console.log("Students:", response);
                 var studentSelect = $('#student-filter');
                 studentSelect.empty();
-                studentSelect.append('<option value="">Select Student</option>');
+                studentSelect.append('<option value="">{% trans "Select Student" %}</option>');
                 $.each(response.students, function(index, student) {
                     studentSelect.append('<option value="'+student.id+'">'+student.full_name+'</option>');
                 });
@@ -226,6 +227,3 @@ $(document).ready(function(){
 });
 </script>
 {% endblock custom_js %}
-
-
-

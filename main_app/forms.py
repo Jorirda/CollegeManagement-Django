@@ -385,11 +385,12 @@ class LeaveReportTeacherForm(FormSettings):
         }
 
 class SummaryTeacherForm(FormSettings):
+    student = forms.ModelChoiceField(queryset=Student.objects.none(), label=_('Select Student'))
+    summary = forms.Textarea()
     class Meta:
         model = SummaryTeacher
         fields = ['student', 'summary']
 
-    student = forms.ModelChoiceField(queryset=Student.objects.none(), label="Select Student")
 
     def __init__(self, *args, **kwargs):
         teacher = kwargs.pop('teacher', None)
@@ -463,12 +464,24 @@ class ResultForm(FormSettings):
         fields = [_('course'), _('session')]
 
 class TeacherEditAttendanceForm(FormSettings):
-    classes = forms.ModelChoiceField(queryset=ClassSchedule.objects.all(), required=False,  widget=forms.Select(attrs={'class': 'form-control'}), label=_('Course'))
+    classes = forms.ModelChoiceField(
+        queryset=ClassSchedule.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control', 'disabled': 'disabled'}),
+        label=_('Course')
+    )
     date = forms.DateField(widget=DateInput(attrs={'type': 'date'}), label=_('Date'), disabled=True)
- 
-    def __init__(self, *args, **kwargs):
-        super(TeacherEditAttendanceForm, self).__init__(*args, **kwargs)
-
+    
     class Meta:
         model = Attendance
-        fields = [_('classes'), _('date')]
+        fields = ['classes', 'date']
+    
+    def __init__(self, *args, **kwargs):
+        super(TeacherEditAttendanceForm, self).__init__(*args, **kwargs)
+    
+    def save(self, commit=True):
+        instance = super(TeacherEditAttendanceForm, self).save(commit=False)
+        instance.classes = self.initial['classes']
+        if commit:
+            instance.save()
+        return instance

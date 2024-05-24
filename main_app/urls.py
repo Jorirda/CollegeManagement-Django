@@ -21,6 +21,9 @@ from . import hod_views, teacher_views, student_views, views
 
 urlpatterns = [
 #hodviews
+    path('renewals/', teacher_views.student_renewals, name='student_renewals'),
+    path('renew_student/<int:student_id>/', teacher_views.renew_student, name='renew_student'),
+    path('withdraw_student/<int:student_id>/', teacher_views.withdraw_student, name='withdraw_student'),
     path('teacher_home/', teacher_views.teacher_home, name='teacher_home'),
     path('get_class_schedules/', teacher_views.get_class_schedules, name='get_class_schedules'),
     path('get_students/', teacher_views.get_students, name='get_students'),
@@ -108,7 +111,6 @@ urlpatterns = [
     path("teacher/apply/leave/", teacher_views.teacher_apply_leave,name='teacher_apply_leave'),
     path("teacher/view/profile/", teacher_views.teacher_view_profile,name='teacher_view_profile'),
     path("teacher/attendance/take/", teacher_views.teacher_take_attendance,name='teacher_take_attendance'),
-    # path("teacher/attendance/update/", teacher_views.teacher_update_attendance,name='teacher_update_attendance'),
     path("teacher/get_students/", teacher_views.get_students, name='get_students'),
     path("teacher/attendance/fetch/", teacher_views.get_student_attendance,name='get_student_attendance'),
     path("teacher/attendance/save/",teacher_views.save_attendance, name='save_attendance'),
@@ -126,10 +128,10 @@ urlpatterns = [
     path('teacher/delete/notification/', teacher_views.teacher_delete_notification, name='teacher_delete_notification'),
     path("teacher/write/summary/", teacher_views.teacher_write_summary, name='teacher_write_summary'),
     # path('teacher/delete/summary/', teacher_views.delete_summary, name='delete_summary'),
-    path("teacher/result/add/", teacher_views.teacher_add_result, name='teacher_add_result'),
-    path("teacher/result/edit/", teacher_views.teacher_edit_result,name='edit_student_result'),
-    path('teacher/result/fetch/', teacher_views.fetch_student_result,name='fetch_student_result'),
-     path('teacher/attendance/edit/', teacher_views.teacher_edit_attendance,name='teacher_edit_attendance'),
+    # path("teacher/result/add/", teacher_views.teacher_add_result, name='teacher_add_result'),
+    # path("teacher/result/edit/", teacher_views.teacher_edit_result,name='edit_student_result'),
+    # path('teacher/result/fetch/', teacher_views.fetch_student_result,name='fetch_student_result'),
+   
 
     
     # Student

@@ -1,6 +1,10 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{ page_title }}{% endblock page_title %}
+{% load i18n %}
+
+{% block page_title %}
+{% trans page_title %}
+{% endblock page_title %}
 
 {% block content %}
 <section class="content">
@@ -28,27 +32,27 @@
                 <!-- general form elements -->
                 <div class="card card-dark">
                     <div class="card-header">
-                        <h3 class="card-title">{{ page_title }}</h3>
+                        <h3 class="card-title">{% trans page_title %}</h3>
                     </div>
 
                     <form id="leave-application-form" method="POST" action="{% url 'teacher_apply_leave' %}">
                         {% csrf_token %}
-                        {% include "main_app/form_template.html" with messages=messages form=form button_text="Apply For Leave" %}
+                        {% include "main_app/form_template.html" with messages=messages form=form button_text=_("Apply For Leave") %}
                     </form>
                 </div>
                 <!-- /.card -->
                 <div class="card card-default">
                     <div class="card-header">
-                        <h3 class="card-title"><b>Leave History</b></h3>
+                        <h3 class="card-title"><b>{% trans "Select Grade" %}</b></h3>
                     </div>
                     <div class="table">
                         <table class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Date</th>
-                                    <th>Message</th>
-                                    <th>Status</th>
+                                    <th>{% trans "ID" %}</th>
+                                    <th>{% trans "Date" %}</th>
+                                    <th>{% trans "Message" %}</th>
+                                    <th>{% trans "Status" %}</th>
                                 </tr>
                             </thead>
                             {% for leave in leave_history %}
@@ -58,11 +62,11 @@
                                 <td>{{ leave.message }}</td>
                                 <td>
                                     {% if leave.status == 0 %}
-                                    <span class="badge badge-warning">Pending</span>
+                                    <span class="badge badge-warning">{% trans "Pending" %}</span>
                                     {% elif leave.status == 1 %}
-                                    <span class="badge badge-success">Accepted</span>
+                                    <span class="badge badge-success">{% trans "Accepted" %}</span>
                                     {% else %}
-                                    <span class="badge badge-danger">Rejected</span>
+                                    <span class="badge badge-danger">{% trans "Rejected" %}</span>
                                     {% endif %}
                                 </td>
                             </tr>

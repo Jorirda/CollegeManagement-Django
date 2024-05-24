@@ -27,20 +27,56 @@
                         <h3 class="card-title">{{ page_title }}</h3>
                     </div>
                     <div class="card-body">
-                        {% include "main_app/form_template.html" with messages=messages  form=form button_text=_("Update Attendance")%}
+                        <form id="attendance-form" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <div class="form-group" id="student_data">
+                                <div class='row'>
+                                    {% for student in students %}
+                                    <div class='col-lg-3'>
+                                        <div class='form-check custom-control custom-checkbox'>
+                                            <input type='checkbox' class='custom-control-input' name='student_data[]' value='{{ student.id }}' id='checkbox{{ student.id }}' {% if student.attendance_status %}checked{% endif %} />
+                                            <label for='checkbox{{ student.id }}' class='custom-control-label'>{{ student.admin.full_name }}</label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <button id="save_attendance" type="submit" class="btn btn-success float-right">{% trans "Update Attendance" %}</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+{% endblock content %}
 
+{% block custom_css %}
+<style>
+    .custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
+        background-color: #28a745; /* Green color matching the .btn-success */
+        border-color: #28a745; /* Ensure border matches as well */
+    }
+</style>
+{% endblock custom_css %}
+
+{% block custom_js %}
 <script>
     $(document).ready(function () {
+        $('#attendance-form').submit(function(event) {
+            event.preventDefault(); // Prevent default form submission
+            
+            // Call the saveAttendance function
+            saveAttendance();
+        });
+
         function saveAttendance() {
             $('#save_attendance').attr("disabled", "disabled").text("Saving Attendance Data...");
 
-            var student_data = $("input[name='student_data']").val();
+            var student_data = $("input[name='student_data[]']:checked").map(function() {
+                return $(this).val();
+            }).get();
             var attendance_date = $('#id_hidden-attendance_date').val();
             var classes = $('#id_hidden-classes').val();
             var attendance_id = '{{ attendance_id }}'; // Add this line to retrieve the attendance_id from the template context
@@ -58,29 +94,30 @@
                 },
                 success: function(data) {
                     if (data.success) {
-                        $('#success-message').text(data.message).addClass('alert-success').show();
+                        $('#success-message').text(data.message).removeClass('alert-danger').addClass('alert-success').show();
                         setTimeout(function() {
                             $('#success-message').hide();
+                            window.location.href = "{% url 'teacher_manage_attendance' %}"; // Redirect to the manage attendance page
                         }, 3000);
                     } else {
-                        $('#success-message').text(data.message).addClass('alert-danger').show();
+                        $('#success-message').text(data.message).removeClass('alert-success').addClass('alert-danger').show();
                         setTimeout(function() {
                             $('#success-message').hide();
                         }, 3000);
                     }
                 },
                 error: function(xhr, status, error) {
-                    $('#success-message').text('{% trans "An error occurred while saving the attendance." %}').addClass('alert-danger').show();
+                    $('#success-message').text('{% trans "An error occurred while saving the attendance." %}').removeClass('alert-success').addClass('alert-danger').show();
                     setTimeout(function() {
                         $('#success-message').hide();
                     }, 3000);
                 },
                 complete: function () {
-                    $('#save_attendance').removeAttr("disabled").text("Save Attendance");
+                    $('#save_attendance').removeAttr("disabled").text("{% trans "Update Attendance" %}");
                 }
             });
         }
     });
-
 </script>
-{% endblock content %}
+{% endblock custom_js %}
+

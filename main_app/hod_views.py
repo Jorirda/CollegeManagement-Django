@@ -308,7 +308,7 @@ def admin_home(request):
         total_students_in_class = Attendance.objects.filter(classes=class_obj).count()
         total_attendance_in_class = AttendanceReport.objects.filter(attendance__classes=class_obj, status=True).count()
         if total_students_in_class > 0:
-            attendance_rate = (total_attendance_in_class / total_students_in_class) * 100
+            attendance_rate = (total_attendance_in_class / total_students_in_class) * 1 
         else:
             attendance_rate = 0
         class_schedule_names_list.append(class_obj.course.name)
@@ -1495,9 +1495,9 @@ def manage_class_schedule(request):
 
 #Notifications
 def admin_notify_teacher(request):
-    teachers = Teacher.objects.all()
-    courses = LearningRecord.objects.filter(teacher=(teacher for teacher in teachers)) 
-    students = Student.objects.all()
+    teachers = Teacher.objects.select_related('course', 'admin').all()
+    courses = Course.objects.all()
+    students = Student.objects.select_related('admin').all()
     context = {
         'page_title': "Send Notifications To Teachers",
         'teachers': teachers,

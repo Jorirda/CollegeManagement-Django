@@ -1,0 +1,190 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block page_title %}<i class="nav-icon fas fa-redo"></i>  {{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<style>
+    .responsive-buttons {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+
+    .btn-responsive {
+        flex: 1 1 auto;
+        margin: 5px;
+        min-width: 68px;
+        text-align: center;
+    }
+
+    @media (max-width: 576px) {
+        .btn-responsive {
+            flex-basis: 100%;
+        }
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    th, td {
+        white-space: nowrap;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+    .pagination a, .pagination span {
+        margin: 0 5px;
+        padding: 8px 16px;
+        text-decoration: none;
+        color: #5FC032;
+        border: 1px solid #DEE2E600;
+        border-radius: 4px;
+    }
+    .pagination a:hover {
+        background-color: #e9ecef;
+    }
+    .pagination .current {
+        background-color: #5FC032;
+        color: white;
+    }
+</style>
+<section class="content">
+    <div class="container-fluid">
+        <div id="success-message" class="alert alert-success" style="display: none;"></div>
+        <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="d-flex align-items-center">
+                            <i class="nav-icon fas fa-redo" style="font-size: 24px; margin-right: 10px;"></i>
+                            <h3 class="card-title">{% trans "Student Renewals" %}</h3>
+                        </div>
+                    </div>
+                    <div class="card-body table-container">
+                        <table id="renewals-table" class="table table-bordered table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>{% trans "Index" %}</th>
+                                    <th>{% trans "Student Name" %}</th>
+                                    <th>{% trans "Course" %}</th>
+                                    <th>{% trans "Payment Amount" %}</th>
+                                    <th>{% trans "Next Payment Date" %}</th>
+                                    <th>{% trans "Status" %}</th>
+                                    <th>{% trans "Actions" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for renewal in renewals %}
+                                <tr id="renewal-{{ renewal.student.id }}">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ renewal.student.admin.full_name }}</td>
+                                    <td>{{ renewal.course.name }}</td>
+                                    <td>{{ renewal.payment_amount }}</td>
+                                    <td>{{ renewal.next_payment_date }}</td>
+                                    <td>{{ renewal.status }}</td>
+                                    <td class="responsive-buttons"> 
+                                        <form class="renew-form" data-student-id="{{ renewal.student.id }}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-success btn-responsive">{% trans "Renew" %}</button>
+                                        </form>
+                                        <form class="withdraw-form" data-student-id="{{ renewal.student.id }}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger btn-responsive">{% trans "Withdraw" %}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    // Handle renew form submission
+    $('.renew-form').submit(function(event) {
+        event.preventDefault();
+        var form = $(this);
+        var studentId = form.data('student-id');
+        console.log('Renew form submitted for student ID:', studentId);
+        console.log('Form data:', form.serialize());
+        $.ajax({
+            type: 'POST',
+            url: '{% url "renew_student" 0 %}'.replace('0', studentId),
+            data: form.serialize(),
+            success: function(response) {
+                console.log('Renewal AJAX success response:', response);
+                if (response.success) {
+                    $('#success-message').text(response.message).show();
+                    setTimeout(function() {
+                        $('#success-message').hide();
+                        location.reload();
+                    }, 3000);
+                } else {
+                    $('#error-message').text(response.message).show();
+                    setTimeout(function() {
+                        $('#error-message').hide();
+                    }, 3000);
+                }
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                console.error('Renewal AJAX error response:', xhr, textStatus, errorThrown);
+                $('#error-message').text('{% trans "An error occurred while processing your request." %}').show();
+                setTimeout(function() {
+                    $('#error-message').hide();
+                }, 3000);
+            }
+        });
+    });
+
+    // Handle withdraw form submission
+    $('.withdraw-form').submit(function(event) {
+        event.preventDefault();
+        var form = $(this);
+        var studentId = form.data('student-id');
+        console.log('Withdraw form submitted for student ID:', studentId);
+        console.log('Form data:', form.serialize());
+        $.ajax({
+            type: 'POST',
+            url: '{% url "withdraw_student" 0 %}'.replace('0', studentId),
+            data: form.serialize(),
+            success: function(response) {
+                console.log('Withdraw AJAX success response:', response);
+                if (response.success) {
+                    $('#success-message').text(response.message).show();
+                    setTimeout(function() {
+                        $('#success-message').hide();
+                        location.reload();
+                    }, 3000);
+                    // Optionally, remove the row
+                    // $('#renewal-' + studentId).remove();
+                } else {
+                    $('#error-message').text(response.message).show();
+                    setTimeout(function() {
+                        $('#error-message').hide();
+                    }, 3000);
+                }
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                console.error('Withdraw AJAX error response:', xhr, textStatus, errorThrown);
+                $('#error-message').text('{% trans "An error occurred while processing your request." %}').show();
+                setTimeout(function() {
+                    $('#error-message').hide();
+                }, 3000);
+            }
+        });
+    });
+</script>
+{% endblock content %}

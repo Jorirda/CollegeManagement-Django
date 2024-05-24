@@ -94,11 +94,6 @@ def fetch_student_result(request):
     except Exception as e:
         return HttpResponse('False')
 
-# def get_class_schedules(request):
-#     course_id = request.GET.get('course_id')
-#     class_schedules = ClassSchedule.objects.filter(course_id=course_id).values('id', 'start_time', 'end_time')
-#     return JsonResponse(list(class_schedules), safe=False)
-
 #teacher
 def teacher_home(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
@@ -161,7 +156,7 @@ def teacher_home(request):
         return JsonResponse({'data': data})
 
     context = {
-        'page_title': f'Teacher Panel - {teacher.admin.full_name}',
+        'page_title': f'教师 - {teacher.admin.full_name}',
         'total_students': total_students,
         'total_attendance': total_attendance,
         'total_leave': total_leave,
@@ -186,18 +181,22 @@ def get_class_schedules(request):
     ]
     return JsonResponse(response, safe=False)
 
+@csrf_exempt
 def get_students(request):
-    course_id = request.GET.get('course')
-    class_schedule_id = request.GET.get('class_schedule')
-    students = Student.objects.filter(learningrecord__schedule_record__id=class_schedule_id).distinct()
-    response = [
-        {
-            'id': student.id,
-            'full_name': student.admin.full_name
-        }
-        for student in students
-    ]
-    return JsonResponse({'students': response})
+    if request.method == 'POST':
+        course_id = request.POST.get('course')
+        class_schedule_id = request.POST.get('class_schedule')
+        students = Student.objects.filter(learningrecord__schedule_record__id=class_schedule_id).distinct()
+        response = [
+            {
+                'id': student.id,
+                'full_name': student.admin.full_name
+            }
+            for student in students
+        ]
+        return JsonResponse({'students': response})
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
 def teacher_view_profile(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
@@ -252,79 +251,48 @@ def teacher_take_attendance(request):
 
     return render(request, 'teacher_template/teacher_take_attendance.html', context)
 
-# def teacher_edit_attendance(request, attendance_id):
-#     teacher = get_object_or_404(Teacher, admin=request.user)
-#     classes = ClassSchedule.objects.filter(teacher=teacher)
-#     sessions = Session.objects.all()
-#     attendance = get_object_or_404(Attendance, id=attendance_id)
-#     attendance_reports = AttendanceReport.objects.filter(attendance=attendance)
-    
-#     # Get all students for the courses taught by the teacher using the LearningRecord model
-#     learning_records = LearningRecord.objects.filter(teacher=teacher)
-#     students = Student.objects.filter(id__in=learning_records.values('student'))
-    
-#     # List of student IDs that have attendance reports
-#     reported_student_ids = attendance_reports.values_list('student_id', flat=True)
-    
-#     if request.method == 'POST':
-#         session_id = request.POST.get('session')
-#         date = request.POST.get('attendance_date')
-#         class_id = request.POST.get('classes')
-#         student_ids = request.POST.getlist('student_data[]')
-
-#         try:
-#             attendance.session_id = session_id
-#             attendance.date = date
-#             attendance.schedule_id = class_id
-#             attendance.save()
-
-#             # Create new attendance reports
-#             AttendanceReport.objects.filter(attendance=attendance).delete()  # Clear existing reports
-#             for student_id in student_ids:
-#                 student = get_object_or_404(Student, id=student_id)
-#                 AttendanceReport.objects.create(student=student, attendance=attendance, status=True)
-
-#             return JsonResponse({'success': True, 'message': "Attendance Updated"})
-#         except Exception as e:
-#             return JsonResponse({'success': False, 'message': f"Attendance Could Not Be Updated: {str(e)}"})
-
-#     context = {
-#         'classes': classes,
-#         'sessions': sessions,
-#         'attendance': attendance,
-#         'attendance_reports': attendance_reports,
-#         'students': students,
-#         'reported_student_ids': reported_student_ids,  # Pass the list to the context
-#         'page_title': 'Edit Attendance'
-#     }
-#     return render(request, "teacher_template/teacher_edit_attendance.html", context)
-
-
 def teacher_edit_attendance(request, attendance_id):
     instance = get_object_or_404(Attendance, id=attendance_id)
-    form = TeacherEditAttendanceForm(request.POST or None, request.FILES or None, instance=instance)  # Adjusted to include request.FILES
+
+    # Initial data for the form
+    initial_data = {
+        'classes': instance.classes,
+    }
+
+    form = TeacherEditAttendanceForm(request.POST or None, instance=instance, initial=initial_data)
+
+    # Get related students and attendance reports
+    attendance_reports = AttendanceReport.objects.filter(attendance=instance)
+    student_ids = attendance_reports.values_list('student_id', flat=True)
+    students = Student.objects.filter(id__in=student_ids)
+
+    for student in students:
+        student.attendance_status = attendance_reports.get(student=student).status
+
+    if request.method == 'POST' and request.is_ajax():
+        if form.is_valid():
+            form.save()
+            student_data = request.POST.getlist('student_data[]')
+
+            # Update attendance status for each student
+            for student in students:
+                attendance_report = attendance_reports.get(student=student)
+                attendance_report.status = str(student.id) in student_data
+                attendance_report.save()
+
+            return JsonResponse({'success': True, 'message': 'Attendance saved successfully'})
+        else:
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'message': 'Failed to update attendance', 'errors': errors}, status=400)
+
     context = {
         'form': form,
+        'students': students,
         'attendance_id': attendance_id,
         'page_title': _('Edit Attendance')
     }
-    if request.method == 'POST':
-        if form.is_valid():
-            classes = form.cleaned_data.get('classes')
-            date = form.cleaned_data.get('date')  # corrected field name
-            
-            try:
-                attendance = Attendance.objects.get(id=attendance_id)
-                attendance.classes = classes
-                attendance.date = date
-                messages.success(request, "Successfully Updated")
-            except Exception as e:
-                messages.error(request, f"Could Not Update: {e}")
-        else:
-            messages.error(request, "Could Not Update")
 
     return render(request, "teacher_template/teacher_edit_attendance.html", context)
-
 
 def teacher_view_attendance(request):
     attendance_id = request.GET.get('attendance_id')
@@ -370,6 +338,9 @@ def save_attendance(request):
 
         for student_dict in students:
             student_id = student_dict.get('id')
+            if student_id is None:
+                logging.error('Student ID is undefined')
+                return JsonResponse({'success': False, 'error': 'Student ID is undefined'}, status=400)
             student_status = student_dict.get('status', 0)
             student = get_object_or_404(Student, id=student_id)
             attendance_report = AttendanceReport(student=student, attendance=attendance, status=student_status)
@@ -441,8 +412,7 @@ def teacher_apply_leave(request):
         'page_title': 'Apply for Leave'
     }
     
-    if request.method == 'POST' and request.is_ajax():
-        form = LeaveReportTeacherForm(request.POST)
+    if request.method == 'POST':
         if form.is_valid():
             try:
                 obj = form.save(commit=False)
@@ -505,6 +475,8 @@ def teacher_write_summary(request):
     }
 
     return render(request, 'teacher_template/teacher_write_summary.html', context)
+
+
 
 
 #Notifications
@@ -576,43 +548,43 @@ def teacher_delete_notification(request):
 
 
 #Result
-def teacher_add_result(request):
-    form = ResultForm(request.POST or None)
-    teacher = get_object_or_404(Teacher, admin=request.user)
-    classes = ClassSchedule.objects.filter(teacher=teacher)
-    sessions = Session.objects.all()
-    context = {'form': form, 'page_title': 'Add Result','classes': classes,
-        'sessions': sessions,}
-    if request.method == 'POST':
-        if form.is_valid():
-            try:
-                form.save()
-                messages.success(request, "Result Added")
-                return redirect(reverse('teacher_add_result'))
-            except Exception as e:
-                messages.error(request, 'Could Not Add ' + str(e))
-        else:
-            messages.error(request, 'Fill Form Properly ')
-    return render(request, "teacher_template/teacher_add_result.html", context)
+# def teacher_add_result(request):
+#     form = ResultForm(request.POST or None)
+#     teacher = get_object_or_404(Teacher, admin=request.user)
+#     classes = ClassSchedule.objects.filter(teacher=teacher)
+#     sessions = Session.objects.all()
+#     context = {'form': form, 'page_title': 'Add Result','classes': classes,
+#         'sessions': sessions,}
+#     if request.method == 'POST':
+#         if form.is_valid():
+#             try:
+#                 form.save()
+#                 messages.success(request, "Result Added")
+#                 return redirect(reverse('teacher_add_result'))
+#             except Exception as e:
+#                 messages.error(request, 'Could Not Add ' + str(e))
+#         else:
+#             messages.error(request, 'Fill Form Properly ')
+#     return render(request, "teacher_template/teacher_add_result.html", context)
 
-def teacher_edit_result(request):
-    form = ResultForm(request.POST or None)
-    teacher = get_object_or_404(Teacher, admin=request.user)
-    classes = ClassSchedule.objects.filter(teacher=teacher)
-    sessions = Session.objects.all()
-    context = {'form': form, 'page_title': 'Edit Result','classes': classes,
-        'sessions': sessions,}
-    if request.method == 'POST':
-        if form.is_valid():
-            try:
-                form.save()
-                messages.success(request, "Result Edited")
-                return redirect(reverse('teacher_edit_result'))
-            except Exception as e:
-                messages.error(request, 'Could Not Add ' + str(e))
-        else:
-            messages.error(request, 'Fill Form Properly ')
-    return render(request, "teacher_template/teacher_edit_result.html", context)
+# def teacher_edit_result(request):
+#     form = ResultForm(request.POST or None)
+#     teacher = get_object_or_404(Teacher, admin=request.user)
+#     classes = ClassSchedule.objects.filter(teacher=teacher)
+#     sessions = Session.objects.all()
+#     context = {'form': form, 'page_title': 'Edit Result','classes': classes,
+#         'sessions': sessions,}
+#     if request.method == 'POST':
+#         if form.is_valid():
+#             try:
+#                 form.save()
+#                 messages.success(request, "Result Edited")
+#                 return redirect(reverse('teacher_edit_result'))
+#             except Exception as e:
+#                 messages.error(request, 'Could Not Add ' + str(e))
+#         else:
+#             messages.error(request, 'Fill Form Properly ')
+#     return render(request, "teacher_template/teacher_edit_result.html", context)
 
 
 #Exempts
@@ -646,3 +618,71 @@ def teacher_fcmtoken(request):
     except Exception as e:
         return HttpResponse("False")
 
+@login_required
+def student_renewals(request):
+    students = Student.objects.all()
+    today = timezone.now().date()
+    renewals = []
+
+    for student in students:
+        last_payment = PaymentRecord.objects.filter(student=student).order_by('-date').first()
+        if last_payment:
+            status = 'Pending' if today <= last_payment.next_payment_date else 'Outstanding'
+            renewals.append({
+                'student': student,
+                'course': last_payment.course,
+                'payment_amount': last_payment.amount_due,
+                'next_payment_date': last_payment.next_payment_date,
+                'status': status,
+            })
+
+    context = {
+        'renewals': renewals,
+        'page_title': 'Student Renewals'
+    }
+    return render(request, 'teacher_template/student_renewals.html', context)
+
+@login_required
+def renew_student(request, student_id):
+    if request.method == 'POST' and request.is_ajax():
+        student = get_object_or_404(Student, id=student_id)
+        last_payment = PaymentRecord.objects.filter(student=student).order_by('-date').first()
+        
+        if last_payment:
+            new_payment_date = last_payment.next_payment_date + timedelta(days=30)  # Assuming monthly renewal
+            PaymentRecord.objects.create(
+                date=timezone.now().date(),
+                next_payment_date=new_payment_date,
+                student=student,
+                course=last_payment.course,
+                lesson_unit_price=last_payment.lesson_unit_price,
+                discounted_price=last_payment.discounted_price,
+                book_costs=last_payment.book_costs,
+                other_fee=last_payment.other_fee,
+                amount_due=last_payment.amount_paid,  # Use the amount paid from the last payment as the new amount due
+                amount_paid=0,  # Initially unpaid
+                payment_method=last_payment.payment_method,
+                status='Pending',
+                payee=last_payment.payee,
+                remark='Renewal payment',
+                lesson_hours=last_payment.lesson_hours,
+                learning_record=last_payment.learning_record  # Use the same learning record
+            )
+            student.admin.total_semester += 1
+            student.save()
+
+            return JsonResponse({'success': True, 'message': "Student renewed successfully!"})
+        else:
+            return JsonResponse({'success': False, 'message': "No previous payment record found for the student."})
+    return JsonResponse({'success': False, 'message': "Invalid request method."})
+
+
+@login_required
+def withdraw_student(request, student_id):
+    if request.method == 'POST' and request.is_ajax():
+        student = get_object_or_404(Student, id=student_id)
+        student.status = 'Withdrawn'  # or 'Withdrawn'
+        student.save()
+
+        return JsonResponse({'success': True, 'message': "Student status updated to Withdrawn."})
+    return JsonResponse({'success': False, 'message': "Invalid request method."})

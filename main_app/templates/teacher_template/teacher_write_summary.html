@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block page_title %}
-    {{ page_title }}
+    {% trans page_title %}
 {% endblock page_title %}
 
 {% block content %}
@@ -17,15 +17,15 @@
                         <h3 class="card-title">{{ page_title }}</h3>
                     </div>
 
-                    {% include "main_app/form_template.html" with messages=messages form=form button_text="Submit Summary" %}
+                    {% include "main_app/form_template.html" with messages=messages form=form button_text=_("Submit Summary") %}
                 </div>
                 <!-- /.card -->
                 <div class="card card-dark">
-                    <div class="card-header"><h3 class="card-title">Summaries</h3></div>
+                    <div class="card-header"><h3 class="card-title">{% trans 'Summaries' %}</h3></div>
                     <div class="table-container p-2">
                         <table class="table table-bordered">
                             <tr>
-                                <th>ID</th>
+                                <th>{% trans 'ID' %}</th>
                                 <th>{% trans 'Student' %}</th>
                                 <th>{% trans 'Summary' %}</th>
                                 <th>{% trans 'Sent On' %}</th>

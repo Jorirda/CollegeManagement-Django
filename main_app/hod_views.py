@@ -93,7 +93,7 @@ def get_result(excel_file, is_teacher):
     html_table = df.to_html(index=False, classes='table table-bordered table-striped')
     return html_table
 
-def get_total_income_by_months(start_year, end_year, start_month_name, end_month_name):
+def get_total_income_by_months(start_date, end_date, start_month_name, end_month_name):
     # Dictionary to correlate month names to their numeric values
     month_dict = {
         "January": 1,
@@ -118,10 +118,10 @@ def get_total_income_by_months(start_year, end_year, start_month_name, end_month
     income_by_month = {}
 
     # Loop through each year and month within the specified range
-    for year in range(start_year, end_year + 1):
+    for year in range(start_date, end_date + 1):
         for month in range(1, 13):
             # Skip months outside the specified range in the first and last year
-            if (year == start_year and month < start_month) or (year == end_year and month > end_month):
+            if (year == start_date and month < start_month) or (year == end_date and month > end_month):
                 continue
             
             month_name = list(month_dict.keys())[list(month_dict.values()).index(month)]
@@ -358,10 +358,10 @@ def admin_home(request):
     income_by_months = {}
     available_years = set()
     for session in sessions:
-        start_year = session.start_year.year
-        end_year = session.end_year.year
-        available_years.update(range(start_year, end_year + 1))
-        monthly_income = get_total_income_by_months(start_year, end_year, "January", "December")
+        start_date = session.start_date.year
+        end_date = session.end_date.year
+        available_years.update(range(start_date, end_date + 1))
+        monthly_income = get_total_income_by_months(start_date, end_date, "January", "December")
         for month_year, income in monthly_income.items():
             if month_year not in income_by_months:
                 income_by_months[month_year] = 0
@@ -523,43 +523,37 @@ def manage_session(request):
 def add_teacher(request):
     form = TeacherForm(request.POST or None, request.FILES or None)
     context = {'form': form, 'page_title': _('Add teacher')}
+
     if request.method == 'POST':
         if form.is_valid():
-            full_name = form.cleaned_data.get('full_name')
-            address = form.cleaned_data.get('address')
-            phone_number = form.cleaned_data.get('phone_number')
-            # institution = form.cleaned_data.get('institution')
-            campus = form.cleaned_data.get('campus')
-            remark = form.cleaned_data.get('remark')
-            email = form.cleaned_data.get('email')
-            gender = form.cleaned_data.get('gender')
-            password = form.cleaned_data.get('password')
-            course = form.cleaned_data.get('course')
-            work_type = form.cleaned_data.get('work_type')
-            # passport = request.FILES.get('profile_pic')
-            # fs = FileSystemStorage()
-            # filename = fs.save(passport.name, passport)
-            # passport_url = fs.url(filename)
             try:
                 user = CustomUser.objects.create_user(
-                    email=email, password=password, user_type=2, full_name=full_name, profile_pic=None)
-                user.gender = gender
-                user.email = email
-                user.address = address
-                user.phone_number = phone_number
-                # user.teacher.institution = institution
-                user.teacher.campus = campus
-                user.remark = remark
-                user.teacher.course = course
-                user.teacher.work_type = work_type
+                    email=form.cleaned_data.get('email'),
+                    password=form.cleaned_data.get('password'),
+                    user_type=2,
+                    full_name=form.cleaned_data.get('full_name')
+                )
+                user.gender = form.cleaned_data.get('gender')
+                user.address = form.cleaned_data.get('address')
+                user.phone_number = form.cleaned_data.get('phone_number')
+                user.remark = form.cleaned_data.get('remark')
                 user.save()
+
+                teacher = Teacher.objects.create(
+                    admin=user,
+                    campus=form.cleaned_data.get('campus'),
+                    work_type=form.cleaned_data.get('work_type')
+                )
+                teacher.courses.set(form.cleaned_data.get('courses'))
+                teacher.save()
+
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_teacher'))
 
             except Exception as e:
-                messages.error(request, "Could Not Add " + str(e))
+                messages.error(request, "Could Not Add: " + str(e))
         else:
-            messages.error(request, "Please fulfil all requirements")
+            messages.error(request, "Please fulfill all requirements")
 
     return render(request, 'hod_template/add_teacher_template.html', context)
 
@@ -815,15 +809,11 @@ def manage_student_query(request):
             student_queries = StudentQuery.objects.filter(student_records__admin__id=selected_student_id).select_related(
                 'student_records__admin', 'payment_records', 'learning_records'
             )
-            # print(f"Student Queries: {student_queries}")
 
-            # Iterate over each student query
             for student_query in student_queries:
-                # Check if the student_query has an associated payment_records object
                 if student_query.payment_records:
                     priceper = (student_query.payment_records.amount_paid / student_query.payment_records.lesson_hours) if student_query.payment_records.lesson_hours else 0
 
-                    # Safely get related student information with fallback values
                     student_info = {
                         'student_name': student_query.student_records.admin.full_name if student_query.student_records and student_query.student_records.admin else 'Unknown',
                         'gender': student_query.student_records.admin.gender if student_query.student_records and student_query.student_records.admin else 'Unknown',
@@ -847,22 +837,18 @@ def manage_student_query(request):
                         'lesson_hours': student_query.learning_records.lesson_hours if student_query.learning_records else 'Unknown',
                         'paid_class_hours': student_query.payment_records.lesson_hours if student_query.payment_records else 'Unknown',
                     }
-                    # Append student query information to the list
                     student_query_info.append(student_info)
         except Exception as e:
             logging.error(f"Error retrieving student queries: {e}")
-    
-    # print(f"Student Query Info: {student_query_info}")
 
-    # Prepare the context to pass to the template
     context = {
         'students': students,
         'student_query_info': student_query_info,
         'page_title': _('Manage Student Queries')
     }
 
-    # Render the template with the context
     return render(request, 'hod_template/manage_student_query.html', context)
+
 
 
 
@@ -1220,12 +1206,11 @@ def delete_payment_record(request, payment_id):
 
 def manage_payment_record(request):
     payments = PaymentRecord.objects.all().select_related('learning_record')
-    paginator = Paginator(payments, 10)  # Show 10 records per page
+    total_amount_paid = payments.aggregate(Sum('amount_paid'))['amount_paid__sum']
 
+    paginator = Paginator(payments, 10)  # Show 10 records per page
     page_number = request.GET.get('page')
     paginated_payments = paginator.get_page(page_number)
-
-    total_amount_paid = payments.aggregate(Sum('amount_paid'))['amount_paid__sum']
 
     context = {
         'payments': paginated_payments,
@@ -1348,13 +1333,11 @@ def manage_learning_record(request):
     if selected_grade:
         learningrecords = learningrecords.filter(course__level_end=selected_grade)
 
+    total_lesson_hours = learningrecords.aggregate(Sum('lesson_hours'))['lesson_hours__sum']
+
     paginator = Paginator(learningrecords, 10)  # Show 10 records per page
     page_number = request.GET.get('page')
     paginated_learningrecords = paginator.get_page(page_number)
-
-    # Log the session ID for debugging
-    # session_id = request.session.get('session_id', None)
-    # logger.debug(f'Session ID: {session_id}')
 
     context = {
         'learningrecords': paginated_learningrecords,
@@ -1362,12 +1345,9 @@ def manage_learning_record(request):
         'grades': [(str(i), chr(64 + i)) for i in range(1, 8)],  # Assuming grades are from 1 to 7
         'selected_teacher': selected_teacher,
         'selected_grade': selected_grade,
-        'page_title': _('Manage Learning Records'),
-        # 'session_id': session_id  # Add session_id to context
+        'total_lesson_hours': total_lesson_hours if total_lesson_hours else 0,
+        'page_title': _('Manage Learning Records')
     }
-
-    # Log the entire context for debugging
-    # logger.debug(f'Context: {context}')
 
     return render(request, 'hod_template/manage_learning_record.html', context)
 

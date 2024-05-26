@@ -4,12 +4,12 @@
 {% block page_title %}{% trans page_title %}{% endblock page_title %}
 {% block custom_css %}
   <style>
-      .invalid{
+      .invalid {
         font-style: italic;
         font-weight: bold;
         color: red;
       }
-      .valid{
+      .valid {
         font-style: italic;
         font-weight: bold;
         color: green;
@@ -28,10 +28,9 @@
                         <h3 class="card-title">{% trans page_title %}</h3>
                     </div>
 
-                    {% include "main_app/form_template.html" with messages=messages  form=form button_text=_("Add Teacher")%}
+                    {% include "main_app/form_template.html" with messages=messages  form=form button_text=_("Add Teacher") %}
                 </div>
                 <!-- /.card -->
-
             </div>
         </div>
     </div>
@@ -45,19 +44,18 @@
     }
     $(document).ready(function(){
         $("#id_email").keyup(function(){
-            
             var email = $(this).val()
             if (validateEmail(email)){
             $.ajax({
                 url: "{% url 'check_email_availability' %}",
                 type: 'POST',
-                data:{email:email}
+                data: {email: email}
             }).done(function(response){
                 if (response == "True"){
                     $(".email_error").remove()
                     $("<span class='invalid email_error'>Email Address Already Exist</span>").insertAfter("#id_email");
                 }
-                else{
+                else {
                     $(".email_error").remove()
                     $("<span class='valid email_error'>Email Address Available</span>").insertAfter("#id_email");
                 }
@@ -69,3 +67,4 @@
     });
 </script>
 {% endblock custom_js %}
+ 

@@ -36,11 +36,11 @@ class CustomUserManager(UserManager):
         return self._create_user(email, password, **extra_fields)
 
 class Session(models.Model):
-    start_year = models.DateField()
-    end_year = models.DateField()
+    start_date = models.DateField()
+    end_date = models.DateField()
 
     def __str__(self):
-        return "From " + str(self.start_year) + " to " + str(self.end_year)
+        return f"From {self.start_date} to {self.end_date}"
 
 class CustomUser(AbstractUser):
     USER_TYPE = ((1, "HOD"), (2, "Teacher"), (3, "Student"))
@@ -104,9 +104,9 @@ class Student(models.Model):
 
 class Teacher(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
+    # course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
+    courses = models.ManyToManyField(Course)
     campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
-    # date_of_birth = models.DateField(blank=True, null=True)
     work_type = models.CharField(max_length=30, blank=True)  # Special/Temporary
 
     def __str__(self):
@@ -122,7 +122,7 @@ class Classes(models.Model):
 
 class ClassSchedule(models.Model):
     course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)
-    lesson_unit_price = models.DecimalField(max_digits=10, default=0, decimal_places=2)
+    # lesson_unit_price = models.DecimalField(max_digits=10, default=0, decimal_places=2)
     teacher = models.ForeignKey(Teacher, null=True, on_delete=models.CASCADE)
     grade = models.CharField(max_length=3, blank=True, null=True)  
     start_time = models.TimeField(null=True)
@@ -282,6 +282,67 @@ class PaymentQuery(models.Model):
     learning_records = models.ForeignKey(LearningRecord, null=True, on_delete=models.CASCADE)
 
 
+# @receiver(post_save, sender=Attendance)
+# @receiver(post_save, sender=Student)
+# @receiver(post_save, sender=LearningRecord)
+# @receiver(post_save, sender=PaymentRecord)
+# def create_or_update_student_query(sender, instance, created, **kwargs):
+#     student = None
+#     if isinstance(instance, Student):
+#         student = instance
+#     elif isinstance(instance, LearningRecord) or isinstance(instance, PaymentRecord):
+#         student = instance.student
+
+#     if student:
+#         # Ensure only one StudentQuery is associated with each student, handle creation or update
+#         student_query, created = StudentQuery.objects.update_or_create(student_records=student)
+
+#         if isinstance(instance, Student):
+#             print("Student instance saved or updated.")
+#         elif isinstance(instance, LearningRecord):
+#             print("LearningRecord instance saved or updated, associated with student.")
+#         elif isinstance(instance, PaymentRecord):
+#             print("PaymentRecord instance saved or updated, associated with student.")
+
+#         # Get related learning and payment records
+#         related_learning_records = student.learningrecord_set.all()
+#         related_payment_records = student.paymentrecord_set.all()
+
+#         # Get the first instance safely
+#         learning_record_instance = related_learning_records.first()
+#         payment_record_instance = related_payment_records.first()
+
+#         if learning_record_instance:
+#             student_query.learning_records = learning_record_instance
+
+#         if payment_record_instance:
+#             student_query.payment_records = payment_record_instance
+#             student_query.paid_class_hours = payment_record_instance.lesson_hours
+#         else:
+#             student_query.paid_class_hours = 0  # Handle the case where there is no payment record
+
+#         # Retrieve the student's learning records as a queryset
+#         learning_records_query = LearningRecord.objects.filter(student=student)
+
+#         # Aggregate the total lesson hours
+#         total_lesson_hours = learning_records_query.aggregate(Sum('lesson_hours'))['lesson_hours__sum'] or 0
+#         total_lesson_hours = int(total_lesson_hours)  # Convert to int, truncating decimals
+
+#         # Use the aggregated hours in your calculation
+#         attendance_count = AttendanceReport.objects.filter(student_id=student_query.pk).count()
+#         student_query.remaining_hours = student_query.paid_class_hours - (total_lesson_hours * attendance_count)
+#         student_query.completed_hours = total_lesson_hours * attendance_count
+        
+#         # Save the student_query after modifications
+#         try:
+#             student_query.save()
+#             print(f"StudentQuery for {student} updated successfully.")
+#         except IntegrityError as e:
+#             print(f"Error saving StudentQuery for {student}: {str(e)}")
+
+# # Register signal handlers
+# post_save.connect(create_or_update_student_query, sender=Student)
+
 @receiver(post_save, sender=Attendance)
 @receiver(post_save, sender=Student)
 @receiver(post_save, sender=LearningRecord)
@@ -328,10 +389,9 @@ def create_or_update_student_query(sender, instance, created, **kwargs):
         total_lesson_hours = learning_records_query.aggregate(Sum('lesson_hours'))['lesson_hours__sum'] or 0
         total_lesson_hours = int(total_lesson_hours)  # Convert to int, truncating decimals
 
-        # Use the aggregated hours in your calculation
-        attendance_count = AttendanceReport.objects.filter(student_id=student_query.pk).count()
-        student_query.remaining_hours = student_query.paid_class_hours - (total_lesson_hours * attendance_count)
-        student_query.completed_hours = total_lesson_hours * attendance_count
+        # Update completed hours and remaining hours
+        student_query.completed_hours = total_lesson_hours
+        student_query.remaining_hours = student_query.paid_class_hours - total_lesson_hours
         
         # Save the student_query after modifications
         try:
@@ -342,6 +402,8 @@ def create_or_update_student_query(sender, instance, created, **kwargs):
 
 # Register signal handlers
 post_save.connect(create_or_update_student_query, sender=Student)
+
+
 
 @receiver(post_save, sender=Teacher)
 @receiver(post_save, sender=LearningRecord)

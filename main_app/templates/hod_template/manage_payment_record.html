@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block page_title %}
-    <i class="nav-icon fas fa-yen-sign"></i> {{ page_title }}
+    <i class="nav-icon fas fa-yen-sign"></i>  {% trans page_title %}
 {% endblock page_title %}
 
 {% block content %}
@@ -64,8 +64,9 @@
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="d-flex align-items-center">
                             <i class="nav-icon fas fa-yen-sign" style="font-size: 24px; margin-right: 10px;"></i>
-                            <h3 class="card-title">{{ page_title }}</h3>
+                            <h3 class="card-title">{% trans page_title %}</h3>
                         </div>
+                        <h3 class="card-title">{% blocktrans %}Total Payments: ¥{{ total_amount_paid }}{% endblocktrans %}</h3>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body table-container">
@@ -76,8 +77,8 @@
                                     <th>{% trans 'Date' %}</th>
                                     <th>{% trans 'Student' %}</th>
                                     <th>{% trans 'Course' %}</th>
-                                    <th>{% trans 'Lesson Unit Price' %}</th>
-                                    <th>{% trans 'Total Lesson Hours' %}</th>
+                                    <th>{% trans 'Class Unit Price' %}</th>
+                                    <th>{% trans 'Total Class Hours' %}</th>
                                     <th>{% trans 'Discounted Price' %}</th>
                                     <th>{% trans 'Book Costs' %}</th>
                                     <th>{% trans 'Other Fee' %}</th>

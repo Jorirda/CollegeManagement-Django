@@ -23,7 +23,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>{% trans 'Course Title' %}</th>
-                                    <th>{% trans 'Lesson Unit Price' %}</th>
+                                    <!-- <th>{% trans 'Lesson Unit Price' %}</th> -->
                                     <th>{% trans 'Teacher' %}</th>
                                     <!-- <th>{% trans 'Subject' %}</th> -->
                                     <th>{% trans 'Class Time' %}</th>
@@ -36,7 +36,7 @@
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ class_schedule.course }}</td>
-                                    <td>¥{{ class_schedule.lesson_unit_price }}</td>
+                                    <!-- <td>¥{{ class_schedule.lesson_unit_price }}</td> -->
                                     <td>{{ class_schedule.teacher }}</td>
                                     <!-- <td>{{ class_schedule.subject }}</td> -->
                                     <td>{{ class_schedule.start_time|time:"h:i A" }} to {{ class_schedule.end_time|time:"h:i A" }}</td>

@@ -8,29 +8,22 @@
 
 {% block content %}
 <style>
-    /* Flex container for responsive button alignment */
     .responsive-buttons {
         display: flex;
-        justify-content: space-around; /* Distributes space around items */
-        flex-wrap: wrap; /* Allows items to wrap onto the next line as needed */
+        justify-content: space-around;
+        flex-wrap: wrap;
     }
-
-    /* Responsive button styling */
     .btn-responsive {
-        flex: 1 1 auto; /* Allows the button to grow and shrink as needed */
-        margin: 2px; /* Adds margin around buttons */
-        min-width: 68px; /* Minimum width of each button */
-        text-align: center; /* Centers button text */
+        flex: 1 1 auto;
+        margin: 2px;
+        min-width: 68px;
+        text-align: center;
     }
-
-    /* Media query for smaller screens */
     @media (max-width: 576px) {
         .btn-responsive {
-            flex-basis: 100%; /* Each button takes full width of the container on small screens */
+            flex-basis: 100%;
         }
     }
-
-    /* Pagination styling */
     .pagination {
         display: flex;
         justify-content: center;
@@ -61,12 +54,11 @@
                         <div class="d-flex align-items-center">
                             <i class="nav-icon fas fa-user" style="font-size: 24px; margin-right: 10px;"></i>
                             <h3 class="card-title">{% trans page_title %}</h3>
-                        </div>        
+                        </div>
                         <h3 class="card-title">{% blocktrans %}Total Teachers: {{ total_teacher_count }} 人 {% endblocktrans %}</h3>
                     </div>
-                    <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="example2" class="table table-bordered table-hover ">
+                        <table id="example2" class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
                                     <th>Index No.</th>
@@ -90,7 +82,7 @@
                                     <td>{{ teacher.email }}</td>
                                     <td>{{ teacher.address }}</td>
                                     <td>{{ teacher.phone_number }}</td>
-                                    <td>{{ teacher.teacher.course.name }}</td>
+                                    <td>{% for course in teacher.teacher.courses.all %}{{ course.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
                                     <td>{{ teacher.teacher.work_type }}</td>
                                     <td>{{ teacher.remark }}</td>
                                     <td class="responsive-buttons">

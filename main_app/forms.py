@@ -10,9 +10,14 @@ class ExcelUploadForm(forms.Form):
 class FormSettings(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(FormSettings, self).__init__(*args, **kwargs)
-        # Here make some changes such as:
         for field in self.visible_fields():
-            field.field.widget.attrs['class'] = 'form-control'
+            # Apply form-control class to all fields except checkboxes
+            if isinstance(field.field.widget, (forms.CheckboxInput, forms.CheckboxSelectMultiple)):
+                field.field.widget.attrs['class'] = 'form-check-input'
+            else:
+                field.field.widget.attrs['class'] = 'form-control'
+
+
 
 class CustomUserForm(FormSettings):
     full_name = forms.CharField(required=True, label=_('Full Name'))
@@ -120,7 +125,7 @@ class TeacherForm(FormSettings):
     address = forms.CharField(widget=forms.Textarea, label=_('Address'))
     phone_number = forms.CharField(max_length=20, required=False, label=_("Phone Number"))
     campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False, label=_("Campus"))
-    course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, label=_("Course"))
+    courses = forms.ModelMultipleChoiceField(queryset=Course.objects.all(), widget=forms.CheckboxSelectMultiple, label=_("Courses"))
     work_type = forms.ChoiceField(choices=[
         ('Full Time', _('Full Time')),
         ('Part Time', _('Part Time')),
@@ -136,6 +141,7 @@ class TeacherForm(FormSettings):
             self.fields['address'].initial = self.instance.admin.address
             self.fields['phone_number'].initial = self.instance.admin.phone_number
             self.fields['remark'].initial = self.instance.admin.remark
+            self.fields['courses'].initial = self.instance.courses.all()
 
     def save(self, commit=True):
         instance = super(TeacherForm, self).save(commit=False)
@@ -146,7 +152,7 @@ class TeacherForm(FormSettings):
         user.address = self.cleaned_data['address']
         user.phone_number = self.cleaned_data['phone_number']
         user.remark = self.cleaned_data['remark']
-        
+
         password = self.cleaned_data.get('password')
         if password:
             user.set_password(password)
@@ -154,12 +160,63 @@ class TeacherForm(FormSettings):
         if commit:
             user.save()
             instance.save()
+            instance.courses.set(self.cleaned_data['courses'])
         return instance
 
     class Meta:
         model = Teacher
-        fields = ['full_name', 'gender', 'email', 'password', 'address', 
-                  'phone_number', 'campus', 'course', 'work_type', 'remark']
+        fields = ['full_name', 'gender', 'email', 'password', 'address', 'phone_number', 'campus', 'courses', 'work_type', 'remark']
+
+
+
+# class TeacherForm(FormSettings):
+#     full_name = forms.CharField(required=True, label=_('Full Name'))
+#     gender = forms.ChoiceField(choices=[('男', _('Male')), ('女', _('Female'))], label=_('Gender'))
+#     email = forms.EmailField(widget=forms.EmailInput, label=_('Email'))
+#     password = forms.CharField(widget=forms.PasswordInput, required=False, label=_('Password'))
+#     address = forms.CharField(widget=forms.Textarea, label=_('Address'))
+#     phone_number = forms.CharField(max_length=20, required=False, label=_("Phone Number"))
+#     campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False, label=_("Campus"))
+#     course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, label=_("Course"))
+#     work_type = forms.ChoiceField(choices=[
+#         ('Full Time', _('Full Time')),
+#         ('Part Time', _('Part Time')),
+#     ], label=_("Contract"))
+#     remark = forms.CharField(widget=forms.Textarea, required=False, label=_('Remark'))
+
+#     def __init__(self, *args, **kwargs):
+#         super(TeacherForm, self).__init__(*args, **kwargs)
+#         if self.instance.pk:  # if the instance exists (editing case)
+#             self.fields['full_name'].initial = self.instance.admin.full_name
+#             self.fields['gender'].initial = self.instance.admin.gender
+#             self.fields['email'].initial = self.instance.admin.email
+#             self.fields['address'].initial = self.instance.admin.address
+#             self.fields['phone_number'].initial = self.instance.admin.phone_number
+#             self.fields['remark'].initial = self.instance.admin.remark
+
+#     def save(self, commit=True):
+#         instance = super(TeacherForm, self).save(commit=False)
+#         user = instance.admin
+#         user.full_name = self.cleaned_data['full_name']
+#         user.gender = self.cleaned_data['gender']
+#         user.email = self.cleaned_data['email']
+#         user.address = self.cleaned_data['address']
+#         user.phone_number = self.cleaned_data['phone_number']
+#         user.remark = self.cleaned_data['remark']
+        
+#         password = self.cleaned_data.get('password')
+#         if password:
+#             user.set_password(password)
+
+#         if commit:
+#             user.save()
+#             instance.save()
+#         return instance
+
+#     class Meta:
+#         model = Teacher
+#         fields = ['full_name', 'gender', 'email', 'password', 'address', 
+#                   'phone_number', 'campus', 'course', 'work_type', 'remark']
 
 class CourseForm(FormSettings):
     name = forms.CharField(label=_('Course Name'))
@@ -335,7 +392,7 @@ class ClassScheduleForm(FormSettings):
         return [(str(i), chr(64 + i)) for i in range(min_level, max_level + 1)]
 
     course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, widget=forms.Select(attrs={'class': 'form-control'}), label=_('Course'))
-    lesson_unit_price = forms.DecimalField(required=False, widget=forms.TextInput(attrs={'placeholder': _('Lesson Unit Price'), 'class': 'form-control'}), label=_('Lesson Unit Price'))
+    # lesson_unit_price = forms.DecimalField(required=False, widget=forms.TextInput(attrs={'placeholder': _('Lesson Unit Price'), 'class': 'form-control'}), label=_('Lesson Unit Price'))
     teacher = forms.ModelChoiceField(queryset=Teacher.objects.all(), required=False, widget=forms.Select(attrs={'class': 'form-control'}), label=_('Teacher'))
     grade = forms.ChoiceField(
         choices=[],  # Initialize empty, will set in __init__
@@ -354,21 +411,24 @@ class ClassScheduleForm(FormSettings):
 
     class Meta:
         model = ClassSchedule
-        fields = ['course', 'lesson_unit_price', 'teacher', 'grade', 'start_time', 'end_time', 'lesson_hours', 'remark']
+        fields = ['course', 'teacher', 'grade', 'start_time', 'end_time', 'lesson_hours', 'remark']
+
+class DateInput(forms.DateInput):
+    input_type = 'date'
 
 class SessionForm(FormSettings):
-    start_time = forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time'}), label=_('Start Time'))
-    end_time = forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time'}), label=_('End Time'))
+    start_date = forms.DateField(required=False, widget=DateInput(attrs={'type': 'date'}), label=_('Start Date'))
+    end_date = forms.DateField(required=False, widget=DateInput(attrs={'type': 'date'}), label=_('End Date'))
 
     def __init__(self, *args, **kwargs):
         super(SessionForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = Session
-        fields = ['start_time', 'end_time']
+        fields = ['start_date', 'end_date']
         widgets = {
-            _('start_year'): DateInput(attrs={'type': 'date'}),
-            _('end_year'): DateInput(attrs={'type': 'date'}),
+            'start_date': DateInput(),
+            'end_date': DateInput(),
         }
 
 class LeaveReportTeacherForm(FormSettings):
@@ -412,15 +472,6 @@ class LeaveReportStudentForm(FormSettings):
         widgets = {
             'date': DateInput(attrs={'type': 'date'}),
         }
-
-# class SummaryStudentForm(FormSettings):
-#     summary = forms.CharField(widget=TextInput(), label=_('Summary'))
-#     def __init__(self, *args, **kwargs):
-#         super(SummaryStudentForm, self).__init__(*args, **kwargs)
-
-#     class Meta:
-#         model = SummaryStudent
-#         fields = [_('Summary')]
 
 class StudentEditForm(CustomUserForm):
     def __init__(self, *args, **kwargs):

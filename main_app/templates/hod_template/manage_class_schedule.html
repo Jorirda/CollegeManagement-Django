@@ -14,7 +14,7 @@
                         <div class="d-flex align-items-center">
                             <i class="nav-icon fas fa-calendar-alt" style="font-size: 24px; margin-right: 10px;"></i>
                             <h3 class="card-title">{% trans page_title %}</h3>
-                        </div>                                      
+                        </div>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
@@ -23,9 +23,9 @@
                                 <tr>
                                     <th>#</th>
                                     <th>{% trans 'Course Title' %}</th>
-                                    <!-- <th>{% trans 'Lesson Unit Price' %}</th> -->
+                                    <th>{% trans 'Hourly Rate' %}</th>
                                     <th>{% trans 'Teacher' %}</th>
-                                    <!-- <th>{% trans 'Subject' %}</th> -->
+                                    <th>{% trans 'Day' %}</th>
                                     <th>{% trans 'Class Time' %}</th>
                                     <th>{% trans 'Remark' %}</th>
                                     <th>{% trans 'Actions' %}</th>
@@ -36,15 +36,15 @@
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ class_schedule.course }}</td>
-                                    <!-- <td>¥{{ class_schedule.lesson_unit_price }}</td> -->
+                                    <td>¥{{ class_schedule.course.hourly_rate }}</td>
                                     <td>{{ class_schedule.teacher }}</td>
-                                    <!-- <td>{{ class_schedule.subject }}</td> -->
+                                    <td>{{ class_schedule.get_day_of_week_display }}</td>
                                     <td>{{ class_schedule.start_time|time:"h:i A" }} to {{ class_schedule.end_time|time:"h:i A" }}</td>
                                     <td>{{ class_schedule.remark }}</td>
                                     <td>
-                                        <a href="{% url 'edit_class_schedule' class_schedule.id %}" class="btn btn-info">{% trans 'Edit' %}</a> - 
+                                        <a href="{% url 'edit_class_schedule' class_schedule.id %}" class="btn btn-info">{% trans 'Edit' %}</a> -
                                         <a href="{% url 'delete_class_schedule' class_schedule.id %}" class="btn btn-danger" onclick="return confirm('{% trans 'Are you sure about this?' %}')">{% trans 'Delete' %}</a>
-                                    </td> 
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

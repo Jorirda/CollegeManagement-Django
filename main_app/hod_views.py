@@ -1,4 +1,4 @@
-import io
+# import io
 import json
 import requests
 import pandas as pd
@@ -15,19 +15,21 @@ from django.shortcuts import (HttpResponse, HttpResponseRedirect,
 from django.templatetags.static import static
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import UpdateView
+# from django.views.generic import UpdateView
 from django.db.models import Sum, F
-from django.contrib.auth.hashers import make_password
+# from django.contrib.auth.hashers import make_password
 from django.shortcuts import render
-from generate import generate_html_table, process_data
+# from generate import generate_html_table, process_data
+from generate import process_data
+from main_app.model_column_mapping import MODEL_COLUMN_MAPPING
 from .forms import *
 from .models import *
 from .forms import ExcelUploadForm
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
-from django.core.files.uploadedfile import InMemoryUploadedFile
+# from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.http import JsonResponse
-from django.core import serializers
+# from django.core import serializers
 from dateutil.relativedelta import relativedelta
 from django.shortcuts import render
 from django.utils.translation import gettext as _
@@ -64,26 +66,97 @@ def get_grade_choices(request):
         choices = []
     return JsonResponse({'choices': choices})
 
-def get_upload(request):
-    is_chinese_data = True  # Manually set this flag to True if the data is Chinese
+@csrf_exempt
+def check_columns(request):
+    if request.method == 'POST':
+        excel_file = request.FILES.get('excel_file')
+        selected_model = request.POST.get('model')
+        user_type = request.POST.get('user_type', None)
 
+        if selected_model == '':
+            return JsonResponse({'success': False, 'error': 'Please select a table type.'})
+
+        try:
+            # Read the Excel file into a DataFrame
+            df = pd.read_excel(excel_file)
+
+            # Adjust the model based on the user type
+            if selected_model == 'CustomUser' and user_type:
+                selected_model = user_type
+
+            # Get the expected columns for the selected model
+            expected_columns = MODEL_COLUMN_MAPPING.get(selected_model, {}).get('fields', {}).keys()
+
+            # Compare DataFrame columns with expected columns
+            uploaded_columns = df.columns.tolist()
+            column_status = []
+
+            for col in expected_columns:
+                column_status.append({
+                    'name': col,
+                    'exists': col in uploaded_columns
+                })
+
+            # Log the comparison results
+            logging.info(f"Uploaded columns: {uploaded_columns}")
+            logging.info(f"Expected columns for {selected_model}: {list(expected_columns)}")
+            logging.info(f"Column status: {column_status}")
+
+            return JsonResponse({'success': True, 'columns': column_status})
+
+        except Exception as e:
+            logging.error(f"Error processing the file: {e}")
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+def get_upload(request):
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
         if form.is_valid():
             excel_file = request.FILES['excel_file']
-            is_teacher = form.cleaned_data['is_teacher']
+            selected_model = form.cleaned_data['model']
+            user_type = form.cleaned_data.get('user_type')
+            
+            if selected_model == 'CustomUser' and user_type:
+                selected_model = user_type
+
             try:
-                # Process the uploaded Excel file
-                processed_data = process_data(excel_file, is_teacher, is_chinese_data)
-                html_table = get_result(excel_file, is_teacher)
-                message = 'Data processed successfully!'
-                context = {'message': message, 'processed_data': processed_data, 'html_table': html_table}
+                df = pd.read_excel(excel_file)
+                logger.info(f"Uploaded columns: {df.columns.tolist()}")
+                model_info = MODEL_COLUMN_MAPPING.get(selected_model)
+                if not model_info:
+                    raise ValueError(f"No model found for the selected type: {selected_model}")
+
+                expected_columns = set(model_info['fields'].keys())
+                actual_columns = set(df.columns)
+                
+                missing_columns = expected_columns - actual_columns
+                extra_columns = actual_columns - expected_columns
+
+                logger.info(f"Expected columns: {expected_columns}")
+                logger.info(f"Actual columns: {actual_columns}")
+                logger.info(f"Missing columns: {missing_columns}")
+                logger.info(f"Extra columns: {extra_columns}")
+
+                column_status = {col: 'missing' if col in missing_columns else 'extra' if col in extra_columns else 'match' for col in expected_columns}
+
+                context = {
+                    'form': form,
+                    'column_status': column_status,
+                    'selected_model': selected_model,
+                    'df': df.to_html(index=False)
+                }
+
+                return render(request, 'hod_template/upload.html', context)
+
             except Exception as e:
-                message = f"Failed to process data: {str(e)}"
-                context = {'message': message}
-            return render(request, 'hod_template/result.html', context)
+                logger.error(f"Error processing file: {e}")
+                context = {'form': form, 'error': str(e)}
+                return render(request, 'hod_template/upload.html', context)
+
     else:
         form = ExcelUploadForm()
+
     return render(request, 'hod_template/upload.html', {'form': form})
 
 def get_result(excel_file, is_teacher):
@@ -151,17 +224,31 @@ def fetch_class_schedule(request):
     course_id = request.GET.get('course_id')
     teacher_id = request.GET.get('teacher_id')
     
-    form = LearningRecordForm()
-    data = form.fetch_class_schedule_data(course_id, teacher_id)
-    
-    return JsonResponse(data)
+    if course_id and teacher_id:
+        try:
+            course_id = int(course_id)
+            teacher_id = int(teacher_id)
+        except ValueError:
+            return JsonResponse({'error': 'Invalid course or teacher ID'}, status=400)
+        
+        form = LearningRecordForm()
+        data = form.fetch_class_schedule_data(course_id, teacher_id)
+        return JsonResponse(data)
+    return JsonResponse({'error': 'Missing course_id or teacher_id'}, status=400)
 
 def filter_teachers(request):
     course_id = request.GET.get('course_id')
-    form = LearningRecordForm()
-    teachers_data = form.fetch_teacher_data(course_id)
-    # print(teachers_data)
-    return JsonResponse({'teachers': teachers_data})
+    
+    if course_id:
+        try:
+            course_id = int(course_id)
+        except ValueError:
+            return JsonResponse({'error': 'Invalid course ID'}, status=400)
+        
+        form = LearningRecordForm()
+        teachers_data = form.fetch_teacher_data(course_id)
+        return JsonResponse({'teachers': teachers_data})
+    return JsonResponse({'error': 'Missing course_id'}, status=400)
 
     
 #Refund
@@ -272,6 +359,7 @@ def admin_get_teacher_class_schedules_count(request):
     print(teacher_id)
     class_schedules_count = ClassSchedule.objects.filter(teacher_id=teacher_id).count()
     return JsonResponse({'class_schedules_count': class_schedules_count})
+
 
 #Admin
 def admin_home(request):
@@ -465,6 +553,7 @@ def admin_view_attendance(request):
 
     return render(request, "hod_template/admin_view_attendance.html", context)
 
+
 #Sessions
 def add_session(request):
     form = SessionForm(request.POST or None)
@@ -599,55 +688,105 @@ def manage_teacher(request):
     }
     return render(request, "hod_template/manage_teacher.html", context)
 
+from collections import defaultdict
+
 def manage_teacher_query(request):
-    # Get all teachers
     teachers = CustomUser.objects.filter(user_type=2)
-
-    # Get the selected teacher ID from the form submission
     selected_teacher_id = request.GET.get('teacher_id')
-
-    # Initialize the teacher_query_info list outside the if block
     teacher_query_info = []
 
-    # If a teacher is selected, filter teacher queries by that teacher
     if selected_teacher_id:
-        # Retrieve the selected teacher's queries
         teacher_queries = TeacherQuery.objects.filter(admin_id=selected_teacher_id)
 
-        # Iterate over each teacher query
         for teacher_query in teacher_queries:
-            # Safely get related teacher information with fallback values
-            learning_record = teacher_query.learning_records
-            teacher_info = {
-                'teacher_name': teacher_query.admin.full_name if teacher_query.teacher_records and teacher_query.teacher_records.admin else 'Unknown',
-                'gender': teacher_query.admin.gender if teacher_query.admin else 'Unknown',
-                'phone_number': teacher_query.teacher_records.admin.phone_number if teacher_query.teacher_records and teacher_query.teacher_records.admin else 'Unknown',
-                'campus': teacher_query.teacher_records.campus if teacher_query.teacher_records else 'Unknown',
-                'address': teacher_query.teacher_records.admin.address if teacher_query.teacher_records and teacher_query.teacher_records.admin else 'Unknown',
-                'num_of_classes': teacher_query.num_of_classes if teacher_query.num_of_classes is not None else 'Unknown',
-                'contract': teacher_query.teacher_records.work_type if teacher_query.teacher_records else 'Unknown',
-                'completed_hours': teacher_query.completed_hours if teacher_query.completed_hours is not None else 'Unknown',
-                'remaining_hours': teacher_query.remaining_hours if teacher_query.remaining_hours is not None else 'Unknown',
-                'date': learning_record.date if learning_record else 'Unknown',
-                'course': learning_record.course if learning_record else 'Unknown',
-                'instructor': learning_record.teacher if learning_record else 'Unknown',
-                'start_time': learning_record.start_time if learning_record else 'Unknown',
-                'end_time': learning_record.end_time if learning_record else 'Unknown',
-                'lesson_hours': learning_record.lesson_hours if learning_record else 'Unknown',
-                # 'class': learning_record.class_name if learning_record else None,
-            }
-            # Append teacher query information to the list
-            teacher_query_info.append(teacher_info)
+            teacher = teacher_query.teacher_records
+            if teacher:
+                related_learning_records = LearningRecord.objects.filter(teacher=teacher)
+                course_info = defaultdict(list)
+                teacher_info = {
+                    'teacher_name': teacher_query.admin.full_name if teacher_query.teacher_records and teacher_query.teacher_records.admin else 'Unknown',
+                    'gender': teacher_query.admin.gender if teacher_query.admin else 'Unknown',
+                    'phone_number': teacher_query.teacher_records.admin.phone_number if teacher_query.teacher_records and teacher_query.teacher_records.admin else 'Unknown',
+                    'campus': teacher_query.teacher_records.campus if teacher_query.teacher_records else 'Unknown',
+                    'address': teacher_query.teacher_records.admin.address if teacher_query.teacher_records and teacher_query.teacher_records.admin else 'Unknown',
+                    'num_of_classes': teacher_query.num_of_classes if teacher_query.num_of_classes is not None else 'Unknown',
+                    'contract': teacher_query.teacher_records.work_type if teacher_query.teacher_records else 'Unknown',
+                    'completed_hours': teacher_query.completed_hours if teacher_query.completed_hours is not None else 'Unknown',
+                    'remaining_hours': teacher_query.remaining_hours if teacher_query.remaining_hours is not None else 'Unknown',
+                }
+                for learning_record in related_learning_records:
+                    course_info[learning_record.course.name].append({
+                        'date': learning_record.date,
+                        'course': learning_record.course.name,
+                        'instructor': learning_record.teacher.admin.full_name,
+                        'start_time': learning_record.start_time,
+                        'end_time': learning_record.end_time,
+                        'lesson_hours': learning_record.lesson_hours,
+                    })
 
-    # Prepare the context to pass to the template
+                for course, records in course_info.items():
+                    teacher_query_info.append({
+                        'course': course,
+                        'teacher_name': teacher_info['teacher_name'],
+                        'gender': teacher_info['gender'],
+                        'phone_number': teacher_info['phone_number'],
+                        'campus': teacher_info['campus'],
+                        'address': teacher_info['address'],
+                        'num_of_classes': teacher_info['num_of_classes'],
+                        'contract': teacher_info['contract'],
+                        'completed_hours': teacher_info['completed_hours'],
+                        'remaining_hours': teacher_info['remaining_hours'],
+                        'records': records
+                    })
+
     context = {
         'teachers': teachers,
         'teacher_query_info': teacher_query_info,
         'page_title': 'Manage Teacher Queries'
     }
-
-    # Render the template with the context
     return render(request, 'hod_template/manage_teacher_query.html', context)
+
+
+# def manage_teacher_query(request):
+#     teachers = CustomUser.objects.filter(user_type=2)
+#     selected_teacher_id = request.GET.get('teacher_id')
+#     teacher_query_info = []
+
+#     if selected_teacher_id:
+#         teacher_queries = TeacherQuery.objects.filter(admin_id=selected_teacher_id)
+
+#         for teacher_query in teacher_queries:
+#             teacher = teacher_query.teacher_records
+#             if teacher:
+#                 related_learning_records = LearningRecord.objects.filter(teacher=teacher)
+#                 for learning_record in related_learning_records:
+#                     teacher_info = {
+#                         'teacher_name': teacher_query.admin.full_name if teacher_query.teacher_records and teacher_query.teacher_records.admin else 'Unknown',
+#                         'gender': teacher_query.admin.gender if teacher_query.admin else 'Unknown',
+#                         'phone_number': teacher_query.teacher_records.admin.phone_number if teacher_query.teacher_records and teacher_query.teacher_records.admin else 'Unknown',
+#                         'campus': teacher_query.teacher_records.campus if teacher_query.teacher_records else 'Unknown',
+#                         'address': teacher_query.teacher_records.admin.address if teacher_query.teacher_records and teacher_query.teacher_records.admin else 'Unknown',
+#                         'num_of_classes': teacher_query.num_of_classes if teacher_query.num_of_classes is not None else 'Unknown',
+#                         'contract': teacher_query.teacher_records.work_type if teacher_query.teacher_records else 'Unknown',
+#                         'completed_hours': teacher_query.completed_hours if teacher_query.completed_hours is not None else 'Unknown',
+#                         'remaining_hours': teacher_query.remaining_hours if teacher_query.remaining_hours is not None else 'Unknown',
+#                         'date': learning_record.date,
+#                         'course': learning_record.course.name,
+#                         'instructor': learning_record.teacher.admin.full_name,
+#                         'start_time': learning_record.start_time,
+#                         'end_time': learning_record.end_time,
+#                         'lesson_hours': learning_record.lesson_hours,
+#                     }
+#                     teacher_query_info.append(teacher_info)
+
+#     context = {
+#         'teachers': teachers,
+#         'teacher_query_info': teacher_query_info,
+#         'page_title': 'Manage Teacher Queries'
+#     }
+#     return render(request, 'hod_template/manage_teacher_query.html', context)
+
+
 
 
 
@@ -848,8 +987,6 @@ def manage_student_query(request):
     }
 
     return render(request, 'hod_template/manage_student_query.html', context)
-
-
 
 
 #Courses
@@ -1220,7 +1357,7 @@ def manage_payment_record(request):
     return render(request, 'hod_template/manage_payment_record.html', context)
 
 
-#Learning
+# Learning
 def add_learning_record(request):
     form = LearningRecordForm(request.POST or None)
     context = {
@@ -1229,38 +1366,17 @@ def add_learning_record(request):
     }
     if request.method == 'POST':
         if form.is_valid():
-            date = form.cleaned_data.get('date')
-            student = form.cleaned_data.get('student')
-            course = form.cleaned_data.get('course')
-            teacher = form.cleaned_data.get('teacher')
-            start_time = form.cleaned_data.get('start_time')
-            end_time = form.cleaned_data.get('end_time')
-            lesson_hours = form.cleaned_data.get('lesson_hours')
-            semester = form.cleaned_data.get('semester')
-            # Get the remark from the associated student
-            remark = student.admin.remark if student and student.admin else None
-            
+            learning_record = form.save(commit=False)
+            student = learning_record.student
+            learning_record.remark = student.admin.remark if student and student.admin else None
             try:
-                learn = LearningRecord()
-                learn.date = date
-                learn.student = student
-                learn.course = course
-                learn.teacher = teacher
-                learn.start_time = start_time
-                learn.end_time = end_time
-                learn.lesson_hours = lesson_hours
-                learn.semester = semester
-                learn.remark = remark  # Assign the remark here
-                learn.save()
-                
+                learning_record.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_learning_record'))
-
             except Exception as e:
                 messages.error(request, "Could Not Add " + str(e))
         else:
             messages.error(request, "Fill Form Properly")
-
     return render(request, 'hod_template/add_learning_record_template.html', context)
 
 def edit_learning_record(request, learn_id):
@@ -1271,46 +1387,20 @@ def edit_learning_record(request, learn_id):
         'learn_id': learn_id,
         'page_title': _('Edit Learning Record')
     }
-    
+
     if request.method == 'POST':
         if form.is_valid():
-            date = form.cleaned_data.get('date')
-            student = form.cleaned_data.get('student')
-            course = form.cleaned_data.get('course')
-            teacher = form.cleaned_data.get('teacher')
-            start_time = form.cleaned_data.get('start_time')
-            end_time = form.cleaned_data.get('end_time')
-            lesson_hours = form.cleaned_data.get('lesson_hours')
-            
+            learning_record = form.save(commit=False)
+            student = learning_record.student
+            learning_record.remark = student.admin.remark if student and student.admin else None
             try:
-                # Check if the course exists
-                if not Course.objects.filter(id=course.id).exists():
-                    messages.error(request, "Selected course does not exist.")
-                    return render(request, 'hod_template/edit_learning_record_template.html', context)
-                
-                # Update learning record fields
-                learningrecord.date = date
-                learningrecord.student = student
-                learningrecord.course = course
-                learningrecord.teacher = teacher
-                learningrecord.start_time = start_time
-                learningrecord.end_time = end_time
-                learningrecord.lesson_hours = lesson_hours
-                
-                # Get the remark from the associated student
-                student.course_id = course
-                remark = student.admin.remark if student and student.admin else None
-                learningrecord.remark = remark
-                student.save()
-                learningrecord.save()
-              
+                learning_record.save()
                 messages.success(request, "Successfully Updated")
                 return redirect(reverse('edit_learning_record', args=[learn_id]))
             except Exception as e:
                 messages.error(request, "Could Not Update: " + str(e))
         else:
             messages.error(request, "Fill Form Properly")
-            
     return render(request, 'hod_template/edit_learning_record_template.html', context)
 
 def delete_learning_record(request, learn_id):
@@ -1320,10 +1410,11 @@ def delete_learning_record(request, learn_id):
     return redirect(reverse('manage_learning_record'))
 
 def manage_learning_record(request):
+    # Your existing code for fetching learning records, teachers, courses, and filtering
     learningrecords = LearningRecord.objects.all()
     teachers = Teacher.objects.all()
     courses = Course.objects.all()
-
+    
     selected_teacher = request.GET.get('teacher_name', '')
     selected_grade = request.GET.get('grade', '')
 
@@ -1338,6 +1429,24 @@ def manage_learning_record(request):
     paginator = Paginator(learningrecords, 10)  # Show 10 records per page
     page_number = request.GET.get('page')
     paginated_learningrecords = paginator.get_page(page_number)
+
+    # New code to fetch day of the week for each learning record
+    for learn in learningrecords:
+        DAYS_OF_WEEK = {
+            0: _('Monday'),
+            1: _('Tuesday'),
+            2: _('Wednesday'),
+            3: _('Thursday'),
+            4: _('Friday'),
+            5: _('Saturday'),
+            6: _('Sunday'),
+        }
+        # Assuming each learning record has a related ClassSchedule
+        day_of_week = learn.schedule_record.day_of_week if learn.schedule_record else None
+        learn.day = DAYS_OF_WEEK.get(day_of_week)
+        learn.save_base()
+        print(learn.day)
+
 
     context = {
         'learningrecords': paginated_learningrecords,
@@ -1376,31 +1485,25 @@ def add_class_schedule(request):
     if request.method == 'POST':
         if form.is_valid():
             course = form.cleaned_data.get('course')
-            lesson_unit_price = form.cleaned_data.get('lesson_unit_price')
             teacher = form.cleaned_data.get('teacher')
             grade = form.cleaned_data.get('grade')
-            start_time = form.cleaned_data.get('start_time') 
-            end_time = form.cleaned_data.get('end_time') 
-            lesson_hours = form.cleaned_data.get('lesson_hours') 
+            day_of_week = form.cleaned_data.get('day_of_week')
+            start_time = form.cleaned_data.get('start_time')
+            end_time = form.cleaned_data.get('end_time')
             remark = form.cleaned_data.get('remark')
-            
-            
+
             try:
-                
-                lesson_hours = calculate_lesson_hours(
-                    start_time,
-                    end_time
+                lesson_hours = calculate_lesson_hours(start_time, end_time)
+                class_schedule = ClassSchedule(
+                    course=course,
+                    teacher=teacher,
+                    grade=grade,
+                    day_of_week=day_of_week,
+                    start_time=start_time,
+                    end_time=end_time,
+                    lesson_hours=lesson_hours,
+                    remark=remark
                 )
-                
-                class_schedule = ClassSchedule()
-                class_schedule.course = course
-                class_schedule.lesson_unit_price = lesson_unit_price
-                class_schedule.teacher = teacher
-                class_schedule.grade = grade
-                class_schedule.start_time = start_time
-                class_schedule.end_time = end_time
-                class_schedule.lesson_hours = lesson_hours
-                class_schedule.remark= remark
                 class_schedule.save()
 
                 messages.success(request, "Successfully Added")
@@ -1423,37 +1526,13 @@ def edit_class_schedule(request, schedule_id):
     }
     if request.method == 'POST':
         if form.is_valid():
-            course = form.cleaned_data.get('course')
-            lesson_unit_price = form.cleaned_data.get('lesson_unit_price')
-            teacher = form.cleaned_data.get('teacher')
-            grade = form.cleaned_data.get('grade')
-            start_time = form.cleaned_data.get('start_time') 
-            end_time = form.cleaned_data.get('end_time') 
-            lesson_hours = form.cleaned_data.get('lesson_hours') 
-            remark = form.cleaned_data.get('remark')
-            
-            
-            try:
-                lesson_hours = calculate_lesson_hours(
-                    start_time,
-                    end_time
-                )
-                
-                class_schedule = ClassSchedule.objects.get(id=schedule_id)
-                class_schedule.course = course
-                class_schedule.lesson_unit_price = lesson_unit_price
-                class_schedule.teacher = teacher
-                class_schedule.grade = grade
-                class_schedule.start_time = start_time
-                class_schedule.end_time = end_time
-                class_schedule.lesson_hours = lesson_hours
-                class_schedule.remark= remark
-                class_schedule.save()
-
-                messages.success(request, "Successfully Updated")
-                return redirect(reverse('edit_class_schedule', args=[schedule_id]))
-            except Exception as e:
-                messages.error(request, "Could Not Add " + str(e))
+            start_time = form.cleaned_data.get('start_time')
+            end_time = form.cleaned_data.get('end_time')
+            lesson_hours = calculate_lesson_hours(start_time, end_time)
+            form.instance.lesson_hours = lesson_hours
+            form.save()
+            messages.success(request, "Successfully Updated")
+            return redirect(reverse('edit_class_schedule', args=[schedule_id]))
         else:
             messages.error(request, "Fill Form Properly")
     return render(request, 'hod_template/edit_class_schedule_template.html', context)
@@ -1475,7 +1554,7 @@ def manage_class_schedule(request):
 
 #Notifications
 def admin_notify_teacher(request):
-    teachers = Teacher.objects.select_related('course', 'admin').all()
+    teachers = Teacher.objects.select_related('admin').all()
     courses = Course.objects.all()
     students = Student.objects.select_related('admin').all()
     context = {
@@ -1484,7 +1563,6 @@ def admin_notify_teacher(request):
         'courses': courses,
         'students': students,
     }
-
     return render(request, "hod_template/teacher_notification.html", context)
 
 def admin_notify_student(request):
@@ -1508,25 +1586,6 @@ def check_email_availability(request):
     except Exception as e:
         return HttpResponse(False)
 
-# @csrf_exempt
-# def student_summary_message(request):
-#     if request.method != 'POST':
-#         summarys = SummaryStudent.objects.all()
-#         context = {
-#             'summarys': summarys,
-#             'page_title': _('Student Summary Messages')
-#         }
-#         return render(request, 'hod_template/student_summary_template.html', context)
-#     else:
-#         summary_id = request.POST.get('id')
-#         try:
-#             summary = get_object_or_404(SummaryStudent, id=summary_id)
-#             reply = request.POST.get('reply')
-#             summary.reply = reply
-#             summary.save()
-#             return HttpResponse(True)
-#         except Exception as e:
-#             return HttpResponse(False)
 
 @csrf_exempt
 def view_teacher_summary(request):
@@ -1586,29 +1645,6 @@ def view_teacher_leave(request):
         except Exception as e:
             return False
 
-# @csrf_exempt
-# def view_student_leave(request):
-#     if request.method != 'POST':
-#         allLeave = LeaveReportStudent.objects.all()
-#         context = {
-#             'allLeave': allLeave,
-#             'page_title': _('Leave Applications From Students')
-#         }
-#         return render(request, "hod_template/student_leave_view.html", context)
-#     else:
-#         id = request.POST.get('id')
-#         status = request.POST.get('status')
-#         if (status == '1'):
-#             status = 1
-#         else:
-#             status = -1
-#         try:
-#             leave = get_object_or_404(LeaveReportStudent, id=id)
-#             leave.status = status
-#             leave.save()
-#             return HttpResponse(True)
-#         except Exception as e:
-#             return False
 
 @csrf_exempt
 def get_admin_attendance(request):
@@ -1689,41 +1725,6 @@ def send_student_notification(request):
     except Exception as e:
         return HttpResponse("False")
 
-# @csrf_exempt
-# def send_teacher_notification(request):
-#     id = request.POST.get('id')
-#     message = request.POST.get('message')
-#     teacher = get_object_or_404(Teacher, admin_id=id)
-#     try:
-#         url = "https://fcm.googleapis.com/fcm/send"
-#         body = {
-#             'notification': {
-#                 'title': "中之学校管理软件",
-#                 'body': message,
-#                 'click_action': reverse('teacher_view_notification'),
-#                 'icon': static('dist/img/AdminLTELogo.png')
-#             },
-#             'to': teacher.admin.fcm_token
-#         }
-#         headers = {'Authorization':
-#                    'key=AAAA3Bm8j_M:APA91bElZlOLetwV696SoEtgzpJr2qbxBfxVBfDWFiopBWzfCfzQp2nRyC7_A2mlukZEHV4g1AmyC6P_HonvSkY2YyliKt5tT3fe_1lrKod2Daigzhb2xnYQMxUWjCAIQcUexAMPZePB',
-#                    'Content-Type': 'application/json'}
-#         data = requests.post(url, data=json.dumps(body), headers=headers)
-
-#         # Set the timezone to China Standard Time
-#         china_tz = pytz.timezone('Asia/Shanghai')
-#         now = timezone.now().astimezone(china_tz)
-
-#         notification = NotificationTeacher(
-#             teacher=teacher,
-#             message=message,
-#             date=now.date(),
-#             time=now.time()
-#         )
-#         notification.save()
-#         return HttpResponse("True")
-#     except Exception as e:
-#         return HttpResponse("False")
 
 @csrf_exempt
 def send_teacher_notification(request):

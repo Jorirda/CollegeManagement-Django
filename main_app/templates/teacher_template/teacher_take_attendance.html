@@ -46,7 +46,7 @@
                             <select name="session" id='session' class="form-control">
                                 <option value="">----</option>
                                 {% for session in sessions %}
-                                <option value="{{ session.id }}">{{ session }} </option>
+                                <option value="{{ session.id }}">{{ session.start_date }} - {{ session.end_date }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -79,6 +79,7 @@
 
             if (!classes || !session) {
                 alert("Please select classes and session");
+                console.log("Classes or session not selected"); // Debugging log
                 return false;
             }
 
@@ -96,10 +97,12 @@
                     console.log("Received response:", response); // Debugging log
                     if (response.error) {
                         alert(response.error);
+                        console.error("Error in response:", response.error); // Debugging log
                         return;
                     }
                     if (response.students.length < 1) {
                         alert("No data to display");
+                        console.log("No students found"); // Debugging log
                     } else {
                         var div_data = "<hr/><div class='form-group'><label>Attendance Date</label><input type='date' class='form-control' name='attendance_date' id='attendance_date'></div><div class='row'>";
                         response.students.forEach(function(student) {
@@ -132,6 +135,14 @@
 
             if (!attendance_date) {
                 alert("Select date");
+                console.log("Attendance date not selected"); // Debugging log
+                $('#save_attendance').removeAttr("disabled").text("Save Attendance");
+                return false;
+            }
+
+            if (!classes || !session) {
+                alert("Please select classes and session");
+                console.log("Classes or session not selected"); // Debugging log
                 $('#save_attendance').removeAttr("disabled").text("Save Attendance");
                 return false;
             }
@@ -183,7 +194,7 @@
         // Bind click events
         $("#fetch_student").click(fetchStudents);
         $(document).on('click', '#save_attendance', saveAttendance);
-        });
+    });
 
 </script>
 {% endblock custom_js %}

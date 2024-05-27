@@ -239,7 +239,6 @@ def teacher_view_profile(request):
 #attendance
 def teacher_take_attendance(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
-    print(teacher)
     classes = ClassSchedule.objects.filter(teacher=teacher)
     sessions = Session.objects.all()
     

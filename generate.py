@@ -6,7 +6,8 @@ from faker import Faker
 from django.contrib.auth.hashers import make_password
 from django.utils.crypto import get_random_string
 from django.db import IntegrityError
-from main_app.models import CustomUser, Campus, Course, LearningRecord, Student, Teacher, PaymentRecord, StudentQuery
+from main_app.models import *
+from main_app.model_column_mapping import MODEL_COLUMN_MAPPING  # Ensure correct import
 
 # Set up Django settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'college_management_system.settings')
@@ -18,7 +19,7 @@ fake = Faker()
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(LEVELNAME)s - %(MESSAGE)s',
+    format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler("data_processing.log"),
         logging.StreamHandler()
@@ -33,6 +34,46 @@ grade_mapping = {
     '四阶': 4
 }
 
+def read_excel_file(excel_file):
+    sheets = pd.read_excel(excel_file, sheet_name=None)
+    return sheets
+
+def process_sheet(sheet_name, sheet_data, model_info):
+    model = model_info['model']
+    field_mapping = model_info['fields']
+    
+    for index, row in sheet_data.iterrows():
+        data = {}
+        for col, field in field_mapping.items():
+            if '__' in field:
+                related_model_field, related_field = field.split('__')
+                related_model = model._meta.get_field(related_model_field).related_model
+                related_obj = related_model.objects.get(**{related_field: row[col]})
+                data[related_model_field] = related_obj
+            else:
+                data[field] = row[col]
+        
+        try:
+            obj, created = model.objects.update_or_create(**data)
+            logging.info(f"{'Created' if created else 'Updated'} {model.__name__}: {obj}")
+        except IntegrityError as e:
+            logging.error(f"IntegrityError for {model.__name__}: {e}")
+        except Exception as e:
+            logging.error(f"Error for {model.__name__}: {e}")
+
+def process_all_sheets(sheets, model_column_mapping):
+    for sheet_name, sheet_data in sheets.items():
+        if sheet_name in model_column_mapping:
+            process_sheet(sheet_name, sheet_data, model_column_mapping[sheet_name])
+        else:
+            logging.warning(f"No model mapping found for sheet: {sheet_name}")
+
+def get_value_from_row(row, column_name, default_value, fake_value):
+    value = row.get(column_name)
+    if pd.isna(value) or value == "":
+        value = default_value if default_value is not None else fake_value
+    return value
+
 def process_data(excel_file, is_teacher, is_chinese_data=False):
     try:
         df = pd.read_excel(excel_file)
@@ -42,33 +83,12 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
         return None  # Return early if the file cannot be processed
 
     if is_chinese_data:
-        column_mapping = {
-            '序号': 'Index',
-            '学生姓名': 'Full Name',
-            '班级': 'Class',
-            '校区': 'Campus',
-            '缴费': 'Payment',
-            '期别': 'Period',
-            '累计报名期次': 'Total Periods',
-            '销售人员': 'Salesperson',
-            '总课时': 'Total Lesson Hours',
-            '已完成课时': 'Completed Lesson Hours',
-            '剩余课时': 'Remaining Lesson Hours',
-            '课程数量': 'Number of Classes',
-            '下次缴费时间\n（课程结束前1月）': 'Next Payment Date',
-            '授课老师': 'Teacher',
-            '书本费': 'Book Costs',
-            '其他费用': 'Other Fee',
-            '应付金额': 'Amount Due',
-            '支付方式': 'Payment Method',
-            '注册日期': 'Enrollment Date',
-            '缴费日期': 'Payment Date',
-            '性别': 'Gender'
-        }
+        # Mapping Chinese columns is handled by MODEL_COLUMN_MAPPING
+        column_mapping = {v: k for k, v in MODEL_COLUMN_MAPPING.items()}
         df.rename(columns=column_mapping, inplace=True)
         logging.info("Columns renamed for Chinese data.")
 
-    required_columns = ['Full Name', 'Class', 'Campus', 'Payment', 'Next Payment Date', 'Total Lesson Hours', 'Completed Lesson Hours', 'Remaining Lesson Hours']
+    required_columns = ['学生姓名', '班级', '校区', '缴费', '下次缴费时间\n（课程结束前1月）', '总课次', '已上课次', '剩余课次']
     for column in required_columns:
         if column not in df.columns:
             logging.error(f"Missing required column: {column}")
@@ -83,8 +103,8 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
 
     for index, row in df.iterrows():
         try:
-            full_name = row.get('Full Name', fake.name())
-            email = row.get('Email', fake.email())
+            full_name = get_value_from_row(row, '学生姓名', None, fake.name())
+            email = get_value_from_row(row, '邮箱', None, fake.email())
 
             if is_teacher:
                 password = get_random_string(12)
@@ -96,11 +116,11 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
                 hashed_password = None
                 logging.info(f"Processed student {email} - no login info required.")
 
-            campus_name = row.get('Campus', 'Unknown Campus')
+            campus_name = get_value_from_row(row, '校区', 'Unknown Campus', fake.company())
             campus, _ = Campus.objects.get_or_create(name=campus_name)
             logging.info(f"Campus retrieved or created: {campus_name}")
 
-            class_full_name = row.get('Class', 'Unknown Class')
+            class_full_name = get_value_from_row(row, '班级', 'Unknown Class', fake.job())
             course_name, grade_level = None, None
             for chinese_grade, grade in grade_mapping.items():
                 if chinese_grade in class_full_name:
@@ -120,12 +140,12 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
                 'email': email,
                 'password': hashed_password,
                 'profile_pic': '/media/default.jpg',
-                'gender': row.get('Gender', fake.random_element(elements=('男', '女'))),
-                'address': row.get('Address', fake.address().replace('\n', ', ')),
-                'phone_number': row.get('Phone Number', fake.phone_number()),
+                'gender': get_value_from_row(row, '性别', None, fake.random_element(elements=('男', '女'))),
+                'address': get_value_from_row(row, '地址', None, fake.address().replace('\n', ', ')),
+                'phone_number': get_value_from_row(row, '电话号码', None, fake.phone_number()),
                 'is_teacher': is_teacher,
                 'user_type': 2 if is_teacher else 3,  
-                'remark': "Salesperson: " + row.get('Salesperson', 'Unknown'),
+                'remark': "销售人员: " + get_value_from_row(row, '销售人员', 'Unknown', fake.name()),
                 'fcm_token': ''  
             }
 
@@ -138,7 +158,7 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
                 continue
 
             if is_teacher:
-                Teacher.objects.get_or_create(user=user)
+                Teacher.objects.get_or_create(admin=user)
                 logging.info(f"Teacher profile created for: {email}")
             else:
                 student, created = Student.objects.get_or_create(
@@ -175,8 +195,8 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
         for user, student, course, row in user_student_pairs:
             try:
                 remark = user.remark if student and student.admin else None
-                total_price = row.get('Amount Due', 0)
-                total_lesson_hours = row.get('Total Lesson Hours', 0)
+                total_price = get_value_from_row(row, '应付金额', 0, 2180)
+                total_lesson_hours = get_value_from_row(row, '总课次', 0, 100)
                 
                 if total_lesson_hours > 0:
                     lesson_unit_price = total_price / total_lesson_hours
@@ -198,19 +218,19 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
                     course=course,
                     defaults={
                         'date': user.date_joined,
-                        'next_payment_date': row.get('Next Payment Date', fake.date_this_year()),
-                        'amount_paid': row.get('Payment', 0),
-                        'payee': row.get('Full Name', 'Unknown'),
+                        'next_payment_date': get_value_from_row(row, '下次缴费时间\n（课程结束前1月）', fake.date_this_year(), fake.date_this_year()),
+                        'amount_paid': get_value_from_row(row, '缴费', 0, fake.random_int(min=1000, max=5000)),
+                        'payee': get_value_from_row(row, '学生姓名', 'Unknown', fake.name()),
                         'status': 'Currently Learning',
                         'lesson_hours': total_lesson_hours,
                         'lesson_unit_price': lesson_unit_price,
                         'discounted_price': discounted_price,
-                        'book_costs': row.get('Book Costs', 0),
-                        'other_fee': row.get('Other Fee', 0),
+                        'book_costs': get_value_from_row(row, '书本费', 0, fake.random_int(min=50, max=500)),
+                        'other_fee': get_value_from_row(row, '其他费用', 0, fake.random_int(min=50, max=500)),
                         'amount_due': total_price,
-                        'payment_method': row.get('Payment Method', 'Please Update'),
+                        'payment_method': get_value_from_row(row, '支付方式', 'Please Update', 'Cash'),
                         'remark': remark,
-                        'total_semester': row.get('Total Periods', 1)
+                        'total_semester': get_value_from_row(row, '累计报名期次', 1, fake.random_int(min=1, max=8))
                     }
                 )
 
@@ -221,10 +241,10 @@ def process_data(excel_file, is_teacher, is_chinese_data=False):
                     learning_records=ls,
                     payment_records=ps,
                     defaults={
-                        'num_of_classes': row.get('Number of Classes', 1),
+                        'num_of_classes': get_value_from_row(row, '课程数量', 1, fake.random_int(min=1, max=10)),
                         'paid_class_hours': total_lesson_hours,
-                        'completed_hours': row.get('Completed Lesson Hours', 0),
-                        'remaining_hours': row.get('Remaining Lesson Hours', 0),
+                        'completed_hours': get_value_from_row(row, '已上课次', 0, fake.random_int(min=0, max=total_lesson_hours)),
+                        'remaining_hours': get_value_from_row(row, '剩余课次', 0, total_lesson_hours - get_value_from_row(row, '已上课次', 0, 0)),
                     }
                 )
 
@@ -253,5 +273,11 @@ def generate_html_table(data):
     table += "</table>"
     return table
 
+def main(excel_file):
+    sheets = read_excel_file(excel_file)
+    process_all_sheets(sheets, MODEL_COLUMN_MAPPING)
+    # Example usage for current process_data function
+    process_data(excel_file, is_teacher=False, is_chinese_data=True)
+
 # Example usage
-# process_data('path_to_excel_file.xlsx', is_teacher=True, is_chinese_data=True)
+# main('path_to_excel_file.xlsx')

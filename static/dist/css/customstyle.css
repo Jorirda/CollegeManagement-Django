@@ -1,18 +1,21 @@
-.login-page{
+.login-page {
   background-color: #000;
 }
 
-.iconimage{
+.iconimage {
   height: 110px;
-  width: auto;   
+  width: auto;
 }
-.img_container{
+
+.img_container {
   display: flex;
   justify-content: space-evenly;
   padding-bottom: 10px;
 }
 
-.cardcustom, .cardloginbodycustom, .formctrlcustom {
+.cardcustom,
+.cardloginbodycustom,
+.formctrlcustom {
   background-color: black;
   padding-bottom: 30px;
 }
@@ -20,17 +23,16 @@
 .login-logo2,
 .register-logo2 {
   font-size: 1rem;
-  /* font-weight: 300; */
   margin-bottom: .9rem;
   text-align: center;
   color: #fff;
 }
 
-.login-logo2{
+.login-logo2 {
   padding-top: 30px;
 }
 
-.custom{
+.custom {
   background: #000;
   color: #fff;
 }
@@ -39,10 +41,9 @@ h1 {
   font-size: 2.2rem;
 }
 
-.custom-border{
+.custom-border {
   border: 1px solid green;
 }
-
 
 .form-control:focus,
 .form-control:not(:placeholder-shown) {
@@ -83,7 +84,6 @@ h1 {
 }
 
 .brand-link-custom {
-
   font-size: 1.25rem;
   line-height: 1.5;
   padding: .8125rem .5rem;
@@ -97,3 +97,65 @@ h1 {
   align-items: center;
 }
 
+/* Custom CSS for spacing fields and consistent form control styling */
+.spaced-field {
+  margin-top: 2rem; /* Adjust the value as needed */
+}
+
+.form-check-input {
+  width: auto;
+  height: auto;
+  margin-right: 1rem;
+  /* Add any other styling you need */
+}
+
+/* Additional spacing for remark field */
+.remarks-field {
+  margin-top: 2rem; /* Adjust the value as needed */
+}
+
+.courses-field {
+  margin-bottom: 2rem; /* Adjust the value as needed */
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.courses-field label {
+  width: 100%;
+}
+
+.courses-field .form-check {
+  width: 33.33%;
+}
+
+/* Fixing overlapping elements */
+.form-group {
+  margin-bottom: 1rem; /* Add margin bottom for spacing between form groups */
+}
+
+.card-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem; /* Add gap between the columns */
+}
+
+.card-body .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-body .form-group label,
+.card-body .form-group input,
+.card-body .form-group select,
+.card-body .form-group textarea {
+  width: 100%; /* Ensure form elements take full width of the column */
+}
+
+.card-body .form-group .form-check {
+  display: flex;
+  align-items: center;
+}
+
+.card-body .form-group .form-check input {
+  margin-right: 0.5rem;
+}

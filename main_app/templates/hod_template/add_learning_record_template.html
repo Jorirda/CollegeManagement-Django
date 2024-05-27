@@ -48,11 +48,13 @@
                             $('#id_start_time').val(data.start_time || '');
                             $('#id_end_time').val(data.end_time || '');
                             $('#id_lesson_hours').val(data.lesson_hours || '');
+                            $('#id_day').val(data.day || '');  // New line: Update day field
                         } else {
                             // Clear form fields if no data is returned
                             $('#id_start_time').val('');
                             $('#id_end_time').val('');
                             $('#id_lesson_hours').val('');
+                            $('#id_day').val('');  // New line: Clear day field
                         }
                     },
                     error: function (xhr, status, error) {

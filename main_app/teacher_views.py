@@ -12,7 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import gettext as _
-
+from datetime import datetime
 
 from .forms import *
 from .models import *
@@ -298,15 +298,53 @@ def teacher_view_attendance(request):
     attendance = get_object_or_404(Attendance, id=attendance_id)
     student_attendances = AttendanceReport.objects.filter(attendance=attendance)
 
-    attendance_details = [
-        {
-            'student_name': student_attendance.student.admin.full_name,
-            'is_present': student_attendance.status
-        }
-        for student_attendance in student_attendances
-    ]
+    attendance_details = []
+
+    # Calculate total class hours attended by each student
+    for student_attendance in student_attendances:
+        student_name = student_attendance.student.admin.full_name
+        is_present = student_attendance.status
+
+        # Retrieve class schedules for the attendance date
+        class_schedules = ClassSchedule.objects.filter(day=attendance.date.weekday())
+
+        total_class_hours = 0
+
+        # Calculate total class hours attended by the student for the session
+        for class_schedule in class_schedules:
+            class_start_datetime = datetime.combine(datetime.today(), class_schedule.start_time)
+            class_end_datetime = datetime.combine(datetime.today(), class_schedule.end_time)
+            class_duration = (class_end_datetime - class_start_datetime).total_seconds() / 3600  # Convert to hours
+            total_class_hours += class_duration
+
+        attendance_details.append({
+            'student_name': student_name,
+            'is_present': is_present,
+            'total_class_hours': total_class_hours,
+        })
+
+    # Debugging code - print attendance details
+    print("Attendance Details:")
+    for detail in attendance_details:
+        print(detail)
 
     return JsonResponse({'success': True, 'attendance_details': attendance_details})
+
+
+def teacher_manage_attendance(request):
+    teacher = get_object_or_404(Teacher, admin=request.user)
+    attendances = Attendance.objects.filter(classes__teacher=teacher)
+    
+    paginator = Paginator(attendances, 10)  # Show 10 records per page
+    page_number = request.GET.get('page')
+    paginated_attendances = paginator.get_page(page_number)
+
+    context = {
+        'attendances': paginated_attendances,
+        'page_title': _('Manage Attendance'),
+    }
+    return render(request, 'teacher_template/teacher_manage_attendance.html', context)
+
 
 @csrf_exempt
 def save_attendance(request):
@@ -474,9 +512,6 @@ def teacher_write_summary(request):
     }
 
     return render(request, 'teacher_template/teacher_write_summary.html', context)
-
-
-
 
 #Notifications
 def teacher_view_notification(request):

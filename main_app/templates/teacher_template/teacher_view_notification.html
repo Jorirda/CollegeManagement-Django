@@ -3,96 +3,47 @@
 {% load i18n %}
 
 {% block page_title %}
-    {% trans page_title %}
+  {{ page_title }}
 {% endblock page_title %}
 
 {% block content %}
-<style>
-    .responsive-buttons {
-        display: flex;
-        justify-content: space-around;
-        flex-wrap: wrap;
-    }
-
-    .btn-responsive {
-        flex: 1 1 auto;
-        margin: 2px;
-        min-width: 68px;
-        text-align: center;
-    }
-
-    @media (max-width: 576px) {
-        .btn-responsive {
-            flex-basis: 100%;
-        }
-    }
-
-    .bolded {
-        font-weight: bold;
-    }
-
-    .preformatted {
-        white-space: pre-line; /* Preserve line breaks */
-    }
-</style>
-
 <section class="content">
     <div class="container-fluid">
-        <div id="success-message" class="alert alert-success" style="display: none;"></div>
-
-        {% if messages %}
-        <div id="message-box">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} message-alert" id="message-{{ forloop.counter }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-        <script>
-            // Hide each message after 1 second and log a message to the console
-            setTimeout(function() {
-                var alerts = document.getElementsByClassName('message-alert');
-                for (var i = 0; i < alerts.length; i++) {
-                    console.log('Hiding message:', alerts[i].innerText);
-                    alerts[i].style.display = 'none';
-                }
-            }, 1000); // 1000 milliseconds = 1 second
-        </script>
-        {% endif %}
-
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <div class="d-flex align-items-center">
-                            <i class="nav-icon fas fa-bell" style="font-size: 24px; margin-right: 10px;"></i>
-                            <h3 class="card-title">{% trans page_title %}</h3>
-                        </div>
+                    <div class="card-header">
+                        <h3 class="card-title">{{ page_title }}</h3>
                     </div>
                     <div class="card-body">
                         <table id="example2" class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
                                     <th>#</th>
-                                    <th>{% trans 'Date' %}</th>
-                                    <th>{% trans 'Time' %}</th>
-                                    <th>{% trans 'Message' %}</th>
-                                    <th>{% trans 'Actions' %}</th>
+                                    <th>{% trans 'Full Name' %}</th>
+                                    <th>{% trans 'Email' %}</th>
+                                    <th>{% trans 'Course' %}</th>
+                                    <th>{% trans 'Avatar' %}</th>
+                                    <th>{% trans 'Action' %}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for notification in notifications %}
-                                <tr id="notification-{{ notification.id }}" {% if not notification.is_read %}class="bolded"{% endif %}>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ notification.date|date:"Y-m-d" }}</td>
-                                    <td>{{ notification.time|date:"g:i A" }}</td>
-                                    <td class="preformatted">{{ notification.message }}</td> <!-- Added class for preformatted text -->
-                                    <td class="responsive-buttons">
-                                        <a href="{% url 'mark_notification_as_read' notification.id %}" class="btn btn-success btn-responsive">{% trans 'Mark as Read' %}</a>
-                                        <button class="btn btn-danger btn-responsive delete-notification" data-notification-id="{{ notification.id }}" onclick="deleteNotification({{ notification.id }})">{% trans 'Delete' %}</button>
-                                    </td>
-                                </tr>
-                                {% empty %}
+                                {% for teacher in teachers %}
                                 <tr>
-                                    <td colspan="5" class="text-center">{% trans "No new messages" %}</td>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ teacher.admin.full_name }}</td>
+                                    <td>{{ teacher.admin.email }}</td>
+                                    <td>{{ teacher.course.name }}</td>
+                                    <td>
+                                        {% if teacher.admin.avatar %}
+                                            <img src="{{ teacher.admin.avatar.url }}" alt="Avatar" width="50">
+                                        {% else %}
+                                            {% trans 'No Image' %}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-primary show_notification" value="{{ teacher.admin.id }}" data-toggle="modal" data-target="#notificationModal">{% trans 'Send Notification' %}</button>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -104,43 +55,129 @@
     </div>
 </section>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- Notification Modal -->
+<div class="modal fade" id="notificationModal" tabindex="-1" role="dialog" aria-labelledby="notificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notificationModalLabel">{% trans 'Send Notification' %}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="teacher_id">
+                <div class="form-group">
+                    <label for="course_id">{% trans 'Select Course' %}</label>
+                    <select class="form-control" id="course_id">
+                        {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="student_id">{% trans 'Select Student' %}</label>
+                    <select class="form-control" id="student_id">
+                        {% for student in students %}
+                        <option value="{{ student.id }}">{{ student.admin.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="classroom_performance">{% trans 'Classroom Performance' %}</label>
+                    <textarea class="form-control" id="classroom_performance" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="status_pictures">{% trans 'Status Pictures' %}</label>
+                    <input type="file" class="form-control-file" id="status_pictures">
+                </div>
+                <div class="form-group">
+                    <label for="message">{% trans 'Message' %}</label>
+                    <textarea class="form-control" id="message" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans 'Close' %}</button>
+                    <button type="button" class="btn btn-primary send_notification">{% trans 'Send Notification' %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+<!-- Include Summernote CSS/JS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-bs4.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-bs4.min.js"></script>
+
 <script>
-    // Function to delete notification and show success message
-    function deleteNotification(notificationId) {
-        if (confirm('{% trans 'Are you sure you want to delete this notification?' %}')) {
+    $(document).ready(function() {
+        $('#message').summernote({
+            height: 200, // Set the height of the editor
+            minHeight: null, // Set minimum height of editor
+            maxHeight: null, // Set maximum height of editor
+            focus: true // Set focus to editable area after initializing summernote
+        });
+
+        $(".show_notification").click(function(){
+            $("#teacher_id").val($(this).val());
+        });
+
+        $(".send_notification").click(function(){
+            var id = $("#teacher_id").val();
+            var message = $("#message").val();
+            var classroom_performance = $("#classroom_performance").val();
+            var status_pictures = $("#status_pictures")[0].files[0];
+            var course_id = $("#course_id").val();
+            var student_id = $("#student_id").val();
+            
+            console.log("Sending Notification with Data:");
+            console.log("Teacher ID: " + id);
+            console.log("Message: " + message);
+            console.log("Classroom Performance: " + classroom_performance);
+            console.log("Status Pictures: " + status_pictures);
+            console.log("Course ID: " + course_id);
+            console.log("Student ID: " + student_id);
+
+            sendNotification(id, message, classroom_performance, status_pictures, course_id, student_id);
+        });
+
+        function sendNotification(id, message, classroom_performance, status_pictures, course_id, student_id){
+            var formData = new FormData();
+            formData.append('id', id);
+            formData.append('message', message);
+            formData.append('classroom_performance', classroom_performance);
+            formData.append('status_pictures', status_pictures);
+            formData.append('course_id', course_id);
+            formData.append('student_id', student_id);
+
             $.ajax({
+                url: "{% url 'send_teacher_notification' %}",
                 type: 'POST',
-                url: '{% url "teacher_delete_notification" %}',
-                data: {
-                    'notification_id': notificationId,
-                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                data: formData,
+                processData: false,
+                contentType: false,
+                enctype: 'multipart/form-data',
+                cache: false,
+                beforeSend: function(xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
                 },
-                success: function(data) {
-                    if (data.success) {
-                        // Remove the table row
-                        $('#notification-' + notificationId).remove();
-                        // Show success message
-                        $('#success-message').text('{% trans "Notification Deleted Successfully!" %}');
-                        $('#success-message').addClass('alert-success').show();
-                        // Hide success message after 3 seconds
-                        setTimeout(function() {
-                            $('#success-message').hide().removeClass('alert-success');
-                        }, 3000);
-                    } 
+                success: function(response) {
+                    console.log("Response from Server: " + response);
+                    if (response == 'True'){
+                        alert("{% trans 'Notification Sent' %}");
+                        location.reload();
+                    } else {
+                        alert("{% trans 'Notification could not be saved. Please try again.' %}");
+                    }
                 },
-                error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
-                    // Show error message
-                    $('#success-message').text('{% trans "An error occurred while deleting the notification." %}');
-                    $('#success-message').addClass('alert-danger').show();
-                    // Hide error message after 3 seconds
-                    setTimeout(function() {
-                        $('#success-message').hide().removeClass('alert-danger'); // Remove the error class for future use
-                    }, 3000);
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log("Error: " + textStatus + ", " + errorThrown);
+                    alert("{% trans 'Error in sending notification' %}");
                 }
             });
         }
-    }
+    });
 </script>
-{% endblock content %}

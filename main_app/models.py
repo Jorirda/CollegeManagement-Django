@@ -87,7 +87,7 @@ class Course(models.Model):
     level_start = models.IntegerField(default=1)
     level_end = models.IntegerField(default=4)
     image = models.ImageField(upload_to='course_images/', blank=True, null=True) 
-    hourly_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, default=0.00)  # New field for hourly rate
+    # hourly_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, default=0.00)  # New field for hourly rate
 
     def __str__(self):
         return self.name
@@ -135,14 +135,14 @@ class ClassSchedule(models.Model):
     course = models.ForeignKey(Course, null=True, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Teacher, null=True, on_delete=models.CASCADE)
     grade = models.CharField(max_length=3, blank=True, null=True)
-    day_of_week = models.IntegerField(choices=DAYS_OF_WEEK, null=True)
+    day = models.IntegerField(choices=DAYS_OF_WEEK, null=True)
     start_time = models.TimeField(null=True)
     end_time = models.TimeField(null=True)
     lesson_hours = models.CharField(max_length=10, null=True)
     remark = models.TextField(default="")
-
+   
     def __str__(self):
-        return f"{self.course.name} - {self.get_day_of_week_display()}"
+        return f"{self.course.name} - {self.get_day_display()}"
 
 class LearningRecord(models.Model):
     date = models.DateField()
@@ -159,7 +159,6 @@ class LearningRecord(models.Model):
     def __str__(self):
         return f'{self.student} - {self.course} - {self.date} - {self.day}'
 
-
 class Attendance(models.Model):
     session = models.ForeignKey(Session, on_delete=models.DO_NOTHING)
     classes = models.ForeignKey(ClassSchedule, on_delete=models.DO_NOTHING)
@@ -169,7 +168,8 @@ class AttendanceReport(models.Model):
     student = models.ForeignKey(Student, on_delete=models.DO_NOTHING)
     attendance = models.ForeignKey(Attendance, on_delete=models.CASCADE)
     status = models.BooleanField(default=False)
-
+    hours_missed = models.PositiveIntegerField(default=0)  # Number of hours missed if absent
+    
 class LeaveReportStudent(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     date = models.CharField(max_length=60)
@@ -202,31 +202,50 @@ class StudentResult(models.Model):
     classes = models.ForeignKey(Classes, on_delete=models.CASCADE, null=True, blank=False)
     
 class PaymentRecord(models.Model):
-    date = models.DateField()
-    next_payment_date = models.DateField(null=True)
+    STATUS_CHOICES = [
+        ('Paid', 'Paid'),
+        ('Refund', 'Refund'),
+    ]
+    
+    date = models.DateField(default=timezone.now)
+    next_payment_date = models.DateField(null=True, blank=True)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    lesson_unit_price = models.DecimalField(max_digits=10, decimal_places=2)
-    discounted_price = models.DecimalField(max_digits=10, decimal_places=2)
-    book_costs = models.DecimalField(max_digits=10, decimal_places=2)
-    other_fee = models.DecimalField(max_digits=10, decimal_places=2)
+    lesson_unit_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    discounted_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    book_costs = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    other_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     amount_due = models.DecimalField(max_digits=10, decimal_places=2)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_method = models.CharField(max_length=100)
-    status = models.CharField(max_length=100)
-    payee = models.CharField(max_length=255)
-    remark = models.TextField(default="")
-    lesson_hours = models.IntegerField()
-    learning_record = models.ForeignKey(
-        LearningRecord, 
-        null=True, 
-        related_name='payment_record', 
-        on_delete=models.SET_NULL
-    )
+    payment_method = models.CharField(max_length=50)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Paid')
+    payee = models.CharField(max_length=100)
+    remark = models.TextField(null=True, blank=True)
+    lesson_hours = models.IntegerField(default=0)
+    learning_record = models.ForeignKey('LearningRecord', on_delete=models.CASCADE, null=True, blank=True) #added recently
+
+    def __str__(self):
+        return f"PaymentRecord for {self.student}"
+
+    def convert_to_refund(self):
+        refund_record = RefundRecord.objects.create(
+            student=self.student,
+            learning_records=self.learning_record,
+            payment_records=self,
+            refund_amount=self.amount_paid,
+            amount_refunded=0,
+            refund_reason=self.remark or "Refund processed"
+        )
+        return refund_record
+
+    def save(self, *args, **kwargs):
+        if self.status == 'Refund':
+            self.convert_to_refund()
+        super().save(*args, **kwargs)
 
 class NotificationTeacher(models.Model):
     date = models.DateField(default=timezone.now)
-    time = models.TimeField(default=timezone.now)  
+    time = models.TimeField(default=timezone.now)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     message = models.TextField()
     is_read = models.BooleanField(default=False)  # New field for marking notifications as read
@@ -248,6 +267,9 @@ class RefundRecord(models.Model):
     refund_amount = models.DecimalField(max_digits=10,null=True, decimal_places=2)
     amount_refunded = models.DecimalField(max_digits=10,null=True, decimal_places=2)
     refund_reason = models.TextField(null=True,)
+
+    def __str__(self):
+        return f"RefundRecord for {self.student}"
 
     def lesson_unit_price(self):
         # Fetch the related PaymentRecord for this ClassSchedule
@@ -348,8 +370,6 @@ def create_or_update_student_query(sender, instance, created, **kwargs):
 
 # Register signal handlers
 post_save.connect(create_or_update_student_query, sender=Student)
-
-
 
 @receiver(post_save, sender=Teacher)
 @receiver(post_save, sender=LearningRecord)

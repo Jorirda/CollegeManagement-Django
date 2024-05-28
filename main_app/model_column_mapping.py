@@ -51,7 +51,7 @@ MODEL_COLUMN_MAPPING = {
         'model': Course,
         'fields': {
             '班级': 'name',
-            '课程概述': 'overview',
+            '班级概述': 'overview',
             '开始级别': 'level_start',
             '结束级别': 'level_end',
             '图片': 'image'
@@ -77,18 +77,19 @@ MODEL_COLUMN_MAPPING = {
             '学生': 'student',
             '班级': 'course',
             '教师': 'teacher',
-            '课程安排': 'schedule_record',
+            '班级安排': 'schedule_record',
             '学期': 'semester',
             '开始时间': 'start_time',
             '结束时间': 'end_time',
-            '课时': 'lesson_hours'
+            '课时': 'lesson_hours',
+            '星期': 'day'
         }
     },
     'PaymentRecord': {
         'model': PaymentRecord,
         'fields': {
             '日期': 'date',
-            '下次缴费时间\n（课程结束前1月）': 'next_payment_date',
+            '下次缴费时间\n（班级结束前1月）': 'next_payment_date',
             '学生': 'student',
             '班级': 'course',
             '课时单价': 'lesson_unit_price',

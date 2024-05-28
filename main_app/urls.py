@@ -21,6 +21,8 @@ from . import hod_views, teacher_views, student_views, views
 
 urlpatterns = [
 #hodviews
+    path('get_class_schedule/', hod_views.get_class_schedule, name='get_class_schedule'),
+    path('get_filtered_teachers/', hod_views.get_filtered_teachers, name='get_filtered_teachers'),
     path('renewals/', teacher_views.student_renewals, name='student_renewals'),
     path('renew_student/<int:student_id>/', teacher_views.renew_student, name='renew_student'),
     path('withdraw_student/<int:student_id>/', teacher_views.withdraw_student, name='withdraw_student'),
@@ -93,8 +95,8 @@ urlpatterns = [
     path("payment/edit/<int:payment_id>",hod_views.edit_payment_record, name='edit_payment_record'),
     path("learn/edit/<int:learn_id>",hod_views.edit_learning_record, name='edit_learning_record'),
     path("schedule/edit/<int:schedule_id>",hod_views.edit_class_schedule, name='edit_class_schedule'),
-    path('fetch-class-schedule/', hod_views.fetch_class_schedule, name='fetch_class_schedule'),
-    path('filter-teachers/', hod_views.filter_teachers, name='filter_teachers'),
+    # path('fetch-class-schedule/', hod_views.fetch_class_schedule, name='fetch_class_schedule'),
+    # path('filter-teachers/', hod_views.filter_teachers, name='filter_teachers'),
 
     #delete
     path("teacher/delete/<int:teacher_id>",hod_views.delete_teacher, name='delete_teacher'),

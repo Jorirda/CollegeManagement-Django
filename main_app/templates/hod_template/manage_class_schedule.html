@@ -23,7 +23,6 @@
                                 <tr>
                                     <th>#</th>
                                     <th>{% trans 'Course Title' %}</th>
-                                    <th>{% trans 'Hourly Rate' %}</th>
                                     <th>{% trans 'Teacher' %}</th>
                                     <th>{% trans 'Day' %}</th>
                                     <th>{% trans 'Class Time' %}</th>
@@ -36,9 +35,8 @@
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ class_schedule.course }}</td>
-                                    <td>¥{{ class_schedule.course.hourly_rate }}</td>
                                     <td>{{ class_schedule.teacher }}</td>
-                                    <td>{{ class_schedule.get_day_of_week_display }}</td>
+                                    <td>{{ class_schedule.get_day_display }}</td>
                                     <td>{{ class_schedule.start_time|time:"h:i A" }} to {{ class_schedule.end_time|time:"h:i A" }}</td>
                                     <td>{{ class_schedule.remark }}</td>
                                     <td>

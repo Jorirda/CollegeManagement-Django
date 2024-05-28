@@ -13,94 +13,95 @@
                     <div class="card-header">
                         <h3 class="card-title">{% trans page_title %}</h3>
                     </div>
-                    {% include "main_app/form_template.html" with messages=messages  form=form button_text=_("Update Schedule")%}
+                    {% include "main_app/form_template.html" with messages=messages form=form button_text=_("Update Schedule") %}
                 </div>
                 <!-- /.card -->
             </div>
         </div>
     </div>
 </section>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function () {
-        function fetchClassSchedule() {
-            var courseId = $('#id_course').val();
-            var teacherId = $('#id_teacher').val();
-            
-            if (courseId && teacherId) {
-                $.ajax({
-                    url: '/fetch-class-schedule/',  // URL to fetch class schedule
-                    method: 'GET',
-                    data: {
-                        'course_id': courseId,
-                        'teacher_id': teacherId
-                    },
-                    dataType: 'json',
-                    success: function (data) {
-                        if (data) {
-                            // Update form fields with fetched schedule data
-                            $('#id_start_time').val(data.start_time || '');
-                            $('#id_end_time').val(data.end_time || '');
-                            $('#id_lesson_hours').val(data.lesson_hours || '');
-                            $('#id_day').val(data.day || ''); // Include the day
-                        } else {
-                            // Clear form fields if no data is returned
-                            $('#id_start_time').val('');
-                            $('#id_end_time').val('');
-                            $('#id_lesson_hours').val('');
-                            $('#id_day').val(''); // Clear day if no data is returned
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error(xhr.responseText);
-                        alert("Failed to fetch class schedule. Please try again later.");
-                    }
-                });
-            }
-        }
 
-        function filterTeachers() {
-            var courseId = $('#id_course').val();
-            
-            $.ajax({
-                url: '/filter-teachers/',  // URL to fetch teachers for the selected course
-                method: 'GET',
-                data: {
-                    'course_id': courseId
-                },
-                dataType: 'json',
-                success: function (data) {
-                    if (data.teachers) {
-                        $('#id_teacher').empty();  // Clear the existing teacher options
-                        // Populate the teacher dropdown with new options
-                        $.each(data.teachers, function(index, teacher) {
-                            $('#id_teacher').append('<option value="'+ teacher[0] + '">' + teacher[1] + '</option>');
-                        });
-                    } else {
-                        // Show a message if no teachers are available
-                        $('#id_teacher').empty().append('<option value="">No teachers available</option>');
-                    }
-                    fetchClassSchedule(); // Ensure class schedule is updated after teachers are loaded
-                },
-                error: function (xhr, status, error) {
-                    console.error(xhr.responseText);
-                    alert("Failed to fetch teachers. Please try again later.");
-                }
-            });
-        }
-
-        // Event listener for course dropdown change
-        $('#id_course').change(function () {
-            filterTeachers();
+<script src="{% static 'dist/js/jquery.min.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#id_course").change(function() {
+            var courseId = $(this).val();
+            console.log("Selected course ID:", courseId);
+            populate_teachers(courseId);
         });
 
-        // Event listener for teacher dropdown change
-        $('#id_teacher').change(function () {
-            fetchClassSchedule();
+        $("#id_teacher").change(function() {
+            var courseId = $("#id_course").val();
+            var teacherId = $(this).val();
+            console.log("Selected teacher ID:", teacherId);
+            update_class_schedule(courseId, teacherId);
         });
-
-        // Uncomment the following line if you want to automatically filter teachers on page load
-        filterTeachers();
     });
+
+    function populate_teachers(courseId) {
+        $.ajax({
+            url: "/get_filtered_teachers/",
+            type: "GET",
+            data: { course_id: courseId },
+            success: function(response) {
+                console.log("Response:", response);
+                var teacherDropdown = $("#id_teacher");
+                teacherDropdown.empty();
+                teacherDropdown.append('<option value="">---------</option>');
+                if (response.teachers) {
+                    console.log("Teachers:", response.teachers);
+                    $.each(response.teachers, function(index, teacher) {
+                        teacherDropdown.append('<option value="' + teacher.id + '">' + teacher.name + '</option>');
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX request failed with status:", status);
+                console.error("Error:", error);
+                console.error("Response:", xhr.responseText);
+            },
+            complete: function(xhr, status) {
+                console.log("AJAX request completed with status:", status);
+            }
+        });
+    }
+
+    function update_class_schedule(courseId, teacherId) {
+    $.ajax({
+        url: "/get_class_schedule/",
+        type: "GET",
+        data: {
+            course_id: courseId,
+            teacher_id: teacherId
+        },
+        success: function(response) {
+            console.log("Class Schedule Response:", response);
+            if (response.schedule) {
+                console.log("Day:", response.schedule.day);
+                console.log("Start Time:", response.schedule.start_time);
+                console.log("End Time:", response.schedule.end_time);
+                $("#id_day").val(response.schedule.day_name); // Use day name instead of number
+                $("#id_start_time").val(response.schedule.start_time);
+                $("#id_end_time").val(response.schedule.end_time);
+                $("#id_lesson_hours").val(response.schedule.lesson_hours);
+            } else {
+                console.log("No schedule found for the selected course and teacher.");
+                $("#id_day").val("");
+                $("#id_start_time").val("");
+                $("#id_end_time").val("");
+                $("#id_lesson_hours").val("");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("AJAX request failed with status:", status);
+            console.error("Error:", error);
+            console.error("Response:", xhr.responseText);
+        },
+        complete: function(xhr, status) {
+            console.log("AJAX request completed with status:", status);
+        }
+    });
+}
 </script>
+
 {% endblock content %}

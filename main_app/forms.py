@@ -1,6 +1,7 @@
 from django import forms
 from django.forms.widgets import DateInput, TextInput, TimeInput
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from .models import *
 
 class ExcelUploadForm(forms.Form):
@@ -238,127 +239,39 @@ class CampusForm(FormSettings):
         fields = ['name', 'principal', 'principal_contact_number']
 
 class LearningRecordForm(FormSettings):
-    date = forms.DateField(
-        required=False, 
-        widget=forms.DateInput(attrs={'type': 'date'}), 
-        label=_('Date')
-    )
-    student = forms.ModelChoiceField(
-        queryset=Student.objects.all(), 
-        required=False, 
-        label=_("Name")
-    )
-    course = forms.ModelChoiceField(
-        queryset=Course.objects.all(), 
-        required=False, 
-        label=_("Course")
-    )
-    teacher = forms.ModelChoiceField(
-        queryset=Teacher.objects.none(), 
-        required=False, 
-        label=_("Teacher")
-    )
-    semester = forms.ModelChoiceField(
-        queryset=Session.objects.all(), 
-        required=False, 
-        label=_("Semester")
-    )
-    day = forms.ChoiceField(
-        choices=ClassSchedule.DAYS_OF_WEEK, 
-        required=False, 
-        widget=forms.Select(attrs={'class': 'form-control'}), 
-        label=_('Day')
-    )
-    start_time = forms.TimeField(
-        required=False, 
-        label=_("Start Time"), 
-        widget=forms.TimeInput(attrs={'readonly': 'readonly'})
-    )
-    end_time = forms.TimeField(
-        required=False, 
-        label=_("End Time"), 
-        widget=forms.TimeInput(attrs={'readonly': 'readonly'})
-    )
-    lesson_hours = forms.CharField(
-        required=False, 
-        label=_("Lesson Hours"), 
-        disabled=True
-    )
-
-    class Meta:
-        model = LearningRecord
-        fields = ['date', 'day', 'student', 'course', 'teacher', 'start_time', 'end_time', 'lesson_hours', 'semester']
+    date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}), label=_('Date'))
+    student = forms.ModelChoiceField(queryset=Student.objects.all(), required=False, label=_("Name"))
+    course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, label=_("Course"))
+    teacher = forms.ModelChoiceField(queryset=Teacher.objects.none(), required=False, label=_("Teacher"))
+    semester = forms.ModelChoiceField(queryset=Session.objects.all(), required=False, label=_("Semester"))
+    day = forms.CharField(max_length=10, required=False, widget=forms.TextInput(attrs={'readonly': 'readonly'}), label=_('Day'))
+    start_time = forms.TimeField(required=False, label=_("Start Time"), widget=forms.TimeInput(attrs={'readonly': 'readonly'}))
+    end_time = forms.TimeField(required=False, label=_("End Time"), widget=forms.TimeInput(attrs={'readonly': 'readonly'}))
+    lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"), disabled=True)
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['start_time'].widget.attrs['readonly'] = True
-        self.fields['end_time'].widget.attrs['readonly'] = True
-        self.fields['lesson_hours'].widget.attrs['readonly'] = True  
-        self.fields['day'].widget.attrs['readonly'] = True
+        super(LearningRecordForm, self).__init__(*args, **kwargs)
+        self.fields['course'].queryset = Course.objects.all()
 
-        if 'course' in self.data and 'teacher' in self.data:
-            try:
-                course_id = int(self.data.get('course', 0))
-                teacher_id = int(self.data.get('teacher', 0))
-                class_schedule_data = self.fetch_class_schedule_data(course_id, teacher_id)
-                if class_schedule_data:
-                    self.fields['start_time'].initial = class_schedule_data.get('start_time')
-                    self.fields['end_time'].initial = class_schedule_data.get('end_time')
-                    self.fields['lesson_hours'].initial = class_schedule_data.get('lesson_hours')
-                    self.fields['day'].initial = class_schedule_data.get('day')
-                teachers_data = self.fetch_teacher_data(course_id)
-                self.filter_teachers_by_course(course_id, teachers_data)
-            except (ValueError, TypeError):
-                pass
-        elif self.instance.pk:
-            course_id = self.instance.course_id
-            teacher_id = self.instance.teacher_id
-            class_schedule_data = self.fetch_class_schedule_data(course_id, teacher_id)
-            if class_schedule_data:
-                self.fields['start_time'].initial = class_schedule_data.get('start_time')
-                self.fields['end_time'].initial = class_schedule_data.get('end_time')
-                self.fields['lesson_hours'].initial = class_schedule_data.get('lesson_hours')
-                self.fields['day'].initial = class_schedule_data.get('day')
-            teachers_data = self.fetch_teacher_data(course_id)
-            self.filter_teachers_by_course(course_id, teachers_data)
-
-    def fetch_class_schedule_data(self, course_id, teacher_id):
-        class_schedule = ClassSchedule.objects.filter(course_id=course_id, teacher_id=teacher_id).first()
-        if class_schedule:
-            return {
-                'start_time': class_schedule.start_time.strftime('%H:%M') if class_schedule.start_time else None,
-                'end_time': class_schedule.end_time.strftime('%H:%M') if class_schedule.end_time else None,
-                'lesson_hours': class_schedule.lesson_hours if class_schedule.lesson_hours is not None else None,
-                'day': class_schedule.day_of_week if class_schedule.day_of_week is not None else None
-            }
-        return {
-            'start_time': None,
-            'end_time': None,
-            'lesson_hours': None,
-            'day': None
-        }
-
-    def fetch_teacher_data(self, course_id):
-        if course_id:
-            teachers = Teacher.objects.filter(classschedule__course_id=course_id).distinct()
-            return [(teacher.id, teacher.admin.full_name) for teacher in teachers]
-        return []
-
-    def filter_teachers_by_course(self, course_id, teachers_data):
-        if course_id:
-            self.fields['teacher'].queryset = Teacher.objects.filter(classschedule__course_id=course_id).distinct()
-            self.fields['teacher'].choices = teachers_data
+        if 'data' in kwargs:
+            course_id = kwargs['data'].get('course')
+            if course_id:
+                self.fields['teacher'].queryset = Teacher.objects.filter(courses__id=course_id)
+            else:
+                self.fields['teacher'].queryset = Teacher.objects.none()
         else:
             self.fields['teacher'].queryset = Teacher.objects.none()
 
-    def clean(self):
-        cleaned_data = super().clean()
-        course = cleaned_data.get('course')
-        teacher = cleaned_data.get('teacher')
-        if course and teacher:
-            class_schedule_data = self.fetch_class_schedule_data(course.id, teacher.id)
-            cleaned_data['lesson_hours'] = class_schedule_data.get('lesson_hours')
-        return cleaned_data
+    def save(self, commit=True):
+        instance = super(LearningRecordForm, self).save(commit=False)
+        instance.classes = self.initial['classes']
+        if commit:
+            instance.save()
+        return instance
+    
+    class Meta:
+        model = LearningRecord
+        fields = ['date', 'student', 'course', 'teacher', 'day', 'start_time', 'end_time', 'lesson_hours', 'semester']
 
 class PaymentRecordForm(FormSettings):
     payee = forms.CharField(label=_('Payee'))
@@ -394,7 +307,7 @@ class PaymentRecordForm(FormSettings):
             _('payment_method'), _('status'), _('payee'), _('remark'), _('lesson_hours')
         ] # Ensures all model fields are included
 
-class ClassScheduleForm(forms.ModelForm):
+class ClassScheduleForm(FormSettings):
     def get_level_grade_choices(self, course_id=None): 
         if course_id:
             course = Course.objects.get(id=course_id)
@@ -413,23 +326,21 @@ class ClassScheduleForm(forms.ModelForm):
         label=_("Max Level"),
         help_text=_("Select a level, which corresponds to a grade.")
     )
-    day_of_week = forms.ChoiceField(choices=ClassSchedule.DAYS_OF_WEEK, required=False, widget=forms.Select(attrs={'class': 'form-control'}), label=_('Day of the Week'))
+    day = forms.ChoiceField(choices=ClassSchedule.DAYS_OF_WEEK, required=False, widget=forms.Select(attrs={'class': 'form-control'}), label=_('Day of the Week'))
     start_time = forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time'}), label=_('Start Time'))
     end_time = forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time'}), label=_('End Time'))
     lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"), disabled=True)
     remark = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': _('Remark'), 'class': 'form-control'}), label=_('Remark'))
-    hourly_rate = forms.DecimalField(max_digits=6, decimal_places=2, required=False, label=_('Hourly Rate'))  # New field
 
     def __init__(self, *args, **kwargs):
         super(ClassScheduleForm, self).__init__(*args, **kwargs)
         initial_course_id = self.instance.course.id if self.instance and self.instance.course else None
         self.fields['grade'].choices = self.get_level_grade_choices(initial_course_id)
-        if initial_course_id:
-            self.fields['hourly_rate'].initial = Course.objects.get(id=initial_course_id).hourly_rate
+      
 
     class Meta:
         model = ClassSchedule
-        fields = ['course', 'teacher', 'grade', 'day_of_week', 'start_time', 'end_time', 'lesson_hours', 'remark', 'hourly_rate']
+        fields = ['course', 'teacher', 'grade', 'day', 'start_time', 'end_time', 'lesson_hours', 'remark']
 
 class DateInput(forms.DateInput):
     input_type = 'date'

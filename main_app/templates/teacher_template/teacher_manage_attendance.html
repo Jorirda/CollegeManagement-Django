@@ -91,16 +91,15 @@
                                     <td class="responsive-buttons">
                                         <a href="{% url 'teacher_edit_attendance' attendance.id %}?course={{ attendance.classes.id }}&date={{ attendance.date }}" class="btn btn-info btn-responsive">{% trans "Edit" %}</a>
                                         <button class="btn btn-danger btn-responsive" onclick="deleteAttendance({{ attendance.id }})">{% trans "Delete" %}</button>
-                                        <button class="btn btn-primary btn-responsive" onclick="viewAttendance({{ attendance.id }})">{% trans "View" %}</button>
+                                        <button class="btn btn-primary btn-responsive" onclick="viewAttendance({{ attendance.id }}, '{{ attendance.date }}')">{% trans "View" %}</button>
                                     </td>
-                                                                     
                                 </tr>
                                 {% empty %}
                                 <tr>
                                     <td colspan="10" class="text-center">{% trans "No Attendance records" %}</td>
                                 </tr>
                                 {% endfor %}
-                            </tbody>
+                            </tbody>                            
                         </table>
                         <div class="pagination">
                             <span class="step-links">
@@ -142,6 +141,9 @@
                         <tr>
                             <th>{% trans "Student Name" %}</th>
                             <th>{% trans "Present" %}</th>
+                            <th>{% trans "Date" %}</th>
+                            <th>{% trans "Total Class Hours" %}</th>
+                            <th>{% trans "Absent Hours" %}</th>
                         </tr>
                     </thead>
                     <tbody id="attendanceDetails">
@@ -155,6 +157,7 @@
         </div>
     </div>
 </div>
+
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
@@ -207,44 +210,36 @@
     }
 
     // Function to view attendance details
-    function viewAttendance(attendanceId) {
-        $.ajax({
-            type: 'GET',
-            url: '{% url "teacher_view_attendance" %}',
-            data: {
-                'attendance_id': attendanceId
-            },
-            success: function(data) {
-                if (data.success) {
-                    var attendanceDetails = data.attendance_details;
-                    var tableBody = $('#attendanceDetails');
-                    tableBody.empty(); // Clear previous data
+    function viewAttendance(attendanceId, attendanceDate) {
+    $.ajax({
+        type: 'GET',
+        url: '{% url "teacher_view_attendance" %}',
+        data: {
+            'attendance_id': attendanceId
+        },
+        success: function(data) {
+            if (data.success) {
+                var attendanceDetails = data.attendance_details;
+                var tableBody = $('#attendanceDetails');
+                
+                tableBody.empty(); // Clear previous data
 
-                    // Populate table with new data
-                    attendanceDetails.forEach(function(detail) {
-                        var row = '<tr>' +
-                                  '<td>' + detail.student_name + '</td>' +
-                                  '<td>' + (detail.is_present ? '{% trans "Yes" %}' : '{% trans "No" %}') + '</td>' +
-                                  '</tr>';
-                        tableBody.append(row);
-                    });
+                // Populate table with new data
+                attendanceDetails.forEach(function(detail) {
+                    var row = '<tr>' +
+                              '<td>' + detail.student_name + '</td>' +
+                              '<td>' + (detail.is_present ? '{% trans "Yes" %}' : '{% trans "No" %}') + '</td>' +
+                              '<td>' + attendanceDate + '</td>' +  // Use the passed date here
+                              '<td>' + detail.total_class_hours + '</td>' +
+                              '<td>' + detail.absent_hours + '</td>' +
+                              '</tr>';
+                    tableBody.append(row);
+                });
 
-                    // Show the modal
-                    $('#viewAttendanceModal').modal('show');
-                } else {
-                    console.error(data.error);
-                    // Show error message
-                    $('#success-message').text('{% trans "An error occurred while retrieving the attendance details." %}');
-                    $('#success-message').addClass('alert-danger');
-                    $('#success-message').show();
-                    // Hide error message after 3 seconds
-                    setTimeout(function() {
-                        $('#success-message').hide();
-                    }, 3000);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error(xhr.responseText);
+                // Show the modal
+                $('#viewAttendanceModal').modal('show');
+            } else {
+                console.error(data.error);
                 // Show error message
                 $('#success-message').text('{% trans "An error occurred while retrieving the attendance details." %}');
                 $('#success-message').addClass('alert-danger');
@@ -254,7 +249,20 @@
                     $('#success-message').hide();
                 }, 3000);
             }
-        });
-    }
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+            // Show error message
+            $('#success-message').text('{% trans "An error occurred while retrieving the attendance details." %}');
+            $('#success-message').addClass('alert-danger');
+            $('#success-message').show();
+            // Hide error message after 3 seconds
+            setTimeout(function() {
+                $('#success-message').hide();
+            }, 3000);
+        }
+    });
+
+}
 </script>
 {% endblock content %}

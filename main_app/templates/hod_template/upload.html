@@ -32,6 +32,9 @@
     .status-red {
         background-color: #f8d7da;
     }
+    .status-yellow {
+        background-color: #fff3cd;
+    }
 </style>
 <div class="container mt-5">
     <!-- Card container -->
@@ -90,7 +93,7 @@ function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
         const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
+        for (let i = 0; cookies.length; i++) {
             const cookie = cookies[i].trim();
             if (cookie.substring(0, name.length + 1) === (name + '=')) {
                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
@@ -145,15 +148,20 @@ document.getElementById('excelFile').addEventListener('change', function() {
           var columnStatusDiv = document.getElementById('column-status');
           columnStatusDiv.innerHTML = '';
           if (data.success) {
-              var statusTable = '<table class="table table-bordered">';
-              statusTable += '<thead><tr><th>{% trans "Column Name" %}</th><th>{% trans "Status" %}</th></tr></thead>';
-              statusTable += '<tbody>';
-              data.columns.forEach(col => {
-                  var statusClass = col.exists ? 'status-green' : 'status-red';
-                  statusTable += `<tr class="${statusClass}"><td>${col.name}</td><td>${col.exists ? '{% trans "Exists" %}' : '{% trans "Missing" %}'}</td></tr>`;
-              });
-              statusTable += '</tbody></table>';
-              columnStatusDiv.innerHTML = statusTable;
+              for (var model in data.columns) {
+                  if (document.getElementById('modelSelect').value === 'Mixed' || document.getElementById('modelSelect').value === model || (document.getElementById('modelSelect').value === 'CustomUser' && (model === 'CustomUser' || model === userType))) {
+                      var statusTable = '<h5>' + model + '</h5>';
+                      statusTable += '<table class="table table-bordered">';
+                      statusTable += '<thead><tr><th>{% trans "Column Name" %}</th><th>{% trans "Status" %}</th></tr></thead>';
+                      statusTable += '<tbody>';
+                      data.columns[model].forEach(col => {
+                          var statusClass = col.status === 'exists' ? 'status-green' : (col.status === 'missing' ? 'status-red' : 'status-yellow');
+                          statusTable += `<tr class="${statusClass}"><td>${col.name}</td><td>${col.status === 'exists' ? '{% trans "Exists" %}' : (col.status === 'missing' ? '{% trans "Missing" %}' : '{% trans "Autofill" %}')}</td></tr>`;
+                      });
+                      statusTable += '</tbody></table>';
+                      columnStatusDiv.innerHTML += statusTable;
+                  }
+              }
           } else {
               columnStatusDiv.innerHTML = '<p class="text-danger">{% trans "Error processing the file." %}</p>';
           }

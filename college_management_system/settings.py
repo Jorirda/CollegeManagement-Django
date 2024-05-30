@@ -204,10 +204,21 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console', 'file'],
-        'level': 'DEBUG',
+        'level': 'WARNING',  # Only log warnings and above at the root level
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'WARNING',  # Only log warnings and above for Django
+            'propagate': False,
+        },
+        'main_app': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',  # Log debug and above for main_app
+            'propagate': False,
+        },
     },
 }
-
 
 
 prod_db = dj_database_url.config(conn_max_age=500)

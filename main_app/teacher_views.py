@@ -181,23 +181,6 @@ def get_class_schedules(request):
     ]
     return JsonResponse(response, safe=False)
 
-@csrf_exempt
-def get_students(request):
-    if request.method == 'POST':
-        course_id = request.POST.get('course')
-        class_schedule_id = request.POST.get('class_schedule')
-        students = Student.objects.filter(learningrecord__schedule_record__id=class_schedule_id).distinct()
-        response = [
-            {
-                'id': student.id,
-                'full_name': student.admin.full_name
-            }
-            for student in students
-        ]
-        return JsonResponse({'students': response})
-    else:
-        return JsonResponse({'error': 'Invalid request method.'}, status=405)
-
 def teacher_view_profile(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
     form = TeacherEditForm(request.POST or None, request.FILES or None, instance=teacher)
@@ -295,55 +278,49 @@ def teacher_edit_attendance(request, attendance_id):
 
 def teacher_view_attendance(request):
     attendance_id = request.GET.get('attendance_id')
+    print(f"Received request for attendance ID: {attendance_id}")  # Debug print statement
     attendance = get_object_or_404(Attendance, id=attendance_id)
     student_attendances = AttendanceReport.objects.filter(attendance=attendance)
+    print(f"Found {len(student_attendances)} student attendance records")  # Debug print statement
 
     attendance_details = []
 
-    # Calculate total class hours attended by each student
     for student_attendance in student_attendances:
-        student_name = student_attendance.student.admin.full_name
+        student = student_attendance.student
+        student_name = student.admin.full_name
         is_present = student_attendance.status
 
-        # Retrieve class schedules for the attendance date
-        class_schedules = ClassSchedule.objects.filter(day=attendance.date.weekday())
+        print(f"Processing student: {student_name}, Present: {is_present}")  # Debug print statement
+
+        # Retrieve all courses the student is enrolled in
+        learning_records = LearningRecord.objects.filter(student=student)
+        enrolled_courses = {record.course for record in learning_records}
+        print(f"Student {student_name} enrolled in {len(enrolled_courses)} courses")  # Debug print statement
 
         total_class_hours = 0
 
-        # Calculate total class hours attended by the student for the session
-        for class_schedule in class_schedules:
-            class_start_datetime = datetime.combine(datetime.today(), class_schedule.start_time)
-            class_end_datetime = datetime.combine(datetime.today(), class_schedule.end_time)
-            class_duration = (class_end_datetime - class_start_datetime).total_seconds() / 3600  # Convert to hours
-            total_class_hours += class_duration
+        for course in enrolled_courses:
+            # Calculate the total class hours for each course
+            course_learning_records = LearningRecord.objects.filter(student=student, course=course)
+            course_hours = course_learning_records.aggregate(Sum('lesson_hours'))['lesson_hours__sum'] or 0
+            total_class_hours += course_hours
+
+            print(f"Course: {course}, Total Hours: {course_hours}")  # Debug print statement
+
+        # Calculate absent hours based on is_present status
+        absent_hours = total_class_hours if not is_present else 0
 
         attendance_details.append({
             'student_name': student_name,
             'is_present': is_present,
             'total_class_hours': total_class_hours,
+            'absent_hours': absent_hours
         })
 
-    # Debugging code - print attendance details
-    print("Attendance Details:")
-    for detail in attendance_details:
-        print(detail)
+        print(f"Added attendance details for {student_name}: Total Class Hours: {total_class_hours}, Absent Hours: {absent_hours}")  # Debug print statement
 
+    print("Returning attendance details as JSON response")  # Debug print statement
     return JsonResponse({'success': True, 'attendance_details': attendance_details})
-
-
-def teacher_manage_attendance(request):
-    teacher = get_object_or_404(Teacher, admin=request.user)
-    attendances = Attendance.objects.filter(classes__teacher=teacher)
-    
-    paginator = Paginator(attendances, 10)  # Show 10 records per page
-    page_number = request.GET.get('page')
-    paginated_attendances = paginator.get_page(page_number)
-
-    context = {
-        'attendances': paginated_attendances,
-        'page_title': _('Manage Attendance'),
-    }
-    return render(request, 'teacher_template/teacher_manage_attendance.html', context)
 
 
 @csrf_exempt
@@ -513,7 +490,7 @@ def teacher_write_summary(request):
 
     return render(request, 'teacher_template/teacher_write_summary.html', context)
 
-#Notifications
+# Notifications
 def teacher_view_notification(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
     
@@ -533,16 +510,25 @@ def teacher_view_notification(request):
             'course_start': notification.payment_record.learning_record.start_time if notification.payment_record and notification.payment_record.learning_record else 'N/A',
             'course_end': notification.payment_record.learning_record.end_time if notification.payment_record and notification.payment_record.learning_record else 'N/A',
             'student_name': notification.student.admin.full_name if notification.student else 'N/A',
-            'next_payment_date': notification.payment_record.next_payment_date if notification.payment_record else 'N/A'
+            'next_payment_date': notification.payment_record.next_payment_date if notification.payment_record else 'N/A',
+            'classroom_performance': notification.classroom_performance,
+            'status_pictures': notification.status_pictures.url if notification.status_pictures else None
         }
         for notification in notifications
     ]
 
+    # Pagination logic
+    paginator = Paginator(annotated_notifications, 10)  # Show 10 notifications per page
+    page_number = request.GET.get('page')
+    paginated_notifications = paginator.get_page(page_number)
+
     context = {
-        'notifications': annotated_notifications,
+        'notifications': paginated_notifications,
         'page_title': "View Notifications"
     }
     return render(request, "teacher_template/teacher_view_notification.html", context)
+
+
 
 @login_required
 def teacher_view_notification_count(request):
@@ -642,15 +628,24 @@ def teacher_delete_notification(request):
 #     return HttpResponse("OK")
 
 @csrf_exempt
+@login_required
 def teacher_fcmtoken(request):
-    token = request.POST.get('token')
-    try:
-        teacher_user = get_object_or_404(CustomUser, id=request.user.id)
-        teacher_user.fcm_token = token
-        teacher_user.save()
-        return HttpResponse("True")
-    except Exception as e:
-        return HttpResponse("False")
+    if request.method == 'POST':
+        token = request.POST.get('token')
+        
+        if not token:
+            return HttpResponse("Token not provided", status=400)
+        
+        try:
+            teacher_user = get_object_or_404(CustomUser, id=request.user.id)
+            teacher_user.fcm_token = token
+            teacher_user.save()
+            return HttpResponse("True")
+        except Exception as e:
+            print(f"Error saving FCM token: {e}")  # Log the error
+            return HttpResponse("False", status=500)
+    else:
+        return HttpResponse("Invalid request method", status=405)
 
 @login_required
 def student_renewals(request):
@@ -709,7 +704,6 @@ def renew_student(request, student_id):
         else:
             return JsonResponse({'success': False, 'message': "No previous payment record found for the student."})
     return JsonResponse({'success': False, 'message': "Invalid request method."})
-
 
 @login_required
 def withdraw_student(request, student_id):

@@ -1,7 +1,7 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
 {% load i18n %}
-{% block page_title %}{% trans page_title %}{% endblock page_title %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
 
 {% block content %}
 <section class="content">
@@ -11,7 +11,7 @@
                 <!-- general form elements -->
                 <div class="card card-dark">
                     <div class="card-header">
-                        <h3 class="card-title">{% trans page_title %}</h3>
+                        <h3 class="card-title">{{ page_title }}</h3>
                     </div>
                     {% include "main_app/form_template.html" with messages=messages form=form button_text=_("Update Schedule") %}
                 </div>
@@ -21,87 +21,108 @@
     </div>
 </section>
 
-<script src="{% static 'dist/js/jquery.min.js' %}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script type="text/javascript">
-    $(document).ready(function() {
-        $("#id_course").change(function() {
-            var courseId = $(this).val();
-            console.log("Selected course ID:", courseId);
-            populate_teachers(courseId);
-        });
-
-        $("#id_teacher").change(function() {
-            var courseId = $("#id_course").val();
-            var teacherId = $(this).val();
-            console.log("Selected teacher ID:", teacherId);
-            update_class_schedule(courseId, teacherId);
-        });
-    });
-
-    function populate_teachers(courseId) {
-        $.ajax({
-            url: "/get_filtered_teachers/",
-            type: "GET",
-            data: { course_id: courseId },
-            success: function(response) {
-                console.log("Response:", response);
-                var teacherDropdown = $("#id_teacher");
-                teacherDropdown.empty();
-                teacherDropdown.append('<option value="">---------</option>');
-                if (response.teachers) {
-                    console.log("Teachers:", response.teachers);
-                    $.each(response.teachers, function(index, teacher) {
-                        teacherDropdown.append('<option value="' + teacher.id + '">' + teacher.name + '</option>');
+$(document).ready(function() {
+    $('#id_course').change(function() {
+        var courseId = $(this).val();
+        if (courseId) {
+            $.ajax({
+                url: '{% url "get_teachers" %}',
+                data: {
+                    'course_id': courseId
+                },
+                success: function(data) {
+                    var options = '<option value="">{% trans "Select Teacher" %}</option>';
+                    $.each(data.teachers, function(key, teacher) {
+                        options += '<option value="' + teacher.id + '">' + teacher.name + '</option>';
                     });
+                    $('#id_teacher').html(options);
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error("AJAX request failed with status:", status);
-                console.error("Error:", error);
-                console.error("Response:", xhr.responseText);
-            },
-            complete: function(xhr, status) {
-                console.log("AJAX request completed with status:", status);
-            }
-        });
-    }
-
-    function update_class_schedule(courseId, teacherId) {
-    $.ajax({
-        url: "/get_class_schedule/",
-        type: "GET",
-        data: {
-            course_id: courseId,
-            teacher_id: teacherId
-        },
-        success: function(response) {
-            console.log("Class Schedule Response:", response);
-            if (response.schedule) {
-                console.log("Day:", response.schedule.day);
-                console.log("Start Time:", response.schedule.start_time);
-                console.log("End Time:", response.schedule.end_time);
-                $("#id_day").val(response.schedule.day_name); // Use day name instead of number
-                $("#id_start_time").val(response.schedule.start_time);
-                $("#id_end_time").val(response.schedule.end_time);
-                $("#id_lesson_hours").val(response.schedule.lesson_hours);
-            } else {
-                console.log("No schedule found for the selected course and teacher.");
-                $("#id_day").val("");
-                $("#id_start_time").val("");
-                $("#id_end_time").val("");
-                $("#id_lesson_hours").val("");
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error("AJAX request failed with status:", status);
-            console.error("Error:", error);
-            console.error("Response:", xhr.responseText);
-        },
-        complete: function(xhr, status) {
-            console.log("AJAX request completed with status:", status);
+            });
+        } else {
+            $('#id_teacher').html('<option value="">{% trans "Select Teacher" %}</option>');
         }
     });
-}
+
+    $('#id_teacher').change(function() {
+        var courseId = $('#id_course').val();
+        var teacherId = $(this).val();
+        if (courseId && teacherId) {
+            $.ajax({
+                url: '{% url "get_schedule" %}',
+                data: {
+                    'course_id': courseId,
+                    'teacher_id': teacherId
+                },
+                success: function(data) {
+                    if (data.schedule) {
+                        $('#id_day').val(data.schedule.day);
+                        $('#id_start_time').val(data.schedule.start_time);
+                        $('#id_end_time').val(data.schedule.end_time);
+                        $('#id_lesson_hours').val(data.schedule.lesson_hours);
+                    } else {
+                        $('#id_day').val('');
+                        $('#id_start_time').val('');
+                        $('#id_end_time').val('');
+                        $('#id_lesson_hours').val('');
+                    }
+                }
+            });
+        } else {
+            $('#id_day').val('');
+            $('#id_start_time').val('');
+            $('#id_end_time').val('');
+            $('#id_lesson_hours').val('');
+        }
+    });
+
+    // Initialize the form with current data
+    var initialCourseId = $('#id_course').val();
+    if (initialCourseId) {
+        $.ajax({
+            url: '{% url "get_teachers" %}',
+            data: {
+                'course_id': initialCourseId
+            },
+            success: function(data) {
+                var options = '<option value="">{% trans "Select Teacher" %}</option>';
+                $.each(data.teachers, function(key, teacher) {
+                    var selected = '';
+                    if ($('#id_teacher').data('initial') == teacher.id) {
+                        selected = 'selected';
+                    }
+                    options += '<option value="' + teacher.id + '" ' + selected + '>' + teacher.name + '</option>';
+                });
+                $('#id_teacher').html(options);
+            }
+        });
+
+        var initialTeacherId = $('#id_teacher').data('initial');
+        if (initialTeacherId) {
+            $.ajax({
+                url: '{% url "get_schedule" %}',
+                data: {
+                    'course_id': initialCourseId,
+                    'teacher_id': initialTeacherId
+                },
+                success: function(data) {
+                    if (data.schedule) {
+                        $('#id_day').val(data.schedule.day);
+                        $('#id_start_time').val(data.schedule.start_time);
+                        $('#id_end_time').val(data.schedule.end_time);
+                        $('#id_lesson_hours').val(data.schedule.lesson_hours);
+                    } else {
+                        $('#id_day').val('');
+                        $('#id_start_time').val('');
+                        $('#id_end_time').val('');
+                        $('#id_lesson_hours').val('');
+                    }
+                }
+            });
+        }
+    }
+});
 </script>
 
 {% endblock content %}

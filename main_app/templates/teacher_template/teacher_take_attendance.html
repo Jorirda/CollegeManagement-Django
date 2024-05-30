@@ -2,15 +2,11 @@
 {% load static %}
 {% load i18n %}
 
-{% block page_title %}
-{% trans page_title %}
-{% endblock page_title %}
-
+{% block page_title %}{{page_title}}{% endblock page_title %}
 {% block content %}
 
 <section class="content">
     <div class="container-fluid">
-        <div id="success-message" class="alert alert-success" style="display: none;"></div>
         <div id="messages">
             {% if messages %}
                 {% for message in messages %}
@@ -20,19 +16,20 @@
                 {% endfor %}
             {% endif %}
         </div>
+        <div id="success-message" class="alert alert-success" style="display: none;"></div>
         <div class="row">
             <div class="col-md-12">
                 <!-- general form elements -->
                 <div class="card card-dark">
                     <div class="card-header">
-                        <h3 class="card-title">{% trans page_title %}</h3>
+                        <h3 class="card-title">{{page_title}}</h3>
                     </div>
 
                     <!-- /.card-header -->
                     <!-- form start -->
                     <div class="card-body">
                         <div class="form-group">
-                            <label>{% trans "Course" %}</label>
+                            <label>Classes</label>
                             <select name="classes" class="form-control" id='classes'>
                                 <option value="">----</option>
                                 {% for class in classes %}
@@ -42,11 +39,11 @@
                         </div>
 
                         <div class="form-group">
-                            <label>{% trans "Session Year" %}</label>
+                            <label>Session Year</label>
                             <select name="session" id='session' class="form-control">
                                 <option value="">----</option>
                                 {% for session in sessions %}
-                                <option value="{{ session.id }}">{{ session.start_date }} - {{ session.end_date }}</option>
+                                <option value="{{ session.id }}">{{ session }} </option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -54,7 +51,7 @@
                     <!-- /.card-body -->
 
                     <div class="card-footer">
-                        <button type="button" id='fetch_student' class="btn btn-success btn-block">{% trans "Fetch Students" %}</button>
+                        <button type="button" id='fetch_student' class="btn btn-success btn-block">Fetch Students</button>
                         <div class="form-group" id="student_data"></div>
                     </div>
                 </div>
@@ -67,7 +64,7 @@
 
 {% block custom_js %}
 <script>
-   $(document).ready(function () {
+    $(document).ready(function () {
 
         // Function to fetch students
         function fetchStudents() {
@@ -79,7 +76,6 @@
 
             if (!classes || !session) {
                 alert("Please select classes and session");
-                console.log("Classes or session not selected"); // Debugging log
                 return false;
             }
 
@@ -87,7 +83,7 @@
                 url: "{% url 'get_students' %}",
                 type: 'POST',
                 headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
                 },
                 data: {
                     'classes': classes,
@@ -97,17 +93,15 @@
                     console.log("Received response:", response); // Debugging log
                     if (response.error) {
                         alert(response.error);
-                        console.error("Error in response:", response.error); // Debugging log
                         return;
                     }
-                    if (response.students.length < 1) {
+                    if (response.length < 1) {
                         alert("No data to display");
-                        console.log("No students found"); // Debugging log
                     } else {
                         var div_data = "<hr/><div class='form-group'><label>Attendance Date</label><input type='date' class='form-control' name='attendance_date' id='attendance_date'></div><div class='row'>";
-                        response.students.forEach(function(student) {
-                            div_data += "<div class='col-lg-3'><div class='form-check custom-control custom-checkbox'><input type='checkbox' class='custom-control-input' checked='checked' name='student_data[]' value='" + student.id + "' id='checkbox" + student.id + "' /><label for='checkbox" + student.id + "' class='custom-control-label'>" + student.full_name + "</label></div></div>";
-                        });
+                        for (var key in response) {
+                            div_data += "<div class='col-lg-3'><div class='form-check custom-control custom-checkbox'><input type='checkbox' class='custom-control-input' checked='checked' name='student_data[]' value='" + response[key]['id'] + "' id='checkbox" + response[key]['id'] + "' /><label for='checkbox" + response[key]['id'] + "' class='custom-control-label'>" + response[key]['name'] + "</label></div></div>";
+                        }
                         div_data += "</div><div class='form-group'><button id='save_attendance' class='btn btn-success' type='button'>Save Attendance</button></div>";
                         $("#student_data").html(div_data);
                     }
@@ -135,15 +129,6 @@
 
             if (!attendance_date) {
                 alert("Select date");
-                console.log("Attendance date not selected"); // Debugging log
-                $('#save_attendance').removeAttr("disabled").text("Save Attendance");
-                return false;
-            }
-
-            if (!classes || !session) {
-                alert("Please select classes and session");
-                console.log("Classes or session not selected"); // Debugging log
-                $('#save_attendance').removeAttr("disabled").text("Save Attendance");
                 return false;
             }
 
@@ -155,7 +140,7 @@
                 url: "{% url 'save_attendance' %}",
                 type: 'POST',
                 headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
                 },
                 data: {
                     'date': attendance_date,
@@ -164,13 +149,18 @@
                     'session': session
                 },
                 success: function(data) {
+                    console.log("Attendance saved successfully:", data); // Debugging log
                     if (data.success) {
-                        $('#success-message').text(data.message).removeClass('alert-danger').addClass('alert-success').show();
+                        // Show success message
+                        $('#success-message').text('{% trans "Attendance saved successfully" %}').addClass('alert-success').show();
+                        // Hide success message after 3 seconds
                         setTimeout(function() {
                             $('#success-message').hide();
                         }, 3000);
                     } else {
-                        $('#success-message').text(data.message).removeClass('alert-success').addClass('alert-danger').show();
+                        // Show error message
+                        $('#success-message').text(data.error).addClass('alert-danger').show();
+                        // Hide error message after 3 seconds
                         setTimeout(function() {
                             $('#success-message').hide();
                         }, 3000);
@@ -195,6 +185,5 @@
         $("#fetch_student").click(fetchStudents);
         $(document).on('click', '#save_attendance', saveAttendance);
     });
-
 </script>
 {% endblock custom_js %}

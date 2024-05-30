@@ -209,8 +209,11 @@
         }
     }
 
-    // Function to view attendance details
-    function viewAttendance(attendanceId, attendanceDate) {
+
+  // Function to view attendance details
+function viewAttendance(attendanceId, attendanceDate) {
+    console.log('viewAttendance called with attendanceId:', attendanceId, 'and attendanceDate:', attendanceDate);
+
     $.ajax({
         type: 'GET',
         url: '{% url "teacher_view_attendance" %}',
@@ -218,28 +221,32 @@
             'attendance_id': attendanceId
         },
         success: function(data) {
+            console.log('AJAX request successful:', data);
+
             if (data.success) {
                 var attendanceDetails = data.attendance_details;
                 var tableBody = $('#attendanceDetails');
-                
+
                 tableBody.empty(); // Clear previous data
 
                 // Populate table with new data
                 attendanceDetails.forEach(function(detail) {
+                    console.log('Processing detail:', detail);
+
                     var row = '<tr>' +
-                              '<td>' + detail.student_name + '</td>' +
-                              '<td>' + (detail.is_present ? '{% trans "Yes" %}' : '{% trans "No" %}') + '</td>' +
-                              '<td>' + attendanceDate + '</td>' +  // Use the passed date here
-                              '<td>' + detail.total_class_hours + '</td>' +
-                              '<td>' + detail.absent_hours + '</td>' +
-                              '</tr>';
+                                '<td>' + detail.student_name + '</td>' +
+                                '<td>' + (detail.is_present ? '{% trans "Yes" %}' : '{% trans "No" %}') + '</td>' +
+                                '<td>' + attendanceDate + '</td>' +  // Use the passed date here
+                                '<td>' + detail.total_class_hours + '</td>' +
+                                '<td>' + detail.absent_hours + '</td>' +
+                                '</tr>';
                     tableBody.append(row);
                 });
 
                 // Show the modal
                 $('#viewAttendanceModal').modal('show');
             } else {
-                console.error(data.error);
+                console.error('Data error:', data.error);
                 // Show error message
                 $('#success-message').text('{% trans "An error occurred while retrieving the attendance details." %}');
                 $('#success-message').addClass('alert-danger');
@@ -251,7 +258,7 @@
             }
         },
         error: function(xhr, status, error) {
-            console.error(xhr.responseText);
+            console.error('AJAX request error:', xhr.responseText, 'Status:', status, 'Error:', error);
             // Show error message
             $('#success-message').text('{% trans "An error occurred while retrieving the attendance details." %}');
             $('#success-message').addClass('alert-danger');
@@ -262,7 +269,6 @@
             }, 3000);
         }
     });
-
 }
 </script>
 {% endblock content %}

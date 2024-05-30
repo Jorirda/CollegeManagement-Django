@@ -5,7 +5,7 @@ import pandas as pd
 import logging
 import pytz
 import uuid
-
+from fuzzywuzzy import fuzz, process
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
@@ -20,7 +20,7 @@ from django.db.models import Sum, F
 # from django.contrib.auth.hashers import make_password
 from django.shortcuts import render
 # from generate import generate_html_table, process_data
-from generate import process_data
+from generate import generate_html_table, main, process_data
 from main_app.model_column_mapping import MODEL_COLUMN_MAPPING
 from .forms import *
 from .models import *
@@ -36,8 +36,10 @@ from django.utils.translation import gettext as _
 from django.db.models import Sum, Count
 from django.utils import timezone
 from collections import defaultdict
+from django.shortcuts import render
 
 
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +68,12 @@ def get_grade_choices(request):
     else:
         choices = []
     return JsonResponse({'choices': choices})
+
+# Specific column mapping rules for autofill
+SPECIFIC_COLUMN_MAPPING = {
+    '学生姓名': '姓名',
+    '授课老师': '姓名',
+}
 
 @csrf_exempt
 def check_columns(request):
@@ -100,18 +108,22 @@ def check_columns(request):
                             'name': col,
                             'status': 'exists' if col in uploaded_columns else 'missing'
                         }
+
+                        # Check for potential autofill columns
+                        if col_status['status'] == 'missing':
+                            # Check specific column mapping first
+                            if col in SPECIFIC_COLUMN_MAPPING and SPECIFIC_COLUMN_MAPPING[col] in uploaded_columns:
+                                col_status['status'] = 'autofill'
+                                col_status['autofill_from'] = SPECIFIC_COLUMN_MAPPING[col]
+                            else:
+                                similar_col = process.extractOne(col, uploaded_columns, scorer=fuzz.partial_ratio)
+                                if similar_col and similar_col[1] >= 80:  # 80 is the similarity threshold
+                                    col_status['status'] = 'autofill'
+                                    col_status['autofill_from'] = similar_col[0]
+
                         model_column_status.append(col_status)
 
                     column_status[model_name] = model_column_status
-
-            # If PaymentRecord is selected, mark related LearningRecord columns as autofill
-            if selected_model == 'PaymentRecord':
-                learning_record_fields = MODEL_COLUMN_MAPPING['LearningRecord']['fields']
-                for col in learning_record_fields:
-                    column_status['LearningRecord'].append({
-                        'name': col,
-                        'status': 'autofill'
-                    })
 
             return JsonResponse({'success': True, 'columns': column_status})
 
@@ -230,43 +242,32 @@ def get_total_income_by_months(start_date, end_date, start_month_name, end_month
 
     return income_by_month
 
-def get_filtered_teachers(request):
-    if request.method == "GET" and request.is_ajax():
-        course_id = request.GET.get("course_id")
+def get_teachers(request):
+    course_id = request.GET.get('course_id')
+    if course_id:
+        teachers = Teacher.objects.filter(courses__id=course_id)
+        data = {'teachers': [{'id': teacher.id, 'name': teacher.admin.full_name} for teacher in teachers]}
+        return JsonResponse(data)
+    return JsonResponse({'teachers': []})
 
-        if course_id:
-            # Filter teachers by course_id and ensure they have admins
-            teachers = Teacher.objects.filter(courses__id=course_id, admin__isnull=False)
-
-            teacher_data = [{"id": teacher.id, "name": teacher.admin.full_name} for teacher in teachers]
-
-            return JsonResponse({"teachers": teacher_data})
-
-    return JsonResponse({}, status=400)
-
-def get_class_schedule(request):
-    if request.method == "GET" and request.is_ajax():
-        course_id = request.GET.get("course_id")
-        teacher_id = request.GET.get("teacher_id")
-
-        logger.info(f"Received request for course_id={course_id}, teacher_id={teacher_id}")
-
-        if course_id and teacher_id:
-            class_schedule = ClassSchedule.objects.filter(course_id=course_id, teacher_id=teacher_id).first()
-            if class_schedule:
-                schedule_data = {
-                    "day_name": class_schedule.get_day_display(),  # Use day name instead of number
-                    "start_time": class_schedule.start_time.strftime("%H:%M"),
-                    "end_time": class_schedule.end_time.strftime("%H:%M"),
-                    "lesson_hours": class_schedule.lesson_hours,
+def get_schedule(request):
+    course_id = request.GET.get('course_id')
+    teacher_id = request.GET.get('teacher_id')
+    if course_id and teacher_id:
+        try:
+            schedule = ClassSchedule.objects.get(course_id=course_id, teacher_id=teacher_id)
+            data = {
+                'schedule': {
+                    'day': schedule.get_day_display(),
+                    'start_time': schedule.start_time,
+                    'end_time': schedule.end_time,
+                    'lesson_hours': schedule.lesson_hours,
                 }
-                return JsonResponse({"schedule": schedule_data})
-            else:
-                logger.warning("No schedule found for the selected course and teacher.")
-        else:
-            logger.error("Missing course_id or teacher_id in the request.")
-
-    return JsonResponse({}, status=400)
+            }
+            return JsonResponse(data)
+        except ClassSchedule.DoesNotExist:
+            pass
+    return JsonResponse({'schedule': None})
 
     
 #Refund
@@ -718,14 +719,15 @@ def manage_teacher_query(request):
             teacher = teacher_query.teacher_records
             if teacher:
                 related_learning_records = LearningRecord.objects.filter(teacher=teacher)
+                num_of_classes = related_learning_records.count()  # Count the number of related learning records
                 course_info = defaultdict(list)
                 teacher_info = {
-                    'teacher_name': teacher_query.admin.full_name if teacher_query.teacher_records and teacher_query.teacher_records.admin else 'Unknown',
+                    'teacher_name': teacher_query.admin.full_name if teacher_query.admin else 'Unknown',
                     'gender': teacher_query.admin.gender if teacher_query.admin else 'Unknown',
-                    'phone_number': teacher_query.teacher_records.admin.phone_number if teacher_query.teacher_records and teacher_query.teacher_records.admin else 'Unknown',
+                    'phone_number': teacher_query.admin.phone_number if teacher_query.admin else 'Unknown',
                     'campus': teacher_query.teacher_records.campus if teacher_query.teacher_records else 'Unknown',
-                    'address': teacher_query.teacher_records.admin.address if teacher_query.teacher_records and teacher_query.teacher_records.admin else 'Unknown',
-                    'num_of_classes': teacher_query.num_of_classes if teacher_query.num_of_classes is not None else 'Unknown',
+                    'address': teacher_query.admin.address if teacher_query.admin else 'Unknown',
+                    'num_of_classes': num_of_classes,
                     'contract': teacher_query.teacher_records.work_type if teacher_query.teacher_records else 'Unknown',
                     'completed_hours': teacher_query.completed_hours if teacher_query.completed_hours is not None else 'Unknown',
                     'remaining_hours': teacher_query.remaining_hours if teacher_query.remaining_hours is not None else 'Unknown',
@@ -761,6 +763,7 @@ def manage_teacher_query(request):
         'page_title': 'Manage Teacher Queries'
     }
     return render(request, 'hod_template/manage_teacher_query.html', context)
+
 
 
 # def manage_teacher_query(request):
@@ -1220,7 +1223,7 @@ def manage_campus(request):
     return render(request, "hod_template/manage_campus.html", context)
 
 
-#Payments
+# Payments
 def add_payment_record(request):
     form = PaymentRecordForm(request.POST or None)
     context = {
@@ -1256,6 +1259,19 @@ def add_payment_record(request):
                 next_payment_date = date + relativedelta(months=1)
 
             try:
+                # Retrieve all courses the student is enrolled in
+                learning_records = LearningRecord.objects.filter(student=student)
+                enrolled_courses = {record.course for record in learning_records}
+
+                total_class_hours = 0
+
+                # Calculate the total class hours for each course
+                for course in enrolled_courses:
+                    course_learning_records = learning_records.filter(course=course)
+                    course_hours = course_learning_records.aggregate(Sum('lesson_hours'))['lesson_hours__sum'] or 0
+                    total_class_hours += course_hours
+
+                # Create PaymentRecord instance and save it
                 payment = PaymentRecord(
                     date=date,
                     next_payment_date=next_payment_date,
@@ -1273,7 +1289,7 @@ def add_payment_record(request):
                     payee=payee,
                     remark=remark
                 )
-                
+
                 student.course = course
                 student.save()
                 payment.save()
@@ -1291,7 +1307,7 @@ def add_payment_record(request):
                     lesson_hours=str(total_lesson_hours) + " hours",  # Assuming lesson_hours is a string field
                     day=date.strftime("%A")  # Assuming day is the day of the week
                 )
-                
+
                 # Link the LearningRecord to the PaymentRecord
                 payment.learning_record = learning_record
                 payment.save()
@@ -1305,6 +1321,8 @@ def add_payment_record(request):
             messages.error(request, "Fill Form Properly")
 
     return render(request, 'hod_template/add_payment_record_template.html', context)
+
+
 
 def edit_payment_record(request, payment_id):
     paymentrecord = get_object_or_404(PaymentRecord, id=payment_id)
@@ -1394,133 +1412,35 @@ def manage_payment_record(request):
 # Learning
 def add_learning_record(request):
     form = LearningRecordForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Successfully Added")
+            return redirect('add_learning_record')
+        else:
+            messages.error(request, "Fill Form Properly")
     context = {
         'form': form,
         'page_title': _('Add Learning Record')
     }
-    if request.method == 'POST':
-        selected_course = request.POST.get('course')
-        selected_teacher = request.POST.get('teacher')
-        
-        # Debugging information
-        print("Selected Course ID:", selected_course)
-        print("Selected Course Object:", Course.objects.filter(id=selected_course).first())
-        print("Selected Teacher ID:", selected_teacher)
-        print("Selected Teacher Object:", Teacher.objects.filter(id=selected_teacher).first())
-
-        form.fields['course'].queryset = Course.objects.all()
-        form.fields['teacher'].queryset = Teacher.objects.filter(courses__id=selected_course)
-
-        print("Available Teachers for Selected Course in Form:", list(form.fields['teacher'].queryset.values_list('id', 'admin__full_name')))
-
-        if form.is_valid():
-            try:
-                date = form.cleaned_data.get('date')
-                student = form.cleaned_data.get('student')
-                course = form.cleaned_data.get('course')
-                teacher = form.cleaned_data.get('teacher')
-                semester = form.cleaned_data.get('semester')
-                day = form.cleaned_data.get('day')
-                start_time = form.cleaned_data.get('start_time')
-                end_time = form.cleaned_data.get('end_time')
-                lesson_hours = form.cleaned_data.get('lesson_hours')
-
-                learning_record = LearningRecord(
-                    date=date,
-                    student=student,
-                    course=course,
-                    teacher=teacher,
-                    semester=semester,
-                    day=day,
-                    start_time=start_time,
-                    end_time=end_time,
-                    lesson_hours=lesson_hours,
-                )
-
-                # Optional: Add remark from the student admin
-                learning_record.remark = student.admin.remark if student and student.admin else None
-                
-                learning_record.save()
-                messages.success(request, "Successfully Added")
-                return redirect(reverse('add_learning_record'))
-
-            except Exception as e:
-                messages.error(request, "Could Not Add " + str(e))
-        else:
-            print("Form Errors:", form.errors)
-            if 'teacher' in form.errors:
-                print("Available teachers at form validation:", list(form.fields['teacher'].queryset.values_list('id', 'admin__full_name')))
-            messages.error(request, "Fill Form Properly")
-
     return render(request, 'hod_template/add_learning_record_template.html', context)
 
 def edit_learning_record(request, learn_id):
     learningrecord = get_object_or_404(LearningRecord, id=learn_id)
     form = LearningRecordForm(request.POST or None, instance=learningrecord)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Successfully Updated")
+            return redirect('edit_learning_record', learn_id=learn_id)
+        else:
+            messages.error(request, "Fill Form Properly")
     context = {
         'form': form,
         'learn_id': learn_id,
         'page_title': _('Edit Learning Record')
     }
-
-    if request.method == 'POST':
-        selected_course = request.POST.get('course')
-        selected_teacher = request.POST.get('teacher')
-
-        # Debugging information
-        print("Selected Course ID:", selected_course)
-        print("Selected Course Object:", Course.objects.filter(id=selected_course).first())
-        print("Selected Teacher ID:", selected_teacher)
-        print("Selected Teacher Object:", Teacher.objects.filter(id=selected_teacher).first())
-
-        form.fields['course'].queryset = Course.objects.all()
-        form.fields['teacher'].queryset = Teacher.objects.filter(courses__id=selected_course)
-
-        print("Available Teachers for Selected Course in Form:", list(form.fields['teacher'].queryset.values_list('id', 'admin__full_name')))
-
-        if form.is_valid():
-            try:
-                cleaned_data = form.cleaned_data
-                
-                date = cleaned_data.get('date')
-                student = cleaned_data.get('student')
-                course = cleaned_data.get('course')
-                teacher = cleaned_data.get('teacher')
-                semester = cleaned_data.get('semester')
-                day = cleaned_data.get('day')
-                start_time = cleaned_data.get('start_time')
-                end_time = cleaned_data.get('end_time')
-                lesson_hours = cleaned_data.get('lesson_hours')
-
-                learning_record = LearningRecord(
-                    date=date,
-                    student=student,
-                    course=course,
-                    teacher=teacher,
-                    semester=semester,
-                    day=day,
-                    start_time=start_time,
-                    end_time=end_time,
-                    lesson_hours=lesson_hours,
-                )
-
-                # Optional: Add remark from the student admin
-                learning_record.remark = student.admin.remark if student and student.admin else None
-
-                learning_record.save()
-                messages.success(request, "Successfully Updated")
-                return redirect(reverse('edit_learning_record', args=[learn_id]))
-
-            except Exception as e:
-                messages.error(request, "Could Not Update: " + str(e))
-        else:
-            print("Form Errors:", form.errors)
-            if 'teacher' in form.errors:
-                print("Available teachers at form validation:", list(form.fields['teacher'].queryset.values_list('id', 'admin__full_name')))
-            messages.error(request, "Fill Form Properly")
-
     return render(request, 'hod_template/edit_learning_record_template.html', context)
-
 
 def delete_learning_record(request, learn_id):
     learn = get_object_or_404(LearningRecord, id=learn_id)
@@ -1530,7 +1450,7 @@ def delete_learning_record(request, learn_id):
 
 def manage_learning_record(request):
     # Your existing code for fetching learning records, teachers, courses, and filtering
-    learningrecords = LearningRecord.objects.all()
+    learningrecords = LearningRecord.objects.all() 
     teachers = Teacher.objects.all()
     courses = Course.objects.all()
     
@@ -1544,6 +1464,15 @@ def manage_learning_record(request):
         learningrecords = learningrecords.filter(course__level_end=selected_grade)
 
     total_lesson_hours = learningrecords.aggregate(Sum('lesson_hours'))['lesson_hours__sum']
+    
+    # Ensure the total lesson hours are a whole number
+    if total_lesson_hours is not None:
+        total_lesson_hours = int(total_lesson_hours)
+    else:
+        total_lesson_hours = 0
+
+    # Format the total lesson hours with "hr" or "hrs"
+    total_lesson_hours_str = f"{total_lesson_hours} hr" if total_lesson_hours == 1 else f"{total_lesson_hours} hrs"
 
     paginator = Paginator(learningrecords, 10)  # Show 10 records per page
     page_number = request.GET.get('page')
@@ -1566,14 +1495,13 @@ def manage_learning_record(request):
         learn.save()
         print(learn.day)
 
-
     context = {
         'learningrecords': paginated_learningrecords,
         'teachers': teachers,
         'grades': [(str(i), chr(64 + i)) for i in range(1, 8)],  # Assuming grades are from 1 to 7
         'selected_teacher': selected_teacher,
         'selected_grade': selected_grade,
-        'total_lesson_hours': total_lesson_hours if total_lesson_hours else 0,
+        'total_lesson_hours': total_lesson_hours_str,
         'page_title': _('Manage Learning Records')
     }
 
@@ -1847,46 +1775,60 @@ def send_student_notification(request):
 
 @csrf_exempt
 def send_teacher_notification(request):
-    id = request.POST.get('id')
-    print(f"Teacher ID received: {id}")
-    message = request.POST.get('message')
-    course_id = request.POST.get('course_id')
-    print(f"Course ID received: {course_id}")
-
-    # Fetch the teacher and course objects
-    teacher = get_object_or_404(Teacher, admin_id=id)
-    course = get_object_or_404(Course, id=course_id)
-
-    # Fetch students enrolled in the course
-    students = Student.objects.filter(course=course)
-    print(f"Course: {course}")
-    print(f"Students: {students}")
-
-    # Find the first student with a valid birthdate
-    studentFirst = None
-    for student in students:
-        print(f"Checking student: {student.admin.full_name}, Birthdate: {student.date_of_birth}")
-        if student.date_of_birth:
-            studentFirst = student
-            break
-
-    if not studentFirst:
-        print("No student with a valid birthdate found.")
-        return HttpResponse("False")
-
-    def calculate_age(birthdate):
-        if birthdate == None:
-            age = 0
-        today = datetime.today()
-        age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
-        return age
-
-    # Create detailed message with student info
-    student_info = f"{studentFirst.admin.full_name} (Age: {calculate_age(studentFirst.date_of_birth)})"
-    detailed_message = f"Course: {course.name}\nStudents:\n{student_info}\n\nMessage: {message}"
-
     try:
-        # Prepare the notification body
+        id = request.POST.get('id')
+        message = request.POST.get('message')
+        course_id = request.POST.get('course_id')
+        student_id = request.POST.get('student_id')
+        classroom_performance = request.POST.get('classroom_performance')
+        status_pictures = request.FILES.get('status_pictures')
+
+        teacher = get_object_or_404(Teacher, admin_id=id)
+        course = get_object_or_404(Course, id=course_id)
+        student = get_object_or_404(Student, id=student_id)
+
+        # Handle the status picture file if it exists
+        notification = NotificationTeacher()
+        if status_pictures:
+            notification.status_pictures = status_pictures  # Set the image field
+
+        # def calculate_age(birthdate):
+        #     if birthdate is None:
+        #         return 0
+        #     today = timezone.now().date()
+        #     age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+        #     return age
+        def calculate_age(date_of_birth):
+            logger.debug("Calculating age...")
+            logger.debug("Date of Birth: %s", date_of_birth)
+
+            if date_of_birth is None:
+                logger.debug("Date of Birth is None. Returning age 0.")
+                return 0
+            
+            today = datetime.now().date()
+            logger.debug("Today's Date: %s", today)
+
+            age = today.year - date_of_birth.year - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
+            logger.debug("Calculated Age: %s", age)
+            
+            return age
+
+        student_info = f"{student.admin.full_name} (Age: {calculate_age(student.date_of_birth)})"
+        detailed_message = f"Course: {course.name}\nStudent:\n{student_info}\nMessage: {message}"
+
+        china_tz = pytz.timezone('Asia/Shanghai')
+        now = timezone.now().astimezone(china_tz)
+
+        notification.teacher = teacher
+        notification.message = detailed_message
+        notification.course = course
+        notification.student = student
+        notification.classroom_performance = classroom_performance
+        notification.date = now.date()
+        notification.time = now.time()
+        notification.save()
+
         url = "https://fcm.googleapis.com/fcm/send"
         body = {
             'notification': {
@@ -1902,22 +1844,9 @@ def send_teacher_notification(request):
             'Content-Type': 'application/json'
         }
         data = requests.post(url, data=json.dumps(body), headers=headers)
-        
-        # Set the timezone to China Standard Time
-        china_tz = pytz.timezone('Asia/Shanghai')
-        now = timezone.now().astimezone(china_tz)
-        
-        # Save the notification
-        notification = NotificationTeacher(
-            teacher=teacher,
-            message=detailed_message,
-            course=course,
-            student=studentFirst,
-            date=now.date(),
-            time=now.time()
-        )
-        notification.save()
+
         return HttpResponse("True")
+
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error while sending notification: {e}")
         return HttpResponse("False")

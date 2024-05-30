@@ -59,57 +59,47 @@
                 <td>{{ query.gender }}</td>
                 <th class="table-dark">{% trans "Date of Birth" %}</th>
                 <td>{{ query.date_of_birth }}</td>
-                <th class="table-dark">{% trans "Contact Details" %}</th>
+                <th class="table-dark">{% trans "Phone Number" %}</th>
                 <td>{{ query.phone_number }}</td>
               </tr>
               <tr>
-                <th class="table-dark">{% trans "Status" %}</th>
+                <th class="table-dark">{% trans "Campus" %}</th>
+                <td>{{ query.campus }}</td>
+                <th class="table-dark">{% trans "State" %}</th>
                 <td>{{ query.state }}</td>
-                <th class="table-dark">{% trans "Total Amount Paid" %}</th>
-                <td>{{ query.paid }}</td>
-                <th class="table-dark">{% trans "Refund Status" %}</th>
-                <td>{{ query.refunded }}</td>
+                <th class="table-dark">{% trans "Payment Status" %}</th>
+                <td>{{ query.payment_status }}</td>
               </tr>
               <tr>
-                <th class="table-dark">{% trans "Enrolment Date" %}</th>
-                <td>{{ query.reg_date}}</td>
+                <th class="table-dark">{% trans "Refunded" %}</th>
+                <td>{{ query.refunded }}</td>
+                <th class="table-dark">{% trans "Registration Date" %}</th>
+                <td>{{ query.reg_date }}</td>
                 <th class="table-dark">{% trans "Number of Classes" %}</th>
                 <td>{{ query.num_of_classes }}</td>
-                <th class="table-dark">{% trans "Enrolled Course" %}</th>
-                <td>{{ query.course }}</td>
               </tr>
               <tr>
-                <th style="background-color: black; color: white">{% trans "Lesson Hours Completed" %}</th>
+                <th class="table-dark">{% trans "Registered Courses" %}</th>
+                <td>{{ query.registered_courses }}</td>
+                <th class="table-dark">{% trans "Completed Hours" %}</th>
                 <td>{{ query.completed_hours }}</td>
-                <th class="table-dark">{% trans "Hours Paid for" %}</th>
-                <td>{{ query.paid_class_hours }}</td>
-                <th class="table-dark">{% trans "Hours Remaining" %}</th>
+                <th class="table-dark">{% trans "Remaining Hours" %}</th>
                 <td>{{ query.remaining_hours }}</td>
               </tr>
             </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-12">
-      <div class="card">
-        <div class="card-body">
-          <!-- Class Details Table -->
-          <table class="table table-bordered table-hover">
-            <thead class="thead-dark">
-              <tr>
-                <th>{% trans "Date" %}</th>
-                <th>{% trans "Course" %}</th>
-                <th>{% trans "Class Teacher" %}</th>
-                <th>{% trans "Starting Time" %}</th>
-                <th>{% trans "Ending Time" %}</th>
-                <th>{% trans "Lesson Hours" %}</th>
-              </tr>
-            </thead>
-            <tbody>
-              
+            <!-- Learning Records Table -->
+            <table class="table table-bordered table-hover table-sm">
+              <thead class="thead-light">
+                <tr>
+                  <th>{% trans "Date" %}</th>
+                  <th>{% trans "Course" %}</th>
+                  <th>{% trans "Instructor" %}</th>
+                  <th>{% trans "Start Time" %}</th>
+                  <th>{% trans "End Time" %}</th>
+                  <th>{% trans "Lesson Hours" %}</th>
+                </tr>
+              </thead>
+              <tbody>
                 <tr>
                   <td>{{ query.date }}</td>
                   <td>{{ query.course }}</td>
@@ -118,22 +108,40 @@
                   <td>{{ query.end_time }}</td>
                   <td>{{ query.lesson_hours }}</td>
                 </tr>
-              {% endfor %}
-
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+            <!-- Payment Records Table -->
+            <table class="table table-bordered table-hover table-sm">
+              <thead class="thead-light">
+                <tr>
+                  <th>{% trans "Paid" %}</th>
+                  <th>{% trans "Paid Class Hours" %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ query.paid }}</td>
+                  <td>{{ query.paid_class_hours }}</td>
+                </tr>
+              </tbody>
+            </table>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  {% else %}
-      <p>{% trans "No Student queries found." %}</p>
+    {% else %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="alert alert-info" role="alert">
+            {% trans "No queries found for the selected student." %}
+          </div>
+        </div>
+      </div>
     {% endif %}
+  </div>
 </section>
 
-{% block custom_js %}
-<script>
-  // Your custom JavaScript here
-</script>
-{% endblock custom_js %}
 {% endblock content %}

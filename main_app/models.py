@@ -168,8 +168,7 @@ class AttendanceReport(models.Model):
     student = models.ForeignKey(Student, on_delete=models.DO_NOTHING)
     attendance = models.ForeignKey(Attendance, on_delete=models.CASCADE)
     status = models.BooleanField(default=False)
-    hours_missed = models.PositiveIntegerField(default=0)  # Number of hours missed if absent
-    
+     
 class LeaveReportStudent(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     date = models.CharField(max_length=60)
@@ -205,6 +204,15 @@ class PaymentRecord(models.Model):
     STATUS_CHOICES = [
         ('Paid', 'Paid'),
         ('Refund', 'Refund'),
+        ('Completed', 'Completed'),
+        ('Pending', 'Pending'),
+    ]
+    
+    PAYMENT_METHOD_CHOICES = [
+        ('WeChat', 'WeChat'), 
+        ('AliPay', 'AliPay'), 
+        ('Bank Card', 'Bank Card'),
+        ('Other', 'Other'),
     ]
     
     date = models.DateField(default=timezone.now)
@@ -217,12 +225,12 @@ class PaymentRecord(models.Model):
     other_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     amount_due = models.DecimalField(max_digits=10, decimal_places=2)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_method = models.CharField(max_length=50)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Paid')
+    payment_method = models.CharField(max_length=50, choices=PAYMENT_METHOD_CHOICES)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
     payee = models.CharField(max_length=100)
     remark = models.TextField(null=True, blank=True)
     lesson_hours = models.IntegerField(default=0)
-    learning_record = models.ForeignKey('LearningRecord', on_delete=models.CASCADE, null=True, blank=True) #added recently
+    learning_record = models.ForeignKey('LearningRecord', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f"PaymentRecord for {self.student}"
@@ -246,18 +254,17 @@ class PaymentRecord(models.Model):
 class NotificationTeacher(models.Model):
     date = models.DateField(default=timezone.now)
     time = models.TimeField(default=timezone.now)
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    teacher = models.ForeignKey('Teacher', on_delete=models.CASCADE)
     message = models.TextField()
-    is_read = models.BooleanField(default=False)  # New field for marking notifications as read
-    course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True, blank=False)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True)
-    payment_record = models.ForeignKey(PaymentRecord, on_delete=models.CASCADE, null=True)
-    # New fields for classroom performance and status pictures
+    is_read = models.BooleanField(default=False)
+    course = models.ForeignKey('Course', on_delete=models.CASCADE, null=True, blank=False)
+    student = models.ForeignKey('Student', on_delete=models.CASCADE, null=True)
+    payment_record = models.ForeignKey('PaymentRecord', on_delete=models.CASCADE, null=True)
     classroom_performance = models.TextField(blank=True, null=True)
     status_pictures = models.ImageField(upload_to='status_pictures/', null=True, blank=True)
 
     def __str__(self):
-        return self.message
+          return self.message
 
 class RefundRecord(models.Model):
     # admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
@@ -368,6 +375,7 @@ def create_or_update_student_query(sender, instance, created, **kwargs):
         except IntegrityError as e:
             print(f"Error saving StudentQuery for {student}: {str(e)}")
 
+    
 # Register signal handlers
 post_save.connect(create_or_update_student_query, sender=Student)
 
@@ -388,17 +396,24 @@ def create_or_update_teacher_query(sender, instance, created, **kwargs):
         if related_learning_records.exists():
             teacher_query.learning_records = related_learning_records.first()
 
-        total_class_duration = sum(
-            (datetime.combine(datetime.today(), record.end_time) - datetime.combine(datetime.today(), record.start_time)).total_seconds()
-            for record in related_learning_records
-        )
+        total_class_duration = 0
+        for record in related_learning_records:
+            if record.start_time and record.end_time:  # Check if start_time and end_time are not None
+                duration = (datetime.combine(datetime.today(), record.end_time) - datetime.combine(datetime.today(), record.start_time)).total_seconds()
+                total_class_duration += duration
+
+                # Debugging: Print start_time, end_time, and duration for each record
+                print("Start Time:", record.start_time)
+                print("End Time:", record.end_time)
+                print("Duration:", duration)
+
+        # num_of_courses = teacher.courses.count()
         
-        num_of_courses = teacher.courses.count()
-        
-        teacher_query.num_of_classes = num_of_courses
+        # teacher_query.num_of_classes = num_of_courses
         teacher_query.completed_hours = total_class_duration // 3600  # Convert seconds to hours
 
         teacher_query.save()
+
 
 # Register signal handlers
 post_save.connect(create_or_update_teacher_query, sender=Teacher)

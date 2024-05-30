@@ -37,15 +37,12 @@
     }
 </style>
 <div class="container mt-5">
-    <!-- Card container -->
     <div class="card shadow-sm">
         <div class="card-header">
             <h3 class="card-title mb-0">{% trans 'Upload Excel File' %}</h3>
         </div>
         <div class="card-body">
             <p>{% trans 'Please choose an Excel file to upload and select the data model.' %}</p>
-
-            <!-- Form for file upload and model selection -->
             <form id="upload-form" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="form-group">
@@ -93,7 +90,7 @@ function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
         const cookies = document.cookie.split(';');
-        for (let i = 0; cookies.length; i++) {
+        for (let i = 0; i < cookies.length; i++) {
             const cookie = cookies[i].trim();
             if (cookie.substring(0, name.length + 1) === (name + '=')) {
                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
@@ -152,11 +149,12 @@ document.getElementById('excelFile').addEventListener('change', function() {
                   if (document.getElementById('modelSelect').value === 'Mixed' || document.getElementById('modelSelect').value === model || (document.getElementById('modelSelect').value === 'CustomUser' && (model === 'CustomUser' || model === userType))) {
                       var statusTable = '<h5>' + model + '</h5>';
                       statusTable += '<table class="table table-bordered">';
-                      statusTable += '<thead><tr><th>{% trans "Column Name" %}</th><th>{% trans "Status" %}</th></tr></thead>';
+                      statusTable += '<thead><tr><th>{% trans "Column Name" %}</th><th>{% trans "Status" %}</th><th>{% trans "Autofill" %}</th></tr></thead>';
                       statusTable += '<tbody>';
                       data.columns[model].forEach(col => {
                           var statusClass = col.status === 'exists' ? 'status-green' : (col.status === 'missing' ? 'status-red' : 'status-yellow');
-                          statusTable += `<tr class="${statusClass}"><td>${col.name}</td><td>${col.status === 'exists' ? '{% trans "Exists" %}' : (col.status === 'missing' ? '{% trans "Missing" %}' : '{% trans "Autofill" %}')}</td></tr>`;
+                          var autofill = col.status === 'autofill' ? `<button class="btn btn-link" onclick="confirmAutofill('${col.name}', '${col.autofill_from}')">{% trans "Confirm" %}</button>` : '';
+                          statusTable += `<tr class="${statusClass}"><td>${col.name}</td><td>${col.status === 'exists' ? '{% trans "Exists" %}' : (col.status === 'missing' ? '{% trans "Missing" %}' : '{% trans "Autofill" %}')}</td><td>${autofill}</td></tr>`;
                       });
                       statusTable += '</tbody></table>';
                       columnStatusDiv.innerHTML += statusTable;
@@ -169,6 +167,11 @@ document.getElementById('excelFile').addEventListener('change', function() {
           document.getElementById('column-status').innerHTML = '<p class="text-danger">{% trans "Error uploading the file." %}</p>';
       });
 });
+
+function confirmAutofill(column, autofillFrom) {
+    alert(`Autofill confirmed for ${column} using ${autofillFrom}`);
+    // Handle autofill confirmation logic here
+}
 
 document.getElementById('upload-form').addEventListener('submit', function(event) {
     var modelSelect = document.getElementById('modelSelect');

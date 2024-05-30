@@ -63,8 +63,10 @@
                         <div class="d-flex align-items-center">
                             <i class="nav-icon fas fa-pencil-alt" style="font-size: 24px; margin-right: 10px;"></i>
                             <h3 class="card-title" style="margin-right: 50px;">{% trans "Student's Learning Record" %}</h3>
-                        </div>  
-                        <h3 class="card-title">{% blocktrans %}Total Class Hours: {{ total_lesson_hours }}{% endblocktrans %}</h3>                         
+                        </div>
+                        <div class="d-flex align-items-center" style="margin-left: auto;">
+                            <h3 class="card-title" style="margin-right: 50px;">{% blocktrans %}Total Class Hours: {{ total_lesson_hours }}{% endblocktrans %}</h3>
+                        </div>
                         <div class="ml-auto">
                             <form method="get" action="{% url 'manage_learning_record' %}" class="form-inline">
                                 <select name="grade" id="gradeFilter" class="form-control">
@@ -83,8 +85,8 @@
                                 </select>
                                 <button type="submit" class="btn btn-success ml-2">{% trans "Filter" %}</button>
                             </form>
-                        </div>                     
-                    </div>
+                        </div>
+                    </div>                    
                     <!-- /.card-header -->
                     <div class="card-body table-container">
                         <table id="example2" class="table table-bordered table-hover">

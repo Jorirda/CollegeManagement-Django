@@ -21,8 +21,8 @@ from . import hod_views, teacher_views, student_views, views
 
 urlpatterns = [
 #hodviews
-    path('get_class_schedule/', hod_views.get_class_schedule, name='get_class_schedule'),
-    path('get_filtered_teachers/', hod_views.get_filtered_teachers, name='get_filtered_teachers'),
+    path('ajax/get-teachers/', hod_views.get_teachers, name='get_teachers'),
+    path('ajax/get-schedule/', hod_views.get_schedule, name='get_schedule'),
     path('renewals/', teacher_views.student_renewals, name='student_renewals'),
     path('renew_student/<int:student_id>/', teacher_views.renew_student, name='renew_student'),
     path('withdraw_student/<int:student_id>/', teacher_views.withdraw_student, name='withdraw_student'),
@@ -68,7 +68,7 @@ urlpatterns = [
     path("attendance/view/", hod_views.admin_view_attendance,name="admin_view_attendance",),
     path("attendance/fetch/", hod_views.get_admin_attendance,name='get_admin_attendance'),
     path('get_attendance_dates/', hod_views.get_attendance_dates, name='get_attendance_dates'),
-    path("upload", hod_views.get_upload,name='get_upload'),
+    path("upload/", hod_views.get_upload,name='get_upload'),
     path("result", hod_views.get_result,name='get_result'),
     path('check_columns/', hod_views.check_columns, name='check_columns'),
     path('refunds', hod_views.refund_records, name='refund_records'),
@@ -149,3 +149,6 @@ urlpatterns = [
     path('student/view/result/', student_views.student_view_result,name='student_view_result'),
 
 ]
+
+
+

@@ -249,12 +249,29 @@ class LearningRecordForm(FormSettings):
     end_time = forms.TimeField(required=False, label=_("End Time"), widget=forms.TimeInput(attrs={'readonly': 'readonly'}))
     lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"), disabled=True)
 
+    class Meta:
+        model = LearningRecord
+        fields = ['date', 'student', 'course', 'teacher', 'day', 'start_time', 'end_time', 'lesson_hours', 'semester']
+
     def __init__(self, *args, **kwargs):
         super(LearningRecordForm, self).__init__(*args, **kwargs)
         self.fields['course'].queryset = Course.objects.all()
 
-        if 'data' in kwargs:
-            course_id = kwargs['data'].get('course')
+        if self.data:
+            course_id = self.data.get('course')
+            teacher_id = self.data.get('teacher')
+
+            if course_id and teacher_id:
+                course = Course.objects.get(id=course_id)
+                teacher = Teacher.objects.get(id=teacher_id)
+                schedule = ClassSchedule.objects.filter(course=course, teacher=teacher).first()
+
+                if schedule:
+                    self.fields['day'].initial = schedule.get_day_display()
+                    self.fields['start_time'].initial = schedule.start_time
+                    self.fields['end_time'].initial = schedule.end_time
+                    self.fields['lesson_hours'].initial = schedule.lesson_hours
+
             if course_id:
                 self.fields['teacher'].queryset = Teacher.objects.filter(courses__id=course_id)
             else:
@@ -264,14 +281,20 @@ class LearningRecordForm(FormSettings):
 
     def save(self, commit=True):
         instance = super(LearningRecordForm, self).save(commit=False)
-        instance.classes = self.initial['classes']
+        course = self.cleaned_data.get('course')
+        teacher = self.cleaned_data.get('teacher')
+
+        if course and teacher:
+            schedule = ClassSchedule.objects.filter(course=course, teacher=teacher).first()
+            if schedule:
+                instance.day = schedule.get_day_display()
+                instance.start_time = schedule.start_time
+                instance.end_time = schedule.end_time
+                instance.lesson_hours = schedule.lesson_hours
+
         if commit:
             instance.save()
         return instance
-    
-    class Meta:
-        model = LearningRecord
-        fields = ['date', 'student', 'course', 'teacher', 'day', 'start_time', 'end_time', 'lesson_hours', 'semester']
 
 class PaymentRecordForm(FormSettings):
     payee = forms.CharField(label=_('Payee'))
@@ -279,17 +302,8 @@ class PaymentRecordForm(FormSettings):
     student = forms.ModelChoiceField(queryset=Student.objects.all(), required=False, label=_("Student"))
     course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False, label=_("Course"))
     date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': 'date'}), label=_('Date'))
-    payment_method = forms.ChoiceField(choices=[
-        ('WeChat', _('WeChat')), 
-        ('AliPay', _('AliPay')), 
-        ('Bank Card', _('Bank Card')),
-        ('Other', _('Other'))
-    ], label=_('Payment Method'))
-    status = forms.ChoiceField(choices=[
-        ('Completed', _('Completed')), 
-        ('Pending', _('Pending')), 
-        ('Refund', _('Refund'))
-    ], label=_('Status'))
+    payment_method = forms.ChoiceField(choices=PaymentRecord.PAYMENT_METHOD_CHOICES, label=_('Payment Method'))
+    status = forms.ChoiceField(choices=PaymentRecord.STATUS_CHOICES, label=_('Status'))
     lesson_unit_price = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Lesson Unit Price'))
     discounted_price = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Discounted Price'))
     book_costs = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Book Costs'))
@@ -298,14 +312,13 @@ class PaymentRecordForm(FormSettings):
     amount_paid = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Amount Paid'))
     lesson_hours = forms.DecimalField(required=False, decimal_places=0, max_digits=10, initial=0, label=_("Total Lesson Hours"))
 
-
     class Meta:
         model = PaymentRecord
         fields = [
-            _('date'), _('student'), 'course', _('lesson_unit_price'),
-            _('discounted_price'), _('book_costs'), _('other_fee'), _('amount_due'), _('amount_paid'), 
-            _('payment_method'), _('status'), _('payee'), _('remark'), _('lesson_hours')
-        ] # Ensures all model fields are included
+            'date', 'student', 'course', 'lesson_unit_price',
+            'discounted_price', 'book_costs', 'other_fee', 'amount_due', 'amount_paid', 
+            'payment_method', 'status', 'payee', 'remark', 'lesson_hours'
+        ] 
 
 class ClassScheduleForm(FormSettings):
     def get_level_grade_choices(self, course_id=None): 

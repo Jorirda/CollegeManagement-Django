@@ -67,6 +67,7 @@
                                     <th>{% trans "Date of Birth" %}</th>
                                     <th>{% trans "Address" %}</th>
                                     <th>{% trans "Phone Number" %}</th>
+                                    <th>{% trans "Courses" %}</th>  <!-- Added courses header -->
                                     <th>{% trans "Enrolment Date" %}</th>
                                     <th>{% trans "Status" %}</th>
                                     <th>{% trans "Remark" %}</th>
@@ -82,6 +83,15 @@
                                     <td>{{ student.date_of_birth }}</td>
                                     <td>{{ student.address }}</td>
                                     <td>{{ student.phone_number }}</td>
+                                    <td>
+                                        {% if student.courses %}
+                                            {% for course in student.courses.all %}
+                                                {{ course.name }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            {% trans "No courses selected for this student" %}
+                                        {% endif %}
+                                    </td>  <!-- Displaying courses associated with the student -->
                                     <td>{{ student.reg_date }}</td>
                                     <td>{{ student.status }}</td>
                                     <td>{{ student.remark }}</td>
@@ -93,22 +103,8 @@
                                 {% endfor %}
                             </tbody>
                         </table>
-                        <div class="pagination">
-                            <span class="step-links">
-                                {% if students.has_previous %}
-                                    <a href="?page=1">&laquo; first</a>
-                                    <a href="?page={{ students.previous_page_number }}">previous</a>
-                                {% endif %}
-                                <span class="current">
-                                    Page {{ students.number }} of {{ students.paginator.num_pages }}.
-                                </span>
-                                {% if students.has_next %}
-                                    <a href="?page={{ students.next_page_number }}">next</a>
-                                    <a href="?page={{ students.paginator.num_pages }}">last &raquo;</a>
-                                {% endif %}
-                            </span>
-                        </div>
-                    </div>
+                        <!-- Pagination -->
+                    </div>                    
                 </div>
             </div>
         </div>

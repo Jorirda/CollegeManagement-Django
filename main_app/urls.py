@@ -18,9 +18,11 @@ from django.urls import path
 from main_app.EditResultView import EditResultView
 
 from . import hod_views, teacher_views, student_views, views
+import generate
 
 urlpatterns = [
 #hodviews
+    path('process_data/', generate.process_data, name='process_data'),
     path('ajax/get-teachers/', hod_views.get_teachers, name='get_teachers'),
     path('ajax/get-schedule/', hod_views.get_schedule, name='get_schedule'),
     path('renewals/', teacher_views.student_renewals, name='student_renewals'),

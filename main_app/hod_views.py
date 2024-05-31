@@ -40,7 +40,15 @@ from django.shortcuts import render
 
 
 import logging
-
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("data_processing.log", encoding='utf-8'),  # Set encoding to 'utf-8'
+        logging.StreamHandler()
+    ]
+)
 logger = logging.getLogger(__name__)
 
 
@@ -69,10 +77,30 @@ def get_grade_choices(request):
         choices = []
     return JsonResponse({'choices': choices})
 
-# Specific column mapping rules for autofill
+# Specific column mapping rules for autofill based on model and user type
 SPECIFIC_COLUMN_MAPPING = {
-    '学生姓名': '姓名',
-    '授课老师': '姓名',
+    'CustomUser': {
+        'Teacher': {
+            '授课老师': '姓名'
+        },
+        'Student': {
+            '学生姓名': '姓名'
+        }
+    }
+}
+
+# Define required fields for each model
+REQUIRED_FIELDS = {
+    'CustomUser': ['姓名', '邮箱', '性别', '地址', '电话号码', '用户类型'],
+    'Student': ['学生姓名', '校区', '班级', '出生日期', '注册日期', '状态'],
+    'Teacher': ['授课老师', '班级', '校区', '工作类型'],
+    'Session': ['开始年份', '结束年份'],
+    'Campus': ['校区', '校长', '校长联系电话'],
+    'Course': ['班级', '班级概述', '开始级别', '结束级别', '图片'],
+    'ClassSchedule': ['班级', '课时单价', '教师', '年级', '开始时间', '结束时间', '课时', '备注'],
+    'LearningRecord': ['日期', '学生', '班级', '教师', '班级安排', '学期', '开始时间', '结束时间', '课时', '星期'],
+    'PaymentRecord': ['日期', '下次缴费时间\n（班级结束前1月）', '学生', '班级', '课时单价', '折后价格', '书本费', '其他费用', '应付金额', '缴费', '支付方式', '状态', '缴费人', '备注', '课时', '学习记录'],
+    'RefundRecord': ['学生', '学习记录', '付款记录', '退款金额', '已退款金额', '退款原因']
 }
 
 @csrf_exempt
@@ -106,20 +134,20 @@ def check_columns(request):
                     for col, field in expected_columns.items():
                         col_status = {
                             'name': col,
-                            'status': 'exists' if col in uploaded_columns else 'missing'
+                            'status': 'exists' if col in uploaded_columns else 'missing',
+                            'can_autofill': False,
+                            'can_use_fake_data': False
                         }
-
-                        # Check for potential autofill columns
                         if col_status['status'] == 'missing':
-                            # Check specific column mapping first
-                            if col in SPECIFIC_COLUMN_MAPPING and SPECIFIC_COLUMN_MAPPING[col] in uploaded_columns:
-                                col_status['status'] = 'autofill'
-                                col_status['autofill_from'] = SPECIFIC_COLUMN_MAPPING[col]
-                            else:
-                                similar_col = process.extractOne(col, uploaded_columns, scorer=fuzz.partial_ratio)
-                                if similar_col and similar_col[1] >= 80:  # 80 is the similarity threshold
+                            for uploaded_col in uploaded_columns:
+                                similarity_ratio = fuzz.ratio(col, uploaded_col)
+                                if similarity_ratio >= 80:
                                     col_status['status'] = 'autofill'
-                                    col_status['autofill_from'] = similar_col[0]
+                                    col_status['can_autofill'] = True
+                                    break
+
+                        if col_status['status'] == 'missing':
+                            col_status['can_use_fake_data'] = True
 
                         model_column_status.append(col_status)
 
@@ -130,6 +158,7 @@ def check_columns(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
 
 def get_upload(request):
     if request.method == 'POST':
@@ -161,6 +190,19 @@ def get_upload(request):
                 logger.info(f"Extra columns: {extra_columns}")
 
                 column_status = {col: 'missing' if col in missing_columns else 'extra' if col in extra_columns else 'match' for col in expected_columns}
+
+                # Check required fields
+                required_fields = REQUIRED_FIELDS.get(selected_model, [])
+                missing_required_fields = [field for field in required_fields if field not in actual_columns]
+
+                for field in missing_required_fields:
+                    column_status[field] = 'missing (required)'
+
+                # Handle autofill suggestions
+                for col in missing_columns:
+                    specific_mapping = SPECIFIC_COLUMN_MAPPING.get(selected_model, {}).get(user_type, {})
+                    if col in specific_mapping and specific_mapping[col] in actual_columns:
+                        column_status[specific_mapping[col]] = 'autofill'
 
                 context = {
                     'form': form,
@@ -381,6 +423,8 @@ def admin_get_teacher_class_schedules_count(request):
 
 
 #Admin
+from django.db.models import Count
+
 def admin_home(request):
     # Aggregate counts
     total_teacher = Teacher.objects.count()
@@ -404,9 +448,12 @@ def admin_home(request):
     course_name_list = []
     student_count_list_in_course = []
     for course in course_all:
-        students_count = Student.objects.filter(course_id=course.pk).count()
+        students_count = Student.objects.filter(courses=course).count()
         course_name_list.append(course.name)
+        print(course_name_list)
         student_count_list_in_course.append(students_count)
+        print(student_count_list_in_course)
+        
 
     # Attendance rate for each class schedule
     attendance_rate_list = []
@@ -415,7 +462,7 @@ def admin_home(request):
         total_students_in_class = Attendance.objects.filter(classes=class_obj).count()
         total_attendance_in_class = AttendanceReport.objects.filter(attendance__classes=class_obj, status=True).count()
         if total_students_in_class > 0:
-            attendance_rate = (total_attendance_in_class / total_students_in_class) * 1 
+            attendance_rate = (total_attendance_in_class / total_students_in_class) * 1
         else:
             attendance_rate = 0
         class_schedule_names_list.append(class_obj.course.name)
@@ -524,6 +571,7 @@ def admin_home(request):
     }
 
     return render(request, 'hod_template/home_content.html', context)
+
 
 def admin_view_profile(request):
     admin = get_object_or_404(Admin, admin=request.user)
@@ -719,7 +767,7 @@ def manage_teacher_query(request):
             teacher = teacher_query.teacher_records
             if teacher:
                 related_learning_records = LearningRecord.objects.filter(teacher=teacher)
-                num_of_classes = related_learning_records.count()  # Count the number of related learning records
+                num_of_classes = related_learning_records.count()
                 course_info = defaultdict(list)
                 teacher_info = {
                     'teacher_name': teacher_query.admin.full_name if teacher_query.admin else 'Unknown',
@@ -732,15 +780,18 @@ def manage_teacher_query(request):
                     'completed_hours': teacher_query.completed_hours if teacher_query.completed_hours is not None else 'Unknown',
                     'remaining_hours': teacher_query.remaining_hours if teacher_query.remaining_hours is not None else 'Unknown',
                 }
-                for learning_record in related_learning_records:
-                    course_info[learning_record.course.name].append({
-                        'date': learning_record.date,
-                        'course': learning_record.course.name,
-                        'instructor': learning_record.teacher.admin.full_name,
-                        'start_time': learning_record.start_time,
-                        'end_time': learning_record.end_time,
-                        'lesson_hours': learning_record.lesson_hours,
-                    })
+
+                for course in teacher.courses.all():
+                    course_records = related_learning_records.filter(course=course)
+                    for record in course_records:
+                        course_info[course.name].append({
+                            'date': record.date,
+                            'course': record.course.name,
+                            'instructor': record.teacher.admin.full_name,
+                            'start_time': record.start_time,
+                            'end_time': record.end_time,
+                            'lesson_hours': record.lesson_hours,
+                        })
 
                 for course, records in course_info.items():
                     teacher_query_info.append({
@@ -763,8 +814,6 @@ def manage_teacher_query(request):
         'page_title': 'Manage Teacher Queries'
     }
     return render(request, 'hod_template/manage_teacher_query.html', context)
-
-
 
 # def manage_teacher_query(request):
 #     teachers = CustomUser.objects.filter(user_type=2)
@@ -805,111 +854,59 @@ def manage_teacher_query(request):
 #     }
 #     return render(request, 'hod_template/manage_teacher_query.html', context)
 
-
 #Students
 def add_student(request):
     form = StudentForm(request.POST or None, request.FILES or None)
     context = {'form': form, 'page_title': _('Add Student')}
-    if request.method == 'POST':
-        if form.is_valid():
-            full_name = form.cleaned_data.get('full_name')
-            gender = form.cleaned_data.get('gender')
-            date_of_birth = form.cleaned_data.get('date_of_birth')
-            address = form.cleaned_data.get('address')
-            phone_number = form.cleaned_data.get('phone_number')
-            password = form.cleaned_data.get('password')
-            grade = form.cleaned_data.get('grade')
-            reg_date = form.cleaned_data.get('reg_date')
-            status = form.cleaned_data.get('status')
-            remark = form.cleaned_data.get('remark')
-            campus = form.cleaned_data.get('campus')
-            
-            # Generate a unique placeholder email if none is provided
-            email = form.cleaned_data.get('email')
-            if not email:
-                unique_id = uuid.uuid4()
-                email = f"{full_name.replace(' ', '').lower()}_{unique_id}@placeholder.com"
+    
+    if request.method == 'POST' and form.is_valid():
+        try:
+            full_name = form.cleaned_data['full_name']
+            gender = form.cleaned_data['gender']
+            email = form.cleaned_data.get('email') or f"{full_name.replace(' ', '').lower()}_{uuid.uuid4()}@placeholder.com"
+            password = form.cleaned_data['password']
 
-            try:
-                user = CustomUser.objects.create_user(
-                    email=email, password=password, user_type=3, full_name=full_name, profile_pic=None)
-                user.gender = gender
-                user.student.date_of_birth = date_of_birth
-                user.address = address
-                user.phone_number = phone_number
-                user.student.status = status
-                user.student.grade = grade
-                user.student.reg_date = reg_date
-                user.remark = remark
-                user.student.campus = campus
-                user.save()
-              
-                messages.success(request, "Successfully Added")
-                return redirect(reverse('add_student'))
-            except Exception as e:
-                messages.error(request, "Could Not Add: " + str(e))
-        else:
-            messages.error(request, "Could Not Add: ")
+            user = CustomUser.objects.create_user(email=email, password=password, user_type=3, full_name=full_name)
+            user.gender = gender
+            user.address = form.cleaned_data['address']
+            user.phone_number = form.cleaned_data['phone_number']
+            user.remark = form.cleaned_data['remark']
+            user.save()
+
+            student = Student.objects.create(
+                admin=user,
+                campus=form.cleaned_data['campus'],
+                date_of_birth=form.cleaned_data['date_of_birth'],
+                reg_date=form.cleaned_data['reg_date'],
+                status=form.cleaned_data['status'],
+            )
+            student.courses.set(form.cleaned_data['courses'])
+            student.save()
+
+            messages.success(request, "Successfully Added")
+            return redirect(reverse('add_student'))
+        except Exception as e:
+            messages.error(request, "Could Not Add: " + str(e))
+    
     return render(request, 'hod_template/add_student_template.html', context)
 
 def edit_student(request, student_id):
-    student = get_object_or_404(Student, admin=student_id)
+    student = get_object_or_404(Student, admin_id=student_id)
     form = StudentForm(request.POST or None, instance=student)
-    context = {
-        'form': form,
-        'student_id': student_id,
-        'page_title': _('Edit Student')
-    }
+    context = {'form': form, 'student_id': student_id, 'page_title': _('Edit Student')}
 
     if request.method == 'POST':
         if form.is_valid():
-            cleaned_data = form.cleaned_data
-            full_name = cleaned_data.get('full_name')
-            grade = cleaned_data.get('grade')
-            phone_number = cleaned_data.get('phone_number')
-            address = cleaned_data.get('address')
-            gender = cleaned_data.get('gender')
-            password = cleaned_data.get('password') or None
-            status = cleaned_data.get('status')
-            remark = cleaned_data.get('remark')
-            campus = form.cleaned_data.get('campus')
-
             try:
-                user = student.admin
-                # user.email = email
-
-                if password is not None:
-                    user.set_password(password)
-
-                # if passport is not None:
-                #     fs = FileSystemStorage()
-                #     filename = fs.save(passport.name, passport)
-                #     passport_url = fs.url(filename)
-                #     user.profile_pic = passport_url
-
-                user.phone_number = phone_number
-                user.full_name = full_name
-                user.gender = gender
-                user.address = address
-                user.remark = remark
-
-                student.status = status
-                student.grade = grade
-                student.campus = campus
-           
-                user.save()
-                student.save()
-
+                form.save()
                 messages.success(request, "Successfully Updated")
                 return redirect(reverse('edit_student', args=[student_id]))
             except Exception as e:
                 messages.error(request, "Could Not Update: " + str(e))
         else:
             messages.error(request, "Please fill the form properly")
-    else:
-        return render(request, "hod_template/edit_student_template.html", context)
 
-    return render(request, "hod_template/edit_student_template.html", context)
+    return render(request, 'hod_template/edit_student_template.html', context)
 
 def delete_student(request, student_id):
     student = get_object_or_404(CustomUser, id=student_id)
@@ -934,6 +931,7 @@ def manage_student(request):
             'reg_date': student_extra.reg_date if student_extra else None,
             'status': student_extra.status if student_extra else None,
             'remark': student.remark if student_extra else None,
+            'courses': student_extra.courses.all() if student_extra else None,  # Include courses
         })
 
     paginator = Paginator(combined_students, 10)  # Show 10 students per page
@@ -1239,7 +1237,7 @@ def add_payment_record(request):
             other_fee = form.cleaned_data.get('other_fee')
             amount_due = form.cleaned_data.get('amount_due')
             amount_paid = form.cleaned_data.get('amount_paid')
-            total_lesson_hours = form.cleaned_data.get('lesson_hours') or 0  # Ensure a default value if not provided
+            # total_lesson_hours = form.cleaned_data.get('lesson_hours') or 0  # Ensure a default value if not provided
             payment_method = form.cleaned_data.get('payment_method')
             status = form.cleaned_data.get('status')
             payee = form.cleaned_data.get('payee')
@@ -1259,18 +1257,6 @@ def add_payment_record(request):
                 next_payment_date = date + relativedelta(months=1)
 
             try:
-                # Retrieve all courses the student is enrolled in
-                learning_records = LearningRecord.objects.filter(student=student)
-                enrolled_courses = {record.course for record in learning_records}
-
-                total_class_hours = 0
-
-                # Calculate the total class hours for each course
-                for course in enrolled_courses:
-                    course_learning_records = learning_records.filter(course=course)
-                    course_hours = course_learning_records.aggregate(Sum('lesson_hours'))['lesson_hours__sum'] or 0
-                    total_class_hours += course_hours
-
                 # Create PaymentRecord instance and save it
                 payment = PaymentRecord(
                     date=date,
@@ -1304,7 +1290,7 @@ def add_payment_record(request):
                     semester=None,  # This can be set appropriately
                     start_time=None,
                     end_time=None,
-                    lesson_hours=str(total_lesson_hours) + " hours",  # Assuming lesson_hours is a string field
+                    # lesson_hours=str(total_lesson_hours) + " hours",  # Assuming lesson_hours is a string field
                     day=date.strftime("%A")  # Assuming day is the day of the week
                 )
 
@@ -1321,8 +1307,6 @@ def add_payment_record(request):
             messages.error(request, "Fill Form Properly")
 
     return render(request, 'hod_template/add_payment_record_template.html', context)
-
-
 
 def edit_payment_record(request, payment_id):
     paymentrecord = get_object_or_404(PaymentRecord, id=payment_id)
@@ -1344,7 +1328,7 @@ def edit_payment_record(request, payment_id):
             other_fee = form.cleaned_data.get('other_fee')
             amount_due = form.cleaned_data.get('amount_due')
             amount_paid = form.cleaned_data.get('amount_paid')
-            lesson_hours = form.cleaned_data.get('lesson_hours') or 0
+            # lesson_hours = form.cleaned_data.get('lesson_hours') or 0
             payment_method = form.cleaned_data.get('payment_method')
             status = form.cleaned_data.get('status')
             payee = form.cleaned_data.get('payee')
@@ -1367,7 +1351,7 @@ def edit_payment_record(request, payment_id):
                 paymentrecord.book_costs = book_costs
                 paymentrecord.other_fee = other_fee
                 paymentrecord.amount_due = amount_due
-                paymentrecord.lesson_hours = lesson_hours
+                # paymentrecord.lesson_hours = lesson_hours
                 paymentrecord.amount_paid = amount_paid
                 paymentrecord.payment_method = payment_method
                 paymentrecord.status = status

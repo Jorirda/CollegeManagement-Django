@@ -461,3 +461,926 @@ INFO 2024-05-30 17:10:54,164 models Learning Record Created/Updated: 11
 INFO 2024-05-30 17:11:16,726 models Learning Record Created/Updated: 26
 INFO 2024-05-30 17:11:22,563 models Learning Record Created/Updated: 26
 INFO 2024-05-30 17:12:12,022 models Learning Record Created/Updated: 27
+INFO 2024-05-31 08:48:49,182 hod_views Attendance data: {'present': 1, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-05-30'], 'leave_dates': []}
+INFO 2024-05-31 08:55:28,293 models Learning Record Created/Updated: 26
+INFO 2024-05-31 08:55:28,324 models Learning Record Created/Updated: 27
+INFO 2024-05-31 08:55:39,059 models Learning Record Created/Updated: 26
+INFO 2024-05-31 08:56:04,859 models Learning Record Created/Updated: 26
+ERROR 2024-05-31 09:00:20,537 log Internal Server Error: /en/payment/add
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 1228, in add_payment_record
+    form = PaymentRecordForm(request.POST or None)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\forms.py", line 333, in __init__
+    self.fields['total_lesson_hours'].initial = total_class_hours
+KeyError: 'total_lesson_hours'
+ERROR 2024-05-31 09:00:20,540 basehttp "POST /en/payment/add HTTP/1.1" 500 75058
+WARNING 2024-05-31 09:00:20,864 log Not Found: /favicon.ico
+WARNING 2024-05-31 09:00:20,865 basehttp "GET /favicon.ico HTTP/1.1" 404 2709
+ERROR 2024-05-31 09:04:30,137 hod_views Error processing file: Reverse for 'process_data' not found. 'process_data' is not a valid view function or pattern name.
+ERROR 2024-05-31 09:04:30,315 log Internal Server Error: /en/upload/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 204, in get_upload
+    return render(request, 'hod_template/upload.html', context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 170, in render
+    return self._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 150, in render
+    return compiled_parent._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 62, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 446, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\base.py", line 87, in reverse
+    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\resolvers.py", line 685, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'process_data' not found. 'process_data' is not a valid view function or pattern name.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 209, in get_upload
+    return render(request, 'hod_template/upload.html', context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 170, in render
+    return self._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 150, in render
+    return compiled_parent._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 62, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 446, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\base.py", line 87, in reverse
+    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\resolvers.py", line 685, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'process_data' not found. 'process_data' is not a valid view function or pattern name.
+ERROR 2024-05-31 09:04:30,329 basehttp "POST /en/upload/ HTTP/1.1" 500 328169
+WARNING 2024-05-31 09:04:30,666 log Not Found: /favicon.ico
+WARNING 2024-05-31 09:04:30,667 basehttp "GET /favicon.ico HTTP/1.1" 404 2709
+ERROR 2024-05-31 09:07:34,052 log Internal Server Error: /en/upload/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 214, in get_upload
+    return render(request, 'hod_template/upload.html', {'form': form})
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 170, in render
+    return self._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 150, in render
+    return compiled_parent._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 62, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 446, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\base.py", line 87, in reverse
+    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\resolvers.py", line 685, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'process_data' not found. 'process_data' is not a valid view function or pattern name.
+ERROR 2024-05-31 09:07:34,064 basehttp "GET /en/upload/ HTTP/1.1" 500 175064
+ERROR 2024-05-31 09:07:36,344 log Internal Server Error: /en/upload/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 214, in get_upload
+    return render(request, 'hod_template/upload.html', {'form': form})
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 170, in render
+    return self._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 150, in render
+    return compiled_parent._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 62, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 446, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\base.py", line 87, in reverse
+    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\resolvers.py", line 685, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'process_data' not found. 'process_data' is not a valid view function or pattern name.
+ERROR 2024-05-31 09:07:36,354 basehttp "GET /en/upload/ HTTP/1.1" 500 175201
+ERROR 2024-05-31 09:07:37,157 log Internal Server Error: /en/upload/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 214, in get_upload
+    return render(request, 'hod_template/upload.html', {'form': form})
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 170, in render
+    return self._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 150, in render
+    return compiled_parent._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 62, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 446, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\base.py", line 87, in reverse
+    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\resolvers.py", line 685, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'process_data' not found. 'process_data' is not a valid view function or pattern name.
+ERROR 2024-05-31 09:07:37,165 basehttp "GET /en/upload/ HTTP/1.1" 500 175201
+ERROR 2024-05-31 09:07:38,409 log Internal Server Error: /en/upload/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 214, in get_upload
+    return render(request, 'hod_template/upload.html', {'form': form})
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 170, in render
+    return self._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 150, in render
+    return compiled_parent._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 62, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 446, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\base.py", line 87, in reverse
+    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\resolvers.py", line 685, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'process_data' not found. 'process_data' is not a valid view function or pattern name.
+ERROR 2024-05-31 09:07:38,417 basehttp "GET /en/upload/ HTTP/1.1" 500 175201
+INFO 2024-05-31 09:09:45,917 models Learning Record Created/Updated: 28
+INFO 2024-05-31 09:10:02,156 models Learning Record Created/Updated: 28
+INFO 2024-05-31 09:10:50,240 models Learning Record Created/Updated: 28
+INFO 2024-05-31 09:10:53,919 models Learning Record Created/Updated: 28
+INFO 2024-05-31 09:21:36,232 hod_views Attendance data: {'present': 1, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-05-30'], 'leave_dates': []}
+INFO 2024-05-31 09:29:48,499 models Learning Record Created/Updated: 28
+WARNING 2024-05-31 09:30:36,300 log Not Found: /en/teacher/view_attendance/
+WARNING 2024-05-31 09:30:36,301 basehttp "GET /en/teacher/view_attendance/?attendance_id=2 HTTP/1.1" 404 1811
+ERROR 2024-05-31 09:31:09,787 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+INFO 2024-05-31 09:31:16,510 hod_views Attendance data: {'present': 1, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-05-30'], 'leave_dates': []}
+INFO 2024-05-31 09:48:41,352 models Learning Record Created/Updated: 28
+INFO 2024-05-31 10:02:06,871 models Learning Record Created/Updated: 28
+ERROR 2024-05-31 10:06:15,769 log Internal Server Error: /en/payment/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 1465, in manage_payment_record
+    return render(request, 'hod_template/manage_payment_record.html', context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 170, in render
+    return self._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 150, in render
+    return compiled_parent._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 62, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 211, in render
+    nodelist.append(node.render_annotated(context))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 446, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\base.py", line 87, in reverse
+    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\resolvers.py", line 685, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'edit_payment_record' with arguments '('',)' not found. 1 pattern(s) tried: ['en/payment/edit/(?P<payment_id>[0-9]+)$']
+ERROR 2024-05-31 10:06:15,779 basehttp "GET /en/payment/manage/ HTTP/1.1" 500 192230
+WARNING 2024-05-31 10:06:16,250 log Not Found: /favicon.ico
+WARNING 2024-05-31 10:06:16,250 basehttp "GET /favicon.ico HTTP/1.1" 404 2709
+ERROR 2024-05-31 10:28:59,276 log Internal Server Error: /en/payment/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 1453, in manage_payment_record
+    ' total_class_hours':  total_class_hours if total_amount_paid else 0,
+NameError: name 'total_class_hours' is not defined
+ERROR 2024-05-31 10:28:59,278 basehttp "GET /en/payment/manage/ HTTP/1.1" 500 68369
+ERROR 2024-05-31 10:29:25,881 log Internal Server Error: /en/payment/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 1453, in manage_payment_record
+    ' total_class_hours':  total_class_hours if total_amount_paid else 0,
+NameError: name 'total_class_hours' is not defined
+ERROR 2024-05-31 10:29:25,883 basehttp "GET /en/payment/manage/ HTTP/1.1" 500 68369
+ERROR 2024-05-31 10:29:27,081 log Internal Server Error: /en/payment/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 1453, in manage_payment_record
+    ' total_class_hours':  total_class_hours if total_amount_paid else 0,
+NameError: name 'total_class_hours' is not defined
+ERROR 2024-05-31 10:29:27,083 basehttp "GET /en/payment/manage/ HTTP/1.1" 500 68369
+INFO 2024-05-31 10:30:36,312 models Learning Record Created/Updated: 28
+INFO 2024-05-31 10:30:55,919 models Learning Record Created/Updated: 28
+INFO 2024-05-31 10:30:58,544 models Learning Record Created/Updated: 28
+INFO 2024-05-31 10:31:29,095 models Learning Record Created/Updated: 28
+INFO 2024-05-31 10:31:45,708 models Learning Record Created/Updated: 28
+INFO 2024-05-31 11:02:45,026 hod_views Attendance data: {'present': 1, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-05-30'], 'leave_dates': []}
+ERROR 2024-05-31 11:19:56,275 log Internal Server Error: /en/calculate_lesson_hours/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+TypeError: calculate_lesson_hours() missing 1 required positional argument: 'end_time'
+ERROR 2024-05-31 11:19:56,277 basehttp "GET /en/calculate_lesson_hours/?student_id=1 HTTP/1.1" 500 63742
+INFO 2024-05-31 11:20:06,614 models Learning Record Created/Updated: 28
+INFO 2024-05-31 11:20:20,797 models Learning Record Created/Updated: 29
+INFO 2024-05-31 11:20:23,338 models Learning Record Created/Updated: 28
+INFO 2024-05-31 11:20:23,360 models Learning Record Created/Updated: 29
+ERROR 2024-05-31 11:23:41,275 log Internal Server Error: /en/calculate_lesson_hours/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+TypeError: calculate_lesson_hours() missing 1 required positional argument: 'end_time'
+ERROR 2024-05-31 11:23:41,277 basehttp "GET /en/calculate_lesson_hours/?student_id=1 HTTP/1.1" 500 63742
+ERROR 2024-05-31 11:24:53,548 log Internal Server Error: /en/calculate_lesson_hours/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+TypeError: calculate_lesson_hours() missing 1 required positional argument: 'end_time'
+ERROR 2024-05-31 11:24:53,550 basehttp "GET /en/calculate_lesson_hours/?student_id=1 HTTP/1.1" 500 63742
+ERROR 2024-05-31 11:28:10,040 log Internal Server Error: /en/calculate_lesson_hours/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+TypeError: calculate_lesson_hours() missing 1 required positional argument: 'end_time'
+ERROR 2024-05-31 11:28:10,042 basehttp "GET /en/calculate_lesson_hours/?student_id=1 HTTP/1.1" 500 63742
+ERROR 2024-05-31 11:32:54,227 log Internal Server Error: /en/calculate_lesson_hours/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+TypeError: calculate_lesson_hours() missing 1 required positional argument: 'end_time'
+ERROR 2024-05-31 11:32:54,230 basehttp "GET /en/calculate_lesson_hours/?student_id=1 HTTP/1.1" 500 63742
+ERROR 2024-05-31 11:33:33,113 log Internal Server Error: /en/calculate_lesson_hours/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+TypeError: calculate_lesson_hours() missing 1 required positional argument: 'end_time'
+ERROR 2024-05-31 11:33:33,114 basehttp "GET /en/calculate_lesson_hours/?student_id=1 HTTP/1.1" 500 63742
+ERROR 2024-05-31 11:56:17,673 log Internal Server Error: /en/payment/edit/15
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 1384, in edit_payment_record
+    if form.is_valid():
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\forms\forms.py", line 177, in is_valid
+    return self.is_bound and not self.errors
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\forms\forms.py", line 172, in errors
+    self.full_clean()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\forms\forms.py", line 375, in full_clean
+    self._clean_form()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\forms\forms.py", line 402, in _clean_form
+    cleaned_data = self.clean()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\forms.py", line 345, in clean
+    lesson_unit_price = amount_due / total_class_hours
+TypeError: unsupported operand type(s) for /: 'decimal.Decimal' and 'float'
+ERROR 2024-05-31 11:56:17,677 basehttp "POST /en/payment/edit/15 HTTP/1.1" 500 91945
+ERROR 2024-05-31 12:56:06,376 log Internal Server Error: /en/payment/edit/15
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 1401, in edit_payment_record
+    lesson_unit_price = amount_due / total_lesson_hours
+NameError: name 'total_lesson_hours' is not defined
+ERROR 2024-05-31 12:56:06,379 basehttp "POST /en/payment/edit/15 HTTP/1.1" 500 73215
+ERROR 2024-05-31 12:57:05,289 log Internal Server Error: /en/payment/edit/15
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 1401, in edit_payment_record
+    lesson_unit_price = amount_due / lesson_hours
+decimal.DivisionByZero: [<class 'decimal.DivisionByZero'>]
+ERROR 2024-05-31 12:57:05,293 basehttp "POST /en/payment/edit/15 HTTP/1.1" 500 73215
+ERROR 2024-05-31 13:15:08,812 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+ERROR 2024-05-31 13:15:17,297 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+INFO 2024-05-31 13:15:24,920 hod_views Attendance data: {'present': 1, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-05-30'], 'leave_dates': []}
+INFO 2024-05-31 13:23:30,986 models Learning Record Created/Updated: 28
+INFO 2024-05-31 13:23:31,009 models Learning Record Created/Updated: 29
+INFO 2024-05-31 13:24:30,627 models Learning Record Created/Updated: 30
+INFO 2024-05-31 13:24:38,832 models Learning Record Created/Updated: 28
+INFO 2024-05-31 13:24:38,856 models Learning Record Created/Updated: 29
+INFO 2024-05-31 13:24:38,887 models Learning Record Created/Updated: 30
+INFO 2024-05-31 13:25:00,044 models Learning Record Created/Updated: 28
+INFO 2024-05-31 13:25:00,076 models Learning Record Created/Updated: 29
+INFO 2024-05-31 13:25:00,104 models Learning Record Created/Updated: 30
+INFO 2024-05-31 13:25:08,051 models Learning Record Created/Updated: 30
+INFO 2024-05-31 13:25:19,287 models Learning Record Created/Updated: 28
+INFO 2024-05-31 13:25:19,317 models Learning Record Created/Updated: 29
+INFO 2024-05-31 13:25:19,352 models Learning Record Created/Updated: 30
+INFO 2024-05-31 13:25:22,820 models Learning Record Created/Updated: 28
+INFO 2024-05-31 13:25:22,847 models Learning Record Created/Updated: 30
+INFO 2024-05-31 13:25:25,244 models Learning Record Created/Updated: 30
+INFO 2024-05-31 13:29:23,493 models Learning Record Created/Updated: 30
+INFO 2024-05-31 13:30:46,021 models Learning Record Created/Updated: 30
+ERROR 2024-05-31 13:45:09,557 log Internal Server Error: /en/learn/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 1524, in manage_learning_record
+    5: _('Saturday'),
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\base.py", line 753, in save
+    self.save_base(using=using, force_insert=force_insert,
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\base.py", line 801, in save_base
+    post_save.send(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\dispatch\dispatcher.py", line 177, in send
+    return [
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\dispatch\dispatcher.py", line 178, in <listcomp>
+    (receiver, receiver(signal=self, sender=sender, **named))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\models.py", line 356, in create_or_update_student_query
+    student_query.paid_class_hours = payment_record_instance.lesson_hours
+AttributeError: 'PaymentRecord' object has no attribute 'lesson_hours'
+ERROR 2024-05-31 13:45:09,563 basehttp "GET /en/learn/manage/ HTTP/1.1" 500 95719
+WARNING 2024-05-31 13:45:10,089 log Not Found: /favicon.ico
+WARNING 2024-05-31 13:45:10,090 basehttp "GET /favicon.ico HTTP/1.1" 404 2709
+INFO 2024-05-31 13:48:32,889 models Learning Record Created/Updated: 30
+ERROR 2024-05-31 14:04:29,737 generate Error processing data: the JSON object must be str, bytes or bytearray, not NoneType
+INFO 2024-05-31 14:05:23,600 models Learning Record Created/Updated: 30
+INFO 2024-05-31 14:06:05,991 models Learning Record Created/Updated: 30
+INFO 2024-05-31 14:08:37,120 models Learning Record Created/Updated: 30
+ERROR 2024-05-31 14:16:25,424 log Internal Server Error: /en/admin/home/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 456, in admin_home
+    students_count = Student.objects.filter(course_id=course.pk).count()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 942, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 962, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 969, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1358, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1377, in _add_q
+    child_clause, needed_inner = self.build_filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1258, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1084, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1481, in names_to_path
+    raise FieldError("Cannot resolve keyword '%s' into field. "
+django.core.exceptions.FieldError: Cannot resolve keyword 'course_id' into field. Choices are: admin, admin_id, attendancereport, campus, campus_id, courses, date_of_birth, id, learningrecord, leavereportstudent, notificationstudent, notificationteacher, paymentrecord, refundrecord, reg_date, status, studentquery, summaryteacher
+ERROR 2024-05-31 14:16:25,428 basehttp "GET /en/admin/home/ HTTP/1.1" 500 114792
+INFO 2024-05-31 14:16:42,741 models Learning Record Created/Updated: 30
+INFO 2024-05-31 14:16:57,632 models Learning Record Created/Updated: 31
+INFO 2024-05-31 14:17:00,576 models Learning Record Created/Updated: 30
+INFO 2024-05-31 14:17:00,601 models Learning Record Created/Updated: 31
+ERROR 2024-05-31 14:29:31,559 log Internal Server Error: /en/admin/home/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 456, in admin_home
+    students_count = Student.objects.filter(course_id=course.pk).count()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 942, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 962, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 969, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1358, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1377, in _add_q
+    child_clause, needed_inner = self.build_filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1258, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1084, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1481, in names_to_path
+    raise FieldError("Cannot resolve keyword '%s' into field. "
+django.core.exceptions.FieldError: Cannot resolve keyword 'course_id' into field. Choices are: admin, admin_id, attendancereport, campus, campus_id, courses, date_of_birth, id, learningrecord, leavereportstudent, notificationstudent, notificationteacher, paymentrecord, refundrecord, reg_date, status, studentquery, summaryteacher
+ERROR 2024-05-31 14:29:31,566 basehttp "GET /en/admin/home/ HTTP/1.1" 500 114724
+ERROR 2024-05-31 14:29:37,189 log Internal Server Error: /en/admin/home/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 456, in admin_home
+    students_count = Student.objects.filter(course_id=course.pk).count()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 942, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 962, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 969, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1358, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1377, in _add_q
+    child_clause, needed_inner = self.build_filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1258, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1084, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1481, in names_to_path
+    raise FieldError("Cannot resolve keyword '%s' into field. "
+django.core.exceptions.FieldError: Cannot resolve keyword 'course_id' into field. Choices are: admin, admin_id, attendancereport, campus, campus_id, courses, date_of_birth, id, learningrecord, leavereportstudent, notificationstudent, notificationteacher, paymentrecord, refundrecord, reg_date, status, studentquery, summaryteacher
+ERROR 2024-05-31 14:29:37,192 basehttp "GET /en/admin/home/ HTTP/1.1" 500 114559
+ERROR 2024-05-31 14:30:28,455 log Internal Server Error: /en/admin/home/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 456, in admin_home
+    students_count = Student.objects.filter(course_id=course.pk).count()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 942, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 962, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 969, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1358, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1377, in _add_q
+    child_clause, needed_inner = self.build_filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1258, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1084, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1481, in names_to_path
+    raise FieldError("Cannot resolve keyword '%s' into field. "
+django.core.exceptions.FieldError: Cannot resolve keyword 'course_id' into field. Choices are: admin, admin_id, attendancereport, campus, campus_id, courses, date_of_birth, id, learningrecord, leavereportstudent, notificationstudent, notificationteacher, paymentrecord, refundrecord, reg_date, status, studentquery, summaryteacher
+ERROR 2024-05-31 14:30:28,460 basehttp "GET /en/admin/home/ HTTP/1.1" 500 114724
+ERROR 2024-05-31 14:30:37,519 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+ERROR 2024-05-31 14:30:43,013 log Internal Server Error: /en/admin/home/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 456, in admin_home
+    students_count = Student.objects.filter(course_id=course.pk).count()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 942, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 962, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 969, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1358, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1377, in _add_q
+    child_clause, needed_inner = self.build_filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1258, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1084, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1481, in names_to_path
+    raise FieldError("Cannot resolve keyword '%s' into field. "
+django.core.exceptions.FieldError: Cannot resolve keyword 'course_id' into field. Choices are: admin, admin_id, attendancereport, campus, campus_id, courses, date_of_birth, id, learningrecord, leavereportstudent, notificationstudent, notificationteacher, paymentrecord, refundrecord, reg_date, status, studentquery, summaryteacher
+ERROR 2024-05-31 14:30:43,018 basehttp "GET /en/admin/home/ HTTP/1.1" 500 114850
+ERROR 2024-05-31 14:31:44,745 log Internal Server Error: /en/admin/home/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 456, in admin_home
+    students_count = Student.objects.filter(course_id=course.pk).count()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 942, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 962, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 969, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1358, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1377, in _add_q
+    child_clause, needed_inner = self.build_filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1258, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1084, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1481, in names_to_path
+    raise FieldError("Cannot resolve keyword '%s' into field. "
+django.core.exceptions.FieldError: Cannot resolve keyword 'course_id' into field. Choices are: admin, admin_id, attendancereport, campus, campus_id, courses, date_of_birth, id, learningrecord, leavereportstudent, notificationstudent, notificationteacher, paymentrecord, refundrecord, reg_date, status, studentquery, summaryteacher
+ERROR 2024-05-31 14:31:44,750 basehttp "GET /en/admin/home/ HTTP/1.1" 500 114726
+ERROR 2024-05-31 14:34:51,533 generate Error processing data: the JSON object must be str, bytes or bytearray, not NoneType
+ERROR 2024-05-31 14:42:29,990 hod_views Error retrieving student queries: Cannot resolve keyword 'student_query' into field. Choices are: course, course_id, date, day, end_time, id, lesson_hours, paymentquery, paymentrecord, refundrecord, schedule_record, schedule_record_id, semester, semester_id, start_time, student, student_id, studentquery, teacher, teacher_id, teacherquery
+ERROR 2024-05-31 14:42:33,155 hod_views Error retrieving student queries: Cannot resolve keyword 'student_query' into field. Choices are: course, course_id, date, day, end_time, id, lesson_hours, paymentquery, paymentrecord, refundrecord, schedule_record, schedule_record_id, semester, semester_id, start_time, student, student_id, studentquery, teacher, teacher_id, teacherquery
+ERROR 2024-05-31 14:42:55,645 log Internal Server Error: /en/admin/home/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 456, in admin_home
+    students_count = Student.objects.filter(course_id=course.pk).count()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 942, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 962, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 969, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1358, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1377, in _add_q
+    child_clause, needed_inner = self.build_filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1258, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1084, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1481, in names_to_path
+    raise FieldError("Cannot resolve keyword '%s' into field. "
+django.core.exceptions.FieldError: Cannot resolve keyword 'course_id' into field. Choices are: admin, admin_id, attendancereport, campus, campus_id, courses, date_of_birth, id, learningrecord, leavereportstudent, notificationstudent, notificationteacher, paymentrecord, refundrecord, reg_date, status, studentquery, summaryteacher
+ERROR 2024-05-31 14:42:55,650 basehttp "GET /en/admin/home/ HTTP/1.1" 500 114850
+ERROR 2024-05-31 14:48:59,035 hod_views Error retrieving student queries: Cannot query "Student 1": Must be "Student" instance.
+ERROR 2024-05-31 14:49:02,206 hod_views Error retrieving student queries: Cannot query "Student 1": Must be "Student" instance.
+ERROR 2024-05-31 14:49:07,037 hod_views Error retrieving student queries: Cannot query "Student 1": Must be "Student" instance.
+ERROR 2024-05-31 14:50:29,358 hod_views Error retrieving student queries: Cannot query "Student 1": Must be "Student" instance.
+ERROR 2024-05-31 14:50:33,123 hod_views Error retrieving student queries: Cannot query "Student 1": Must be "Student" instance.
+ERROR 2024-05-31 14:50:47,282 hod_views Error retrieving student queries: Cannot query "Student 1": Must be "Student" instance.
+ERROR 2024-05-31 14:50:50,784 log Internal Server Error: /en/admin/home/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 456, in admin_home
+    students_count = Student.objects.filter(course_id=course.pk).count()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 942, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 962, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 969, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1358, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1377, in _add_q
+    child_clause, needed_inner = self.build_filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1258, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1084, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1481, in names_to_path
+    raise FieldError("Cannot resolve keyword '%s' into field. "
+django.core.exceptions.FieldError: Cannot resolve keyword 'course_id' into field. Choices are: admin, admin_id, attendancereport, campus, campus_id, courses, date_of_birth, id, learningrecord, leavereportstudent, notificationstudent, notificationteacher, paymentrecord, refundrecord, reg_date, status, studentquery, summaryteacher
+ERROR 2024-05-31 14:50:50,789 basehttp "GET /en/admin/home/ HTTP/1.1" 500 114739
+ERROR 2024-05-31 14:52:15,277 hod_views Error retrieving student queries: Cannot query "Student 1": Must be "Student" instance.
+ERROR 2024-05-31 14:52:19,171 hod_views Error retrieving student queries: Cannot query "Student 1": Must be "Student" instance.
+ERROR 2024-05-31 14:53:19,262 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+ERROR 2024-05-31 14:53:38,110 log Internal Server Error: /en/get_class_schedules/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\fields\__init__.py", line 1774, in get_prep_value
+    return int(value)
+ValueError: invalid literal for int() with base 10: ''
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 173, in get_class_schedules
+    class_schedules = ClassSchedule.objects.filter(course_id=course_id)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 942, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 962, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 969, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1358, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1377, in _add_q
+    child_clause, needed_inner = self.build_filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1319, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1165, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\lookups.py", line 24, in __init__
+    self.rhs = self.get_prep_lookup()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\fields\related_lookups.py", line 115, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\fields\__init__.py", line 1776, in get_prep_value
+    raise e.__class__(
+ValueError: Field 'id' expected a number but got ''.
+ERROR 2024-05-31 14:53:38,118 basehttp "GET /en/get_class_schedules/?course_id= HTTP/1.1" 500 126374
+ERROR 2024-05-31 14:53:42,081 hod_views Error retrieving student queries: Cannot query "Student 1": Must be "Student" instance.
+ERROR 2024-05-31 14:54:11,381 hod_views Error retrieving student queries: Cannot query "Student 1": Must be "Student" instance.
+ERROR 2024-05-31 14:54:14,039 hod_views Error retrieving student queries: Cannot query "Student 1": Must be "Student" instance.
+ERROR 2024-05-31 14:55:27,273 log Internal Server Error: /en/student/query
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 1015, in manage_student_query
+    if selected_student_id:
+NameError: name 'selected_student_id' is not defined
+ERROR 2024-05-31 14:55:27,280 basehttp "GET /en/student/query?student_id=2 HTTP/1.1" 500 67697
+INFO 2024-05-31 14:58:30,612 hod_views Attendance data: {'present': 1, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-05-30'], 'leave_dates': []}
+ERROR 2024-05-31 15:16:44,187 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+ERROR 2024-05-31 15:16:44,865 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+ERROR 2024-05-31 15:16:52,365 log Internal Server Error: /en/admin/home/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 449, in admin_home
+    students_count = Student.objects.filter(course_id=course.pk).count()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 942, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 962, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 969, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1358, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1377, in _add_q
+    child_clause, needed_inner = self.build_filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1258, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1084, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1481, in names_to_path
+    raise FieldError("Cannot resolve keyword '%s' into field. "
+django.core.exceptions.FieldError: Cannot resolve keyword 'course_id' into field. Choices are: admin, admin_id, attendancereport, campus, campus_id, courses, date_of_birth, id, learningrecord, leavereportstudent, notificationstudent, notificationteacher, paymentrecord, refundrecord, reg_date, status, studentquery, summaryteacher
+ERROR 2024-05-31 15:16:52,379 basehttp "GET /en/admin/home/ HTTP/1.1" 500 114850
+ERROR 2024-05-31 15:19:50,085 log Internal Server Error: /en/admin/home/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 449, in admin_home
+    students_count = Student.objects.filter(course_id=course.pk).count()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 942, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 962, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 969, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1358, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1377, in _add_q
+    child_clause, needed_inner = self.build_filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1258, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1084, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1481, in names_to_path
+    raise FieldError("Cannot resolve keyword '%s' into field. "
+django.core.exceptions.FieldError: Cannot resolve keyword 'course_id' into field. Choices are: admin, admin_id, attendancereport, campus, campus_id, courses, date_of_birth, id, learningrecord, leavereportstudent, notificationstudent, notificationteacher, paymentrecord, refundrecord, reg_date, status, studentquery, summaryteacher
+ERROR 2024-05-31 15:19:50,090 basehttp "GET /en/admin/home/ HTTP/1.1" 500 114559
+INFO 2024-05-31 15:23:36,469 hod_views Attendance data: {'present': 1, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-05-30'], 'leave_dates': []}
+INFO 2024-05-31 15:42:07,620 hod_views Attendance data: {'present': 1, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-05-30'], 'leave_dates': []}
+INFO 2024-05-31 15:44:11,611 hod_views Attendance data: {'present': 1, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-05-30'], 'leave_dates': []}
+INFO 2024-05-31 15:50:28,146 hod_views Attendance data: {'present': 1, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-05-30'], 'leave_dates': []}
+INFO 2024-05-31 15:52:46,804 hod_views Attendance data: {'present': 1, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-05-30'], 'leave_dates': []}
+INFO 2024-05-31 16:21:35,245 models Learning Record Created/Updated: 30
+INFO 2024-05-31 16:21:35,273 models Learning Record Created/Updated: 31
+ERROR 2024-05-31 16:59:54,865 log Internal Server Error: /en/get_class_schedules/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\fields\__init__.py", line 1774, in get_prep_value
+    return int(value)
+ValueError: invalid literal for int() with base 10: ''
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 173, in get_class_schedules
+    class_schedules = ClassSchedule.objects.filter(course_id=course_id)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 942, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 962, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 969, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1358, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1377, in _add_q
+    child_clause, needed_inner = self.build_filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1319, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1165, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\lookups.py", line 24, in __init__
+    self.rhs = self.get_prep_lookup()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\fields\related_lookups.py", line 115, in get_prep_lookup
+    self.rhs = target_field.get_prep_value(self.rhs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\fields\__init__.py", line 1776, in get_prep_value
+    raise e.__class__(
+ValueError: Field 'id' expected a number but got ''.
+ERROR 2024-05-31 16:59:54,873 basehttp "GET /en/get_class_schedules/?course_id= HTTP/1.1" 500 126374
+INFO 2024-05-31 17:06:34,761 models Learning Record Created/Updated: 30
+INFO 2024-05-31 17:06:34,784 models Learning Record Created/Updated: 31
+INFO 2024-05-31 17:13:58,274 models Learning Record Created/Updated: 30
+INFO 2024-05-31 17:13:58,310 models Learning Record Created/Updated: 31

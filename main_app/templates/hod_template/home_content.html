@@ -418,25 +418,31 @@
 
         var course_name_list = JSON.parse('{{ course_name_list|escapejs }}');
         var student_count_list_in_course = JSON.parse('{{ student_count_list_in_course|escapejs }}');
+
+        console.log("Course Names:", course_name_list);
+        console.log("Student Counts:", student_count_list_in_course);
+
         var pieData2 = {
             labels: course_name_list,
-            datasets: [
-                {
-                    data: student_count_list_in_course,
-                    backgroundColor: ['#FF6F22', '#BF19D5', '#1255F3', '#65BD00', '#04048F', '#1EDEC2', '#EF2020', '#FF0D72'],
-                }
-            ]
-        }
-        var pieChartCanvas2 = $('#pieChart2').get(0).getContext('2d')
+            datasets: [{
+                data: student_count_list_in_course,
+                backgroundColor: ['#FF6F22', '#BF19D5', '#1255F3', '#65BD00', '#04048F', '#1EDEC2', '#EF2020', '#FF0D72'],
+            }]
+        };
+
+        var pieChartCanvas2 = $('#pieChart2').get(0).getContext('2d');
         var pieOptions2 = {
             maintainAspectRatio: false,
             responsive: true,
-        }
+        };
+
         var pieChart2 = new Chart(pieChartCanvas2, {
             type: 'pie',
             data: pieData2,
             options: pieOptions2
-        })
+        });
+
+
 
         var teacher_names = JSON.parse('{{ teacher_names|escapejs }}');
         var lesson_hours = JSON.parse('{{ lesson_hours|escapejs }}');

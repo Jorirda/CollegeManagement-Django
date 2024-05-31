@@ -78,22 +78,38 @@ class StudentForm(CustomUserForm):
     phone_number = forms.CharField(max_length=20, required=False, label=_("Phone Number"))
     remark = forms.CharField(label=_('Remark'))
     campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False, label=_("Campus"))
-    
+    courses = forms.ModelMultipleChoiceField(
+        queryset=Course.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'courses-field'}),
+        label=_("Courses")
+    )
 
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
         if self.instance.pk:  # if the instance exists (editing case)
             self.fields['campus'].initial = self.instance.campus
+            self.fields['courses'].initial = self.instance.courses.all()
         # Reorder fields as requested
-        field_order = [_('full_name'), _('gender'), _('date_of_birth'), _('address'), _('phone_number'),_('campus'), _('reg_date'),_('status'), _('remark')]
+        field_order = [_('full_name'), _('gender'), _('date_of_birth'), _('address'), _('phone_number'), _('campus'), _('courses'),_('reg_date'), _('status'), _('remark'), ]
                          
         # Set the field order
         self.fields = {k: self.fields[k] for k in field_order}
 
-    class Meta:
-        model = Student
-        fields = ['full_name', 'gender', 'date_of_birth', 'reg_date', 
-                   'status', 'address', 'phone_number', 'remark'] 
+    def save(self, commit=True):
+        instance = super(StudentForm, self).save(commit=False)
+        user = instance.admin
+        user.full_name = self.cleaned_data['full_name']
+        user.gender = self.cleaned_data['gender']
+        user.address = self.cleaned_data['address']
+        user.phone_number = self.cleaned_data['phone_number']
+        user.remark = self.cleaned_data['remark']
+
+        if commit:
+            user.save()
+            instance.save()
+            instance.courses.set(self.cleaned_data['courses'])
+        return instance
 
 class AdminForm(FormSettings):
     full_name = forms.CharField(required=False, label=_('Full Name'))
@@ -310,14 +326,14 @@ class PaymentRecordForm(FormSettings):
     other_fee = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Other Fee'))
     amount_due = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Amount Due'))
     amount_paid = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Amount Paid'))
-    lesson_hours = forms.DecimalField(required=False, decimal_places=0, max_digits=10, initial=0, label=_("Total Lesson Hours"))
+    # lesson_hours = forms.DecimalField(required=False, decimal_places=0, max_digits=10, initial=0, label=_("Total Lesson Hours"))
 
     class Meta:
         model = PaymentRecord
         fields = [
             'date', 'student', 'course', 'lesson_unit_price',
             'discounted_price', 'book_costs', 'other_fee', 'amount_due', 'amount_paid', 
-            'payment_method', 'status', 'payee', 'remark', 'lesson_hours'
+            'payment_method', 'status', 'payee', 'remark'
         ] 
 
 class ClassScheduleForm(FormSettings):

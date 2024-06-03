@@ -4,9 +4,18 @@
 {% block page_title %}{% trans page_title %}{% endblock page_title %}
 
 {% block content %}
-
 <section class="content">
     <div class="container-fluid">
+        <div id="messages">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div id="success-message" class="alert alert-success" style="display: none;"></div>
         <div class="row">
             <div class="col-md-12">
                 <!-- general form elements -->
@@ -14,13 +23,38 @@
                     <div class="card-header">
                         <h3 class="card-title">{% trans page_title %}</h3>
                     </div>
-
-                    {% include "main_app/form_template.html" with messages=messages  form=form button_text=_("Add Session")  %}
+                    {% include "main_app/form_template.html" with messages=messages form=form button_text=_("Add Session") %}
                 </div>
-                <!-- /.card -->
-
             </div>
         </div>
     </div>
 </section>
 {% endblock content %}
+{% block custom_js %}
+<script>
+    $(document).ready(function(){
+        $('form').on('submit', function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: "{% url 'add_session' %}",
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    $('#messages').html('<div class="alert alert-success">' + response.message + '</div>');
+                    setTimeout(function() {
+                        $('.alert').fadeOut('slow');
+                        window.location.href = "{% url 'manage_session' %}";
+                    }, 3000);
+                },
+                error: function(response) {
+                    var errors = response.responseJSON.errors;
+                    $('#messages').html('<div class="alert alert-danger">' + response.responseJSON.message + '</div>');
+                    setTimeout(function() {
+                        $('.alert').fadeOut('slow');
+                    }, 3000);
+                }
+            });
+        });
+    });
+</script>
+{% endblock custom_js %}

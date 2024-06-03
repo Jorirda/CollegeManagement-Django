@@ -47,6 +47,22 @@
 </style>
 <section class="content">
     <div class="container-fluid">
+        <div id="success-message" class="alert alert-success" style="display: none;"></div>
+        {% if messages %}
+        <div id="message-box">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} message-alert" id="message-{{ forloop.counter }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        <script>
+            setTimeout(function() {
+                var alerts = document.getElementsByClassName('message-alert');
+                for (var i = 0; i < alerts.length; i++) {
+                    alerts[i].style.display = 'none';
+                }
+            }, 3000);
+        </script>
+        {% endif %}
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -76,7 +92,7 @@
                             </thead>
                             <tbody>
                                 {% for student in students %}
-                                <tr>
+                                <tr id="student-{{ student.id }}">
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ student.full_name }}</td>
                                     <td>{{ student.gender }}</td>
@@ -95,9 +111,9 @@
                                     <td>{{ student.reg_date }}</td>
                                     <td>{{ student.status }}</td>
                                     <td>{{ student.remark }}</td>
-                                    <td>
+                                    <td class="responsive-buttons">
                                         <a href="{% url 'edit_student' student.id %}" class="btn btn-info btn-responsive">{% trans "Edit" %}</a>
-                                        <a href="{% url 'delete_student' student.id %}" class="btn btn-danger btn-responsive" onclick="return confirm('{% trans 'Are you sure about this ?' %}')">{% trans "Delete" %}</a>
+                                        <button class="btn btn-danger btn-responsive" onclick="deleteStudent({{ student.id }})">{% trans "Delete" %}</button>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -110,4 +126,40 @@
         </div>
     </div>
 </section>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    function deleteStudent(studentId) {
+        if (confirm('{% trans "Are you sure you want to delete this student?" %}')) {
+            $.ajax({
+                type: 'POST',
+                url: '{% url "delete_student" 0 %}'.replace('0', studentId),
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(data) {
+                    if (data.success) {
+                        $('#student-' + studentId).remove();
+                        $('#success-message').text('{% trans "Student Deleted Successfully!" %}');
+                        $('#success-message').addClass('alert-success').show();
+                        // Jump to the top of the page
+                        window.scrollTo(0, 0);
+                        setTimeout(function() {
+                            $('#success-message').hide().removeClass('alert-success');
+                        }, 3000);
+                    } 
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    $('#success-message').text('{% trans "An error occurred while deleting the student." %}');
+                    $('#success-message').addClass('alert-danger').show();
+                    // Jump to the top of the page
+                    window.scrollTo(0, 0);
+                    setTimeout(function() {
+                        $('#success-message').hide().removeClass('alert-danger');
+                    }, 3000);
+                }
+            });
+        }
+    }
+</script>
 {% endblock content %}

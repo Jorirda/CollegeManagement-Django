@@ -76,7 +76,7 @@ class StudentForm(CustomUserForm):
         ('Refund', _('Refund')),
     ], label=_("Status"), widget=forms.Select(attrs={'class': 'hideable'}))
     phone_number = forms.CharField(max_length=20, required=False, label=_("Phone Number"))
-    remark = forms.CharField(label=_('Remark'))
+    remark = forms.CharField(required=False, label=_('Remark'))
     campus = forms.ModelChoiceField(queryset=Campus.objects.all(), required=False, label=_("Campus"))
     courses = forms.ModelMultipleChoiceField(
         queryset=Course.objects.all(),
@@ -84,6 +84,10 @@ class StudentForm(CustomUserForm):
         widget=forms.CheckboxSelectMultiple(attrs={'class': 'courses-field'}),
         label=_("Courses")
     )
+
+    class Meta:
+        model = Student
+        fields = ['full_name', 'gender', 'address', 'date_of_birth', 'reg_date', 'status', 'phone_number', 'remark', 'campus', 'courses']
 
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
@@ -199,7 +203,7 @@ class TeacherForm(FormSettings):
             instance.save()
             instance.courses.set(self.cleaned_data['courses'])
         return instance
-
+    
     class Meta:
         model = Teacher
         fields = ['full_name', 'gender', 'email', 'password', 'address', 'phone_number', 'campus', 'courses', 'work_type', 'remark']
@@ -208,24 +212,18 @@ class CourseForm(FormSettings):
     name = forms.CharField(label=_('Course Name'))
     overview = forms.CharField(label=_('Course Description'), widget=forms.Textarea)
     LEVEL_GRADE_CHOICES = [(str(i), chr(64 + i)) for i in range(1, 8)]
-    hourly_rate = forms.DecimalField(
-        required=False,
-        label=_("Hourly Rate"),
-        widget=forms.NumberInput(attrs={'class': 'form-control'}),
-    )
+    # hourly_rate = forms.DecimalField(
+    #     required=False,
+    #     label=_("Hourly Rate"),
+    #     widget=forms.NumberInput(attrs={'class': 'form-control'}),
+    # )
 
     level_grade = forms.ChoiceField(
         choices=LEVEL_GRADE_CHOICES,
         label=_("Max Level"),
         help_text=_("Select a level, which corresponds to a grade.")
     )
-    image = forms.ImageField(label=_('Course Image'), required=False)  # Added this line
-    def __init__(self, *args, **kwargs):
-        super(CourseForm, self).__init__(*args, **kwargs)
-        # instance = kwargs.get('instance')
-        # if instance:
-        #     # Generate level choices from instance range
-        #     self.fields['level'].choices = [(i, str(i)) for i in range(instance.level_start, instance.level_end + 1)]
+    image = forms.ImageField(label=_('Course Image'), required=False)  # Add this line
 
     class Meta:
         model = Course
@@ -263,7 +261,7 @@ class LearningRecordForm(FormSettings):
     day = forms.CharField(max_length=10, required=False, widget=forms.TextInput(attrs={'readonly': 'readonly'}), label=_('Day'))
     start_time = forms.TimeField(required=False, label=_("Start Time"), widget=forms.TimeInput(attrs={'readonly': 'readonly'}))
     end_time = forms.TimeField(required=False, label=_("End Time"), widget=forms.TimeInput(attrs={'readonly': 'readonly'}))
-    lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"), disabled=True)
+    lesson_hours = forms.DecimalField(required=False, max_digits=5, decimal_places=2, label=_("Lesson Hours"), widget=forms.NumberInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))
 
     class Meta:
         model = LearningRecord
@@ -312,6 +310,7 @@ class LearningRecordForm(FormSettings):
             instance.save()
         return instance
 
+
 class PaymentRecordForm(FormSettings):
     payee = forms.CharField(label=_('Payee'))
     remark = forms.CharField(required=True, label=_('Remark'))
@@ -326,18 +325,17 @@ class PaymentRecordForm(FormSettings):
     other_fee = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Other Fee'))
     amount_due = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Amount Due'))
     amount_paid = forms.DecimalField(widget=forms.TextInput(attrs={'placeholder': _('¥')}), label=_('Amount Paid'))
-    # lesson_hours = forms.DecimalField(required=False, decimal_places=0, max_digits=10, initial=0, label=_("Total Lesson Hours"))
+    lesson_hours = forms.DecimalField(widget=forms.TextInput(attrs={'readonly': 'readonly'}), required=False, label=_('Lesson Hours'))  # Changed to DecimalField
 
     class Meta:
         model = PaymentRecord
         fields = [
             'date', 'student', 'course', 'lesson_unit_price',
             'discounted_price', 'book_costs', 'other_fee', 'amount_due', 'amount_paid', 
-            'payment_method', 'status', 'payee', 'remark'
-        ] 
-
+            'payment_method', 'status', 'payee', 'remark', 'lesson_hours'  # Included lesson_hours in fields
+        ]
 class ClassScheduleForm(FormSettings):
-    def get_level_grade_choices(self, course_id=None): 
+    def get_level_grade_choices(self, course_id=None):
         if course_id:
             course = Course.objects.get(id=course_id)
             min_level = course.level_start
@@ -358,18 +356,18 @@ class ClassScheduleForm(FormSettings):
     day = forms.ChoiceField(choices=ClassSchedule.DAYS_OF_WEEK, required=False, widget=forms.Select(attrs={'class': 'form-control'}), label=_('Day of the Week'))
     start_time = forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time'}), label=_('Start Time'))
     end_time = forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time'}), label=_('End Time'))
-    lesson_hours = forms.CharField(required=False, label=_("Lesson Hours"), disabled=True)
+    lesson_hours = forms.DecimalField(required=False, max_digits=5, decimal_places=2, label=_("Lesson Hours"), widget=forms.NumberInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))  # Changed to DecimalField
     remark = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': _('Remark'), 'class': 'form-control'}), label=_('Remark'))
 
     def __init__(self, *args, **kwargs):
         super(ClassScheduleForm, self).__init__(*args, **kwargs)
         initial_course_id = self.instance.course.id if self.instance and self.instance.course else None
         self.fields['grade'].choices = self.get_level_grade_choices(initial_course_id)
-      
 
     class Meta:
         model = ClassSchedule
         fields = ['course', 'teacher', 'grade', 'day', 'start_time', 'end_time', 'lesson_hours', 'remark']
+
 
 class DateInput(forms.DateInput):
     input_type = 'date'

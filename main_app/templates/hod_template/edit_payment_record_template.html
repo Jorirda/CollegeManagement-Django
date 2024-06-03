@@ -1,25 +1,107 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
 {% load i18n %}
-{% block page_title %}{% trans page_title %}{% endblock page_title %}
-
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+{% block custom_css %}
+<style>
+    .invalid {
+        font-style: italic;
+        font-weight: bold;
+        color: red;
+    }
+    .valid {
+        font-style: italic;
+        font-weight: bold;
+        color: green;
+    }
+</style>
+{% endblock custom_css %}
 {% block content %}
-
 <section class="content">
     <div class="container-fluid">
+        <div id="messages">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div id="success-message" class="alert alert-success" style="display: none;"></div>
         <div class="row">
             <div class="col-md-12">
                 <!-- general form elements -->
                 <div class="card card-dark">
                     <div class="card-header">
-                        <h3 class="card-title">{% trans page_title %}</h3>
+                        <h3 class="card-title">{{ page_title }}</h3>
                     </div>
-                    {% include "main_app/form_template.html" with messages=messages  form=form button_text=_("Update Payment Record")%}
+                    {% include "main_app/form_template.html" with messages=messages form=form button_text=_("Update Payment Record") %}
                 </div>
                 <!-- /.card -->
-
             </div>
         </div>
     </div>
 </section>
 {% endblock content %}
+{% block custom_js %}
+<script>
+    $(document).ready(function(){
+        function updateLessonHours(studentId) {
+            if (studentId) {
+                $.ajax({
+                    url: "{% url 'get_lesson_hours' %}",
+                    data: {'student_id': studentId},
+                    success: function(data) {
+                        if (data.success) {
+                            $('#id_lesson_hours').val(data.lesson_hours);
+                        } else {
+                            console.error("Error updating lesson hours:", data.error);
+                        }
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        console.error("AJAX request failed:", textStatus, errorThrown);
+                    }
+                });
+            } else {
+                $('#id_lesson_hours').val('');
+            }
+        }
+
+        $('#id_student').change(function() {
+            var studentId = $(this).val();
+            updateLessonHours(studentId);
+        });
+        
+        // Initialize the form with current data
+        var initialStudentId = $('#id_student').val();
+        updateLessonHours(initialStudentId);
+
+        $('form').on('submit', function(event) {
+            event.preventDefault();
+            var paymentId = {{ payment_id }};
+            $.ajax({
+                url: "{% url 'edit_payment_record' payment_id=payment_id %}",
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    $('#messages').html('<div class="alert alert-success">' + response.message + '</div>');
+                    window.scrollTo(0, 0);
+                    setTimeout(function() {
+                        $('.alert').fadeOut('slow');
+                        window.location.href = "{% url 'manage_payment_record' %}"; 
+                    }, 3000);
+                },
+                error: function(response) {
+                    var errors = response.responseJSON.errors;
+                    $('#messages').html('<div class="alert alert-danger">' + response.responseJSON.message + '</div>');
+                    window.scrollTo(0, 0);
+                    setTimeout(function() {
+                        $('.alert').fadeOut('slow');
+                    }, 3000);
+                }
+            });
+        });
+    });
+</script>
+{% endblock custom_js %}

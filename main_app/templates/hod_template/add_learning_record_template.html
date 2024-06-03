@@ -6,20 +6,25 @@
 {% block content %}
 <section class="content">
     <div class="container-fluid">
+        <div id="messages">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
         <div class="row">
             <div class="col-md-12">
-                <div class="card">
+                <!-- general form elements -->
+                <div class="card card-dark">
                     <div class="card-header">
-                        <h3 class="card-title">{% trans "Add Learning Record" %}</h3>
+                        <h3 class="card-title">{{ page_title }}</h3>
                     </div>
-                    <div class="card-body">
-                        <form method="post" novalidate>
-                            {% csrf_token %}
-                            {{ form.as_p }}
-                            <button type="submit" class="btn btn-primary">{% trans "Submit" %}</button>
-                        </form>
-                    </div>
+                    {% include "main_app/form_template.html" with messages=messages form=form button_text=_("Add Learning Record") %}
                 </div>
+                <!-- /.card -->
             </div>
         </div>
     </div>
@@ -79,6 +84,48 @@ $(document).ready(function() {
             $('#id_end_time').val('');
             $('#id_lesson_hours').val('');
         }
+    });
+
+    // Initialize the form with current data if necessary
+    var initialCourseId = $('#id_course').val();
+    if (initialCourseId) {
+        $.ajax({
+            url: '{% url "get_teachers" %}',
+            data: { 'course_id': initialCourseId },
+            success: function(data) {
+                var options = '<option value="">{% trans "Select Teacher" %}</option>';
+                $.each(data.teachers, function(key, teacher) {
+                    var selected = $('#id_teacher').data('initial') == teacher.id ? 'selected' : '';
+                    options += '<option value="' + teacher.id + '" ' + selected + '>' + teacher.name + '</option>';
+                });
+                $('#id_teacher').html(options);
+            }
+        });
+    }
+
+    $('form').on('submit', function(event) {
+        event.preventDefault();
+        $.ajax({
+            url: "{% url 'add_learning_record' %}",
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                $('#messages').html('<div class="alert alert-success">' + response.message + '</div>');
+                window.scrollTo(0, 0);
+                setTimeout(function() {
+                    $('.alert').fadeOut('slow');
+                    window.location.href = "{% url 'manage_learning_record' %}";
+                }, 3000);
+            },
+            error: function(response) {
+                var errors = response.responseJSON.errors;
+                $('#messages').html('<div class="alert alert-danger">' + response.responseJSON.message + '</div>');
+                window.scrollTo(0, 0);
+                setTimeout(function() {
+                    $('.alert').fadeOut('slow');
+                }, 3000);
+            }
+        });
     });
 });
 </script>

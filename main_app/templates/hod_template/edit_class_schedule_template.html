@@ -7,6 +7,16 @@
 
 <section class="content">
     <div class="container-fluid">
+        <div id="messages">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div id="success-message" class="alert alert-success" style="display: none;"></div>
         <div class="row">
             <div class="col-md-12">
                 <!-- general form elements -->
@@ -53,32 +63,50 @@
 
             var lessonHoursField = $('#id_lesson_hours');
             if (minutes === 0) {
-                lessonHoursField.val(hours + 'h');
+                lessonHoursField.val(hours);
             } else {
-                lessonHoursField.val(hours + 'h ' + minutes + 'm');
+                lessonHoursField.val(hours + minutes / 60); // Convert minutes to fraction of an hour
             }
         }
-
-        document.getElementById('id_course').addEventListener('change', function() {
-            var courseId = this.value;
-            fetch(`/get-grade-choices/?course_id=${courseId}`)
-                .then(response => response.json())
-                .then(data => {
-                    var select = document.getElementById('id_grade');
-                    select.innerHTML = '';
-                    data.choices.forEach(function(choice) {
-                        var option = new Option(choice[1], choice[0]);
-                        select.add(option);
-                    });
-                    // Fetch hourly rate
-                    fetch(`/get-course-hourly-rate/?course_id=${courseId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            document.getElementById('id_hourly_rate').value = data.hourly_rate;
-                        });
-                });
-        });
     });
-</script>
 
+    document.getElementById('id_course').addEventListener('change', function() {
+        var courseId = this.value;
+        fetch(`/get-grade-choices/?course_id=${courseId}`)
+            .then(response => response.json())
+            .then(data => {
+                var select = document.getElementById('id_grade');
+                select.innerHTML = '';
+                data.choices.forEach(function(choice) {
+                    var option = new Option(choice[1], choice[0]);
+                    select.add(option);
+                });
+            });
+    });
+
+    $('form').on('submit', function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: "{% url 'edit_class_schedule' schedule_id%}",
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    $('#messages').html('<div class="alert alert-success">' + response.message + '</div>');
+                    window.scrollTo(0, 0);
+                    setTimeout(function() {
+                        $('.alert').fadeOut('slow');
+                        window.location.href = "{% url 'manage_class_schedule' %}";
+                    }, 3000);
+                },
+                error: function(response) {
+                    var errors = response.responseJSON.errors;
+                    $('#messages').html('<div class="alert alert-danger">' + response.responseJSON.message + '</div>');
+                    window.scrollTo(0, 0);
+                    setTimeout(function() {
+                        $('.alert').fadeOut('slow');
+                    }, 3000);
+                }
+            });
+        });
+</script>
 {% endblock content %}

@@ -322,7 +322,6 @@ def teacher_view_attendance(request):
     print("Returning attendance details as JSON response")  # Debug print statement
     return JsonResponse({'success': True, 'attendance_details': attendance_details})
 
-
 @csrf_exempt
 def save_attendance(request):
     if request.method != 'POST':
@@ -409,8 +408,12 @@ def teacher_courses(request):
     page_number = request.GET.get('page')
     paginated_records = paginator.get_page(page_number)
     
+    # Calculate total lesson hours
+    total_lesson_hours = learningrecords.aggregate(Sum('lesson_hours'))['lesson_hours__sum'] or 0
+    
     context = {
         'learningrecords': paginated_records,  # Pass the paginated queryset to the template
+        'total_lesson_hours': total_lesson_hours,
         'page_title': _('Teacher Courses'),
     }
     return render(request, 'teacher_template/teacher_courses.html', context)
@@ -527,8 +530,6 @@ def teacher_view_notification(request):
         'page_title': "View Notifications"
     }
     return render(request, "teacher_template/teacher_view_notification.html", context)
-
-
 
 @login_required
 def teacher_view_notification_count(request):

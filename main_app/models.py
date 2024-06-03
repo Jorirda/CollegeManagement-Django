@@ -44,7 +44,7 @@ class Session(models.Model):
 
 class CustomUser(AbstractUser):
     USER_TYPE = ((1, "HOD"), (2, "Teacher"), (3, "Student"))
-    GENDER = [("M", "Male"), ("F", "Female")]
+    GENDER = [("男", "Male"), ("女", "Female")]
 
     username = None # Removed username, using email instead
     full_name = models.TextField(default="")
@@ -96,25 +96,13 @@ class Student(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)
     # course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True)  
-    courses = models.ManyToManyField(Course, blank=True)  # Changed to ManyToManyField
+    courses = models.ManyToManyField(Course)  # Changed to ManyToManyField
     date_of_birth = models.DateField(blank=True, null=True)
     reg_date = models.DateField(blank=True, null=True)
     status = models.CharField(max_length=30, blank=True, default='Currently Learning')
 
     def __str__(self):
         return self.admin.full_name
-
-
-# class Student(models.Model):
-#     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-#     campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)
-#     course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True)  # Reverted back to ForeignKey
-#     date_of_birth = models.DateField(blank=True, null=True)
-#     reg_date = models.DateField(blank=True, null=True)
-#     status = models.CharField(max_length=30, blank=True, default='Currently Learning')
-
-#     def __str__(self):
-#         return self.admin.full_name
 
 class Teacher(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
@@ -151,9 +139,9 @@ class ClassSchedule(models.Model):
     day = models.IntegerField(choices=DAYS_OF_WEEK, null=True)
     start_time = models.TimeField(null=True)
     end_time = models.TimeField(null=True)
-    lesson_hours = models.CharField(max_length=10, null=True)
+    lesson_hours = models.DecimalField(max_digits=5, decimal_places=2, null=True)  # Changed to DecimalField
     remark = models.TextField(default="")
-   
+
     def __str__(self):
         return f"{self.course.name} - {self.get_day_display()}"
 
@@ -166,7 +154,7 @@ class LearningRecord(models.Model):
     semester = models.ForeignKey(Session, null=True, on_delete=models.CASCADE)
     start_time = models.TimeField(null=True)
     end_time = models.TimeField(null=True)
-    lesson_hours = models.CharField(max_length=10, null=True)
+    lesson_hours = models.DecimalField(max_digits=5, decimal_places=2, null=True)  # Changed to DecimalField
     day = models.CharField(max_length=20, null=True)  # New field for day of the week
 
     def __str__(self):
@@ -242,7 +230,7 @@ class PaymentRecord(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
     payee = models.CharField(max_length=100)
     remark = models.TextField(null=True, blank=True)
-    lesson_hours = models.IntegerField(default=0)
+    lesson_hours = models.DecimalField(max_digits=5, decimal_places=2, default=0)  # Changed to DecimalField
     learning_record = models.ForeignKey('LearningRecord', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):

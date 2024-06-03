@@ -42,6 +42,22 @@
 </style>
 <section class="content">
     <div class="container-fluid">
+        <div id="success-message" class="alert alert-success" style="display: none;"></div>
+        {% if messages %}
+        <div id="message-box">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} message-alert" id="message-{{ forloop.counter }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        <script>
+            setTimeout(function() {
+                var alerts = document.getElementsByClassName('message-alert');
+                for (var i = 0; i < alerts.length; i++) {
+                    alerts[i].style.display = 'none';
+                }
+            }, 3000);
+        </script>
+        {% endif %}
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -65,20 +81,22 @@
                             </thead>
                             <tbody>
                                 {% for course in courses %}
-                                <tr>
+                                <tr id="course-{{ course.id }}">
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ course.name }}</td>
                                     <td>{{ course.overview }}</td>
                                     <td>
                                         {% if course.image %}
                                             <img src="{{ course.image.url }}" alt="{{ course.name }}" class="course-image">
+                                            <br>
+                                            <small>URL: {{ course.image.url }}</small> <!-- Add debugging output -->
                                         {% else %}
                                             No Image
                                         {% endif %}
                                     </td>
                                     <td class="responsive-buttons">
                                         <a href="{% url 'edit_course' course.id %}" class="btn btn-info btn-responsive">{% trans 'Edit' %}</a>
-                                        <a href="{% url 'delete_course' course.id %}" onclick="return confirm('{% trans 'Are you sure you want to delete this course?' %}')" class="btn btn-danger btn-responsive">{% trans 'Delete' %}</a> 
+                                        <button onclick="deleteCourse({{ course.id }})" class="btn btn-danger btn-responsive">{% trans 'Delete' %}</button> 
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -90,4 +108,41 @@
         </div>
     </div>
 </section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    function deleteCourse(courseId) {
+        if (confirm('{% trans "Are you sure you want to delete this course?" %}')) {
+            $.ajax({
+                type: 'POST',
+                url: '{% url "delete_course" 0 %}'.replace('0', courseId),
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#course-' + courseId).remove();
+                        $('#success-message').text('{% trans "Course Deleted Successfully!" %}');
+                        $('#success-message').addClass('alert-success').show();
+                        window.scrollTo(0, 0);
+                        setTimeout(function() {
+                            $('#success-message').hide().removeClass('alert-success');
+                        }, 3000);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    $('#success-message').text('{% trans "An error occurred while deleting the course." %}');
+                    $('#success-message').addClass('alert-danger').show();
+                    window.scrollTo(0, 0);
+                    setTimeout(function() {
+                        $('#success-message').hide().removeClass('alert-danger');
+                    }, 3000);
+                }
+            });
+        }
+    }
+</script>
 {% endblock content %}

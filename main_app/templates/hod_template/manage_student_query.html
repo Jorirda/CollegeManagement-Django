@@ -5,8 +5,8 @@
 {% block page_title %}
   {{ page_title }}
 {% endblock page_title %}
-{% block content %}
 
+{% block content %}
 <section class="content">
   <div class="container-fluid">
     <div class="row">
@@ -15,8 +15,8 @@
           <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
             <div class="d-flex align-items-center">
               <i class="nav-icon fas fa-search" style="font-size: 24px; margin-right: 10px;"></i>
-                <h3 class="card-title">{% trans page_title %}</h3>
-            </div>                                      
+              <h3 class="card-title">{{ page_title }}</h3>
+            </div>
           </div>
         </div>
         <div class="card">
@@ -25,7 +25,7 @@
               <div class="form-group d-flex align-items-center mb-0">
                 <label for="student_selector" class="mr-3">{% trans "Select Student:" %}</label>
                 <select id="student_selector" name="student_id" class="form-control mr-3">
-                  <option value="">{% trans "Select a Student" %}</option>
+                  <option value="">{% trans "All Students" %}</option>
                   {% for student in students %}
                     <option value="{{ student.id }}">{{ student.full_name }}</option>
                   {% endfor %}
@@ -37,111 +37,128 @@
         </div>
       </div>
     </div>
+
     {% if student_query_info %}
+      {% for query in student_query_info %}
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">{{ query.course }}</h3>
+              </div>
+              <div class="card-body">
+                <table class="table table-bordered">
+                  <tbody>
+                    <tr>
+                      <th class="table-dark">{% trans "Name" %}</th>
+                      <td>{{ query.student_name }}</td>
+                    </tr>
+                    <tr>
+                      <th class="table-dark">{% trans "Gender" %}</th>
+                      <td>{{ query.gender }}</td>
+                      <th class="table-dark">{% trans "Phone Number" %}</th>
+                      <td>{{ query.phone_number }}</td>
+                    </tr>
+                    <tr>
+                      <th class="table-dark">{% trans "Date of Birth" %}</th>
+                      <td>{{ query.date_of_birth }}</td>
+                      <th class="table-dark">{% trans "Registration Date" %}</th>
+                      <td>{{ query.reg_date }}</td>
+                    </tr>
+                    <tr>
+                      <th class="table-dark">{% trans "Campus" %}</th>
+                      <td>{{ query.campus }}</td>
+                      <th class="table-dark">{% trans "State" %}</th>
+                      <td>{{ query.state }}</td>
+                    </tr>
+                    <tr>
+                      <th class="table-dark">{% trans "Payment Status" %}</th>
+                      <td>{{ query.payment_status }}</td>
+                      <th class="table-dark">{% trans "Refunded" %}</th>
+                      <td>{{ query.refunded }}</td>
+                    </tr>
+                    <tr>
+                      <th class="table-dark">{% trans "Number of Classes" %}</th>
+                      <td>{{ query.num_of_classes }}</td>
+                      <th class="table-dark">{% trans "Registered Courses" %}</th>
+                      <td>{{ query.registered_courses }}</td>
+                    </tr>
+                    <tr>
+                      <th class="table-dark">{% trans "Completed Hours" %}</th>
+                      <td>{{ query.completed_hours }}</td>
+                      <th class="table-dark">{% trans "Remaining Hours" %}</th>
+                      <td>{{ query.remaining_hours }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table class="table table-bordered table-hover">
+                  <thead class="thead-dark">
+                    <tr>
+                      <th>{% trans "Date" %}</th>
+                      <th>{% trans "Course" %}</th>
+                      <th>{% trans "Instructor" %}</th>
+                      <th>{% trans "Start Time" %}</th>
+                      <th>{% trans "End Time" %}</th>
+                      <th>{% trans "Lesson Hours" %}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for rec in query.records %}
+                      <tr class="table-row">
+                        <td>{{ rec.date }}</td>
+                        <td>{{ rec.course }}</td>
+                        <td>{{ rec.instructor }}</td>
+                        <td>{{ rec.start_time }}</td>
+                        <td>{{ rec.end_time }}</td>
+                        <td>{{ rec.lesson_hours }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
     <div class="row">
       <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <table class="table table-bordered">
-              <tbody>
-                {% for query in student_query_info %}
-                  <tr>
-                    <th style="width: 22.3%;" class="table-dark">{% trans "Student Name" %}</th>
-                    <td>{{ query.student_name }}</td>
-                  </tr>
-
-              </tbody>
-            </table>
-            <!-- Details Table -->
-            <table class="table table-bordered table-hover table-sm">
-              <tr>
-                <th class="table-dark">{% trans "Gender" %}</th>
-                <td>{{ query.gender }}</td>
-                <th class="table-dark">{% trans "Date of Birth" %}</th>
-                <td>{{ query.date_of_birth }}</td>
-                <th class="table-dark">{% trans "Phone Number" %}</th>
-                <td>{{ query.phone_number }}</td>
-              </tr>
-              <tr>
-                <th class="table-dark">{% trans "Campus" %}</th>
-                <td>{{ query.campus }}</td>
-                <th class="table-dark">{% trans "State" %}</th>
-                <td>{{ query.state }}</td>
-                <th class="table-dark">{% trans "Payment Status" %}</th>
-                <td>{{ query.payment_status }}</td>
-              </tr>
-              <tr>
-                <th class="table-dark">{% trans "Refunded" %}</th>
-                <td>{{ query.refunded }}</td>
-                <th class="table-dark">{% trans "Registration Date" %}</th>
-                <td>{{ query.reg_date }}</td>
-                <th class="table-dark">{% trans "Number of Classes" %}</th>
-                <td>{{ query.num_of_classes }}</td>
-              </tr>
-              <tr>
-                <th class="table-dark">{% trans "Registered Courses" %}</th>
-                <td>{{ query.registered_courses }}</td>
-                <th class="table-dark">{% trans "Completed Hours" %}</th>
-                <td>{{ query.completed_hours }}</td>
-                <th class="table-dark">{% trans "Remaining Hours" %}</th>
-                <td>{{ query.remaining_hours }}</td>
-              </tr>
-            </table>
-            <!-- Learning Records Table -->
-            <table class="table table-bordered table-hover table-sm">
-              <thead class="thead-light">
-                <tr>
-                  <th>{% trans "Date" %}</th>
-                  <th>{% trans "Course" %}</th>
-                  <th>{% trans "Instructor" %}</th>
-                  <th>{% trans "Start Time" %}</th>
-                  <th>{% trans "End Time" %}</th>
-                  <th>{% trans "Lesson Hours" %}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>{{ query.date }}</td>
-                  <td>{{ query.course }}</td>
-                  <td>{{ query.instructor }}</td>
-                  <td>{{ query.start_time }}</td>
-                  <td>{{ query.end_time }}</td>
-                  <td>{{ query.lesson_hours }}</td>
-                </tr>
-              </tbody>
-            </table>
-            <!-- Payment Records Table -->
-            <table class="table table-bordered table-hover table-sm">
-              <thead class="thead-light">
-                <tr>
-                  <th>{% trans "Paid" %}</th>
-                  <th>{% trans "Paid Class Hours" %}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>{{ query.paid }}</td>
-                  <td>{{ query.paid_class_hours }}</td>
-                </tr>
-              </tbody>
-            </table>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
+        <div class="alert alert-info" role="alert">
+          {% trans "No Student Queries found." %}
         </div>
       </div>
     </div>
-    {% else %}
-      <div class="row">
-        <div class="col-md-12">
-          <div class="alert alert-info" role="alert">
-            {% trans "No queries found for the selected student." %}
-          </div>
-        </div>
-      </div>
     {% endif %}
   </div>
 </section>
 
+{% block custom_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const rows = document.querySelectorAll('.table-row');
+    rows.forEach(row => {
+      row.addEventListener('mouseover', function() {
+        this.style.backgroundColor = '#f1f1f1';
+        this.style.transition = 'background-color 0.3s ease';
+      });
+      row.addEventListener('mouseout', function() {
+        this.style.backgroundColor = '';
+        this.style.transition = 'background-color 0.3s ease';
+      });
+    });
+
+    const formElements = document.querySelectorAll('.form-control, .btn-primary');
+    formElements.forEach(element => {
+      element.style.transition = 'all 0.3s ease';
+    });
+    const button = document.querySelector('.btn-primary');
+    button.addEventListener('mouseover', function() {
+      this.style.backgroundColor = '#0056b3';
+    });
+    button.addEventListener('mouseout', function() {
+      this.style.backgroundColor = '#007bff';
+    });
+  });
+</script>
+{% endblock custom_js %}
 {% endblock content %}

@@ -22,6 +22,7 @@ import generate
 
 urlpatterns = [
 #hodviews
+    path('ajax/get-lesson-hours/', hod_views.get_lesson_hours, name='get_lesson_hours'),
     path('process_data/', generate.process_data, name='process_data'),
     path('ajax/get-teachers/', hod_views.get_teachers, name='get_teachers'),
     path('ajax/get-schedule/', hod_views.get_schedule, name='get_schedule'),
@@ -42,7 +43,7 @@ urlpatterns = [
     path("admin/home/", hod_views.admin_home, name='admin_home'),
     # path("teacher/query", hod_views.view_teacher_query, name='view_teacher_query'),
     path("student/query", hod_views.manage_student_query, name='manage_student_query'),
-    path("send_student_notification/", hod_views.send_student_notification,name='send_student_notification'),
+    # path("send_student_notification/", hod_views.send_student_notification,name='send_student_notification'),
     path("send_teacher_notification/", hod_views.send_teacher_notification,name='send_teacher_notification'),
 
     path("add_session/", hod_views.add_session, name='add_session'),
@@ -106,7 +107,7 @@ urlpatterns = [
     path("classes/delete/<int:classes_id>",hod_views.delete_classes, name='delete_classes'),
     path("session/delete/<int:session_id>",hod_views.delete_session, name='delete_session'),
     path("student/delete/<int:student_id>",hod_views.delete_student, name='delete_student'),
-    path("campus/edit/<int:campus_id>",hod_views.delete_campus, name='delete_campus'),
+    path('delete_campus/<int:campus_id>/', hod_views.delete_campus, name='delete_campus'),
     path("payment/delete/<int:payment_id>",hod_views.delete_payment_record, name='delete_payment_record'),
     path("learn/delete/<int:learn_id>",hod_views.delete_learning_record, name='delete_learning_record'),
     path("schedule/delete/<int:schedule_id>",hod_views.delete_class_schedule, name='delete_class_schedule'),

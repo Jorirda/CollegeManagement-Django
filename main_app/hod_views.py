@@ -110,7 +110,7 @@ def check_columns(request):
         selected_model = request.POST.get('model')
         user_type = request.POST.get('user_type', None)
 
-        if selected_model == '':
+        if not selected_model:
             return JsonResponse({'success': False, 'error': 'Please select a table type.'})
 
         try:
@@ -121,7 +121,6 @@ def check_columns(request):
             if selected_model == 'CustomUser' and user_type:
                 selected_model = user_type
 
-            # Initialize column status dictionary
             column_status = {}
 
             # Check each model's columns
@@ -139,12 +138,25 @@ def check_columns(request):
                             'can_use_fake_data': False
                         }
                         if col_status['status'] == 'missing':
-                            for uploaded_col in uploaded_columns:
-                                similarity_ratio = fuzz.ratio(col, uploaded_col)
-                                if similarity_ratio >= 80:
-                                    col_status['status'] = 'autofill'
-                                    col_status['can_autofill'] = True
-                                    break
+                            # Check specific column mapping rules
+                            specific_mapping = SPECIFIC_COLUMN_MAPPING.get('CustomUser', {}).get(user_type, {})
+                            if col in specific_mapping.values():
+                                for source_col, target_col in specific_mapping.items():
+                                    if col == target_col and source_col in uploaded_columns:
+                                        col_status['status'] = 'autofill'
+                                        col_status['can_autofill'] = True
+                                        col_status['autofill_from'] = source_col
+                                        break
+
+                            # General autofill logic
+                            if not col_status['can_autofill']:
+                                for uploaded_col in uploaded_columns:
+                                    similarity_ratio = fuzz.ratio(col, uploaded_col)
+                                    if similarity_ratio >= 80:
+                                        col_status['status'] = 'autofill'
+                                        col_status['can_autofill'] = True
+                                        col_status['autofill_from'] = uploaded_col
+                                        break
 
                         if col_status['status'] == 'missing':
                             col_status['can_use_fake_data'] = True
@@ -159,7 +171,6 @@ def check_columns(request):
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
-
 def get_upload(request):
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
@@ -167,13 +178,13 @@ def get_upload(request):
             excel_file = request.FILES['excel_file']
             selected_model = form.cleaned_data['model']
             user_type = form.cleaned_data.get('user_type')
-            
+
             if selected_model == 'CustomUser' and user_type:
                 selected_model = user_type
 
             try:
                 df = pd.read_excel(excel_file)
-                logger.info(f"Uploaded columns: {df.columns.tolist()}")
+                print(f"Uploaded columns: {df.columns.tolist()}")
                 model_info = MODEL_COLUMN_MAPPING.get(selected_model)
                 if not model_info:
                     raise ValueError(f"No model found for the selected type: {selected_model}")
@@ -184,10 +195,11 @@ def get_upload(request):
                 missing_columns = expected_columns - actual_columns
                 extra_columns = actual_columns - expected_columns
 
-                logger.info(f"Expected columns: {expected_columns}")
-                logger.info(f"Actual columns: {actual_columns}")
-                logger.info(f"Missing columns: {missing_columns}")
-                logger.info(f"Extra columns: {extra_columns}")
+                # Print columns in English for better debugging
+                print(f"Expected columns: {expected_columns}")
+                print(f"Actual columns: {actual_columns}")
+                print(f"Missing columns: {missing_columns}")
+                print(f"Extra columns: {extra_columns}")
 
                 column_status = {col: 'missing' if col in missing_columns else 'extra' if col in extra_columns else 'match' for col in expected_columns}
 
@@ -204,17 +216,37 @@ def get_upload(request):
                     if col in specific_mapping and specific_mapping[col] in actual_columns:
                         column_status[specific_mapping[col]] = 'autofill'
 
+                # Color coding for columns
+                column_colors = {}
+                for col, status in column_status.items():
+                    if status == 'autofill':
+                        column_colors[col] = 'yellow'
+                    elif status == 'missing' or status == 'missing (required)':
+                        column_colors[col] = 'red'
+                    elif status == 'extra':
+                        column_colors[col] = 'blue'
+                    else:
+                        column_colors[col] = 'green'
+
                 context = {
                     'form': form,
                     'column_status': column_status,
+                    'column_colors': column_colors,
                     'selected_model': selected_model,
                     'df': df.to_html(index=False)
                 }
 
+                # Directly call the main function to process and upload data
+                result = main(excel_file, selected_model, user_type)
+                if result:
+                    print("Data processing and upload completed successfully.")
+                else:
+                    print("Data processing and upload failed.")
+                    
                 return render(request, 'hod_template/upload.html', context)
 
             except Exception as e:
-                logger.error(f"Error processing file: {e}")
+                print(f"Error processing file: {e}")
                 context = {'form': form, 'error': str(e)}
                 return render(request, 'hod_template/upload.html', context)
 
@@ -222,6 +254,8 @@ def get_upload(request):
         form = ExcelUploadForm()
 
     return render(request, 'hod_template/upload.html', {'form': form})
+
+
 
 def get_result(excel_file, is_teacher):
     # Read the Excel file into a DataFrame
@@ -286,6 +320,7 @@ def get_total_income_by_months(start_date, end_date, start_month_name, end_month
 
 def get_teachers(request):
     course_id = request.GET.get('course_id')
+    print("Course ID:", course_id)  # Add this print statement
     if course_id:
         teachers = Teacher.objects.filter(courses__id=course_id)
         data = {'teachers': [{'id': teacher.id, 'name': teacher.admin.full_name} for teacher in teachers]}
@@ -295,6 +330,8 @@ def get_teachers(request):
 def get_schedule(request):
     course_id = request.GET.get('course_id')
     teacher_id = request.GET.get('teacher_id')
+    print("Course ID:", course_id)  # Add this print statement
+    print("Teacher ID:", teacher_id)  # Add this print statement
     if course_id and teacher_id:
         try:
             schedule = ClassSchedule.objects.get(course_id=course_id, teacher_id=teacher_id)
@@ -311,6 +348,27 @@ def get_schedule(request):
             pass
     return JsonResponse({'schedule': None})
 
+def get_classes_taken_by_teachers(request):
+    current_month = datetime.now().month
+    current_year = datetime.now().year
+    teachers = Teacher.objects.all()
+    teacher_names = []
+    classes_taken = []
+    
+    for teacher in teachers:
+        count = LearningRecord.objects.filter(
+            teacher=teacher,
+            date__year=current_year,
+            date__month=current_month
+        ).count()
+        teacher_names.append(teacher.full_name)  # Adjust based on your Teacher model
+        classes_taken.append(count)
+    
+    data = {
+        'teachers': teacher_names,
+        'classes_taken': classes_taken
+    }
+    return JsonResponse(data)
     
 #Refund
 def refund_records(request):
@@ -363,28 +421,8 @@ def refund_records(request):
 
     return render(request, 'hod_template/refund_records.html', context)
 
-def get_classes_taken_by_teachers(request):
-    current_month = datetime.now().month
-    current_year = datetime.now().year
-    teachers = Teacher.objects.all()
-    teacher_names = []
-    classes_taken = []
-    
-    for teacher in teachers:
-        count = LearningRecord.objects.filter(
-            teacher=teacher,
-            date__year=current_year,
-            date__month=current_month
-        ).count()
-        teacher_names.append(teacher.full_name)  # Adjust based on your Teacher model
-        classes_taken.append(count)
-    
-    data = {
-        'teachers': teacher_names,
-        'classes_taken': classes_taken
-    }
-    return JsonResponse(data)
 
+#Admin
 def admin_get_student_attendance(request):
     student_id = request.GET.get('student_id')
     # logger.info(f"Fetching attendance data for student ID: {student_id}")  # Log student ID
@@ -420,10 +458,6 @@ def admin_get_teacher_class_schedules_count(request):
     print(teacher_id)
     class_schedules_count = ClassSchedule.objects.filter(teacher_id=teacher_id).count()
     return JsonResponse({'class_schedules_count': class_schedules_count})
-
-
-#Admin
-from django.db.models import Count
 
 def admin_home(request):
     # Aggregate counts
@@ -572,7 +606,6 @@ def admin_home(request):
 
     return render(request, 'hod_template/home_content.html', context)
 
-
 def admin_view_profile(request):
     admin = get_object_or_404(Admin, admin=request.user)
     form = AdminForm(request.POST or None, request.FILES or None,
@@ -609,6 +642,7 @@ def admin_view_profile(request):
                 request, "Error Occured While Updating Profile " + str(e))
     return render(request, "hod_template/admin_view_profile.html", context)
 
+
 def admin_view_attendance(request):
     classes = Course.objects.all()
     sessions = Session.objects.all()
@@ -620,54 +654,74 @@ def admin_view_attendance(request):
 
     return render(request, "hod_template/admin_view_attendance.html", context)
 
+def admin_notify_teacher(request):
+    teachers = Teacher.objects.select_related('admin').all()
+    courses = Course.objects.all()
+    students = Student.objects.select_related('admin').all()
+    context = {
+        'page_title': "Send Notifications To Teachers",
+        'teachers': teachers,
+        'courses': courses,
+        'students': students,
+    }
+    return render(request, "hod_template/teacher_notification.html", context)
+
+def admin_notify_student(request):
+    student = CustomUser.objects.filter(user_type=3)
+    context = {
+        'page_title': _("Send Notifications To Students"),
+        'students': student
+    }
+    return render(request, "hod_template/student_notification.html", context)
 
 #Sessions
 def add_session(request):
     form = SessionForm(request.POST or None)
     context = {'form': form, 'page_title': _('Add Session')}
-    if request.method == 'POST':
+    
+    if request.method == 'POST' and request.is_ajax():
         if form.is_valid():
             try:
                 form.save()
-                messages.success(request, "Session Created")
-                return redirect(reverse('add_session'))
+                return JsonResponse({'success': True, 'message': 'Session Created Successfully'})
             except Exception as e:
-                messages.error(request, 'Could Not Add ' + str(e))
+                return JsonResponse({'success': False, 'message': 'Could Not Add: ' + str(e)}, status=400)
         else:
-            messages.error(request, 'Fill Form Properly ')
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'message': 'Fill Form Properly', 'errors': errors}, status=400)
+
     return render(request, "hod_template/add_session_template.html", context)
 
 def edit_session(request, session_id):
     instance = get_object_or_404(Session, id=session_id)
     form = SessionForm(request.POST or None, instance=instance)
-    context = {'form': form, 'session_id': session_id,
-               'page_title': 'Edit Session'}
-    if request.method == 'POST':
+    context = {'form': form, 'session_id': session_id, 'page_title': 'Edit Session'}
+
+    if request.method == 'POST' and request.is_ajax():
         if form.is_valid():
             try:
                 form.save()
-                messages.success(request, "Session Updated")
-                return redirect(reverse('edit_session', args=[session_id]))
+                return JsonResponse({'success': True, 'message': 'Session Updated Successfully'})
             except Exception as e:
-                messages.error(
-                    request, "Session Could Not Be Updated " + str(e))
-                return render(request, "hod_template/edit_session_template.html", context)
+                return JsonResponse({'success': False, 'message': 'Session Could Not Be Updated: ' + str(e)}, status=400)
         else:
-            messages.error(request, "Invalid Form Submitted ")
-            return render(request, "hod_template/edit_session_template.html", context)
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'message': 'Invalid Form Submitted', 'errors': errors}, status=400)
 
-    else:
-        return render(request, "hod_template/edit_session_template.html", context)
+    return render(request, "hod_template/edit_session_template.html", context)
     
 def delete_session(request, session_id):
-    session = get_object_or_404(Session, id=session_id)
-    try:
-        session.delete()
-        messages.success(request, "Session deleted successfully!")
-    except Exception:
-        messages.error(
-            request, "There are students assigned to this session. Please move them to another session.")
-    return redirect(reverse('manage_session'))
+    if request.method == 'POST' and request.is_ajax():
+        try:
+            session = get_object_or_404(Session, id=session_id)
+            session.delete()
+            return JsonResponse({'success': True})
+        except Session.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Session does not exist'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request method or not an AJAX request'})
 
 def manage_session(request):
     sessions = Session.objects.all()
@@ -679,37 +733,39 @@ def manage_session(request):
 def add_teacher(request):
     form = TeacherForm(request.POST or None, request.FILES or None)
     context = {'form': form, 'page_title': _('Add teacher')}
-
+    
     if request.method == 'POST':
         if form.is_valid():
+            full_name = form.cleaned_data.get('full_name')
+            address = form.cleaned_data.get('address')
+            phone_number = form.cleaned_data.get('phone_number')
+            campus = form.cleaned_data.get('campus')
+            remark = form.cleaned_data.get('remark')
+            email = form.cleaned_data.get('email')
+            gender = form.cleaned_data.get('gender')
+            password = form.cleaned_data.get('password')
+            courses = form.cleaned_data.get('courses')  # Get the courses
+            work_type = form.cleaned_data.get('work_type')
+
             try:
-                user = CustomUser.objects.create_user(
-                    email=form.cleaned_data.get('email'),
-                    password=form.cleaned_data.get('password'),
-                    user_type=2,
-                    full_name=form.cleaned_data.get('full_name')
-                )
-                user.gender = form.cleaned_data.get('gender')
-                user.address = form.cleaned_data.get('address')
-                user.phone_number = form.cleaned_data.get('phone_number')
-                user.remark = form.cleaned_data.get('remark')
+                user = CustomUser.objects.create_user(email=email, password=password, user_type=2, full_name=full_name, profile_pic=None)
+                user.gender = gender
+                user.address = address
+                user.phone_number = phone_number
+                user.teacher.campus = campus
+                user.remark = remark
+                user.teacher.work_type = work_type
                 user.save()
 
-                teacher = Teacher.objects.create(
-                    admin=user,
-                    campus=form.cleaned_data.get('campus'),
-                    work_type=form.cleaned_data.get('work_type')
-                )
-                teacher.courses.set(form.cleaned_data.get('courses'))
-                teacher.save()
+                # Set the many-to-many relationship
+                user.teacher.courses.set(courses)
 
-                messages.success(request, "Successfully Added")
-                return redirect(reverse('add_teacher'))
-
+                return JsonResponse({'success': True, 'message': 'Teacher Added Successfully'})
             except Exception as e:
-                messages.error(request, "Could Not Add: " + str(e))
+                return JsonResponse({'success': False, 'message': 'Could Not Add: ' + str(e)}, status=400)
         else:
-            messages.error(request, "Please fulfill all requirements")
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'message': 'Please fulfill all requirements', 'errors': errors}, status=400)
 
     return render(request, 'hod_template/add_teacher_template.html', context)
 
@@ -722,24 +778,31 @@ def edit_teacher(request, teacher_id):
         'page_title': _('Edit teacher')
     }
 
-    if request.method == 'POST':
+    if request.method == 'POST' and request.is_ajax():
         if form.is_valid():
             try:
                 form.save()
-                messages.success(request, "Successfully Updated")
-                return redirect(reverse('edit_teacher', args=[teacher_id]))
+                return JsonResponse({'success': True, 'message': 'Teacher Updated Successfully'})
             except Exception as e:
-                messages.error(request, "Could Not Update: " + str(e))
+                return JsonResponse({'success': False, 'message': 'Could Not Update: ' + str(e)}, status=400)
         else:
-            messages.error(request, "Please fill the form properly")
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'message': 'Please fill the form properly', 'errors': errors}, status=400)
 
     return render(request, "hod_template/edit_teacher_template.html", context)
 
 def delete_teacher(request, teacher_id):
-    teacher = get_object_or_404(CustomUser, teacher__id=teacher_id)
-    teacher.delete()
-    messages.success(request, "teacher deleted successfully!")
-    return redirect(reverse('manage_teacher'))
+    if request.method == 'POST' and request.is_ajax():
+        try:
+            teacher = get_object_or_404(CustomUser, teacher__id=teacher_id)
+            teacher.delete()
+            return JsonResponse({'success': True})
+        except CustomUser.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Teacher does not exist'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request method or not an AJAX request'})
 
 def manage_teacher(request):
     allteacher = CustomUser.objects.filter(user_type=2)
@@ -859,35 +922,46 @@ def add_student(request):
     form = StudentForm(request.POST or None, request.FILES or None)
     context = {'form': form, 'page_title': _('Add Student')}
     
-    if request.method == 'POST' and form.is_valid():
-        try:
-            full_name = form.cleaned_data['full_name']
-            gender = form.cleaned_data['gender']
-            email = form.cleaned_data.get('email') or f"{full_name.replace(' ', '').lower()}_{uuid.uuid4()}@placeholder.com"
-            password = form.cleaned_data['password']
+    if request.method == 'POST':
+        if form.is_valid():
+            full_name = form.cleaned_data.get('full_name')
+            gender = form.cleaned_data.get('gender')
+            date_of_birth = form.cleaned_data.get('date_of_birth')
+            address = form.cleaned_data.get('address')
+            phone_number = form.cleaned_data.get('phone_number')
+            password = form.cleaned_data.get('password')
+            grade = form.cleaned_data.get('grade')
+            reg_date = form.cleaned_data.get('reg_date')
+            status = form.cleaned_data.get('status')
+            remark = form.cleaned_data.get('remark')
+            campus = form.cleaned_data.get('campus')
+            courses = form.cleaned_data.get('courses')  # Get courses from form
 
-            user = CustomUser.objects.create_user(email=email, password=password, user_type=3, full_name=full_name)
-            user.gender = gender
-            user.address = form.cleaned_data['address']
-            user.phone_number = form.cleaned_data['phone_number']
-            user.remark = form.cleaned_data['remark']
-            user.save()
+            try:
+                email = form.cleaned_data.get('email') or f"{full_name.replace(' ', '').lower()}_{uuid.uuid4()}@placeholder.com"
+                
+                user = CustomUser.objects.create_user(email=email, password=password, user_type=3, full_name=full_name, profile_pic=None)
+                user.gender = gender
+                user.student.date_of_birth = date_of_birth
+                user.address = address
+                user.phone_number = phone_number
+                user.student.status = status
+                user.student.grade = grade
+                user.student.reg_date = reg_date
+                user.remark = remark
+                user.student.campus = campus
+                user.save()
 
-            student = Student.objects.create(
-                admin=user,
-                campus=form.cleaned_data['campus'],
-                date_of_birth=form.cleaned_data['date_of_birth'],
-                reg_date=form.cleaned_data['reg_date'],
-                status=form.cleaned_data['status'],
-            )
-            student.courses.set(form.cleaned_data['courses'])
-            student.save()
+                # Set the many-to-many relationship
+                user.student.courses.set(courses)
+              
+                return JsonResponse({'success': True, 'message': 'Student Added Successfully'})
+            except Exception as e:
+                return JsonResponse({'success': False, 'message': 'Could Not Add: ' + str(e)}, status=400)
+        else:
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'message': 'Please fulfill all requirements', 'errors': errors}, status=400)
 
-            messages.success(request, "Successfully Added")
-            return redirect(reverse('add_student'))
-        except Exception as e:
-            messages.error(request, "Could Not Add: " + str(e))
-    
     return render(request, 'hod_template/add_student_template.html', context)
 
 def edit_student(request, student_id):
@@ -895,24 +969,31 @@ def edit_student(request, student_id):
     form = StudentForm(request.POST or None, instance=student)
     context = {'form': form, 'student_id': student_id, 'page_title': _('Edit Student')}
 
-    if request.method == 'POST':
+    if request.method == 'POST' and request.is_ajax():
         if form.is_valid():
             try:
                 form.save()
-                messages.success(request, "Successfully Updated")
-                return redirect(reverse('edit_student', args=[student_id]))
+                return JsonResponse({'success': True, 'message': 'Student Updated Successfully'})
             except Exception as e:
-                messages.error(request, "Could Not Update: " + str(e))
+                return JsonResponse({'success': False, 'message': 'Could Not Update: ' + str(e)}, status=400)
         else:
-            messages.error(request, "Please fill the form properly")
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'message': 'Please fill the form properly', 'errors': errors}, status=400)
 
     return render(request, 'hod_template/edit_student_template.html', context)
 
 def delete_student(request, student_id):
-    student = get_object_or_404(CustomUser, id=student_id)
-    student.delete()
-    messages.success(request, "Student deleted successfully!")
-    return redirect(reverse('manage_student'))
+    if request.method == 'POST' and request.is_ajax():
+        try:
+            student = get_object_or_404(CustomUser, id=student_id)
+            student.delete()
+            return JsonResponse({'success': True, 'message': 'Student Deleted Successfully!'})
+        except CustomUser.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Student does not exist'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request method or not an AJAX request'}, status=400)
 
 def manage_student(request):
     students = CustomUser.objects.filter(user_type=3)
@@ -946,53 +1027,115 @@ def manage_student(request):
     return render(request, "hod_template/manage_student.html", context)
 
 def manage_student_query(request):
+    print("Fetching all students...")
     # Get all students
     students = CustomUser.objects.filter(user_type=3)
+    print(f"Total students fetched: {students.count()}")
 
     # Get the selected student ID from the form submission
     selected_student_id = request.GET.get('student_id')
+    print(f"Selected student ID: {selected_student_id}")
 
-    # Initialize the student_query_info list outside the if block
+    # Initialize the student_query_info list
     student_query_info = []
 
-    # If a student is selected, filter student queries by that student
     if selected_student_id:
         try:
-            # Retrieve the selected student's queries and related objects
-            student_queries = StudentQuery.objects.filter(student_records__admin__id=selected_student_id).select_related(
-                'student_records__admin', 'payment_records', 'learning_records'
-            )
+            print(f"Retrieving student record for ID: {selected_student_id}...")
+            # Retrieve the student record
+            student_record = Student.objects.select_related('admin').get(admin__id=selected_student_id)
+            student_name = student_record.admin.full_name
+            gender = student_record.admin.gender
+            date_of_birth = student_record.date_of_birth
+            phone_number = student_record.admin.phone_number
+            campus = student_record.campus
+            state = student_record.status
+            reg_date = student_record.reg_date
 
-            for student_query in student_queries:
-                if student_query.payment_records:
-                    priceper = (student_query.payment_records.amount_paid / student_query.payment_records.lesson_hours) if student_query.payment_records.lesson_hours else 0
+            print(f"Student record retrieved: {student_name}, {gender}, {date_of_birth}, {phone_number}, {campus}, {state}, {reg_date}")
 
-                    student_info = {
-                        'student_name': student_query.student_records.admin.full_name if student_query.student_records and student_query.student_records.admin else 'Unknown',
-                        'gender': student_query.student_records.admin.gender if student_query.student_records and student_query.student_records.admin else 'Unknown',
-                        'date_of_birth': student_query.student_records.date_of_birth if student_query.student_records else 'Unknown',
-                        'phone_number': student_query.student_records.admin.phone_number if student_query.student_records and student_query.student_records.admin else 'Unknown',
-                        'campus': student_query.student_records.campus if student_query.student_records else 'Unknown',
-                        'state': student_query.student_records.status if student_query.student_records else 'Unknown',
-                        'payment_status': student_query.payment_records.status if student_query.payment_records else 'Unknown',
-                        'refunded': student_query.refund if student_query.refund is not None else 'Unknown',
-                        'reg_date': student_query.student_records.reg_date if student_query.student_records else 'Unknown',
-                        'num_of_classes': student_query.num_of_classes if student_query.num_of_classes is not None else 'Unknown',
-                        'registered_courses': student_query.registered_courses if student_query.registered_courses else 'Unknown',
-                        'completed_hours': student_query.completed_hours if student_query.completed_hours is not None else 'Unknown',
-                        'remaining_hours': student_query.remaining_hours if student_query.remaining_hours is not None else 'Unknown',
-                        'date': student_query.learning_records.date if student_query.learning_records else 'Unknown',
-                        'course': student_query.learning_records.course if student_query.learning_records else 'Unknown',
-                        'instructor': student_query.learning_records.teacher if student_query.learning_records else 'Unknown',
-                        'start_time': student_query.learning_records.start_time if student_query.learning_records else 'Unknown',
-                        'end_time': student_query.learning_records.end_time if student_query.learning_records else 'Unknown',
-                        'paid': student_query.payment_records.amount_paid if student_query.payment_records else 'Unknown',
-                        'lesson_hours': student_query.learning_records.lesson_hours if student_query.learning_records else 'Unknown',
-                        'paid_class_hours': student_query.payment_records.lesson_hours if student_query.payment_records else 'Unknown',
-                    }
-                    student_query_info.append(student_info)
+            # Retrieve payment and learning records
+            print("Fetching payment records...")
+            payment_record = PaymentRecord.objects.filter(student=student_record).first()
+            print(f"Payment record: {payment_record}")
+
+            if payment_record:
+                print(f"Payment record details - Status: {payment_record.status}, Amount Paid: {payment_record.amount_paid}, Lesson Hours: {payment_record.lesson_hours}")
+            else:
+                print("No payment record found for this student.")
+
+            print("Fetching learning records...")
+            learning_records = LearningRecord.objects.filter(student=student_record).select_related('course', 'teacher__admin')
+            print(f"Total learning records fetched: {learning_records.count()}")
+
+            # Function to extract numeric part from lesson_hours
+            def extract_numeric_value(value):
+                try:
+                    return float(''.join(filter(str.isdigit, str(value))))
+                except ValueError:
+                    return 0.0
+
+            # Ensure lesson_hours are treated as numbers
+            completed_hours = sum(extract_numeric_value(record.lesson_hours) for record in learning_records if record.lesson_hours)
+            print(f"Completed hours: {completed_hours}")
+
+            remaining_hours = extract_numeric_value(payment_record.lesson_hours) - completed_hours if payment_record and payment_record.lesson_hours else 0
+            print(f"Remaining hours: {remaining_hours}")
+
+            student_info = {
+                'student_name': student_name,
+                'gender': gender,
+                'date_of_birth': date_of_birth,
+                'phone_number': phone_number,
+                'campus': campus,
+                'state': state,
+                'payment_status': payment_record.status if payment_record else 'Unknown',
+                'refunded': payment_record.status == 'Refund' if payment_record else 'Unknown',
+                'reg_date': reg_date,
+                'num_of_classes': learning_records.count(),
+                'registered_courses': ", ".join(set(record.course.name for record in learning_records)),
+                'completed_hours': completed_hours,
+                'remaining_hours': remaining_hours,
+                'records': defaultdict(list)
+            }
+
+            print(f"Student info: {student_info}")
+
+            for record in learning_records:
+                course_info = {
+                    'date': record.date,
+                    'course': record.course.name,
+                    'instructor': record.teacher.admin.full_name,  # Corrected line
+                    'start_time': record.start_time,
+                    'end_time': record.end_time,
+                    'lesson_hours': record.lesson_hours,
+                }
+                print(f"Adding course info: {course_info}")
+                student_info['records'][record.course.name].append(course_info)
+
+            for course, records in student_info['records'].items():
+                student_query_info.append({
+                    'course': course,
+                    'student_name': student_info['student_name'],
+                    'gender': student_info['gender'],
+                    'date_of_birth': student_info['date_of_birth'],
+                    'phone_number': student_info['phone_number'],
+                    'campus': student_info['campus'],
+                    'state': student_info['state'],
+                    'payment_status': student_info['payment_status'],
+                    'refunded': student_info['refunded'],
+                    'reg_date': student_info['reg_date'],
+                    'num_of_classes': student_info['num_of_classes'],
+                    'registered_courses': student_info['registered_courses'],
+                    'completed_hours': student_info['completed_hours'],
+                    'remaining_hours': student_info['remaining_hours'],
+                    'records': records
+                })
+                print(f"Appended student query info for course: {course}")
+
         except Exception as e:
             logging.error(f"Error retrieving student queries: {e}")
+            print(f"Error: {e}")
 
     context = {
         'students': students,
@@ -1000,40 +1143,100 @@ def manage_student_query(request):
         'page_title': _('Manage Student Queries')
     }
 
+    print("Rendering the template with context...")
     return render(request, 'hod_template/manage_student_query.html', context)
+
+# def manage_student_query(request):
+#     # Get all students
+#     students = CustomUser.objects.filter(user_type=3)
+
+#     # Get the selected student ID from the form submission
+#     selected_student_id = request.GET.get('student_id')
+
+#     # Initialize the student_query_info list outside the if block
+#     student_query_info = []
+
+#     # If a student is selected, filter student queries by that student
+#     if selected_student_id:
+#         try:
+#             # Retrieve the selected student's queries and related objects
+#             student_queries = StudentQuery.objects.filter(student_records__admin__id=selected_student_id).select_related(
+#                 'student_records__admin', 'payment_records', 'learning_records'
+#             )
+
+#             for student_query in student_queries:
+#                 if student_query.payment_records:
+#                     priceper = (student_query.payment_records.amount_paid / student_query.payment_records.lesson_hours) if student_query.payment_records.lesson_hours else 0
+
+#                     student_info = {
+#                         'student_name': student_query.student_records.admin.full_name if student_query.student_records and student_query.student_records.admin else 'Unknown',
+#                         'gender': student_query.student_records.admin.gender if student_query.student_records and student_query.student_records.admin else 'Unknown',
+#                         'date_of_birth': student_query.student_records.date_of_birth if student_query.student_records else 'Unknown',
+#                         'phone_number': student_query.student_records.admin.phone_number if student_query.student_records and student_query.student_records.admin else 'Unknown',
+#                         'campus': student_query.student_records.campus if student_query.student_records else 'Unknown',
+#                         'state': student_query.student_records.status if student_query.student_records else 'Unknown',
+#                         'payment_status': student_query.payment_records.status if student_query.payment_records else 'Unknown',
+#                         'refunded': student_query.refund if student_query.refund is not None else 'Unknown',
+#                         'reg_date': student_query.student_records.reg_date if student_query.student_records else 'Unknown',
+#                         'num_of_classes': student_query.num_of_classes if student_query.num_of_classes is not None else 'Unknown',
+#                         'registered_courses': student_query.registered_courses if student_query.registered_courses else 'Unknown',
+#                         'completed_hours': student_query.completed_hours if student_query.completed_hours is not None else 'Unknown',
+#                         'remaining_hours': student_query.remaining_hours if student_query.remaining_hours is not None else 'Unknown',
+#                         'date': student_query.learning_records.date if student_query.learning_records else 'Unknown',
+#                         'course': student_query.learning_records.course if student_query.learning_records else 'Unknown',
+#                         'instructor': student_query.learning_records.teacher if student_query.learning_records else 'Unknown',
+#                         'start_time': student_query.learning_records.start_time if student_query.learning_records else 'Unknown',
+#                         'end_time': student_query.learning_records.end_time if student_query.learning_records else 'Unknown',
+#                         'paid': student_query.payment_records.amount_paid if student_query.payment_records else 'Unknown',
+#                         'lesson_hours': student_query.learning_records.lesson_hours if student_query.learning_records else 'Unknown',
+#                         'paid_class_hours': student_query.payment_records.lesson_hours if student_query.payment_records else 'Unknown',
+#                     }
+#                     student_query_info.append(student_info)
+#         except Exception as e:
+#             logging.error(f"Error retrieving student queries: {e}")
+
+#     context = {
+#         'students': students,
+#         'student_query_info': student_query_info,
+#         'page_title': _('Manage Student Queries')
+#     }
+
+#     return render(request, 'hod_template/manage_student_query.html', context)
 
 
 #Courses
 def add_course(request):
-    form = CourseForm(request.POST or None, request.FILES or None)  # Adjusted to include request.FILES
-    context = {
-        'form': form,
-        'page_title': _('Add Course')
-    }
+    form = CourseForm(request.POST or None, request.FILES or None)
+    context = {'form': form, 'page_title': _('Add Course')}
+    
     if request.method == 'POST':
         if form.is_valid():
+            # Extract form data
             name = form.cleaned_data.get('name')
             overview = form.cleaned_data.get('overview')
             level_grade = form.cleaned_data.get('level_grade')
-            image = form.cleaned_data.get('image')  # Get the image from cleaned_data
+            image = form.cleaned_data.get('image')  # Get the image from the form
+
             try:
-                course = Course()
-                course.name = name
-                course.overview = overview
-                course.level_end = level_grade
-                course.image = image  # Set the image field
-                course.save()
-                messages.success(request, "Successfully Added")
-                return redirect(reverse('add_course'))
+                # Create Course instance
+                course = Course.objects.create(
+                    name=name,
+                    overview=overview,
+                    level_end=level_grade,
+                    image=image  # Set the image field
+                )
+                return JsonResponse({'success': True, 'message': 'Course Added Successfully'})
             except Exception as e:
-                messages.error(request, f"Could Not Add: {e}")
+                return JsonResponse({'success': False, 'message': 'Could Not Add: ' + str(e)}, status=400)
         else:
-            messages.error(request, "Could Not Add")
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'message': 'Please fulfill all requirements', 'errors': errors}, status=400)
+    
     return render(request, 'hod_template/add_course_template.html', context)
 
 def edit_course(request, course_id):
     instance = get_object_or_404(Course, id=course_id)
-    form = CourseForm(request.POST or None, request.FILES or None, instance=instance)  # Adjusted to include request.FILES
+    form = CourseForm(request.POST or None, request.FILES or None, instance=instance)
     context = {
         'form': form,
         'course_id': course_id,
@@ -1041,11 +1244,14 @@ def edit_course(request, course_id):
     }
     if request.method == 'POST':
         if form.is_valid():
+            # Extract form data
             name = form.cleaned_data.get('name')
-            overview = form.cleaned_data.get('overview')  # corrected field name
+            overview = form.cleaned_data.get('overview')
             level_grade = form.cleaned_data.get('level_grade')
-            image = form.cleaned_data.get('image')  # Get the image from cleaned_data
+            image = form.cleaned_data.get('image')  # Get the image from the form
+
             try:
+                # Update Course instance
                 course = Course.objects.get(id=course_id)
                 course.name = name
                 course.overview = overview
@@ -1053,22 +1259,27 @@ def edit_course(request, course_id):
                 if image:  # Only update the image if a new one is provided
                     course.image = image
                 course.save()
-                messages.success(request, "Successfully Updated")
+                return JsonResponse({'success': True, 'message': 'Course Updated Successfully'})
             except Exception as e:
-                messages.error(request, f"Could Not Update: {e}")
+                return JsonResponse({'success': False, 'message': 'Could Not Update: ' + str(e)}, status=400)
         else:
-            messages.error(request, "Could Not Update")
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'message': 'Please fill the form properly', 'errors': errors}, status=400)
 
     return render(request, 'hod_template/edit_course_template.html', context)
 
 def delete_course(request, course_id):
-    course = get_object_or_404(Course, id=course_id)
-    try:
-        course.delete()
-        messages.success(request, "Course deleted successfully!")
-    except Exception as e:
-        messages.error(request, f"Sorry, some students are assigned to this course already. Kindly change the affected student course and try again. Error: {e}")
-    return redirect(reverse('manage_course'))
+    if request.method == 'POST' and request.is_ajax():
+        try:
+            course = get_object_or_404(Course, id=course_id)
+            course.delete()
+            return JsonResponse({'success': True, 'message': 'Course Deleted Successfully!'})
+        except Course.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Course does not exist'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request method or not an AJAX request'}, status=400)
 
 def manage_course(request):
     courses = Course.objects.all()
@@ -1159,21 +1370,21 @@ def add_campus(request):
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
-            principal = form.cleaned_data.get('principal')  # New field
-            principal_contact_number = form.cleaned_data.get('principal_contact_number')  # New field
+            principal = form.cleaned_data.get('principal')
+            principal_contact_number = form.cleaned_data.get('principal_contact_number')
 
             try:
                 campus = Campus()
                 campus.name = name
-                campus.principal = principal  # New field
-                campus.principal_contact_number = principal_contact_number  # New field
+                campus.principal = principal
+                campus.principal_contact_number = principal_contact_number
                 campus.save()
-                messages.success(request, "Successfully Added")
-                return redirect(reverse('add_campus'))
+                return JsonResponse({'success': True, 'message': 'Campus Added Successfully'})
             except Exception as e:
-                messages.error(request, "Could Not Add " + str(e))
+                return JsonResponse({'success': False, 'message': 'Could Not Add: ' + str(e)}, status=400)
         else:
-            messages.error(request, "Fill Form Properly")
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'message': 'Please fulfill all requirements', 'errors': errors}, status=400)
 
     return render(request, 'hod_template/add_campus_template.html', context)
 
@@ -1188,29 +1399,36 @@ def edit_campus(request, campus_id):
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
-            principal = form.cleaned_data.get('principal')  # New field
-            principal_contact_number = form.cleaned_data.get('principal_contact_number')  # New field
+            principal = form.cleaned_data.get('principal')
+            principal_contact_number = form.cleaned_data.get('principal_contact_number')
 
             try:
                 campus = Campus.objects.get(id=campus_id)
                 campus.name = name
-                campus.principal = principal  # New field
-                campus.principal_contact_number = principal_contact_number  # New field
+                campus.principal = principal
+                campus.principal_contact_number = principal_contact_number
                 campus.save()
-                messages.success(request, "Successfully Updated")
-                return redirect(reverse('edit_campus', args=[campus_id]))
+                return JsonResponse({'success': True, 'message': 'Campus Updated Successfully'})
             except Exception as e:
-                messages.error(request, "Could Not Update " + str(e))
+                return JsonResponse({'success': False, 'message': 'Could Not Update: ' + str(e)}, status=400)
         else:
-            messages.error(request, "Fill Form Properly")
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'message': 'Please fulfill all requirements', 'errors': errors}, status=400)
 
     return render(request, 'hod_template/edit_campus_template.html', context)
 
 def delete_campus(request, campus_id):
-    campus = get_object_or_404(Campus, id=campus_id)
-    campus.delete()
-    messages.success(request, "Campus deleted successfully!")
-    return redirect(reverse('manage_campus'))
+    if request.method == 'POST' and request.is_ajax():
+        try:
+            campus = get_object_or_404(Campus, id=campus_id)
+            campus.delete()
+            return JsonResponse({'success': True, 'message': 'Campus Deleted Successfully!'})
+        except Campus.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Campus does not exist'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request method or not an AJAX request'}, status=400)
 
 def manage_campus(request):
     campuses = Campus.objects.all()
@@ -1222,13 +1440,28 @@ def manage_campus(request):
 
 
 # Payments
+def get_lesson_hours(request):
+    student_id = request.GET.get('student_id')
+    print(f"Received request for student_id: {student_id}")
+    try:
+        total_lesson_hours = LearningRecord.objects.filter(student_id=student_id).aggregate(Sum('lesson_hours'))['lesson_hours__sum']
+        if total_lesson_hours is None:
+            total_lesson_hours = 0
+        print(f"Total lesson hours for student {student_id}: {total_lesson_hours}")
+
+        return JsonResponse({'success': True, 'lesson_hours': float(total_lesson_hours)})
+    except Exception as e:
+        print(f"Error calculating lesson hours for student {student_id}: {str(e)}")
+        return JsonResponse({'success': False, 'error': str(e)})
+
 def add_payment_record(request):
     form = PaymentRecordForm(request.POST or None)
     context = {
         'form': form,
         'page_title': _('Add Payment Record')
     }
-    if request.method == 'POST':
+
+    if request.method == 'POST' and request.is_ajax():
         if form.is_valid():
             date = form.cleaned_data.get('date')
             student = form.cleaned_data.get('student')
@@ -1237,7 +1470,7 @@ def add_payment_record(request):
             other_fee = form.cleaned_data.get('other_fee')
             amount_due = form.cleaned_data.get('amount_due')
             amount_paid = form.cleaned_data.get('amount_paid')
-            # total_lesson_hours = form.cleaned_data.get('lesson_hours') or 0  # Ensure a default value if not provided
+            lesson_hours = form.cleaned_data.get('lesson_hours')  # Added lesson_hours
             payment_method = form.cleaned_data.get('payment_method')
             status = form.cleaned_data.get('status')
             payee = form.cleaned_data.get('payee')
@@ -1245,12 +1478,12 @@ def add_payment_record(request):
             next_payment_date = form.cleaned_data.get('next_payment_date')
 
             # Calculate lesson unit price and discounted price
-            if total_lesson_hours > 0:
-                lesson_unit_price = amount_due / total_lesson_hours
+            if lesson_hours > 0:
+                lesson_unit_price = amount_due / lesson_hours
             else:
                 lesson_unit_price = 2180
 
-            discounted_price = lesson_unit_price * total_lesson_hours
+            discounted_price = lesson_unit_price * lesson_hours
 
             # If next_payment_date is not provided, set it to date + 1 month
             if not next_payment_date:
@@ -1265,7 +1498,7 @@ def add_payment_record(request):
                     course=course,
                     lesson_unit_price=lesson_unit_price,
                     discounted_price=discounted_price,
-                    lesson_hours=total_lesson_hours,
+                    lesson_hours=lesson_hours,  # Added lesson_hours
                     book_costs=book_costs,
                     other_fee=other_fee,
                     amount_due=amount_due,
@@ -1290,7 +1523,6 @@ def add_payment_record(request):
                     semester=None,  # This can be set appropriately
                     start_time=None,
                     end_time=None,
-                    # lesson_hours=str(total_lesson_hours) + " hours",  # Assuming lesson_hours is a string field
                     day=date.strftime("%A")  # Assuming day is the day of the week
                 )
 
@@ -1298,13 +1530,13 @@ def add_payment_record(request):
                 payment.learning_record = learning_record
                 payment.save()
 
-                messages.success(request, "Successfully Added")
-                return redirect(reverse('add_payment_record'))
+                return JsonResponse({'success': True, 'message': 'Payment Record Added Successfully'})
 
             except Exception as e:
-                messages.error(request, "Could Not Add: " + str(e))
+                return JsonResponse({'success': False, 'message': 'Could Not Add: ' + str(e)}, status=400)
         else:
-            messages.error(request, "Fill Form Properly")
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'message': 'Please fulfill all requirements', 'errors': errors}, status=400)
 
     return render(request, 'hod_template/add_payment_record_template.html', context)
 
@@ -1318,68 +1550,56 @@ def edit_payment_record(request, payment_id):
         'page_title': _('Edit Payment Record'),
     }
 
-    if request.method == 'POST':
+    if request.method == 'POST' and request.is_ajax():
         if form.is_valid():
-            date = form.cleaned_data.get('date')
-            student = form.cleaned_data.get('student')
-            course = form.cleaned_data.get('course')
-            learning = form.cleaned_data.get('learning')
-            book_costs = form.cleaned_data.get('book_costs')
-            other_fee = form.cleaned_data.get('other_fee')
-            amount_due = form.cleaned_data.get('amount_due')
-            amount_paid = form.cleaned_data.get('amount_paid')
-            # lesson_hours = form.cleaned_data.get('lesson_hours') or 0
-            payment_method = form.cleaned_data.get('payment_method')
-            status = form.cleaned_data.get('status')
-            payee = form.cleaned_data.get('payee')
-            remark = form.cleaned_data.get('remark')
-
-            if lesson_hours > 0:
-                lesson_unit_price = amount_due / lesson_hours
-            else:
-                lesson_unit_price = 2180
-
-            discounted_price = lesson_unit_price * lesson_hours
-
             try:
-                paymentrecord.date = date
-                paymentrecord.student = student
-                paymentrecord.course = course
-                paymentrecord.learning_record = learning
-                paymentrecord.lesson_unit_price = lesson_unit_price
-                paymentrecord.discounted_price = discounted_price
-                paymentrecord.book_costs = book_costs
-                paymentrecord.other_fee = other_fee
-                paymentrecord.amount_due = amount_due
-                # paymentrecord.lesson_hours = lesson_hours
-                paymentrecord.amount_paid = amount_paid
-                paymentrecord.payment_method = payment_method
-                paymentrecord.status = status
-                paymentrecord.payee = payee
-                paymentrecord.remark = remark
-
-                student.course_id = course
-                student.save()
-
-                paymentrecord.save()
-
-                messages.success(request, "Successfully Updated")
-                return redirect(reverse('edit_payment_record', args=[payment_id]))
+                form.save()
+                return JsonResponse({'success': True, 'message': 'Payment Record Updated Successfully'})
             except Exception as e:
-                messages.error(request, "Could Not Update: " + str(e))
+                return JsonResponse({'success': False, 'message': 'Could Not Update: ' + str(e)}, status=400)
         else:
-            messages.error(request, "Fill Form Properly")
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'message': 'Please fill the form properly', 'errors': errors}, status=400)
+
     return render(request, 'hod_template/edit_payment_record_template.html', context)
 
 def delete_payment_record(request, payment_id):
-    payment = get_object_or_404(PaymentRecord, id=payment_id)
-    payment.delete()
-    messages.success(request, "Record deleted Successfully!")
-    return redirect(reverse('manage_payment_record'))
+    if request.method == 'POST' and request.is_ajax():
+        try:
+            payment = get_object_or_404(PaymentRecord, id=payment_id)
+            payment.delete()
+            return JsonResponse({'success': True, 'message': 'Payment Record Deleted Successfully!'})
+        except PaymentRecord.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Payment record does not exist'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request method or not an AJAX request'}, status=400)
 
 def manage_payment_record(request):
-    payments = PaymentRecord.objects.all().select_related('learning_record')
+    payments = PaymentRecord.objects.all().select_related('learning_record', 'student').order_by('id')
+    
+    # Calculate total amount paid
     total_amount_paid = payments.aggregate(Sum('amount_paid'))['amount_paid__sum']
+    print(f"Total amount paid: {total_amount_paid}")
+
+    # Calculate lesson hours for each payment record
+    for payment in payments:
+        total_lesson_hours = LearningRecord.objects.filter(student=payment.student).aggregate(Sum('lesson_hours'))['lesson_hours__sum']
+        if total_lesson_hours is None:
+            total_lesson_hours = 0
+        else:
+            total_lesson_hours = float(total_lesson_hours)  # Ensure it is a float
+
+        # Determine if the total lesson hours should be displayed as "hr" or "hrs"
+        # if total_lesson_hours == 1:
+        #     lesson_hours_str = f"{total_lesson_hours} hr"
+        # else:
+        #     lesson_hours_str = f"{total_lesson_hours} hrs"
+
+        # Assuming you want to store this string representation
+        payment.lesson_hours = lesson_hours_str
+        print(f"Student: {payment.student}, Total lesson hours: {payment.lesson_hours}")
 
     paginator = Paginator(payments, 10)  # Show 10 records per page
     page_number = request.GET.get('page')
@@ -1390,48 +1610,61 @@ def manage_payment_record(request):
         'total_amount_paid': total_amount_paid if total_amount_paid else 0,
         'page_title': _('Manage Payment Records')
     }
+    
+    print(f"Paginated Payments: {[payment.id for payment in paginated_payments]}")
+
     return render(request, 'hod_template/manage_payment_record.html', context)
 
 
 # Learning
 def add_learning_record(request):
     form = LearningRecordForm(request.POST or None)
-    if request.method == 'POST':
+    context = {'form': form, 'page_title': _('Add Learning Record')}
+    
+    if request.method == 'POST' and request.is_ajax():
         if form.is_valid():
-            form.save()
-            messages.success(request, "Successfully Added")
-            return redirect('add_learning_record')
+            try:
+                form.save()
+                return JsonResponse({'success': True, 'message': 'Successfully Added'})
+            except Exception as e:
+                return JsonResponse({'success': False, 'message': 'Could Not Add: ' + str(e)}, status=400)
         else:
-            messages.error(request, "Fill Form Properly")
-    context = {
-        'form': form,
-        'page_title': _('Add Learning Record')
-    }
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'message': 'Please fill the form properly', 'errors': errors}, status=400)
+    
     return render(request, 'hod_template/add_learning_record_template.html', context)
 
 def edit_learning_record(request, learn_id):
     learningrecord = get_object_or_404(LearningRecord, id=learn_id)
     form = LearningRecordForm(request.POST or None, instance=learningrecord)
-    if request.method == 'POST':
+    context = {'form': form, 'learn_id': learn_id, 'page_title': _('Edit Learning Record')}
+    
+    if request.method == 'POST' and request.is_ajax():
         if form.is_valid():
-            form.save()
-            messages.success(request, "Successfully Updated")
-            return redirect('edit_learning_record', learn_id=learn_id)
+            try:
+                form.save()
+                return JsonResponse({'success': True, 'message': 'Successfully Updated'})
+            except Exception as e:
+                return JsonResponse({'success': False, 'message': 'Could Not Update: ' + str(e)}, status=400)
         else:
-            messages.error(request, "Fill Form Properly")
-    context = {
-        'form': form,
-        'learn_id': learn_id,
-        'page_title': _('Edit Learning Record')
-    }
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'message': 'Please fill the form properly', 'errors': errors}, status=400)
+    
     return render(request, 'hod_template/edit_learning_record_template.html', context)
 
 def delete_learning_record(request, learn_id):
-    learn = get_object_or_404(LearningRecord, id=learn_id)
-    learn.delete()
-    messages.success(request, "Classes deleted successfully!")
-    return redirect(reverse('manage_learning_record'))
-
+    if request.method == 'POST' and request.is_ajax():
+        try:
+            learn = get_object_or_404(LearningRecord, id=learn_id)
+            learn.delete()
+            return JsonResponse({'success': True, 'message': 'Learning Record Deleted Successfully!'})
+        except LearningRecord.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Learning record does not exist'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request method or not an AJAX request'}, status=400)
+    
 def manage_learning_record(request):
     # Your existing code for fetching learning records, teachers, courses, and filtering
     learningrecords = LearningRecord.objects.all() 
@@ -1447,16 +1680,10 @@ def manage_learning_record(request):
     if selected_grade:
         learningrecords = learningrecords.filter(course__level_end=selected_grade)
 
-    total_lesson_hours = learningrecords.aggregate(Sum('lesson_hours'))['lesson_hours__sum']
+    total_lesson_hours = learningrecords.aggregate(total_hours=Sum('lesson_hours'))['total_hours']
     
     # Ensure the total lesson hours are a whole number
-    if total_lesson_hours is not None:
-        total_lesson_hours = int(total_lesson_hours)
-    else:
-        total_lesson_hours = 0
-
-    # Format the total lesson hours with "hr" or "hrs"
-    total_lesson_hours_str = f"{total_lesson_hours} hr" if total_lesson_hours == 1 else f"{total_lesson_hours} hrs"
+    # total_lesson_hours_str = f"{total_lesson_hours} hr" if total_lesson_hours == 1 else f"{total_lesson_hours} hrs"
 
     paginator = Paginator(learningrecords, 10)  # Show 10 records per page
     page_number = request.GET.get('page')
@@ -1485,7 +1712,7 @@ def manage_learning_record(request):
         'grades': [(str(i), chr(64 + i)) for i in range(1, 8)],  # Assuming grades are from 1 to 7
         'selected_teacher': selected_teacher,
         'selected_grade': selected_grade,
-        'total_lesson_hours': total_lesson_hours_str,
+        'total_lesson_hours': total_lesson_hours,
         'page_title': _('Manage Learning Records')
     }
 
@@ -1493,20 +1720,28 @@ def manage_learning_record(request):
 
 
 #Schedules
+# def calculate_lesson_hours(start_time, end_time):
+#     start = datetime.strptime(start_time.strftime('%H:%M:%S'), '%H:%M:%S')
+#     end = datetime.strptime(end_time.strftime('%H:%M:%S'), '%H:%M:%S')
+#     if start_time >= end_time:
+#         raise ValueError("End time must be after start time.")
+#     delta = end - start
+#     hours, remainder = divmod(delta.total_seconds(), 3600)
+#     minutes, _ = divmod(remainder, 60)
+    
+#     if int(minutes) == 0:
+#         return f"{int(hours)}h"
+#     else:
+#         return f"{int(hours)}h {int(minutes)}m"
+
 def calculate_lesson_hours(start_time, end_time):
-    start = datetime.strptime(start_time.strftime('%H:%M:%S'), '%H:%M:%S')
-    end = datetime.strptime(end_time.strftime('%H:%M:%S'), '%H:%M:%S')
-    if start_time >= end_time:
+    start = datetime.combine(datetime.min, start_time)
+    end = datetime.combine(datetime.min, end_time)
+    if start >= end:
         raise ValueError("End time must be after start time.")
-    delta = end - start
-    hours, remainder = divmod(delta.total_seconds(), 3600)
-    minutes, _ = divmod(remainder, 60)
-    
-    if int(minutes) == 0:
-        return f"{int(hours)}h"
-    else:
-        return f"{int(hours)}h {int(minutes)}m"
-    
+    duration = end - start
+    return duration.total_seconds() / 3600  # Convert to hours and return as a decimal value
+
 def add_class_schedule(request):
     form = ClassScheduleForm(request.POST or None)
     context = {
@@ -1522,7 +1757,6 @@ def add_class_schedule(request):
             start_time = form.cleaned_data.get('start_time')
             end_time = form.cleaned_data.get('end_time')
             remark = form.cleaned_data.get('remark')
-
             try:
                 lesson_hours = calculate_lesson_hours(start_time, end_time)
                 class_schedule = ClassSchedule(
@@ -1536,15 +1770,12 @@ def add_class_schedule(request):
                     remark=remark,
                 )
                 class_schedule.save()
-
-                messages.success(request, "Successfully Added")
-                return redirect(reverse('add_class_schedule'))
-
+                return JsonResponse({'success': True, 'message': 'Class Schedule Added Successfully'})
             except Exception as e:
-                messages.error(request, "Could Not Add " + str(e))
+                return JsonResponse({'success': False, 'message': 'Could Not Add: ' + str(e)}, status=400)
         else:
-            messages.error(request, "Fill Form Properly")
-
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'message': 'Please fulfill all requirements', 'errors': errors}, status=400)
     return render(request, 'hod_template/add_class_schedule_template.html', context)
 
 def edit_class_schedule(request, schedule_id):
@@ -1557,22 +1788,46 @@ def edit_class_schedule(request, schedule_id):
     }
     if request.method == 'POST':
         if form.is_valid():
+            course = form.cleaned_data.get('course')
+            teacher = form.cleaned_data.get('teacher')
+            grade = form.cleaned_data.get('grade')
+            day = form.cleaned_data.get('day')
             start_time = form.cleaned_data.get('start_time')
             end_time = form.cleaned_data.get('end_time')
-            lesson_hours = calculate_lesson_hours(start_time, end_time)
-            form.instance.lesson_hours = lesson_hours
-            form.save()
-            messages.success(request, "Successfully Updated")
-            return redirect(reverse('edit_class_schedule', args=[schedule_id]))
+            remark = form.cleaned_data.get('remark')
+            try:
+                lesson_hours = calculate_lesson_hours(start_time, end_time)
+                class_schedule = ClassSchedule(
+                    course=course,
+                    teacher=teacher,
+                    grade=grade,
+                    day=day,
+                    start_time=start_time,
+                    end_time=end_time,
+                    lesson_hours=lesson_hours,
+                    remark=remark,
+                )
+                class_schedule.save()
+                return JsonResponse({'success': True, 'message': 'Class Schedule Updated Successfully'})
+            except Exception as e:
+                return JsonResponse({'success': False, 'message': 'Could Not Update: ' + str(e)}, status=400)
         else:
-            messages.error(request, "Fill Form Properly")
+            errors = form.errors.as_json()
+            return JsonResponse({'success': False, 'message': 'Please fulfill all requirements', 'errors': errors}, status=400)
     return render(request, 'hod_template/edit_class_schedule_template.html', context)
 
 def delete_class_schedule(request, schedule_id):
-    schedule = get_object_or_404(ClassSchedule, id=schedule_id)
-    schedule.delete()
-    messages.success(request, "Class Schedule deleted successfully!")
-    return redirect(reverse('manage_class_schedule'))
+    if request.method == 'POST' and request.is_ajax():
+        try:
+            schedule = get_object_or_404(ClassSchedule, id=schedule_id)
+            schedule.delete()
+            return JsonResponse({'success': True, 'message': 'Class Schedule Deleted Successfully!'})
+        except ClassSchedule.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Class schedule does not exist'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request method or not an AJAX request'}, status=400)
 
 def manage_class_schedule(request):
     class_schedules = ClassSchedule.objects.all()
@@ -1584,26 +1839,83 @@ def manage_class_schedule(request):
 
 
 #Notifications
-def admin_notify_teacher(request):
-    teachers = Teacher.objects.select_related('admin').all()
-    courses = Course.objects.all()
-    students = Student.objects.select_related('admin').all()
-    context = {
-        'page_title': "Send Notifications To Teachers",
-        'teachers': teachers,
-        'courses': courses,
-        'students': students,
-    }
-    return render(request, "hod_template/teacher_notification.html", context)
+@csrf_exempt
+def send_teacher_notification(request):
+    try:
+        id = request.POST.get('id')
+        message = request.POST.get('message')
+        course_id = request.POST.get('course_id')
+        student_id = request.POST.get('student_id')
+        classroom_performance = request.POST.get('classroom_performance')
+        status_pictures = request.FILES.get('status_pictures')
 
-def admin_notify_student(request):
-    student = CustomUser.objects.filter(user_type=3)
-    context = {
-        'page_title': _("Send Notifications To Students"),
-        'students': student
-    }
-    return render(request, "hod_template/student_notification.html", context)
+        teacher = get_object_or_404(Teacher, admin_id=id)
+        course = get_object_or_404(Course, id=course_id)
+        student = get_object_or_404(Student, id=student_id)
 
+        # Handle the status picture file if it exists
+        notification = NotificationTeacher()
+        if status_pictures:
+            notification.status_pictures = status_pictures  # Set the image field
+
+        # def calculate_age(birthdate):
+        #     if birthdate is None:
+        #         return 0
+        #     today = timezone.now().date()
+        #     age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+        #     return age
+        def calculate_age(date_of_birth):
+            logger.debug("Calculating age...")
+            logger.debug("Date of Birth: %s", date_of_birth)
+
+            if date_of_birth is None:
+                logger.debug("Date of Birth is None. Returning age 0.")
+                return 0
+            
+            today = datetime.now().date()
+            logger.debug("Today's Date: %s", today)
+
+            age = today.year - date_of_birth.year - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
+            logger.debug("Calculated Age: %s", age)
+            
+            return age
+
+        student_info = f"{student.admin.full_name} (Age: {calculate_age(student.date_of_birth)})"
+        detailed_message = f"Course: {course.name}\nStudent:\n{student_info}\nMessage: {message}"
+
+        china_tz = pytz.timezone('Asia/Shanghai')
+        now = timezone.now().astimezone(china_tz)
+
+        notification.teacher = teacher
+        notification.message = detailed_message
+        notification.course = course
+        notification.student = student
+        notification.classroom_performance = classroom_performance
+        notification.date = now.date()
+        notification.time = now.time()
+        notification.save()
+
+        url = "https://fcm.googleapis.com/fcm/send"
+        body = {
+            'notification': {
+                'title': "中之学校管理软件",
+                'body': detailed_message,
+                'click_action': reverse('teacher_view_notification'),
+                'icon': static('dist/img/AdminLTELogo.png')
+            },
+            'to': teacher.admin.fcm_token
+        }
+        headers = {
+            'Authorization': 'key=YOUR_SERVER_KEY',
+            'Content-Type': 'application/json'
+        }
+        data = requests.post(url, data=json.dumps(body), headers=headers)
+
+        return HttpResponse("True")
+
+    except Exception as e:
+        print(f"Error while sending notification: {e}")
+        return HttpResponse("False")
 
 #Exempts
 @csrf_exempt
@@ -1730,107 +2042,28 @@ def get_attendance_dates(request):
         logger.error(f"Error fetching attendance dates: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
 
-@csrf_exempt
-def send_student_notification(request):
-    id = request.POST.get('id')
-    message = request.POST.get('message')
-    student = get_object_or_404(Student, admin_id=id)
-    try:
-        url = "https://fcm.googleapis.com/fcm/send"
-        body = {
-            'notification': {
-                'title': "中之学校管理软件",
-                'body': message,
-                'click_action': reverse('student_view_notification'),
-                'icon': static('dist/img/AdminLTELogo.png')
-            },
-            'to': student.admin.fcm_token
-        }
-        headers = {'Authorization':
-                   'key=AAAA3Bm8j_M:APA91bElZlOLetwV696SoEtgzpJr2qbxBfxVBfDWFiopBWzfCfzQp2nRyC7_A2mlukZEHV4g1AmyC6P_HonvSkY2YyliKt5tT3fe_1lrKod2Daigzhb2xnYQMxUWjCAIQcUexAMPZePB',
-                   'Content-Type': 'application/json'}
-        data = requests.post(url, data=json.dumps(body), headers=headers)
-        notification = NotificationStudent(student=student, message=message)
-        notification.save()
-        return HttpResponse("True")
-    except Exception as e:
-        return HttpResponse("False")
-
-
-@csrf_exempt
-def send_teacher_notification(request):
-    try:
-        id = request.POST.get('id')
-        message = request.POST.get('message')
-        course_id = request.POST.get('course_id')
-        student_id = request.POST.get('student_id')
-        classroom_performance = request.POST.get('classroom_performance')
-        status_pictures = request.FILES.get('status_pictures')
-
-        teacher = get_object_or_404(Teacher, admin_id=id)
-        course = get_object_or_404(Course, id=course_id)
-        student = get_object_or_404(Student, id=student_id)
-
-        # Handle the status picture file if it exists
-        notification = NotificationTeacher()
-        if status_pictures:
-            notification.status_pictures = status_pictures  # Set the image field
-
-        # def calculate_age(birthdate):
-        #     if birthdate is None:
-        #         return 0
-        #     today = timezone.now().date()
-        #     age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
-        #     return age
-        def calculate_age(date_of_birth):
-            logger.debug("Calculating age...")
-            logger.debug("Date of Birth: %s", date_of_birth)
-
-            if date_of_birth is None:
-                logger.debug("Date of Birth is None. Returning age 0.")
-                return 0
-            
-            today = datetime.now().date()
-            logger.debug("Today's Date: %s", today)
-
-            age = today.year - date_of_birth.year - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
-            logger.debug("Calculated Age: %s", age)
-            
-            return age
-
-        student_info = f"{student.admin.full_name} (Age: {calculate_age(student.date_of_birth)})"
-        detailed_message = f"Course: {course.name}\nStudent:\n{student_info}\nMessage: {message}"
-
-        china_tz = pytz.timezone('Asia/Shanghai')
-        now = timezone.now().astimezone(china_tz)
-
-        notification.teacher = teacher
-        notification.message = detailed_message
-        notification.course = course
-        notification.student = student
-        notification.classroom_performance = classroom_performance
-        notification.date = now.date()
-        notification.time = now.time()
-        notification.save()
-
-        url = "https://fcm.googleapis.com/fcm/send"
-        body = {
-            'notification': {
-                'title': "中之学校管理软件",
-                'body': detailed_message,
-                'click_action': reverse('teacher_view_notification'),
-                'icon': static('dist/img/AdminLTELogo.png')
-            },
-            'to': teacher.admin.fcm_token
-        }
-        headers = {
-            'Authorization': 'key=YOUR_SERVER_KEY',
-            'Content-Type': 'application/json'
-        }
-        data = requests.post(url, data=json.dumps(body), headers=headers)
-
-        return HttpResponse("True")
-
-    except Exception as e:
-        print(f"Error while sending notification: {e}")
-        return HttpResponse("False")
+# @csrf_exempt
+# def send_student_notification(request):
+#     id = request.POST.get('id')
+#     message = request.POST.get('message')
+#     student = get_object_or_404(Student, admin_id=id)
+#     try:
+#         url = "https://fcm.googleapis.com/fcm/send"
+#         body = {
+#             'notification': {
+#                 'title': "中之学校管理软件",
+#                 'body': message,
+#                 'click_action': reverse('student_view_notification'),
+#                 'icon': static('dist/img/AdminLTELogo.png')
+#             },
+#             'to': student.admin.fcm_token
+#         }
+#         headers = {'Authorization':
+#                    'key=AAAA3Bm8j_M:APA91bElZlOLetwV696SoEtgzpJr2qbxBfxVBfDWFiopBWzfCfzQp2nRyC7_A2mlukZEHV4g1AmyC6P_HonvSkY2YyliKt5tT3fe_1lrKod2Daigzhb2xnYQMxUWjCAIQcUexAMPZePB',
+#                    'Content-Type': 'application/json'}
+#         data = requests.post(url, data=json.dumps(body), headers=headers)
+#         notification = NotificationStudent(student=student, message=message)
+#         notification.save()
+#         return HttpResponse("True")
+#     except Exception as e:
+#         return HttpResponse("False")

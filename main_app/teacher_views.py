@@ -193,7 +193,6 @@ def teacher_view_profile(request):
                 password = form.cleaned_data.get('password')
                 gender = form.cleaned_data.get('gender')
                 passport = request.FILES.get('profile_pic')
-
                 admin = teacher.admin
 
                 if password:
@@ -209,12 +208,16 @@ def teacher_view_profile(request):
                 admin.save()
                 teacher.save()
 
-                messages.success(request, "Profile Updated!")
+                if request.is_ajax():
+                    return JsonResponse({'success': True, 'message': 'Profile Updated Successfully'})
                 return redirect(reverse('teacher_view_profile'))
             else:
-                messages.error(request, "Invalid Data Provided")
+                if request.is_ajax():
+                    errors = form.errors.as_json()
+                    return JsonResponse({'success': False, 'message': 'Invalid Data Provided', 'errors': errors}, status=400)
         except Exception as e:
-            messages.error(request, f"Error Occurred While Updating Profile: {e}")
+            if request.is_ajax():
+                return JsonResponse({'success': False, 'message': f"Error Occurred While Updating Profile: {e}"}, status=400)
     
     return render(request, "teacher_template/teacher_view_profile.html", context)
 
@@ -233,8 +236,12 @@ def teacher_take_attendance(request):
 
     return render(request, 'teacher_template/teacher_take_attendance.html', context)
 
+@csrf_exempt
 def teacher_edit_attendance(request, attendance_id):
+    print(f"Received request for attendance ID: {attendance_id}")
+
     instance = get_object_or_404(Attendance, id=attendance_id)
+    print(f"Retrieved attendance instance: {instance}")
 
     # Initial data for the form
     initial_data = {
@@ -242,6 +249,7 @@ def teacher_edit_attendance(request, attendance_id):
     }
 
     form = TeacherEditAttendanceForm(request.POST or None, instance=instance, initial=initial_data)
+    print("Form initialized")
 
     # Get related students and attendance reports
     attendance_reports = AttendanceReport.objects.filter(attendance=instance)
@@ -252,6 +260,7 @@ def teacher_edit_attendance(request, attendance_id):
         student.attendance_status = attendance_reports.get(student=student).status
 
     if request.method == 'POST' and request.is_ajax():
+        print("Processing POST request")
         if form.is_valid():
             form.save()
             student_data = request.POST.getlist('student_data[]')
@@ -261,10 +270,13 @@ def teacher_edit_attendance(request, attendance_id):
                 attendance_report = attendance_reports.get(student=student)
                 attendance_report.status = str(student.id) in student_data
                 attendance_report.save()
+                print(f"Updated attendance status for student ID: {student.id} to {attendance_report.status}")
 
+            print("Attendance saved successfully")
             return JsonResponse({'success': True, 'message': 'Attendance saved successfully'})
         else:
             errors = form.errors.as_json()
+            print(f"Failed to update attendance: {errors}")
             return JsonResponse({'success': False, 'message': 'Failed to update attendance', 'errors': errors}, status=400)
 
     context = {
@@ -283,6 +295,10 @@ def teacher_view_attendance(request):
     student_attendances = AttendanceReport.objects.filter(attendance=attendance)
     print(f"Found {len(student_attendances)} student attendance records")  # Debug print statement
 
+    # Get the current course from the attendance record
+    current_course = attendance.classes.course
+    print(f"Current course being viewed: {current_course}")  # Debug print statement
+
     attendance_details = []
 
     for student_attendance in student_attendances:
@@ -298,17 +314,23 @@ def teacher_view_attendance(request):
         print(f"Student {student_name} enrolled in {len(enrolled_courses)} courses")  # Debug print statement
 
         total_class_hours = 0
+        absent_hours = 0
 
         for course in enrolled_courses:
             # Calculate the total class hours for each course
             course_learning_records = LearningRecord.objects.filter(student=student, course=course)
-            course_hours = course_learning_records.aggregate(Sum('lesson_hours'))['lesson_hours__sum'] or 0
+            course_hours = course_learning_records.aggregate(Sum('lesson_hours'))['lesson_hours__sum'] or Decimal('0')
             total_class_hours += course_hours
 
             print(f"Course: {course}, Total Hours: {course_hours}")  # Debug print statement
 
         # Calculate absent hours based on is_present status
-        absent_hours = total_class_hours if not is_present else 0
+        if not is_present:
+            class_schedule = ClassSchedule.objects.filter(course=current_course).first()
+            if class_schedule:
+                lesson_hours = class_schedule.lesson_hours
+                print(f"Class Schedule for {current_course}: Lesson Hours: {lesson_hours}")  # Debug print statement
+                absent_hours = lesson_hours
 
         attendance_details.append({
             'student_name': student_name,
@@ -321,23 +343,17 @@ def teacher_view_attendance(request):
 
     print("Returning attendance details as JSON response")  # Debug print statement
     return JsonResponse({'success': True, 'attendance_details': attendance_details})
-
 @csrf_exempt
 def save_attendance(request):
     if request.method != 'POST':
-        logging.error('Invalid request method')
         return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
 
-    logging.debug('Processing POST request')
     student_data = request.POST.get('student_ids')
     date = request.POST.get('date')
     classes_id = request.POST.get('classes')
     session_id = request.POST.get('session')
 
-    logging.debug(f'Received data: student_data={student_data}, date={date}, classes_id={classes_id}, session_id={session_id}')
-
     if not (student_data and date and classes_id and session_id):
-        logging.error('Missing data')
         return JsonResponse({'success': False, 'error': 'Missing data'}, status=400)
 
     try:
@@ -345,29 +361,21 @@ def save_attendance(request):
         session = get_object_or_404(Session, id=session_id)
         classes = get_object_or_404(ClassSchedule, id=classes_id)
         attendance = Attendance(session=session, classes=classes, date=date)
-        logging.debug(f'Created Attendance object: {attendance}')
         attendance.save()
-        logging.debug('Attendance object saved')
 
         for student_dict in students:
             student_id = student_dict.get('id')
             if student_id is None:
-                logging.error('Student ID is undefined')
                 return JsonResponse({'success': False, 'error': 'Student ID is undefined'}, status=400)
             student_status = student_dict.get('status', 0)
             student = get_object_or_404(Student, id=student_id)
             attendance_report = AttendanceReport(student=student, attendance=attendance, status=student_status)
-            logging.debug(f'Creating AttendanceReport object: {attendance_report}')
             attendance_report.save()
-            logging.debug('AttendanceReport object saved')
 
-        logging.debug('Attendance and AttendanceReport objects saved successfully')
         return JsonResponse({'success': True, 'message': 'Attendance saved successfully'})
     except json.JSONDecodeError:
-        logging.error('Invalid JSON')
         return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
     except Exception as e:
-        logging.error(f'Unexpected error: {str(e)}')
         return JsonResponse({'success': False, 'error': f'An unexpected error occurred: {str(e)}'}, status=500)
 
 def teacher_delete_attendance(request):
@@ -386,8 +394,8 @@ def teacher_delete_attendance(request):
     
 def teacher_manage_attendance(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
-    attendances = Attendance.objects.filter(classes__teacher=teacher)
-    
+    attendances = Attendance.objects.filter(classes__teacher=teacher).order_by('id')  # Add an ordering field
+
     paginator = Paginator(attendances, 10)  # Show 10 records per page
     page_number = request.GET.get('page')
     paginated_attendances = paginator.get_page(page_number)

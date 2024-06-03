@@ -176,7 +176,7 @@
                         $('#success-message').text('{% trans "Notification Deleted Successfully!" %}');
                         $('#success-message').addClass('alert-success').show();
                         setTimeout(function() {
-                            $('#success-message').hide().removeClass('alert-success');
+                            $('#success-message').fadeOut().removeClass('alert-success');
                         }, 3000);
                     } 
                 },
@@ -185,7 +185,7 @@
                     $('#success-message').text('{% trans "An error occurred while deleting the notification." %}');
                     $('#success-message').addClass('alert-danger').show();
                     setTimeout(function() {
-                        $('#success-message').hide().removeClass('alert-danger');
+                        $('#success-message').fadeOut().removeClass('alert-danger');
                     }, 3000);
                 }
             });

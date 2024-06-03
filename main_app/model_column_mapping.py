@@ -15,7 +15,7 @@ MODEL_COLUMN_MAPPING = {
     'Student': {
         'model': Student,
         'fields': {
-            '学生姓名': 'admin__full_name',
+            '学生姓名': 'admin',
             '校区': 'campus',
             '班级': 'course',
             '出生日期': 'date_of_birth',
@@ -26,7 +26,7 @@ MODEL_COLUMN_MAPPING = {
     'Teacher': {
         'model': Teacher,
         'fields': {
-            '授课老师': 'admin__full_name',
+            '授课老师': 'admin',
             '班级': 'course',
             '校区': 'campus',
             '工作类型': 'work_type'

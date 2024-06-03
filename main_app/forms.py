@@ -310,7 +310,6 @@ class LearningRecordForm(FormSettings):
             instance.save()
         return instance
 
-
 class PaymentRecordForm(FormSettings):
     payee = forms.CharField(label=_('Payee'))
     remark = forms.CharField(required=True, label=_('Remark'))
@@ -334,6 +333,7 @@ class PaymentRecordForm(FormSettings):
             'discounted_price', 'book_costs', 'other_fee', 'amount_due', 'amount_paid', 
             'payment_method', 'status', 'payee', 'remark', 'lesson_hours'  # Included lesson_hours in fields
         ]
+
 class ClassScheduleForm(FormSettings):
     def get_level_grade_choices(self, course_id=None):
         if course_id:
@@ -367,7 +367,6 @@ class ClassScheduleForm(FormSettings):
     class Meta:
         model = ClassSchedule
         fields = ['course', 'teacher', 'grade', 'day', 'start_time', 'end_time', 'lesson_hours', 'remark']
-
 
 class DateInput(forms.DateInput):
     input_type = 'date'

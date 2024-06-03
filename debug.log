@@ -4100,3 +4100,469 @@ INFO 2024-06-03 13:42:19,619 models Learning Record Created/Updated: 5
 INFO 2024-06-03 13:42:51,146 models Learning Record Created/Updated: 1
 INFO 2024-06-03 13:42:54,382 models Learning Record Created/Updated: 1
 INFO 2024-06-03 13:42:54,415 models Learning Record Created/Updated: 5
+INFO 2024-06-03 13:49:33,151 models Learning Record Created/Updated: 1
+INFO 2024-06-03 13:49:33,176 models Learning Record Created/Updated: 5
+INFO 2024-06-03 13:51:07,980 models Learning Record Created/Updated: 6
+ERROR 2024-06-03 13:51:11,256 log Internal Server Error: /en/payment/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 1601, in manage_payment_record
+    payment.lesson_hours = lesson_hours_str
+NameError: name 'lesson_hours_str' is not defined
+ERROR 2024-06-03 13:51:11,260 basehttp "GET /en/payment/manage/ HTTP/1.1" 500 68023
+WARNING 2024-06-03 13:51:11,567 log Not Found: /favicon.ico
+WARNING 2024-06-03 13:51:11,567 basehttp "GET /favicon.ico HTTP/1.1" 404 2709
+INFO 2024-06-03 13:52:53,507 models Learning Record Created/Updated: 1
+INFO 2024-06-03 13:52:53,533 models Learning Record Created/Updated: 5
+INFO 2024-06-03 13:52:53,559 models Learning Record Created/Updated: 6
+INFO 2024-06-03 13:55:30,083 models Learning Record Created/Updated: 7
+INFO 2024-06-03 13:55:38,939 models Learning Record Created/Updated: 1
+INFO 2024-06-03 13:55:38,964 models Learning Record Created/Updated: 5
+INFO 2024-06-03 13:55:38,993 models Learning Record Created/Updated: 6
+INFO 2024-06-03 13:55:39,024 models Learning Record Created/Updated: 7
+INFO 2024-06-03 13:55:56,109 models Learning Record Created/Updated: 6
+INFO 2024-06-03 13:55:59,336 models Learning Record Created/Updated: 6
+INFO 2024-06-03 13:55:59,363 models Learning Record Created/Updated: 7
+INFO 2024-06-03 13:56:08,050 models Learning Record Created/Updated: 7
+INFO 2024-06-03 13:56:11,306 models Learning Record Created/Updated: 6
+INFO 2024-06-03 13:56:11,331 models Learning Record Created/Updated: 7
+ERROR 2024-06-03 13:56:33,201 log Internal Server Error: /en/admin/home/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 595, in admin_home
+    'lesson_hours': json.dumps(lesson_hours),
+  File "C:\Users\total\AppData\Local\Programs\Python\Python38\lib\json\__init__.py", line 231, in dumps
+    return _default_encoder.encode(obj)
+  File "C:\Users\total\AppData\Local\Programs\Python\Python38\lib\json\encoder.py", line 199, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+  File "C:\Users\total\AppData\Local\Programs\Python\Python38\lib\json\encoder.py", line 257, in iterencode
+    return _iterencode(o, 0)
+  File "C:\Users\total\AppData\Local\Programs\Python\Python38\lib\json\encoder.py", line 179, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type Decimal is not JSON serializable
+ERROR 2024-06-03 13:56:33,205 basehttp "GET /en/admin/home/ HTTP/1.1" 500 97341
+INFO 2024-06-03 14:00:04,273 hod_views Attendance data: {'present': 0, 'absent': 0, 'leave': 0, 'attendance_dates': [], 'leave_dates': []}
+ERROR 2024-06-03 14:00:34,616 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+ERROR 2024-06-03 14:06:53,773 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+INFO 2024-06-03 14:07:11,674 hod_views Attendance data: {'present': 0, 'absent': 0, 'leave': 0, 'attendance_dates': [], 'leave_dates': []}
+WARNING 2024-06-03 14:16:09,086 log Bad Request: /en/teacher/attendance/edit/2/
+WARNING 2024-06-03 14:16:09,087 basehttp "POST /en/teacher/attendance/edit/2/ HTTP/1.1" 400 76
+WARNING 2024-06-03 14:17:02,432 log Bad Request: /en/teacher/attendance/edit/1/
+WARNING 2024-06-03 14:17:02,432 basehttp "POST /en/teacher/attendance/edit/1/ HTTP/1.1" 400 76
+ERROR 2024-06-03 14:17:27,698 log Internal Server Error: /en/upload/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 255, in get_upload
+    return render(request, 'hod_template/upload.html', {'form': form})
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 34, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\engine.py", line 143, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\engine.py", line 125, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loaders\base.py", line 29, in get_template
+    return Template(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 193, in compile_nodelist
+    return parser.parse()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 478, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 965, in do_if
+    nodelist = parser.parse(('elif', 'else', 'endif'))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 478, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 814, in do_for
+    nodelist_loop = parser.parse(('empty', 'endfor',))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 449, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 447, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 563, in compile_filter
+    return FilterExpression(token, self)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 662, in __init__
+    raise TemplateSyntaxError("Could not parse the remainder: '%s' "
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: '[column]' from 'column_colors[column]'
+ERROR 2024-06-03 14:17:27,707 basehttp "GET /en/upload/ HTTP/1.1" 500 170997
+WARNING 2024-06-03 14:17:27,972 log Not Found: /favicon.ico
+WARNING 2024-06-03 14:17:27,973 basehttp "GET /favicon.ico HTTP/1.1" 404 2709
+ERROR 2024-06-03 14:21:32,458 log Internal Server Error: /en/upload/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 255, in get_upload
+    return render(request, 'hod_template/upload.html', {'form': form})
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 34, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\engine.py", line 143, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\engine.py", line 125, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loaders\base.py", line 29, in get_template
+    return Template(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 193, in compile_nodelist
+    return parser.parse()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 478, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 965, in do_if
+    nodelist = parser.parse(('elif', 'else', 'endif'))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 478, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 814, in do_for
+    nodelist_loop = parser.parse(('empty', 'endfor',))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 449, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 447, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 563, in compile_filter
+    return FilterExpression(token, self)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 662, in __init__
+    raise TemplateSyntaxError("Could not parse the remainder: '%s' "
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: '[column]' from 'column_colors[column]'
+ERROR 2024-06-03 14:21:32,465 basehttp "GET /en/upload/ HTTP/1.1" 500 170997
+ERROR 2024-06-03 14:21:33,201 log Internal Server Error: /en/upload/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 255, in get_upload
+    return render(request, 'hod_template/upload.html', {'form': form})
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 34, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\engine.py", line 143, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\engine.py", line 125, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loaders\base.py", line 29, in get_template
+    return Template(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 193, in compile_nodelist
+    return parser.parse()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 478, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 965, in do_if
+    nodelist = parser.parse(('elif', 'else', 'endif'))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 478, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 814, in do_for
+    nodelist_loop = parser.parse(('empty', 'endfor',))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 449, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 447, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 563, in compile_filter
+    return FilterExpression(token, self)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 662, in __init__
+    raise TemplateSyntaxError("Could not parse the remainder: '%s' "
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: '[column]' from 'column_colors[column]'
+ERROR 2024-06-03 14:21:33,210 basehttp "GET /en/upload/ HTTP/1.1" 500 170997
+WARNING 2024-06-03 14:23:33,417 log Bad Request: /en/teacher/attendance/edit/1/
+WARNING 2024-06-03 14:23:33,418 basehttp "POST /en/teacher/attendance/edit/1/ HTTP/1.1" 400 76
+WARNING 2024-06-03 14:24:55,163 log Bad Request: /en/teacher/attendance/edit/1/
+WARNING 2024-06-03 14:24:55,163 basehttp "POST /en/teacher/attendance/edit/1/ HTTP/1.1" 400 76
+ERROR 2024-06-03 14:31:50,646 log Internal Server Error: /en/upload/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 255, in get_upload
+    return render(request, 'hod_template/upload.html', {'form': form})
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 34, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\engine.py", line 143, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\engine.py", line 125, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loaders\base.py", line 29, in get_template
+    return Template(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 193, in compile_nodelist
+    return parser.parse()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 478, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 965, in do_if
+    nodelist = parser.parse(('elif', 'else', 'endif'))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 478, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 814, in do_for
+    nodelist_loop = parser.parse(('empty', 'endfor',))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 449, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 447, in parse
+    filter_expression = self.compile_filter(token.contents)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 563, in compile_filter
+    return FilterExpression(token, self)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 662, in __init__
+    raise TemplateSyntaxError("Could not parse the remainder: '%s' "
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: '[column]' from 'column_colors[column]'
+ERROR 2024-06-03 14:31:50,656 basehttp "GET /en/upload/ HTTP/1.1" 500 170997
+INFO 2024-06-03 14:34:24,317 teacher_views Received request for attendance ID: 1
+DEBUG 2024-06-03 14:34:24,318 teacher_views Retrieved attendance instance: Attendance object (1)
+INFO 2024-06-03 14:34:31,876 teacher_views Received request for attendance ID: 1
+DEBUG 2024-06-03 14:34:31,877 teacher_views Retrieved attendance instance: Attendance object (1)
+ERROR 2024-06-03 14:34:31,881 teacher_views Failed to update attendance: {}
+WARNING 2024-06-03 14:34:31,882 log Bad Request: /en/teacher/attendance/edit/1/
+WARNING 2024-06-03 14:34:31,883 basehttp "POST /en/teacher/attendance/edit/1/ HTTP/1.1" 400 76
+WARNING 2024-06-03 14:37:03,018 log Bad Request: /en/teacher/attendance/edit/1/
+WARNING 2024-06-03 14:37:03,019 basehttp "POST /en/teacher/attendance/edit/1/ HTTP/1.1" 400 76
+WARNING 2024-06-03 14:41:45,140 log Bad Request: /en/teacher/attendance/edit/2/
+WARNING 2024-06-03 14:41:45,140 basehttp "POST /en/teacher/attendance/edit/2/ HTTP/1.1" 400 76
+WARNING 2024-06-03 14:42:37,597 log Bad Request: /en/teacher/attendance/edit/2/
+WARNING 2024-06-03 14:42:37,597 basehttp "POST /en/teacher/attendance/edit/2/ HTTP/1.1" 400 76
+WARNING 2024-06-03 14:50:23,566 log Bad Request: /en/teacher/attendance/edit/2/
+WARNING 2024-06-03 14:50:23,566 basehttp "POST /en/teacher/attendance/edit/2/ HTTP/1.1" 400 76
+WARNING 2024-06-03 14:50:44,673 log Bad Request: /en/teacher/attendance/edit/2/
+WARNING 2024-06-03 14:50:44,673 basehttp "POST /en/teacher/attendance/edit/2/ HTTP/1.1" 400 76
+WARNING 2024-06-03 15:03:15,693 log Bad Request: /en/teacher/attendance/edit/2/
+WARNING 2024-06-03 15:03:15,694 basehttp "POST /en/teacher/attendance/edit/2/ HTTP/1.1" 400 76
+ERROR 2024-06-03 15:08:45,110 log Internal Server Error: /en/learn/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 1685, in manage_learning_record
+    learningrecords = LearningRecord.objects.all().order_by('date_field_name_here')
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 1134, in order_by
+    obj.query.add_ordering(*field_names)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1919, in add_ordering
+    self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1481, in names_to_path
+    raise FieldError("Cannot resolve keyword '%s' into field. "
+django.core.exceptions.FieldError: Cannot resolve keyword 'date_field_name_here' into field. Choices are: course, course_id, date, day, end_time, id, lesson_hours, paymentquery, paymentrecord, refundrecord, schedule_record, schedule_record_id, semester, semester_id, start_time, student, student_id, studentquery, teacher, teacher_id, teacherquery
+ERROR 2024-06-03 15:08:45,115 basehttp "GET /en/learn/manage/ HTTP/1.1" 500 84050
+WARNING 2024-06-03 15:08:45,477 log Not Found: /favicon.ico
+WARNING 2024-06-03 15:08:45,478 basehttp "GET /favicon.ico HTTP/1.1" 404 2709
+INFO 2024-06-03 15:10:48,955 models Learning Record Created/Updated: 6
+INFO 2024-06-03 15:10:48,998 models Learning Record Created/Updated: 7
+DEBUG 2024-06-03 15:13:32,394 hod_views Calculating age...
+DEBUG 2024-06-03 15:13:32,395 hod_views Date of Birth: 2009-02-03
+DEBUG 2024-06-03 15:13:32,395 hod_views Today's Date: 2024-06-03
+DEBUG 2024-06-03 15:13:32,395 hod_views Calculated Age: 15
+WARNING 2024-06-03 15:20:32,153 log Bad Request: /en/teacher/attendance/edit/1/
+WARNING 2024-06-03 15:20:32,154 basehttp "POST /en/teacher/attendance/edit/1/ HTTP/1.1" 400 76
+WARNING 2024-06-03 15:22:45,497 log Bad Request: /en/teacher/attendance/edit/1/
+WARNING 2024-06-03 15:22:45,498 basehttp "POST /en/teacher/attendance/edit/1/ HTTP/1.1" 400 76
+WARNING 2024-06-03 15:25:18,586 log Bad Request: /en/teacher/attendance/edit/1/
+WARNING 2024-06-03 15:25:18,586 basehttp "POST /en/teacher/attendance/edit/1/ HTTP/1.1" 400 76
+WARNING 2024-06-03 15:32:51,475 log Bad Request: /en/teacher/attendance/edit/1/
+WARNING 2024-06-03 15:32:51,476 basehttp "POST /en/teacher/attendance/edit/1/ HTTP/1.1" 400 76
+WARNING 2024-06-03 15:35:50,294 log Bad Request: /en/teacher/attendance/edit/1/
+WARNING 2024-06-03 15:35:50,294 basehttp "POST /en/teacher/attendance/edit/1/ HTTP/1.1" 400 76
+ERROR 2024-06-03 15:43:32,411 log Internal Server Error: /en/teacher/view_attendance/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 318, in teacher_view_attendance
+    course_hours = course_learning_records.aggregate(Sum('lesson_hours'))['lsson_hours__sum'] or 0
+KeyError: 'lsson_hours__sum'
+ERROR 2024-06-03 15:43:32,415 basehttp "GET /en/teacher/view_attendance/?attendance_id=1 HTTP/1.1" 500 70003
+ERROR 2024-06-03 15:44:29,170 log Internal Server Error: /en/teacher/view_attendance/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 318, in teacher_view_attendance
+    course_hours = course_learning_records.aggregate(Sum('lesson_hours'))['lsson_hours__sum'] or 0
+KeyError: 'lsson_hours__sum'
+ERROR 2024-06-03 15:44:29,173 basehttp "GET /en/teacher/view_attendance/?attendance_id=1 HTTP/1.1" 500 70003
+ERROR 2024-06-03 16:07:46,500 log Internal Server Error: /en/schedule/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 470, in parse
+    compile_func = self.tags[command]
+KeyError: 'request.path'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 1832, in manage_class_schedule
+    return render(request, "hod_template/manage_class_schedule.html", context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 170, in render
+    return self._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 150, in render
+    return compiled_parent._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 180, in render
+    template = context.template.engine.select_template(template_name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\engine.py", line 174, in select_template
+    return self.get_template(template_name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\engine.py", line 143, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\engine.py", line 125, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loaders\base.py", line 29, in get_template
+    return Template(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 193, in compile_nodelist
+    return parser.parse()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 478, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 965, in do_if
+    nodelist = parser.parse(('elif', 'else', 'endif'))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 472, in parse
+    self.invalid_block_tag(token, command, parse_until)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 522, in invalid_block_tag
+    raise self.error(
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 288: 'request.path', expected 'elif', 'else' or 'endif'. Did you forget to register or load this tag?
+ERROR 2024-06-03 16:07:46,512 basehttp "GET /en/schedule/manage/ HTTP/1.1" 500 224582
+ERROR 2024-06-03 16:24:57,156 log Internal Server Error: /en/teacher/view_attendance/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 335, in teacher_view_attendance
+    absent_hours += total_class_hours_for_course - class_duration
+TypeError: unsupported operand type(s) for -: 'decimal.Decimal' and 'float'
+ERROR 2024-06-03 16:24:57,159 basehttp "GET /en/teacher/view_attendance/?attendance_id=1 HTTP/1.1" 500 71380
+ERROR 2024-06-03 16:25:43,723 log Internal Server Error: /en/teacher/view_attendance/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 335, in teacher_view_attendance
+    absent_hours += total_class_hours_for_course - class_duration
+TypeError: unsupported operand type(s) for -: 'decimal.Decimal' and 'float'
+ERROR 2024-06-03 16:25:43,726 basehttp "GET /en/teacher/view_attendance/?attendance_id=1 HTTP/1.1" 500 71380
+ERROR 2024-06-03 16:27:10,530 log Internal Server Error: /en/teacher/view_attendance/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 335, in teacher_view_attendance
+    class_duration_decimal = Decimal(str(class_duration))  # Convert to Decimal
+NameError: name 'Decimal' is not defined
+ERROR 2024-06-03 16:27:10,533 basehttp "GET /en/teacher/view_attendance/?attendance_id=1 HTTP/1.1" 500 71266
+ERROR 2024-06-03 16:56:31,120 generate Error creating record: Cannot assign "'candidate'": "Student.admin" must be a "CustomUser" instance.
+ERROR 2024-06-03 16:56:46,642 generate Error creating record: Cannot assign "'with'": "Student.admin" must be a "CustomUser" instance.
+INFO 2024-06-03 16:58:11,925 hod_views Attendance data: {'present': 0, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03'], 'leave_dates': []}
+WARNING 2024-06-03 17:03:40,378 log Not Found: /en/teacher/view_attendance/
+WARNING 2024-06-03 17:03:40,379 basehttp "GET /en/teacher/view_attendance/?attendance_id=3&course_id=4 HTTP/1.1" 404 1823
+WARNING 2024-06-03 17:03:53,627 log Not Found: /en/teacher/view_attendance/
+WARNING 2024-06-03 17:03:53,627 basehttp "GET /en/teacher/view_attendance/?attendance_id=3&course_id=4 HTTP/1.1" 404 1823
+WARNING 2024-06-03 17:09:26,555 log Not Found: /teacher/view_attendance/1/June 3, 2024/
+WARNING 2024-06-03 17:09:26,555 basehttp "GET /teacher/view_attendance/1/June%203,%202024/ HTTP/1.1" 404 2797
+ERROR 2024-06-03 17:10:51,311 generate Missing required column: 出生日期
+WARNING 2024-06-03 17:14:30,505 generate Missing required column: 出生日期. Using fake data.
+WARNING 2024-06-03 17:15:38,498 generate Missing required column: 出生日期. Using fake data.
+WARNING 2024-06-03 17:15:49,614 generate Missing required column: 出生日期. Using fake data.
+INFO 2024-06-03 17:16:06,853 hod_views Attendance data: {'present': 2, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03'], 'leave_dates': []}
+WARNING 2024-06-03 17:16:22,693 generate Missing required column: 出生日期. Using fake data.
+WARNING 2024-06-03 17:20:54,924 generate Missing required column: 出生日期. Using fake data.
+WARNING 2024-06-03 17:20:54,928 generate Missing required column: 注册日期. Using fake data.
+INFO 2024-06-03 17:20:55,593 models Learning Record Created/Updated: 8
+INFO 2024-06-03 17:20:55,633 models Learning Record Created/Updated: 9
+INFO 2024-06-03 17:21:26,047 models Learning Record Created/Updated: 6
+INFO 2024-06-03 17:21:26,070 models Learning Record Created/Updated: 7
+ERROR 2024-06-03 17:21:26,172 log Internal Server Error: /en/learn/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 1697, in manage_learning_record
+    learn.save()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\base.py", line 753, in save
+    self.save_base(using=using, force_insert=force_insert,
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\base.py", line 801, in save_base
+    post_save.send(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\dispatch\dispatcher.py", line 177, in send
+    return [
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\dispatch\dispatcher.py", line 178, in <listcomp>
+    (receiver, receiver(signal=self, sender=sender, **named))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\models.py", line 335, in create_or_update_student_query
+    student_query, created = StudentQuery.objects.update_or_create(student_records=student)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 589, in update_or_create
+    obj = self.select_for_update().get(**kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 433, in get
+    raise self.model.MultipleObjectsReturned(
+main_app.models.StudentQuery.MultipleObjectsReturned: get() returned more than one StudentQuery -- it returned 2!
+ERROR 2024-06-03 17:21:26,179 basehttp "GET /en/learn/manage/ HTTP/1.1" 500 109193

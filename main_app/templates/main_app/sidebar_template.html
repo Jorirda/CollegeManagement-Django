@@ -261,8 +261,7 @@
                 <li class="nav-item has-treeview">
                     {% url 'add_class_schedule' as add_class_schedule %}
                     {% url 'manage_class_schedule' as manage_class_schedule %}
-                    {% url 'admin_view_attendance' as admin_view_attendance %}
-                    <a href="#" class="nav-link {% if request.path == add_class_schedule or request.path == manage_class_schedule or request.path == admin_view_attendance %}active{% endif %}">
+                    <a href="#" class="nav-link {% if request.path == add_class_schedule or request.path == manage_class_schedule %}active{% endif %}">
                         <i class="nav-icon fas fa-calendar-alt"></i>
                         <p>
                             {% trans "Schedule" %}
@@ -282,14 +281,27 @@
                                 <p>{% trans "Manage Schedule" %}</p>
                             </a>
                         </li>
+                    </ul>
+                </li>
+                <li class="nav-item has-treeview">
+                    {% url 'admin_view_attendance' as admin_view_attendance %}
+                    <a href="#" class="nav-link {% if request.path == admin_view_attendance %}active{% endif %}">
+                        <i class="nav-icon fas fa-user-check"></i>
+                        <p>
+                            {% trans "Attendance" %}
+                            <i class="fas fa-angle-right right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="{{ admin_view_attendance }}" class="nav-link {% if request.path == admin_view_attendance %}active{% endif %}">
-                                <i class="nav-icon fas fa-calendar-alt"></i>
+                                <i class="nav-icon fas fa-user-check"></i>
                                 <p>{% trans "View Attendance" %}</p>
                             </a>
                         </li>
                     </ul>
                 </li>
+                
                 <li class="nav-item has-treeview">
                     {% url 'manage_student_query' as manage_student_query %}
                     {% url 'manage_teacher_query' as manage_teacher_query %}

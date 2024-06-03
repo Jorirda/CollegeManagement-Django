@@ -19,8 +19,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Sum, F
 # from django.contrib.auth.hashers import make_password
 from django.shortcuts import render
-# from generate import generate_html_table, process_data
-from generate import generate_html_table, main, process_data
+from generate import  process_data
 from main_app.model_column_mapping import MODEL_COLUMN_MAPPING
 from .forms import *
 from .models import *
@@ -171,6 +170,7 @@ def check_columns(request):
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
+@csrf_exempt
 def get_upload(request):
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
@@ -195,7 +195,6 @@ def get_upload(request):
                 missing_columns = expected_columns - actual_columns
                 extra_columns = actual_columns - expected_columns
 
-                # Print columns in English for better debugging
                 print(f"Expected columns: {expected_columns}")
                 print(f"Actual columns: {actual_columns}")
                 print(f"Missing columns: {missing_columns}")
@@ -203,20 +202,17 @@ def get_upload(request):
 
                 column_status = {col: 'missing' if col in missing_columns else 'extra' if col in extra_columns else 'match' for col in expected_columns}
 
-                # Check required fields
                 required_fields = REQUIRED_FIELDS.get(selected_model, [])
                 missing_required_fields = [field for field in required_fields if field not in actual_columns]
 
                 for field in missing_required_fields:
                     column_status[field] = 'missing (required)'
 
-                # Handle autofill suggestions
                 for col in missing_columns:
                     specific_mapping = SPECIFIC_COLUMN_MAPPING.get(selected_model, {}).get(user_type, {})
                     if col in specific_mapping and specific_mapping[col] in actual_columns:
                         column_status[specific_mapping[col]] = 'autofill'
 
-                # Color coding for columns
                 column_colors = {}
                 for col, status in column_status.items():
                     if status == 'autofill':
@@ -236,8 +232,7 @@ def get_upload(request):
                     'df': df.to_html(index=False)
                 }
 
-                # Directly call the main function to process and upload data
-                result = main(excel_file, selected_model, user_type)
+                result = process_data(excel_file,selected_model)
                 if result:
                     print("Data processing and upload completed successfully.")
                 else:
@@ -254,6 +249,7 @@ def get_upload(request):
         form = ExcelUploadForm()
 
     return render(request, 'hod_template/upload.html', {'form': form})
+
 
 
 
@@ -484,10 +480,7 @@ def admin_home(request):
     for course in course_all:
         students_count = Student.objects.filter(courses=course).count()
         course_name_list.append(course.name)
-        print(course_name_list)
         student_count_list_in_course.append(students_count)
-        print(student_count_list_in_course)
-        
 
     # Attendance rate for each class schedule
     attendance_rate_list = []
@@ -525,7 +518,7 @@ def admin_home(request):
     for teacher in Teacher.objects.all():
         teacher_names.append(teacher.admin.full_name)
         total_hours = LearningRecord.objects.filter(teacher=teacher).aggregate(Sum('lesson_hours'))['lesson_hours__sum'] or 0
-        lesson_hours.append(total_hours)
+        lesson_hours.append(float(total_hours))  # Convert Decimal to float
 
     # Monthly income breakdown
     month_dict = {
@@ -1256,8 +1249,9 @@ def edit_course(request, course_id):
                 course.name = name
                 course.overview = overview
                 course.level_end = level_grade
-                if image:  # Only update the image if a new one is provided
-                    course.image = image
+                course.image = image
+                # if image:  # Only update the image if a new one is provided
+                #     course.image = image
                 course.save()
                 return JsonResponse({'success': True, 'message': 'Course Updated Successfully'})
             except Exception as e:
@@ -1598,7 +1592,7 @@ def manage_payment_record(request):
         #     lesson_hours_str = f"{total_lesson_hours} hrs"
 
         # Assuming you want to store this string representation
-        payment.lesson_hours = lesson_hours_str
+        # payment.lesson_hours = lesson_hours_str
         print(f"Student: {payment.student}, Total lesson hours: {payment.lesson_hours}")
 
     paginator = Paginator(payments, 10)  # Show 10 records per page
@@ -1666,8 +1660,8 @@ def delete_learning_record(request, learn_id):
         return JsonResponse({'success': False, 'message': 'Invalid request method or not an AJAX request'}, status=400)
     
 def manage_learning_record(request):
-    # Your existing code for fetching learning records, teachers, courses, and filtering
-    learningrecords = LearningRecord.objects.all() 
+    # Fetch learning records, teachers, courses, and filter them
+    learningrecords = LearningRecord.objects.all().order_by('date', 'student__admin__id')  # Ensure consistent ordering
     teachers = Teacher.objects.all()
     courses = Course.objects.all()
     
@@ -1681,9 +1675,6 @@ def manage_learning_record(request):
         learningrecords = learningrecords.filter(course__level_end=selected_grade)
 
     total_lesson_hours = learningrecords.aggregate(total_hours=Sum('lesson_hours'))['total_hours']
-    
-    # Ensure the total lesson hours are a whole number
-    # total_lesson_hours_str = f"{total_lesson_hours} hr" if total_lesson_hours == 1 else f"{total_lesson_hours} hrs"
 
     paginator = Paginator(learningrecords, 10)  # Show 10 records per page
     page_number = request.GET.get('page')
@@ -1704,7 +1695,7 @@ def manage_learning_record(request):
         day = learn.schedule_record.day if learn.schedule_record else None
         learn.day = DAYS_OF_WEEK.get(day)
         learn.save()
-        print(learn.day)
+        # print(learn.day)
 
     context = {
         'learningrecords': paginated_learningrecords,
@@ -1717,6 +1708,7 @@ def manage_learning_record(request):
     }
 
     return render(request, 'hod_template/manage_learning_record.html', context)
+
 
 
 #Schedules

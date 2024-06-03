@@ -446,7 +446,7 @@ def link_records(sender, instance, created, **kwargs):
 
     elif isinstance(instance, LearningRecord):
         learning_record = instance
-        print("Learning Record Created/Updated")
+        # print("Learning Record Created/Updated")
         
         # Find related payment records based on course, student, and date
         related_payments = PaymentRecord.objects.filter(

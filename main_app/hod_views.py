@@ -426,8 +426,6 @@ def refund_records(request):
     return render(request, 'hod_template/refund_records.html', context)
 
 
-
-
 #Admin
 def admin_get_student_attendance(request):
     student_id = request.GET.get('student_id')
@@ -1672,20 +1670,6 @@ def manage_learning_record(request):
 
 
 #Schedules
-# def calculate_lesson_hours(start_time, end_time):
-#     start = datetime.strptime(start_time.strftime('%H:%M:%S'), '%H:%M:%S')
-#     end = datetime.strptime(end_time.strftime('%H:%M:%S'), '%H:%M:%S')
-#     if start_time >= end_time:
-#         raise ValueError("End time must be after start time.")
-#     delta = end - start
-#     hours, remainder = divmod(delta.total_seconds(), 3600)
-#     minutes, _ = divmod(remainder, 60)
-    
-#     if int(minutes) == 0:
-#         return f"{int(hours)}h"
-#     else:
-#         return f"{int(hours)}h {int(minutes)}m"
-
 def calculate_lesson_hours(start_time, end_time):
     start = datetime.combine(datetime.min, start_time)
     end = datetime.combine(datetime.min, end_time)

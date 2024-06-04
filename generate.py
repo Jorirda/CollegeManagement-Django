@@ -17,6 +17,7 @@ django.setup()
 # Create a Faker generator
 fake = Faker()
 random_number = random.randint(1, 7)
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -52,6 +53,7 @@ def process_data(excel_file, auto_create_learning_record=False, auto_create_paym
     try:
         df = pd.read_excel(excel_file)
         logging.info(f"Dataframe loaded successfully with {len(df)} rows.")
+        logging.info(f"Columns in dataframe: {df.columns.tolist()}")
     except Exception as e:
         logging.error(f"Error reading Excel file: {e}")
         return None  # Return early if the file cannot be processed
@@ -61,12 +63,17 @@ def process_data(excel_file, auto_create_learning_record=False, auto_create_paym
 
     for index, row in df.iterrows():
         try:
+            if '出生日期' not in row:
+                logging.warning(f"Missing '出生日期' column in row {index}. Using fake data.")
+                date_of_birth = fake.date_of_birth(minimum_age=10, maximum_age=18)
+            else:
+                date_of_birth = row.get('出生日期')
+
             full_name = row.get('学生姓名', fake.name())
             email = row.get('邮箱', fake.email())
             gender = row.get('性别', fake.random_element(elements=('男', '女')))
             address = row.get('地址', fake.address().replace('\n', ', '))
             phone_number = row.get('电话号码', fake.phone_number())
-            date_of_birth = row.get('出生日期', fake.date_of_birth(minimum_age=10, maximum_age=18))
             reg_date = row.get('注册日期', fake.date_this_year())
             status = row.get('状态', 'active')
 
@@ -113,7 +120,6 @@ def process_data(excel_file, auto_create_learning_record=False, auto_create_paym
                     'reg_date': reg_date,
                     'status': status
                 }
-                
             )
             # Add course to student_courses relationship
             student.courses.add(course)
@@ -170,7 +176,6 @@ def process_course(excel_file):
 
     for index, row in df.iterrows():
         try:
-            overview = row.get('班级概述', fake.text())
             class_name = row.get('班级', 'Unknown Class')
             course_name, grade_level = None, None
             for chinese_grade, grade in grade_mapping.items():
@@ -183,7 +188,6 @@ def process_course(excel_file):
                 course, created = Course.objects.get_or_create(name=course_name)
                 if created or course.level_end < grade_level:
                     course.level_end = grade_level
-                    course.overview = overview
                     course.save()
                 logging.info(f"Course retrieved or created: {course_name}")
 
@@ -201,17 +205,21 @@ def process_learning_record(excel_file):
 
     for index, row in df.iterrows():
         try:
-            student_email = row.get('学生邮箱')
-            student = CustomUser.objects.get(email=student_email)
+            student_name = row.get('学生姓名')
+            student_salesperson = row.get('销售人员')
             course_name = row.get('班级')
+            teacher_name = row.get('教师')
+
+            student = Student.objects.get(admin__full_name=student_name, admin__remark__icontains=student_salesperson)
             course = Course.objects.get(name=course_name)
+            teacher = Teacher.objects.get(admin__full_name=teacher_name)
 
             LearningRecord.objects.update_or_create(
-                student=student.student,
+                student=student,
                 course=course,
                 defaults={
                     'date': row.get('日期'),
-                    'teacher': row.get('教师'),
+                    'teacher': teacher,
                     'schedule_record': row.get('班级安排'),
                     'semester': row.get('学期'),
                     'start_time': row.get('开始时间'),
@@ -221,12 +229,14 @@ def process_learning_record(excel_file):
                 }
             )
 
-            logging.info(f"LearningRecord instance saved or updated for student: {student_email}")
+            logging.info(f"LearningRecord instance saved or updated for student: {student_name}")
 
-        except CustomUser.DoesNotExist:
-            logging.error(f"Student with email {student_email} does not exist.")
+        except Student.DoesNotExist:
+            logging.error(f"Student {student_name} with salesperson {student_salesperson} does not exist.")
         except Course.DoesNotExist:
             logging.error(f"Course {course_name} does not exist.")
+        except Teacher.DoesNotExist:
+            logging.error(f"Teacher {teacher_name} does not exist.")
         except Exception as e:
             logging.error(f"Exception: {e}")
             continue
@@ -241,13 +251,17 @@ def process_payment_record(excel_file):
 
     for index, row in df.iterrows():
         try:
-            student_email = row.get('学生邮箱')
-            student = CustomUser.objects.get(email=student_email)
+            student_name = row.get('学生姓名')
+            student_salesperson = row.get('销售人员')
             course_name = row.get('班级')
+            teacher_name = row.get('教师')
+
+            student = Student.objects.get(admin__full_name=student_name, admin__remark__icontains=student_salesperson)
             course = Course.objects.get(name=course_name)
+            teacher = Teacher.objects.get(admin__full_name=teacher_name)
 
             PaymentRecord.objects.update_or_create(
-                student=student.student,
+                student=student,
                 course=course,
                 defaults={
                     'date': row.get('日期'),
@@ -266,18 +280,24 @@ def process_payment_record(excel_file):
                 }
             )
 
-            logging.info(f"PaymentRecord instance saved or updated for student: {student_email}")
+            logging.info(f"PaymentRecord instance saved or updated for student: {student_name}")
 
-        except CustomUser.DoesNotExist:
-            logging.error(f"Student with email {student_email} does not exist.")
+        except Student.DoesNotExist:
+            logging.error(f"Student {student_name} with salesperson {student_salesperson} does not exist.")
         except Course.DoesNotExist:
             logging.error(f"Course {course_name} does not exist.")
+        except Teacher.DoesNotExist:
+            logging.error(f"Teacher {teacher_name} does not exist.")
         except Exception as e:
             logging.error(f"Exception: {e}")
             continue
 
 def main(excel_file, selected_model, user_type=None, auto_create_learning_record=False, auto_create_payment_record=False):
-    if selected_model == 'CustomUser' and user_type in ['Student', 'Teacher']:
+    if selected_model == 'Student':
+        process_data(excel_file, auto_create_learning_record, auto_create_payment_record)
+    elif selected_model == 'Teacher':
+        process_data(excel_file, auto_create_learning_record, auto_create_payment_record)
+    elif selected_model == 'CustomUser' and user_type in ['Student', 'Teacher']:
         process_data(excel_file, auto_create_learning_record, auto_create_payment_record)
     elif selected_model == 'Course':
         process_course(excel_file)

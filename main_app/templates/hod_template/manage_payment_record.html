@@ -71,9 +71,15 @@
                             <i class="nav-icon fas fa-yen-sign" style="font-size: 24px; margin-right: 10px;"></i>
                             <h3 class="card-title">{% trans "Payment Records" %}</h3>
                         </div>
-                        <div class="d-flex align-items-center" style="margin-left: 20%; margin-right: auto;">
-                            <h3 class="card-title">{% blocktrans %}Total Payments: ¥{{ total_amount_paid }}{% endblocktrans %}</h3>
+                        <div class="d-flex align-items-center">
+                            {% for student_id, total_absent_hours in total_absent_hours_list %}
+                                {% if forloop.first %}
+                                    <h3 class="card-title">{% blocktrans %}Total Absent Hours for Students: {% endblocktrans %}</h3>
+                                {% endif %}
+                                <h3 class="card-title">{% blocktrans %}{{ student_id }}: {{ total_absent_hours }}{% endblocktrans %}</h3>
+                            {% endfor %}
                         </div>
+                        >
                     </div>
                     <div class="card-body table-container">
                         <table id="example2" class="table table-bordered table-hover">

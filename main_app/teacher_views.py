@@ -288,6 +288,8 @@ def teacher_view_attendance(request):
     # Get the current course from the attendance record
     current_course = attendance.classes.course
 
+    total_absent_hours = 0  # Initialize total absent hours
+
     attendance_details = []
 
     for student_attendance in student_attendances:
@@ -314,6 +316,7 @@ def teacher_view_attendance(request):
             if class_schedule:
                 lesson_hours = class_schedule.lesson_hours
                 absent_hours = lesson_hours
+                total_absent_hours += absent_hours  # Accumulate total absent hours
 
         attendance_details.append({
             'student_name': student_name,
@@ -322,7 +325,7 @@ def teacher_view_attendance(request):
             'absent_hours': absent_hours
         })
 
-    return JsonResponse({'success': True, 'attendance_details': attendance_details})
+    return JsonResponse({'success': True, 'attendance_details': attendance_details, 'total_absent_hours': total_absent_hours})
 
 @csrf_exempt
 def save_attendance(request):
@@ -373,9 +376,70 @@ def teacher_delete_attendance(request):
     else:
         return JsonResponse({'success': False, 'error': 'Invalid request method or not an AJAX request'})
     
+# def teacher_manage_attendance(request):
+#     teacher = get_object_or_404(Teacher, admin=request.user)
+#     attendances = Attendance.objects.filter(classes__teacher=teacher).order_by('id')
+    
+#     # Get the list of students the teacher is currently teaching
+#     students = Student.objects.filter(learningrecord__teacher=teacher).distinct()
+    
+#     # Filter attendances by selected student
+#     selected_student_id = request.GET.get('student_id')
+#     if selected_student_id:
+#         attendances = attendances.filter(attendancereport__student_id=selected_student_id).distinct()
+    
+#     paginator = Paginator(attendances, 10)  # Show 10 records per page
+#     page_number = request.GET.get('page')
+#     paginated_attendances = paginator.get_page(page_number)
+
+#     total_absent_hours = 0  # Initialize total absent hours
+    
+#     for attendance in attendances:
+#         # Calculate absent hours for each attendance record
+#         student_attendances = AttendanceReport.objects.filter(attendance=attendance)
+#         current_course = attendance.classes.course
+
+#         for student_attendance in student_attendances:
+#             is_present = student_attendance.status
+
+#             if not is_present:
+#                 class_schedule = ClassSchedule.objects.filter(course=current_course).first()
+#                 if class_schedule:
+#                     lesson_hours = class_schedule.lesson_hours
+#                     total_absent_hours += lesson_hours
+
+#     context = {
+#         'attendances': paginated_attendances,
+#         'page_title': _('Manage Attendance'),
+#         'students': students,  # Pass the students list to the template
+#         'selected_student_id': selected_student_id,  # Pass the selected student to the template
+#         'total_absent_hours': total_absent_hours  # Pass total absent hours to the template
+#     }
+#     return render(request, 'teacher_template/teacher_manage_attendance.html', context)
+
 def teacher_manage_attendance(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
-    attendances = Attendance.objects.filter(classes__teacher=teacher).order_by('id')  # Add an ordering field
+    attendances = Attendance.objects.filter(classes__teacher=teacher).order_by('id')
+    
+    # Get the list of students the teacher is currently teaching
+    students = Student.objects.filter(learningrecord__teacher=teacher).distinct()
+    
+    # Filter attendances by selected student
+    selected_student_id = request.GET.get('student_id')
+    total_absent_hours = 0  # Initialize total absent hours
+
+    if selected_student_id:
+        attendances = attendances.filter(attendancereport__student_id=selected_student_id).distinct()
+        # Calculate total absent hours for the selected student
+        total_absent_hours = AttendanceReport.objects.filter(
+            student_id=selected_student_id,
+            status=False  # False means absent
+        ).aggregate(total_hours=Sum('attendance__classes__lesson_hours'))['total_hours'] or 0
+    else:
+        # Calculate total absent hours for all students
+        total_absent_hours = AttendanceReport.objects.filter(
+            status=False  # False means absent
+        ).aggregate(total_hours=Sum('attendance__classes__lesson_hours'))['total_hours'] or 0
 
     paginator = Paginator(attendances, 10)  # Show 10 records per page
     page_number = request.GET.get('page')
@@ -384,8 +448,13 @@ def teacher_manage_attendance(request):
     context = {
         'attendances': paginated_attendances,
         'page_title': _('Manage Attendance'),
+        'students': students,  # Pass the students list to the template
+        'selected_student_id': selected_student_id,  # Pass the selected student to the template
+        'total_absent_hours': total_absent_hours  # Pass total absent hours to the template
     }
     return render(request, 'teacher_template/teacher_manage_attendance.html', context)
+
+
 
 @login_required
 def teacher_courses(request):

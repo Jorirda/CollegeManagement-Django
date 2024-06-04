@@ -55,6 +55,19 @@
         background-color: #5FC032;
         color: white;
     }
+
+    .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .dropdown-container {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        width: 300px;
+    }
 </style>
 <section class="content">
     <div class="container-fluid">
@@ -63,10 +76,22 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="card-header header-container">
                         <div class="d-flex align-items-center">
                             <i class="nav-icon fas fa-pencil-alt" style="font-size: 24px; margin-right: 10px;"></i>
                             <h3 class="card-title">{% trans "Manage Attendance" %}</h3>
+                        </div>
+                        <div class="d-flex align-items-center" style="margin-left: 15%;">
+                            <h3 class="card-title">{% blocktrans %}Total Absent Hours: {{ total_absent_hours }}{% endblocktrans %}</h3>
+                        </div>                        
+                        <!-- Student Dropdown -->
+                        <div class="dropdown-container" style="margin-left: 25%;">
+                            <select id="studentDropdown" class="form-control">
+                                <option value="">{% trans "Select a student" %}</option>
+                                {% for student in students %}
+                                    <option value="{{ student.id }}" {% if student.id|stringformat:"s" == selected_student_id %}selected{% endif %}>{{ student.admin.full_name }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                     </div>
                     <!-- /.card-header -->
@@ -104,8 +129,8 @@
                         <div class="pagination">
                             <span class="step-links">
                                 {% if attendances.has_previous %}
-                                    <a href="?page=1">&laquo; first</a>
-                                    <a href="?page={{ attendances.previous_page_number }}">previous</a>
+                                    <a href="?page=1{% if selected_student_id %}&student_id={{ selected_student_id }}{% endif %}">&laquo; first</a>
+                                    <a href="?page={{ attendances.previous_page_number }}{% if selected_student_id %}&student_id={{ selected_student_id }}{% endif %}">previous</a>
                                 {% endif %}
                                 
                                 <span class="current">
@@ -113,8 +138,8 @@
                                 </span>
                                 
                                 {% if attendances.has_next %}
-                                    <a href="?page={{ attendances.next_page_number }}">next</a>
-                                    <a href="?page={{ attendances.paginator.num_pages }}">last &raquo;</a>
+                                    <a href="?page={{ attendances.next_page_number }}{% if selected_student_id %}&student_id={{ selected_student_id }}{% endif %}">next</a>
+                                    <a href="?page={{ attendances.paginator.num_pages }}{% if selected_student_id %}&student_id={{ selected_student_id }}{% endif %}">last &raquo;</a>
                                 {% endif %}
                             </span>
                         </div>
@@ -183,7 +208,6 @@
                             $('#success-message').hide();
                         }, 3000);
                     } else {
-                        console.error(data.error);
                         // Show error message
                         $('#success-message').text('{% trans "An error occurred while deleting the attendance." %}');
                         $('#success-message').addClass('alert-danger');
@@ -195,7 +219,6 @@
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
                     // Show error message
                     $('#success-message').text('{% trans "An error occurred while deleting the attendance." %}');
                     $('#success-message').addClass('alert-danger');
@@ -209,44 +232,55 @@
         }
     }
 
+    // Function to view attendance details
+    function viewAttendance(attendanceId, attendanceDate) {
+        console.log('viewAttendance called with attendanceId:', attendanceId, 'and attendanceDate:', attendanceDate);
 
-  // Function to view attendance details
-function viewAttendance(attendanceId, attendanceDate) {
-    console.log('viewAttendance called with attendanceId:', attendanceId, 'and attendanceDate:', attendanceDate);
+        $.ajax({
+            type: 'GET',
+            url: '{% url "teacher_view_attendance" %}',
+            data: {
+                'attendance_id': attendanceId
+            },
+            success: function(data) {
+                console.log('AJAX request successful:', data);
 
-    $.ajax({
-        type: 'GET',
-        url: '{% url "teacher_view_attendance" %}',
-        data: {
-            'attendance_id': attendanceId
-        },
-        success: function(data) {
-            console.log('AJAX request successful:', data);
+                if (data.success) {
+                    var attendanceDetails = data.attendance_details;
+                    var tableBody = $('#attendanceDetails');
 
-            if (data.success) {
-                var attendanceDetails = data.attendance_details;
-                var tableBody = $('#attendanceDetails');
+                    tableBody.empty(); // Clear previous data
 
-                tableBody.empty(); // Clear previous data
+                    // Populate table with new data
+                    attendanceDetails.forEach(function(detail) {
+                        console.log('Processing detail:', detail);
 
-                // Populate table with new data
-                attendanceDetails.forEach(function(detail) {
-                    console.log('Processing detail:', detail);
+                        var row = '<tr>' +
+                                    '<td>' + detail.student_name + '</td>' +
+                                    '<td>' + (detail.is_present ? '{% trans "Yes" %}' : '{% trans "No" %}') + '</td>' +
+                                    '<td>' + attendanceDate + '</td>' +  // Use the passed date here
+                                    '<td>' + detail.total_class_hours + '</td>' +
+                                    '<td>' + detail.absent_hours + '</td>' +
+                                    '</tr>';
+                        tableBody.append(row);
+                    });
 
-                    var row = '<tr>' +
-                                '<td>' + detail.student_name + '</td>' +
-                                '<td>' + (detail.is_present ? '{% trans "Yes" %}' : '{% trans "No" %}') + '</td>' +
-                                '<td>' + attendanceDate + '</td>' +  // Use the passed date here
-                                '<td>' + detail.total_class_hours + '</td>' +
-                                '<td>' + detail.absent_hours + '</td>' +
-                                '</tr>';
-                    tableBody.append(row);
-                });
-
-                // Show the modal
-                $('#viewAttendanceModal').modal('show');
-            } else {
-                console.error('Data error:', data.error);
+                    // Show the modal
+                    $('#viewAttendanceModal').modal('show');
+                } else {
+                    console.error('Data error:', data.error);
+                    // Show error message
+                    $('#success-message').text('{% trans "An error occurred while retrieving the attendance details." %}');
+                    $('#success-message').addClass('alert-danger');
+                    $('#success-message').show();
+                    // Hide error message after 3 seconds
+                    setTimeout(function() {
+                        $('#success-message').hide();
+                    }, 3000);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX request error:', xhr.responseText, 'Status:', status, 'Error:', error);
                 // Show error message
                 $('#success-message').text('{% trans "An error occurred while retrieving the attendance details." %}');
                 $('#success-message').addClass('alert-danger');
@@ -256,19 +290,15 @@ function viewAttendance(attendanceId, attendanceDate) {
                     $('#success-message').hide();
                 }, 3000);
             }
-        },
-        error: function(xhr, status, error) {
-            console.error('AJAX request error:', xhr.responseText, 'Status:', status, 'Error:', error);
-            // Show error message
-            $('#success-message').text('{% trans "An error occurred while retrieving the attendance details." %}');
-            $('#success-message').addClass('alert-danger');
-            $('#success-message').show();
-            // Hide error message after 3 seconds
-            setTimeout(function() {
-                $('#success-message').hide();
-            }, 3000);
-        }
+        });
+    }
+
+    // Add change event listener to the dropdown
+    $('#studentDropdown').change(function() {
+        var selectedStudentId = $(this).val();
+        var currentUrl = window.location.href.split('?')[0]; // Get the base URL without parameters
+        var newUrl = currentUrl + '?student_id=' + selectedStudentId; // Add the selected student ID as a parameter
+        window.location.href = newUrl; // Redirect to the new URL
     });
-}
 </script>
 {% endblock content %}

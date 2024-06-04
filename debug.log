@@ -4696,3 +4696,444 @@ INFO 2024-06-04 11:41:02,198 models Learning Record Created/Updated: 14
 INFO 2024-06-04 11:41:02,221 models Learning Record Created/Updated: 15
 INFO 2024-06-04 11:41:02,244 models Learning Record Created/Updated: 16
 INFO 2024-06-04 11:41:02,266 models Learning Record Created/Updated: 17
+ERROR 2024-06-04 13:06:21,608 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+ERROR 2024-06-04 13:20:13,124 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+INFO 2024-06-04 13:20:18,780 hod_views Attendance data: {'present': 1, 'absent': 1, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03'], 'leave_dates': []}
+ERROR 2024-06-04 13:20:35,151 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+ERROR 2024-06-04 13:32:24,098 log Internal Server Error: /en/teacher/attendance/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 379, in teacher_manage_attendance
+    attendances = Attendance.objects.filter(classes__teacher=teacher, student__in=teacher.students.all()).order_by('id')
+AttributeError: 'Teacher' object has no attribute 'students'
+ERROR 2024-06-04 13:32:24,101 basehttp "GET /en/teacher/attendance/manage/ HTTP/1.1" 500 67937
+ERROR 2024-06-04 13:36:11,997 log Internal Server Error: /en/teacher/attendance/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 383, in teacher_manage_attendance
+    attendances = Attendance.objects.filter(student__in=students).order_by('id')
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 942, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 962, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 969, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1358, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1377, in _add_q
+    child_clause, needed_inner = self.build_filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1258, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1084, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1481, in names_to_path
+    raise FieldError("Cannot resolve keyword '%s' into field. "
+django.core.exceptions.FieldError: Cannot resolve keyword 'student' into field. Choices are: attendancereport, classes, classes_id, date, id, session, session_id
+ERROR 2024-06-04 13:36:12,004 basehttp "GET /en/teacher/attendance/manage/ HTTP/1.1" 500 113486
+ERROR 2024-06-04 13:37:18,138 log Internal Server Error: /en/teacher/attendance/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 385, in teacher_manage_attendance
+    paginator = Paginator(attendances, 10)  # Show 10 records per page
+NameError: name 'attendances' is not defined
+ERROR 2024-06-04 13:37:18,141 basehttp "GET /en/teacher/attendance/manage/ HTTP/1.1" 500 68536
+INFO 2024-06-04 13:39:56,525 models Learning Record Created/Updated: 6
+INFO 2024-06-04 13:39:56,551 models Learning Record Created/Updated: 7
+INFO 2024-06-04 13:39:56,575 models Learning Record Created/Updated: 14
+INFO 2024-06-04 13:39:56,601 models Learning Record Created/Updated: 15
+INFO 2024-06-04 13:39:56,625 models Learning Record Created/Updated: 16
+INFO 2024-06-04 13:39:56,649 models Learning Record Created/Updated: 17
+INFO 2024-06-04 14:12:21,513 hod_views Attendance data: {'present': 2, 'absent': 1, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-04 14:13:48,316 hod_views Attendance data: {'present': 2, 'absent': 1, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+ERROR 2024-06-04 14:14:04,707 log Internal Server Error: /en/teacher/attendance/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1584, in transform
+    return self.try_transform(wrapped, name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1198, in try_transform
+    raise FieldError(
+django.core.exceptions.FieldError: Unsupported lookup 'classschedule' for AutoField or join on the field not permitted.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 395, in teacher_manage_attendance
+    total_absent_hours = AttendanceReport.objects.filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 395, in aggregate
+    query.add_annotation(aggregate_expr, alias, is_summary=True)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1018, in add_annotation
+    annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None,
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\aggregates.py", line 47, in resolve_expression
+    c = super().resolve_expression(query, allow_joins, reuse, summarize)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\expressions.py", line 637, in resolve_expression
+    c.source_expressions[pos] = arg.resolve_expression(query, allow_joins, reuse, summarize, for_save)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\expressions.py", line 539, in resolve_expression
+    return query.resolve_ref(self.name, allow_joins, reuse, summarize)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1692, in resolve_ref
+    join_info.transform_function(targets[0], final_alias)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1588, in transform
+    raise last_field_exception
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1583, in transform
+    wrapped = previous(field, alias)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1588, in transform
+    raise last_field_exception
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1565, in setup_joins
+    path, final_field, targets, rest = self.names_to_path(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1481, in names_to_path
+    raise FieldError("Cannot resolve keyword '%s' into field. "
+django.core.exceptions.FieldError: Cannot resolve keyword 'classschedule' into field. Choices are: attendance, course, course_id, day, end_time, grade, id, learningrecord, lesson_hours, remark, start_time, teacher, teacher_id
+ERROR 2024-06-04 14:14:04,714 basehttp "GET /en/teacher/attendance/manage/?student_id= HTTP/1.1" 500 148340
+WARNING 2024-06-04 14:14:07,818 generate Missing '出生日期' column in row 0. Using fake data.
+WARNING 2024-06-04 14:14:08,002 generate Missing '出生日期' column in row 1. Using fake data.
+INFO 2024-06-04 14:14:28,966 models Learning Record Created/Updated: 6
+INFO 2024-06-04 14:14:28,995 models Learning Record Created/Updated: 7
+INFO 2024-06-04 14:14:29,021 models Learning Record Created/Updated: 14
+INFO 2024-06-04 14:14:29,046 models Learning Record Created/Updated: 15
+INFO 2024-06-04 14:14:29,072 models Learning Record Created/Updated: 16
+INFO 2024-06-04 14:14:29,097 models Learning Record Created/Updated: 17
+ERROR 2024-06-04 14:21:15,552 log Internal Server Error: /en/teacher/attendance/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 382, in teacher_manage_attendance
+    total_absent_hours = sum(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 383, in <genexpr>
+    teacher_view_attendance(attendance.id) for attendance in attendances
+TypeError: teacher_view_attendance() missing 1 required positional argument: 'attendance_id'
+ERROR 2024-06-04 14:21:15,555 basehttp "GET /en/teacher/attendance/manage/?student_id= HTTP/1.1" 500 73523
+ERROR 2024-06-04 14:21:46,382 log Internal Server Error: /en/teacher/view_attendance/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\fields\__init__.py", line 1774, in get_prep_value
+    return int(value)
+TypeError: int() argument must be a string, a bytes-like object or a number, not 'WSGIRequest'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 284, in teacher_view_attendance
+    attendance = get_object_or_404(Attendance, id=attendance_id)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 76, in get_object_or_404
+    return queryset.get(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 418, in get
+    clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 942, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 962, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 969, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1358, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1377, in _add_q
+    child_clause, needed_inner = self.build_filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1319, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1165, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\lookups.py", line 24, in __init__
+    self.rhs = self.get_prep_lookup()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\lookups.py", line 74, in get_prep_lookup
+    return self.lhs.output_field.get_prep_value(self.rhs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\fields\__init__.py", line 1776, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <WSGIRequest: GET '/en/teacher/view_attendance/?attendance_id=1'>.
+ERROR 2024-06-04 14:21:46,392 basehttp "GET /en/teacher/view_attendance/?attendance_id=1 HTTP/1.1" 500 131501
+ERROR 2024-06-04 14:21:46,997 log Internal Server Error: /en/teacher/view_attendance/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\fields\__init__.py", line 1774, in get_prep_value
+    return int(value)
+TypeError: int() argument must be a string, a bytes-like object or a number, not 'WSGIRequest'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 284, in teacher_view_attendance
+    attendance = get_object_or_404(Attendance, id=attendance_id)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 76, in get_object_or_404
+    return queryset.get(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 418, in get
+    clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 942, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 962, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 969, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1358, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1377, in _add_q
+    child_clause, needed_inner = self.build_filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1319, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1165, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\lookups.py", line 24, in __init__
+    self.rhs = self.get_prep_lookup()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\lookups.py", line 74, in get_prep_lookup
+    return self.lhs.output_field.get_prep_value(self.rhs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\fields\__init__.py", line 1776, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <WSGIRequest: GET '/en/teacher/view_attendance/?attendance_id=1'>.
+ERROR 2024-06-04 14:21:47,003 basehttp "GET /en/teacher/view_attendance/?attendance_id=1 HTTP/1.1" 500 131501
+ERROR 2024-06-04 14:21:57,579 log Internal Server Error: /en/teacher/view_attendance/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\fields\__init__.py", line 1774, in get_prep_value
+    return int(value)
+TypeError: int() argument must be a string, a bytes-like object or a number, not 'WSGIRequest'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 284, in teacher_view_attendance
+    attendance = get_object_or_404(Attendance, id=attendance_id)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 76, in get_object_or_404
+    return queryset.get(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 418, in get
+    clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 942, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 962, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 969, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1358, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1377, in _add_q
+    child_clause, needed_inner = self.build_filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1319, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1165, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\lookups.py", line 24, in __init__
+    self.rhs = self.get_prep_lookup()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\lookups.py", line 74, in get_prep_lookup
+    return self.lhs.output_field.get_prep_value(self.rhs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\fields\__init__.py", line 1776, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <WSGIRequest: GET '/en/teacher/view_attendance/?attendance_id=7'>.
+ERROR 2024-06-04 14:21:57,584 basehttp "GET /en/teacher/view_attendance/?attendance_id=7 HTTP/1.1" 500 131501
+ERROR 2024-06-04 14:22:08,795 log Internal Server Error: /en/teacher/view_attendance/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\fields\__init__.py", line 1774, in get_prep_value
+    return int(value)
+TypeError: int() argument must be a string, a bytes-like object or a number, not 'WSGIRequest'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 284, in teacher_view_attendance
+    attendance = get_object_or_404(Attendance, id=attendance_id)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 76, in get_object_or_404
+    return queryset.get(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 418, in get
+    clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 942, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 962, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 969, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1358, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1377, in _add_q
+    child_clause, needed_inner = self.build_filter(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1319, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1165, in build_lookup
+    lookup = lookup_class(lhs, rhs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\lookups.py", line 24, in __init__
+    self.rhs = self.get_prep_lookup()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\lookups.py", line 74, in get_prep_lookup
+    return self.lhs.output_field.get_prep_value(self.rhs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\fields\__init__.py", line 1776, in get_prep_value
+    raise e.__class__(
+TypeError: Field 'id' expected a number but got <WSGIRequest: GET '/en/teacher/view_attendance/?attendance_id=7'>.
+ERROR 2024-06-04 14:22:08,802 basehttp "GET /en/teacher/view_attendance/?attendance_id=7 HTTP/1.1" 500 131501
+ERROR 2024-06-04 14:46:35,167 log Internal Server Error: /en/teacher/attendance/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 396, in teacher_manage_attendance
+    total_absent_hours = Attendance.objects.aggregate(Sum('absent_hours'))['absent_hours__sum'] or 0
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 395, in aggregate
+    query.add_annotation(aggregate_expr, alias, is_summary=True)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1018, in add_annotation
+    annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None,
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\aggregates.py", line 47, in resolve_expression
+    c = super().resolve_expression(query, allow_joins, reuse, summarize)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\expressions.py", line 637, in resolve_expression
+    c.source_expressions[pos] = arg.resolve_expression(query, allow_joins, reuse, summarize, for_save)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\expressions.py", line 539, in resolve_expression
+    return query.resolve_ref(self.name, allow_joins, reuse, summarize)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1683, in resolve_ref
+    join_info = self.setup_joins(field_list, self.get_meta(), self.get_initial_alias(), can_reuse=reuse)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1565, in setup_joins
+    path, final_field, targets, rest = self.names_to_path(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\query.py", line 1481, in names_to_path
+    raise FieldError("Cannot resolve keyword '%s' into field. "
+django.core.exceptions.FieldError: Cannot resolve keyword 'absent_hours' into field. Choices are: attendancereport, classes, classes_id, date, id, session, session_id
+ERROR 2024-06-04 14:46:35,173 basehttp "GET /en/teacher/attendance/manage/ HTTP/1.1" 500 115770
+WARNING 2024-06-04 14:51:26,334 generate Missing '出生日期' column in row 0. Using fake data.
+WARNING 2024-06-04 14:51:26,507 generate Missing '出生日期' column in row 1. Using fake data.
+ERROR 2024-06-04 15:08:18,226 log Internal Server Error: /en/teacher/attendance/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 414, in teacher_manage_attendance
+    return render(request, 'teacher_template/teacher_manage_attendance.html', context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 34, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\engine.py", line 143, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\engine.py", line 125, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loaders\base.py", line 29, in get_template
+    return Template(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 193, in compile_nodelist
+    return parser.parse()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 478, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 270, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 478, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 219, in do_block
+    parser.invalid_block_tag(endblock, 'endblock', acceptable_endblocks)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 522, in invalid_block_tag
+    raise self.error(
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 303: 'endblock', expected 'endblock' or 'endblock extra_script'. Did you forget to register or load this tag?
+ERROR 2024-06-04 15:08:18,234 basehttp "GET /en/teacher/attendance/manage/?student_id= HTTP/1.1" 500 176294
+ERROR 2024-06-04 15:08:44,075 log Internal Server Error: /en/teacher/attendance/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 414, in teacher_manage_attendance
+    return render(request, 'teacher_template/teacher_manage_attendance.html', context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 34, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\engine.py", line 143, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\engine.py", line 125, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loaders\base.py", line 29, in get_template
+    return Template(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 193, in compile_nodelist
+    return parser.parse()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 478, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 270, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 478, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 219, in do_block
+    parser.invalid_block_tag(endblock, 'endblock', acceptable_endblocks)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 522, in invalid_block_tag
+    raise self.error(
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 303: 'endblock', expected 'endblock' or 'endblock extra_script'. Did you forget to register or load this tag?
+ERROR 2024-06-04 15:08:44,080 basehttp "GET /en/teacher/attendance/manage/?student_id= HTTP/1.1" 500 176294
+ERROR 2024-06-04 15:10:49,314 log Internal Server Error: /en/teacher/attendance/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 409, in teacher_manage_attendance
+    return render(request, 'teacher_template/teacher_manage_attendance.html', context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 34, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\engine.py", line 143, in get_template
+    template, origin = self.find_template(template_name)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\engine.py", line 125, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loaders\base.py", line 29, in get_template
+    return Template(
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 193, in compile_nodelist
+    return parser.parse()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 478, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 270, in do_extends
+    nodelist = parser.parse()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 478, in parse
+    raise self.error(token, e)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 219, in do_block
+    parser.invalid_block_tag(endblock, 'endblock', acceptable_endblocks)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 522, in invalid_block_tag
+    raise self.error(
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 303: 'endblock', expected 'endblock' or 'endblock extra_script'. Did you forget to register or load this tag?
+ERROR 2024-06-04 15:10:49,322 basehttp "GET /en/teacher/attendance/manage/?student_id= HTTP/1.1" 500 176202

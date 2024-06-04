@@ -139,7 +139,7 @@ class ClassSchedule(models.Model):
     day = models.IntegerField(choices=DAYS_OF_WEEK, null=True)
     start_time = models.TimeField(null=True)
     end_time = models.TimeField(null=True)
-    lesson_hours = models.DecimalField(max_digits=5, decimal_places=2, null=True)  # Changed to DecimalField
+    lesson_hours = models.DecimalField(max_digits=5, decimal_places=1, null=True)  # Changed to DecimalField
     remark = models.TextField(default="")
 
     def __str__(self):
@@ -154,7 +154,7 @@ class LearningRecord(models.Model):
     semester = models.ForeignKey(Session, null=True, on_delete=models.CASCADE)
     start_time = models.TimeField(null=True)
     end_time = models.TimeField(null=True)
-    lesson_hours = models.DecimalField(max_digits=5, decimal_places=2, null=True)  # Changed to DecimalField
+    lesson_hours = models.DecimalField(max_digits=5, decimal_places=1, null=True)  # Changed to DecimalField
     day = models.CharField(max_length=20, null=True)  # New field for day of the week
 
     def __str__(self):
@@ -230,7 +230,7 @@ class PaymentRecord(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
     payee = models.CharField(max_length=100)
     remark = models.TextField(null=True, blank=True)
-    lesson_hours = models.DecimalField(max_digits=5, decimal_places=2, default=0)  # Changed to DecimalField
+    lesson_hours = models.DecimalField(max_digits=5, decimal_places=1, default=0)  # Changed to DecimalField
     learning_record = models.ForeignKey('LearningRecord', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
@@ -355,8 +355,6 @@ def create_or_update_student_query(sender, instance, created, **kwargs):
         if payment_record_instance:
             student_query.payment_records = payment_record_instance
             student_query.paid_class_hours = payment_record_instance.lesson_hours
-        else:
-            student_query.paid_class_hours = 0  # Handle the case where there is no payment record
 
         # Retrieve the student's learning records as a queryset
         learning_records_query = LearningRecord.objects.filter(student=student)
@@ -376,7 +374,6 @@ def create_or_update_student_query(sender, instance, created, **kwargs):
         except IntegrityError as e:
             print(f"Error saving StudentQuery for {student}: {str(e)}")
 
-    
 # Register signal handlers
 post_save.connect(create_or_update_student_query, sender=Student)
 

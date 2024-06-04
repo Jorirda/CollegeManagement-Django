@@ -8,36 +8,53 @@
 
 {% block content %}
 <style>
-    /* Flex container for responsive button alignment */
     .responsive-buttons {
         display: flex;
-        justify-content: space-around; /* Distributes space around items */
-        flex-wrap: wrap; /* Allows items to wrap onto the next line as needed */
+        justify-content: space-around;
+        flex-wrap: wrap;
     }
 
-    /* Responsive button styling */
     .btn-responsive {
-        flex: 1 1 100%; /* Allows the button to grow and shrink as needed */
-        margin: 2px; /* Adds margin around buttons */
-        min-width: 68px; /* Minimum width of each button */
-        text-align: center; /* Centers button text */
+        flex: 1 1 auto;
+        margin: 2px;
+        min-width: 68px;
+        text-align: center;
     }
 
-    /* Media query for smaller screens */
     @media (max-width: 576px) {
         .btn-responsive {
-            flex-basis: 100%; /* Each button takes full width of the container on small screens */
+            flex-basis: 100%;
         }
     }
 
-    /* Style for the table to ensure consistent row heights */
     .course-image {
-        max-width: 100px; /* Limits the width of the image */
-        max-height: 100px; /* Limits the height of the image */
+        max-width: 100px;
+        max-height: 100px;
     }
 
     td, th {
-        vertical-align: middle !important; /* Ensures vertical alignment to middle for all cells */
+        vertical-align: middle !important;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+    .pagination a, .pagination span {
+        margin: 0 5px;
+        padding: 8px 16px;
+        text-decoration: none;
+        color: #5FC032;
+        border: 1px solid #DEE2E600;
+        border-radius: 4px;
+    }
+    .pagination a:hover {
+        background-color: #e9ecef;
+    }
+    .pagination .current {
+        background-color: #5FC032;
+        color: white;
     }
 </style>
 <section class="content">
@@ -65,9 +82,11 @@
                         <div class="d-flex align-items-center">
                             <i class="nav-icon fas fa-bookmark" style="font-size: 24px; margin-right: 10px;"></i>
                             <h3 class="card-title">{% trans page_title %}</h3>
-                        </div>                        
+                        </div>
+                        <div class="d-flex align-items-center" style="margin-left: 20%; margin-right: auto;">
+                            <h3 class="card-title">{% blocktrans %}Total Courses: {{ total_courses }}{% endblocktrans %}</h3>
+                        </div>
                     </div>
-                    <!-- /.card-header -->
                     <div class="card-body">
                         <table id="example2" class="table table-bordered table-hover">
                             <thead class="thead-dark">
@@ -88,10 +107,8 @@
                                     <td>
                                         {% if course.image %}
                                             <img src="{{ course.image.url }}" alt="{{ course.name }}" class="course-image">
-                                            <br>
-                                            <small>URL: {{ course.image.url }}</small> <!-- Add debugging output -->
                                         {% else %}
-                                            No Image
+                                            {% trans "No Image" %}
                                         {% endif %}
                                     </td>
                                     <td class="responsive-buttons">
@@ -102,6 +119,23 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                        <div class="pagination">
+                            <span class="step-links">
+                                {% if courses.has_previous %}
+                                    <a href="?page=1">&laquo; first</a>
+                                    <a href="?page={{ courses.previous_page_number }}">previous</a>
+                                {% endif %}
+                                
+                                <span class="current">
+                                    Page {{ courses.number }} of {{ courses.paginator.num_pages }}.
+                                </span>
+                                
+                                {% if courses.has_next %}
+                                    <a href="?page={{ courses.next_page_number }}">next</a>
+                                    <a href="?page={{ courses.paginator.num_pages }}">last &raquo;</a>
+                                {% endif %}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

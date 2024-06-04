@@ -83,7 +83,7 @@
                                     <th>{% trans "Date of Birth" %}</th>
                                     <th>{% trans "Address" %}</th>
                                     <th>{% trans "Phone Number" %}</th>
-                                    <th>{% trans "Courses" %}</th>  <!-- Added courses header -->
+                                    <th>{% trans "Courses" %}</th>
                                     <th>{% trans "Enrolment Date" %}</th>
                                     <th>{% trans "Status" %}</th>
                                     <th>{% trans "Remark" %}</th>
@@ -101,13 +101,13 @@
                                     <td>{{ student.phone_number }}</td>
                                     <td>
                                         {% if student.courses %}
-                                            {% for course in student.courses.all %}
+                                            {% for course in student.courses %}
                                                 {{ course.name }}{% if not forloop.last %}, {% endif %}
                                             {% endfor %}
                                         {% else %}
                                             {% trans "No courses selected for this student" %}
                                         {% endif %}
-                                    </td>  <!-- Displaying courses associated with the student -->
+                                    </td>
                                     <td>{{ student.reg_date }}</td>
                                     <td>{{ student.status }}</td>
                                     <td>{{ student.remark }}</td>
@@ -119,8 +119,24 @@
                                 {% endfor %}
                             </tbody>
                         </table>
-                        <!-- Pagination -->
-                    </div>                    
+                        <div class="pagination">
+                            <span class="step-links">
+                                {% if students.has_previous %}
+                                    <a href="?page=1">&laquo; first</a>
+                                    <a href="?page={{ students.previous_page_number }}">previous</a>
+                                {% endif %}
+                                
+                                <span class="current">
+                                    Page {{ students.number }} of {{ students.paginator.num_pages }}.
+                                </span>
+                                
+                                {% if students.has_next %}
+                                    <a href="?page={{ students.next_page_number }}">next</a>
+                                    <a href="?page={{ students.paginator.num_pages }}">last &raquo;</a>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -141,7 +157,6 @@
                         $('#student-' + studentId).remove();
                         $('#success-message').text('{% trans "Student Deleted Successfully!" %}');
                         $('#success-message').addClass('alert-success').show();
-                        // Jump to the top of the page
                         window.scrollTo(0, 0);
                         setTimeout(function() {
                             $('#success-message').hide().removeClass('alert-success');
@@ -152,7 +167,6 @@
                     console.error(xhr.responseText);
                     $('#success-message').text('{% trans "An error occurred while deleting the student." %}');
                     $('#success-message').addClass('alert-danger').show();
-                    // Jump to the top of the page
                     window.scrollTo(0, 0);
                     setTimeout(function() {
                         $('#success-message').hide().removeClass('alert-danger');

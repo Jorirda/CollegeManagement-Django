@@ -4,6 +4,44 @@
 {% block page_title %}{% trans page_title %}{% endblock page_title %}
 
 {% block content %}
+<style>
+    .responsive-buttons {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+    .btn-responsive {
+        flex: 1 1 auto;
+        margin: 2px;
+        min-width: 68px;
+        text-align: center;
+    }
+    @media (max-width: 576px) {
+        .btn-responsive {
+            flex-basis: 100%;
+        }
+    }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+    .pagination a, .pagination span {
+        margin: 0 5px;
+        padding: 8px 16px;
+        text-decoration: none;
+        color: #5FC032;
+        border: 1px solid #DEE2E600;
+        border-radius: 4px;
+    }
+    .pagination a:hover {
+        background-color: #e9ecef;
+    }
+    .pagination .current {
+        background-color: #5FC032;
+        color: white;
+    }
+</style>
 
 <section class="content">
     <div class="container-fluid">
@@ -31,6 +69,9 @@
                             <i class="nav-icon fas fa-calendar-alt" style="font-size: 24px; margin-right: 10px;"></i>
                             <h3 class="card-title">{% trans page_title %}</h3>
                         </div>
+                        <div class="d-flex align-items-center" style="margin-left: 20%; margin-right: auto;">
+                            <h3 class="card-title">{% blocktrans %}Total Class Schedules: {{ total_class_schedules }}{% endblocktrans %}</h3>
+                        </div>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
@@ -54,16 +95,32 @@
                                     <td>{{ class_schedule.teacher }}</td>
                                     <td>{{ class_schedule.get_day_display }}</td>
                                     <td>{{ class_schedule.start_time|time:"h:i A" }} to {{ class_schedule.end_time|time:"h:i A" }}</td>
-                                    <!-- <td>{{ class_schedule.lesson_hours }} hours</td> Display lesson_hours -->
                                     <td>{{ class_schedule.remark }}</td>
-                                    <td>
-                                        <a href="{% url 'edit_class_schedule' class_schedule.id %}" class="btn btn-info">{% trans 'Edit' %}</a> -
-                                        <a href="#" class="btn btn-danger" onclick="deleteClassSchedule('{{ class_schedule.id }}')">{% trans 'Delete' %}</a>
+                                    <td class="responsive-buttons">
+                                        <a href="{% url 'edit_class_schedule' class_schedule.id %}" class="btn btn-info btn-responsive">{% trans 'Edit' %}</a>
+                                        <a href="#" class="btn btn-danger btn-responsive" onclick="deleteClassSchedule('{{ class_schedule.id }}')">{% trans 'Delete' %}</a>
                                     </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
+                        <div class="pagination">
+                            <span class="step-links">
+                                {% if class_schedules.has_previous %}
+                                    <a href="?page=1">&laquo; first</a>
+                                    <a href="?page={{ class_schedules.previous_page_number }}">previous</a>
+                                {% endif %}
+                                
+                                <span class="current">
+                                    Page {{ class_schedules.number }} of {{ class_schedules.paginator.num_pages }}.
+                                </span>
+                                
+                                {% if class_schedules.has_next %}
+                                    <a href="?page={{ class_schedules.next_page_number }}">next</a>
+                                    <a href="?page={{ class_schedules.paginator.num_pages }}">last &raquo;</a>
+                                {% endif %}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

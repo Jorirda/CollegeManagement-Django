@@ -4,7 +4,6 @@
 {% block page_title %}{% trans page_title %}{% endblock page_title %}
 
 {% block content %}
-
 <section class="content">
     <div class="container-fluid">
         <div id="messages">
@@ -24,25 +23,30 @@
                     <div class="card-header">
                         <h3 class="card-title">{% trans page_title %}</h3>
                     </div>
-
-                    {% include "main_app/form_template.html" with messages=messages  form=form button_text=_("Add Course") %}
+                    <!-- Your form template -->
+                    {% include "main_app/form_template.html" with messages=messages form=form button_text=_("Add Course") %}
                 </div>
                 <!-- /.card -->
-
             </div>
         </div>
     </div>
 </section>
 {% endblock content %}
+
 {% block custom_js %}
 <script>
     $(document).ready(function(){
         $('form').on('submit', function(event) {
             event.preventDefault();
+
+            var formData = new FormData(this); // Use FormData to include file inputs
+
             $.ajax({
                 url: "{% url 'add_course' %}",
                 type: 'POST',
-                data: $(this).serialize(),
+                data: formData,
+                processData: false, // Do not process data
+                contentType: false, // Do not set content type
                 success: function(response) {
                     $('#messages').html('<div class="alert alert-success">' + response.message + '</div>');
                     window.scrollTo(0, 0);

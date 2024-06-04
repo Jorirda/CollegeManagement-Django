@@ -19,7 +19,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Sum, F
 # from django.contrib.auth.hashers import make_password
 from django.shortcuts import render
-from generate import  process_data
+from generate import  main, process_data
 from main_app.model_column_mapping import MODEL_COLUMN_MAPPING
 from .forms import *
 from .models import *
@@ -136,6 +136,7 @@ def check_columns(request):
                             'can_autofill': False,
                             'can_use_fake_data': False
                         }
+
                         if col_status['status'] == 'missing':
                             # Check specific column mapping rules
                             specific_mapping = SPECIFIC_COLUMN_MAPPING.get('CustomUser', {}).get(user_type, {})
@@ -156,6 +157,11 @@ def check_columns(request):
                                         col_status['can_autofill'] = True
                                         col_status['autofill_from'] = uploaded_col
                                         break
+
+                            # Additional logic for 结束级别 autofill
+                            if col == '结束级别':
+                                col_status['status'] = 'autofill'
+                                col_status['can_autofill'] = True
 
                         if col_status['status'] == 'missing':
                             col_status['can_use_fake_data'] = True
@@ -178,6 +184,8 @@ def get_upload(request):
             excel_file = request.FILES['excel_file']
             selected_model = form.cleaned_data['model']
             user_type = form.cleaned_data.get('user_type')
+            auto_create_learning_record = 'auto_create_learning_record' in request.POST
+            auto_create_payment_record = 'auto_create_payment_record' in request.POST
 
             if selected_model == 'CustomUser' and user_type:
                 selected_model = user_type
@@ -195,6 +203,7 @@ def get_upload(request):
                 missing_columns = expected_columns - actual_columns
                 extra_columns = actual_columns - expected_columns
 
+                # Print columns in English for better debugging
                 print(f"Expected columns: {expected_columns}")
                 print(f"Actual columns: {actual_columns}")
                 print(f"Missing columns: {missing_columns}")
@@ -202,17 +211,20 @@ def get_upload(request):
 
                 column_status = {col: 'missing' if col in missing_columns else 'extra' if col in extra_columns else 'match' for col in expected_columns}
 
+                # Check required fields
                 required_fields = REQUIRED_FIELDS.get(selected_model, [])
                 missing_required_fields = [field for field in required_fields if field not in actual_columns]
 
                 for field in missing_required_fields:
                     column_status[field] = 'missing (required)'
 
+                # Handle autofill suggestions
                 for col in missing_columns:
                     specific_mapping = SPECIFIC_COLUMN_MAPPING.get(selected_model, {}).get(user_type, {})
                     if col in specific_mapping and specific_mapping[col] in actual_columns:
                         column_status[specific_mapping[col]] = 'autofill'
 
+                # Color coding for columns
                 column_colors = {}
                 for col, status in column_status.items():
                     if status == 'autofill':
@@ -231,13 +243,8 @@ def get_upload(request):
                     'selected_model': selected_model,
                     'df': df.to_html(index=False)
                 }
-
-                result = process_data(excel_file,selected_model)
-                if result:
-                    print("Data processing and upload completed successfully.")
-                else:
-                    print("Data processing and upload failed.")
-                    
+                main(excel_file, selected_model, user_type, auto_create_learning_record, auto_create_payment_record)  # for uploading to db
+                print("Main Ran")
                 return render(request, 'hod_template/upload.html', context)
 
             except Exception as e:
@@ -249,9 +256,6 @@ def get_upload(request):
         form = ExcelUploadForm()
 
     return render(request, 'hod_template/upload.html', {'form': form})
-
-
-
 
 def get_result(excel_file, is_teacher):
     # Read the Excel file into a DataFrame
@@ -382,10 +386,14 @@ def refund_records(request):
         # Attempt to find a corresponding StudentQuery record
         student_query = StudentQuery.objects.filter(payment_records=payment_record).first()
 
+        # Fetch the teacher's name correctly
+        teacher_name = learning_record.teacher.admin.full_name if learning_record and learning_record.teacher and learning_record.teacher.admin else 'Unknown'
+
         payment_info = {
             'student_name': student_record.admin.full_name if student_record and student_record.admin else 'Unknown',
             'date_of_birth': student_record.date_of_birth if student_record else 'Unknown',
             'course': learning_record.course if learning_record else 'Unknown',
+            'teacher_name': teacher_name,  # Include Teacher Name
             'total_hours': payment_record.lesson_hours if payment_record.lesson_hours is not None else 'Unknown',
             'hours_spent': student_query.completed_hours if student_query and student_query.completed_hours is not None else 'Unknown',
             'hours_remaining': student_query.remaining_hours if student_query and student_query.remaining_hours is not None else 'Unknown',
@@ -416,6 +424,8 @@ def refund_records(request):
     }
 
     return render(request, 'hod_template/refund_records.html', context)
+
+
 
 
 #Admin
@@ -635,7 +645,6 @@ def admin_view_profile(request):
                 request, "Error Occured While Updating Profile " + str(e))
     return render(request, "hod_template/admin_view_profile.html", context)
 
-
 def admin_view_attendance(request):
     classes = Course.objects.all()
     sessions = Session.objects.all()
@@ -720,7 +729,6 @@ def manage_session(request):
     sessions = Session.objects.all()
     context = {'sessions': sessions, 'page_title': _('Manage Sessions')}
     return render(request, "hod_template/manage_session.html", context)
-
 
 #Teachers
 def add_teacher(request):
@@ -1020,21 +1028,17 @@ def manage_student(request):
     return render(request, "hod_template/manage_student.html", context)
 
 def manage_student_query(request):
-    print("Fetching all students...")
     # Get all students
     students = CustomUser.objects.filter(user_type=3)
-    print(f"Total students fetched: {students.count()}")
 
     # Get the selected student ID from the form submission
     selected_student_id = request.GET.get('student_id')
-    print(f"Selected student ID: {selected_student_id}")
 
     # Initialize the student_query_info list
     student_query_info = []
 
     if selected_student_id:
         try:
-            print(f"Retrieving student record for ID: {selected_student_id}...")
             # Retrieve the student record
             student_record = Student.objects.select_related('admin').get(admin__id=selected_student_id)
             student_name = student_record.admin.full_name
@@ -1045,35 +1049,13 @@ def manage_student_query(request):
             state = student_record.status
             reg_date = student_record.reg_date
 
-            print(f"Student record retrieved: {student_name}, {gender}, {date_of_birth}, {phone_number}, {campus}, {state}, {reg_date}")
-
             # Retrieve payment and learning records
-            print("Fetching payment records...")
             payment_record = PaymentRecord.objects.filter(student=student_record).first()
-            print(f"Payment record: {payment_record}")
 
-            if payment_record:
-                print(f"Payment record details - Status: {payment_record.status}, Amount Paid: {payment_record.amount_paid}, Lesson Hours: {payment_record.lesson_hours}")
-            else:
-                print("No payment record found for this student.")
-
-            print("Fetching learning records...")
+            # Ensure lesson_hours are treated as they are
             learning_records = LearningRecord.objects.filter(student=student_record).select_related('course', 'teacher__admin')
-            print(f"Total learning records fetched: {learning_records.count()}")
-
-            # Function to extract numeric part from lesson_hours
-            def extract_numeric_value(value):
-                try:
-                    return float(''.join(filter(str.isdigit, str(value))))
-                except ValueError:
-                    return 0.0
-
-            # Ensure lesson_hours are treated as numbers
-            completed_hours = sum(extract_numeric_value(record.lesson_hours) for record in learning_records if record.lesson_hours)
-            print(f"Completed hours: {completed_hours}")
-
-            remaining_hours = extract_numeric_value(payment_record.lesson_hours) - completed_hours if payment_record and payment_record.lesson_hours else 0
-            print(f"Remaining hours: {remaining_hours}")
+            completed_hours = sum(float(record.lesson_hours) for record in learning_records if record.lesson_hours)
+            remaining_hours = float(payment_record.lesson_hours) - completed_hours if payment_record and payment_record.lesson_hours else 0
 
             student_info = {
                 'student_name': student_name,
@@ -1092,18 +1074,15 @@ def manage_student_query(request):
                 'records': defaultdict(list)
             }
 
-            print(f"Student info: {student_info}")
-
             for record in learning_records:
                 course_info = {
                     'date': record.date,
                     'course': record.course.name,
-                    'instructor': record.teacher.admin.full_name,  # Corrected line
+                    'instructor': record.teacher.admin.full_name,
                     'start_time': record.start_time,
                     'end_time': record.end_time,
                     'lesson_hours': record.lesson_hours,
                 }
-                print(f"Adding course info: {course_info}")
                 student_info['records'][record.course.name].append(course_info)
 
             for course, records in student_info['records'].items():
@@ -1124,11 +1103,9 @@ def manage_student_query(request):
                     'remaining_hours': student_info['remaining_hours'],
                     'records': records
                 })
-                print(f"Appended student query info for course: {course}")
 
         except Exception as e:
             logging.error(f"Error retrieving student queries: {e}")
-            print(f"Error: {e}")
 
     context = {
         'students': students,
@@ -1136,8 +1113,8 @@ def manage_student_query(request):
         'page_title': _('Manage Student Queries')
     }
 
-    print("Rendering the template with context...")
     return render(request, 'hod_template/manage_student_query.html', context)
+
 
 # def manage_student_query(request):
 #     # Get all students
@@ -1277,8 +1254,14 @@ def delete_course(request, course_id):
 
 def manage_course(request):
     courses = Course.objects.all()
+    total_courses = courses.count()  # Calculate the total number of courses
+    paginator = Paginator(courses, 10)  # Show 10 courses per page
+    page_number = request.GET.get('page')
+    courses_page = paginator.get_page(page_number)
+    
     context = {
-        'courses': courses,
+        'courses': courses_page,
+        'total_courses': total_courses,  # Pass the total courses to the context
         'page_title': _('Manage Courses')
     }
     return render(request, "hod_template/manage_course.html", context)
@@ -1352,7 +1335,6 @@ def manage_classes(request):
         'page_title': _('Manage Classes')
     }
     return render(request, "hod_template/manage_classes.html", context)
-
 
 #Campuses
 def add_campus(request):
@@ -1431,7 +1413,6 @@ def manage_campus(request):
         'page_title': _('Manage Campuses')
     }
     return render(request, "hod_template/manage_campus.html", context)
-
 
 # Payments
 def get_lesson_hours(request):
@@ -1575,25 +1556,6 @@ def manage_payment_record(request):
     
     # Calculate total amount paid
     total_amount_paid = payments.aggregate(Sum('amount_paid'))['amount_paid__sum']
-    print(f"Total amount paid: {total_amount_paid}")
-
-    # Calculate lesson hours for each payment record
-    for payment in payments:
-        total_lesson_hours = LearningRecord.objects.filter(student=payment.student).aggregate(Sum('lesson_hours'))['lesson_hours__sum']
-        if total_lesson_hours is None:
-            total_lesson_hours = 0
-        else:
-            total_lesson_hours = float(total_lesson_hours)  # Ensure it is a float
-
-        # Determine if the total lesson hours should be displayed as "hr" or "hrs"
-        # if total_lesson_hours == 1:
-        #     lesson_hours_str = f"{total_lesson_hours} hr"
-        # else:
-        #     lesson_hours_str = f"{total_lesson_hours} hrs"
-
-        # Assuming you want to store this string representation
-        # payment.lesson_hours = lesson_hours_str
-        print(f"Student: {payment.student}, Total lesson hours: {payment.lesson_hours}")
 
     paginator = Paginator(payments, 10)  # Show 10 records per page
     page_number = request.GET.get('page')
@@ -1604,8 +1566,6 @@ def manage_payment_record(request):
         'total_amount_paid': total_amount_paid if total_amount_paid else 0,
         'page_title': _('Manage Payment Records')
     }
-    
-    print(f"Paginated Payments: {[payment.id for payment in paginated_payments]}")
 
     return render(request, 'hod_template/manage_payment_record.html', context)
 
@@ -1823,11 +1783,19 @@ def delete_class_schedule(request, schedule_id):
 
 def manage_class_schedule(request):
     class_schedules = ClassSchedule.objects.all()
+    total_class_schedules = class_schedules.count()  # Calculate the total number of class schedules
+    
+    paginator = Paginator(class_schedules, 10)  # Show 10 class schedules per page
+    page_number = request.GET.get('page')
+    class_schedules_page = paginator.get_page(page_number)
+
     context = {
-        'class_schedules': class_schedules,
+        'class_schedules': class_schedules_page,
+        'total_class_schedules': total_class_schedules,  # Pass the total class schedules count to the context
         'page_title': _('Manage Class Schedule')
     }
     return render(request, "hod_template/manage_class_schedule.html", context)
+
 
 
 #Notifications

@@ -81,6 +81,14 @@
                     <label for="excelFile">{% trans 'Excel File:' %}</label>
                     <input type="file" class="form-control-file" id="excelFile" name="excel_file" required>
                 </div>
+                <div class="form-check student-options" style="display: none;">
+                    <input type="checkbox" class="form-check-input" id="autoCreateLearningRecord" name="auto_create_learning_record">
+                    <label class="form-check-label" for="autoCreateLearningRecord">{% trans 'Auto-create Learning Records' %}</label>
+                </div>
+                <div class="form-check student-options" style="display: none;">
+                    <input type="checkbox" class="form-check-input" id="autoCreatePaymentRecord" name="auto_create_payment_record">
+                    <label class="form-check-label" for="autoCreatePaymentRecord">{% trans 'Auto-create Payment Records' %}</label>
+                </div>
                 <button type="submit" class="btn btn-primary mt-3">{% trans 'Upload' %}</button>
             </form>
 
@@ -116,6 +124,21 @@ document.getElementById('modelSelect').addEventListener('change', function() {
     } else {
         userTypeGroup.style.display = 'none';
     }
+});
+
+document.querySelectorAll('input[name="user_type"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        var studentOptions = document.querySelectorAll('.student-options');
+        if (this.value === 'Student') {
+            studentOptions.forEach(function(option) {
+                option.style.display = 'block';
+            });
+        } else {
+            studentOptions.forEach(function(option) {
+                option.style.display = 'none';
+            });
+        }
+    });
 });
 
 document.getElementById('excelFile').addEventListener('change', function() {

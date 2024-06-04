@@ -4566,3 +4566,133 @@ Traceback (most recent call last):
     raise self.model.MultipleObjectsReturned(
 main_app.models.StudentQuery.MultipleObjectsReturned: get() returned more than one StudentQuery -- it returned 2!
 ERROR 2024-06-03 17:21:26,179 basehttp "GET /en/learn/manage/ HTTP/1.1" 500 109193
+INFO 2024-06-03 23:07:26,033 models Learning Record Created/Updated: 6
+INFO 2024-06-03 23:07:26,072 models Learning Record Created/Updated: 7
+INFO 2024-06-04 00:24:53,896 models Learning Record Created/Updated: 6
+INFO 2024-06-04 00:24:53,921 models Learning Record Created/Updated: 7
+ERROR 2024-06-04 08:56:47,789 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+ERROR 2024-06-04 09:18:00,642 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+INFO 2024-06-04 09:18:08,768 hod_views Attendance data: {'present': 2, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03'], 'leave_dates': []}
+ERROR 2024-06-04 09:36:45,598 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+INFO 2024-06-04 09:36:55,912 hod_views Attendance data: {'present': 2, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03'], 'leave_dates': []}
+ERROR 2024-06-04 09:37:00,877 generate Exception: Cannot assign "1": "LearningRecord.semester" must be a "Session" instance.
+ERROR 2024-06-04 09:37:01,065 generate Exception: Cannot assign "1": "LearningRecord.semester" must be a "Session" instance.
+ERROR 2024-06-04 09:37:22,988 generate Exception: Cannot assign "1": "LearningRecord.semester" must be a "Session" instance.
+ERROR 2024-06-04 09:37:23,162 generate Exception: Cannot assign "1": "LearningRecord.semester" must be a "Session" instance.
+INFO 2024-06-04 09:38:21,732 models Learning Record Created/Updated: 6
+INFO 2024-06-04 09:38:21,763 models Learning Record Created/Updated: 7
+ERROR 2024-06-04 09:38:38,494 generate Exception: Invalid field name(s) for model LearningRecord: 'session'.
+ERROR 2024-06-04 09:38:38,671 generate Exception: Invalid field name(s) for model LearningRecord: 'session'.
+INFO 2024-06-04 09:40:03,024 models Learning Record Created/Updated: 6
+INFO 2024-06-04 09:40:03,054 models Learning Record Created/Updated: 7
+ERROR 2024-06-04 09:40:21,191 generate Exception: Invalid field name(s) for model LearningRecord: 'Session'.
+ERROR 2024-06-04 09:40:21,357 generate Exception: Invalid field name(s) for model LearningRecord: 'Session'.
+INFO 2024-06-04 09:41:20,737 models Learning Record Created/Updated: 10
+INFO 2024-06-04 09:41:20,911 models Learning Record Created/Updated: 11
+INFO 2024-06-04 09:41:25,544 models Learning Record Created/Updated: 10
+INFO 2024-06-04 09:41:25,561 models Learning Record Created/Updated: 11
+INFO 2024-06-04 09:41:25,584 models Learning Record Created/Updated: 6
+INFO 2024-06-04 09:41:25,608 models Learning Record Created/Updated: 7
+INFO 2024-06-04 09:45:19,952 models Learning Record Created/Updated: 12
+INFO 2024-06-04 09:45:20,159 models Learning Record Created/Updated: 13
+INFO 2024-06-04 09:45:37,046 models Learning Record Created/Updated: 12
+INFO 2024-06-04 09:45:37,062 models Learning Record Created/Updated: 13
+INFO 2024-06-04 09:45:37,087 models Learning Record Created/Updated: 6
+INFO 2024-06-04 09:45:37,112 models Learning Record Created/Updated: 7
+INFO 2024-06-04 09:47:31,593 models Learning Record Created/Updated: 12
+INFO 2024-06-04 09:47:31,608 models Learning Record Created/Updated: 13
+INFO 2024-06-04 09:47:31,629 models Learning Record Created/Updated: 6
+INFO 2024-06-04 09:47:31,653 models Learning Record Created/Updated: 7
+WARNING 2024-06-04 09:57:48,396 basehttp "GET /static/js/bootstrap-datepicker.min.js HTTP/1.1" 404 1817
+WARNING 2024-06-04 09:57:48,555 basehttp "GET /static/js/moment.min.js HTTP/1.1" 404 1775
+INFO 2024-06-04 10:03:21,058 models Learning Record Created/Updated: 6
+INFO 2024-06-04 10:03:21,092 models Learning Record Created/Updated: 7
+INFO 2024-06-04 10:04:59,137 models Learning Record Created/Updated: 6
+INFO 2024-06-04 10:04:59,162 models Learning Record Created/Updated: 7
+WARNING 2024-06-04 10:09:11,922 basehttp "GET /static/js/bootstrap-datepicker.min.js HTTP/1.1" 404 1817
+WARNING 2024-06-04 10:09:11,923 basehttp "GET /static/js/moment.min.js HTTP/1.1" 404 1775
+WARNING 2024-06-04 10:10:02,643 basehttp "GET /static/js/moment.min.js HTTP/1.1" 404 1775
+WARNING 2024-06-04 10:10:02,645 basehttp "GET /static/js/bootstrap-datepicker.min.js HTTP/1.1" 404 1817
+INFO 2024-06-04 10:10:37,448 models Class Schedule Record Created/Updated: 6
+INFO 2024-06-04 10:15:43,506 hod_views Attendance data: {'present': 2, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03'], 'leave_dates': []}
+ERROR 2024-06-04 10:31:04,776 log Internal Server Error: /en/student/manage/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 1009, in manage_student
+    'remark': student_extra.remark if student_extra else None,
+AttributeError: 'Student' object has no attribute 'remark'
+ERROR 2024-06-04 10:31:04,781 basehttp "GET /en/student/manage/ HTTP/1.1" 500 68791
+WARNING 2024-06-04 10:31:05,147 log Not Found: /favicon.ico
+WARNING 2024-06-04 10:31:05,148 basehttp "GET /favicon.ico HTTP/1.1" 404 2709
+INFO 2024-06-04 10:36:04,889 hod_views Attendance data: {'present': 2, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03'], 'leave_dates': []}
+INFO 2024-06-04 10:37:58,213 hod_views Attendance data: {'present': 2, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03'], 'leave_dates': []}
+INFO 2024-06-04 10:40:56,140 models Learning Record Created/Updated: 6
+INFO 2024-06-04 10:40:56,163 models Learning Record Created/Updated: 7
+INFO 2024-06-04 10:41:04,756 models Learning Record Created/Updated: 6
+INFO 2024-06-04 10:41:04,779 models Learning Record Created/Updated: 7
+WARNING 2024-06-04 11:03:07,642 basehttp "GET /static/js/moment.min.js HTTP/1.1" 404 1775
+WARNING 2024-06-04 11:03:07,643 basehttp "GET /static/js/bootstrap-datepicker.min.js HTTP/1.1" 404 1817
+WARNING 2024-06-04 11:03:13,252 basehttp "GET /static/js/moment.min.js HTTP/1.1" 404 1775
+WARNING 2024-06-04 11:03:14,120 basehttp "GET /static/js/bootstrap-datepicker.min.js HTTP/1.1" 404 1817
+INFO 2024-06-04 11:04:09,077 models Class Schedule Record Created/Updated: 7
+WARNING 2024-06-04 11:04:17,363 basehttp "GET /static/js/moment.min.js HTTP/1.1" 404 1775
+WARNING 2024-06-04 11:04:18,154 basehttp "GET /static/js/bootstrap-datepicker.min.js HTTP/1.1" 404 1817
+INFO 2024-06-04 11:04:43,737 models Class Schedule Record Created/Updated: 8
+WARNING 2024-06-04 11:06:21,488 basehttp "GET /static/js/moment.min.js HTTP/1.1" 404 1775
+WARNING 2024-06-04 11:06:21,488 basehttp "GET /static/js/bootstrap-datepicker.min.js HTTP/1.1" 404 1817
+WARNING 2024-06-04 11:06:43,525 basehttp "GET /static/js/moment.min.js HTTP/1.1" 404 1775
+WARNING 2024-06-04 11:06:43,527 basehttp "GET /static/js/bootstrap-datepicker.min.js HTTP/1.1" 404 1817
+INFO 2024-06-04 11:07:12,686 models Class Schedule Record Created/Updated: 9
+WARNING 2024-06-04 11:07:22,330 basehttp "GET /static/js/moment.min.js HTTP/1.1" 404 1775
+WARNING 2024-06-04 11:07:23,145 basehttp "GET /static/js/bootstrap-datepicker.min.js HTTP/1.1" 404 1817
+INFO 2024-06-04 11:07:59,354 models Class Schedule Record Created/Updated: 10
+INFO 2024-06-04 11:10:20,898 models Learning Record Created/Updated: 6
+INFO 2024-06-04 11:10:20,922 models Learning Record Created/Updated: 7
+INFO 2024-06-04 11:10:42,592 models Learning Record Created/Updated: 6
+INFO 2024-06-04 11:10:42,623 models Learning Record Created/Updated: 7
+WARNING 2024-06-04 11:13:16,497 basehttp "GET /static/css/customstyle.css HTTP/1.1" 404 1784
+INFO 2024-06-04 11:13:50,752 models Learning Record Created/Updated: 14
+INFO 2024-06-04 11:13:54,026 models Learning Record Created/Updated: 6
+INFO 2024-06-04 11:13:54,052 models Learning Record Created/Updated: 7
+INFO 2024-06-04 11:13:54,075 models Learning Record Created/Updated: 14
+INFO 2024-06-04 11:14:13,783 models Learning Record Created/Updated: 6
+INFO 2024-06-04 11:14:13,808 models Learning Record Created/Updated: 7
+INFO 2024-06-04 11:14:13,831 models Learning Record Created/Updated: 14
+INFO 2024-06-04 11:14:32,130 models Learning Record Created/Updated: 15
+INFO 2024-06-04 11:14:35,384 models Learning Record Created/Updated: 6
+INFO 2024-06-04 11:14:35,410 models Learning Record Created/Updated: 7
+INFO 2024-06-04 11:14:35,433 models Learning Record Created/Updated: 14
+INFO 2024-06-04 11:14:35,456 models Learning Record Created/Updated: 15
+INFO 2024-06-04 11:14:51,615 models Learning Record Created/Updated: 16
+INFO 2024-06-04 11:14:54,897 models Learning Record Created/Updated: 6
+INFO 2024-06-04 11:14:54,924 models Learning Record Created/Updated: 7
+INFO 2024-06-04 11:14:54,949 models Learning Record Created/Updated: 14
+INFO 2024-06-04 11:14:54,973 models Learning Record Created/Updated: 15
+INFO 2024-06-04 11:14:54,996 models Learning Record Created/Updated: 16
+INFO 2024-06-04 11:15:11,404 models Learning Record Created/Updated: 17
+INFO 2024-06-04 11:15:14,947 models Learning Record Created/Updated: 6
+INFO 2024-06-04 11:15:14,975 models Learning Record Created/Updated: 7
+INFO 2024-06-04 11:15:14,998 models Learning Record Created/Updated: 14
+INFO 2024-06-04 11:15:15,022 models Learning Record Created/Updated: 15
+INFO 2024-06-04 11:15:15,047 models Learning Record Created/Updated: 16
+INFO 2024-06-04 11:15:15,070 models Learning Record Created/Updated: 17
+INFO 2024-06-04 11:24:11,174 hod_views Attendance data: {'present': 2, 'absent': 0, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03'], 'leave_dates': []}
+ERROR 2024-06-04 11:24:50,142 log Internal Server Error: /en/refunds
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 390, in refund_records
+    teacher_name = learning_record.teacher.full_name if learning_record and learning_record.teacher else 'Unknown'
+AttributeError: 'Teacher' object has no attribute 'full_name'
+ERROR 2024-06-04 11:24:50,146 basehttp "GET /en/refunds HTTP/1.1" 500 68687
+INFO 2024-06-04 11:41:02,147 models Learning Record Created/Updated: 6
+INFO 2024-06-04 11:41:02,174 models Learning Record Created/Updated: 7
+INFO 2024-06-04 11:41:02,198 models Learning Record Created/Updated: 14
+INFO 2024-06-04 11:41:02,221 models Learning Record Created/Updated: 15
+INFO 2024-06-04 11:41:02,244 models Learning Record Created/Updated: 16
+INFO 2024-06-04 11:41:02,266 models Learning Record Created/Updated: 17

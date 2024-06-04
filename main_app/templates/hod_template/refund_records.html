@@ -48,6 +48,7 @@
                                     <th>{% trans "Date of Birth" %}</th>
                                     <th>{% trans "Student Name" %}</th>
                                     <th>{% trans "Course" %}</th>
+                                    <th>{% trans "Teacher" %}</th> <!-- New Column for Teacher -->
                                     <th>{% trans "Total Lesson Hours" %}</th>
                                     <th>{% trans "Hours Spent" %}</th>
                                     <th>{% trans "Hours Remaining" %}</th>
@@ -63,6 +64,7 @@
                                     <td>{{ refund.date_of_birth|date:"Y-m-d" }}</td>
                                     <td>{{ refund.student_name }}</td>
                                     <td>{{ refund.course }}</td>
+                                    <td>{{ refund.teacher_name }}</td> <!-- Display Teacher Name -->
                                     <td>{{ refund.total_hours }}</td>
                                     <td>{{ refund.hours_spent }}</td>
                                     <td>{{ refund.hours_remaining }}</td>
@@ -73,10 +75,10 @@
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="10" class="text-center">{% trans "No refund records found." %}</td>
+                                    <td colspan="11" class="text-center">{% trans "No refund records found." %}</td>
                                 </tr>
                                 {% endfor %}
-                            </tbody>
+                            </tbody>                            
                         </table>
                         <div class="pagination">
                             <span class="step-links">

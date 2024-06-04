@@ -1,4 +1,5 @@
 import os
+import random
 import django
 import pandas as pd
 import logging
@@ -6,7 +7,7 @@ from faker import Faker
 from django.contrib.auth.hashers import make_password
 from django.utils.crypto import get_random_string
 from django.db import IntegrityError
-from main_app.models import CustomUser, Campus, Course, LearningRecord, Student, Teacher, PaymentRecord, StudentQuery
+from main_app.models import CustomUser, Campus, Course, LearningRecord, Student, Teacher, PaymentRecord, StudentQuery, Session, ClassSchedule, RefundRecord
 from main_app.model_column_mapping import MODEL_COLUMN_MAPPING
 
 # Set up Django settings
@@ -15,7 +16,7 @@ django.setup()
 
 # Create a Faker generator
 fake = Faker()
-
+random_number = random.randint(1, 7)
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -34,13 +35,20 @@ grade_mapping = {
     '四阶': 4
 }
 
-def get_value_from_row(row, column_name, default_value=None, fake_value=None):
-    value = row.get(column_name)
-    if pd.isna(value) or value == "":
-        value = default_value if default_value is not None else fake_value
-    return value
+REQUIRED_FIELDS = {
+    'CustomUser': ['姓名', '邮箱', '性别', '地址', '电话号码', '用户类型'],
+    'Student': ['学生姓名', '校区', '班级', '出生日期', '注册日期', '状态'],
+    'Teacher': ['授课老师', '班级', '校区', '工作类型'],
+    'Session': ['开始年份', '结束年份'],
+    'Campus': ['校区', '校长', '校长联系电话'],
+    'Course': ['班级', '班级概述', '开始级别', '结束级别', '图片'],
+    'ClassSchedule': ['班级', '课时单价', '教师', '年级', '开始时间', '结束时间', '课时', '备注'],
+    'LearningRecord': ['日期', '学生', '班级', '教师', '班级安排', '学期', '开始时间', '结束时间', '课时', '星期'],
+    'PaymentRecord': ['日期', '下次缴费时间\n（班级结束前1月）', '学生', '班级', '课时单价', '折后价格', '书本费', '其他费用', '应付金额', '缴费', '支付方式', '状态', '缴费人', '备注', '课时', '学习记录'],
+    'RefundRecord': ['学生', '学习记录', '付款记录', '退款金额', '已退款金额', '退款原因']
+}
 
-def process_data(excel_file, selected_model):
+def process_data(excel_file, auto_create_learning_record=False, auto_create_payment_record=False):
     try:
         df = pd.read_excel(excel_file)
         logging.info(f"Dataframe loaded successfully with {len(df)} rows.")
@@ -48,33 +56,28 @@ def process_data(excel_file, selected_model):
         logging.error(f"Error reading Excel file: {e}")
         return None  # Return early if the file cannot be processed
 
-    required_columns = MODEL_COLUMN_MAPPING[selected_model]['fields'].keys()
-    for column in required_columns:
-        if column not in df.columns:
-            logging.warning(f"Missing required column: {column}. Using fake data.")
-            fake_value = fake.date_of_birth(minimum_age=10, maximum_age=18).isoformat() if column == '出生日期' else ''
-            df[column] = df.apply(lambda x: fake_value, axis=1)
-
     fake_data = []
     user_student_pairs = []
 
     for index, row in df.iterrows():
         try:
-            full_name = get_value_from_row(row, '学生姓名', fake.name())
-            email = get_value_from_row(row, '邮箱', fake.email())
+            full_name = row.get('学生姓名', fake.name())
+            email = row.get('邮箱', fake.email())
+            gender = row.get('性别', fake.random_element(elements=('男', '女')))
+            address = row.get('地址', fake.address().replace('\n', ', '))
+            phone_number = row.get('电话号码', fake.phone_number())
+            date_of_birth = row.get('出生日期', fake.date_of_birth(minimum_age=10, maximum_age=18))
+            reg_date = row.get('注册日期', fake.date_this_year())
+            status = row.get('状态', 'active')
 
-            password = get_random_string(12)
-            hashed_password = make_password(password)
-
-            campus_name = get_value_from_row(row, '校区', fake.company())
+            campus_name = row.get('校区', 'Unknown Campus')
             campus, _ = Campus.objects.get_or_create(name=campus_name)
-            logging.info(f"Campus retrieved or created: {campus_name}")
 
-            class_full_name = get_value_from_row(row, '班级', fake.job())
+            class_name = row.get('班级', 'Unknown Class')
             course_name, grade_level = None, None
             for chinese_grade, grade in grade_mapping.items():
-                if chinese_grade in class_full_name:
-                    course_name = class_full_name.replace(chinese_grade, '').strip()
+                if chinese_grade in class_name:
+                    course_name = class_name.replace(chinese_grade, '').strip()
                     grade_level = grade
                     break
 
@@ -85,61 +88,68 @@ def process_data(excel_file, selected_model):
                     course.save()
                 logging.info(f"Course retrieved or created: {course_name}")
 
-            user_data = {
-                'full_name': full_name,
-                'email': email,
-                'password': hashed_password,
-                'profile_pic': '/media/default.jpg',
-                'gender': get_value_from_row(row, '性别', fake.random_element(elements=('男', '女'))),
-                'address': get_value_from_row(row, '地址', fake.address().replace('\n', ', ')),
-                'phone_number': get_value_from_row(row, '电话号码', fake.phone_number()),
-                'is_teacher': selected_model == 'Teacher',
-                'user_type': 2 if selected_model == 'Teacher' else 3,  
-                'remark': "Salesperson: " + get_value_from_row(row, '销售人员', fake.name()),
-                'fcm_token': ''  
-            }
+            remark = "销售人员: " + row.get('销售人员', 'Unknown')
 
-            try:
-                user, user_created = CustomUser.objects.get_or_create(
-                    email=email,
-                    defaults=user_data
-                )
-                if not user_created:
-                    for key, value in user_data.items():
-                        setattr(user, key, value)
-                    user.save()
-                fake_data.append(user_data)
-                logging.info(f"User {'created' if user_created else 'updated'}: {email}")
-            except IntegrityError:
-                logging.error(f"IntegrityError for user: {email}")
-                continue
+            # Create or update CustomUser
+            user, created = CustomUser.objects.update_or_create(
+                email=email,
+                defaults={
+                    'full_name': full_name,
+                    'password': make_password('password123'),
+                    'gender': gender,
+                    'address': address,
+                    'phone_number': phone_number,
+                    'user_type': 3,  # Assuming 3 is for students
+                    'remark': remark
+                }
+            )
 
-            if selected_model == 'Teacher':
-                Teacher.objects.get_or_create(admin=user)
-                logging.info(f"Teacher profile created for: {email}")
-            else:
-                student, student_created = Student.objects.get_or_create(
-                    admin=user,
+            # Create or update Student
+            student, created = Student.objects.update_or_create(
+                admin=user,
+                defaults={
+                    'campus': campus,
+                    'date_of_birth': date_of_birth,
+                    'reg_date': reg_date,
+                    'status': status
+                }
+                
+            )
+            # Add course to student_courses relationship
+            student.courses.add(course)
+            
+            if auto_create_learning_record:
+                LearningRecord.objects.get_or_create(
+                    student=student,
+                    course=course,
                     defaults={
-                        'campus': campus,
-                        'course': course,
-                        'date_of_birth': get_value_from_row(row, '出生日期', fake_value=fake.date_of_birth(minimum_age=10, maximum_age=18).isoformat()),
-                        'reg_date': get_value_from_row(row, '注册日期', fake_value=fake.date_this_year().isoformat()),
-                        'status': get_value_from_row(row, '状态', fake_value='active')
+                        'date': reg_date,
+                        'semester_id': 1,  # Example value
+                        'start_time': '08:00',
+                        'end_time': '10:00',
+                        'lesson_hours': 2,
+                        'day': 'Monday'
                     }
                 )
-                if not student_created:
-                    student.campus = campus
-                    student.course = course
-                    student.date_of_birth = get_value_from_row(row, '出生日期', fake_value=fake.date_of_birth(minimum_age=10, maximum_age=18).isoformat())
-                    student.reg_date = get_value_from_row(row, '注册日期', fake_value=fake.date_this_year().isoformat())
-                    student.status = get_value_from_row(row, '状态', fake_value='active')
-                    student.save()
-                    logging.info(f"Updated student {student} with new campus and course.")
-                else:
-                    logging.info(f"Student created: {student}")
 
-                user_student_pairs.append((user, student, course, row))
+            if auto_create_payment_record:
+                PaymentRecord.objects.get_or_create(
+                    student=student,
+                    course=course,
+                    defaults={
+                        'date': reg_date,
+                        'amount_paid': 1000,  # Example value
+                        'payment_method': 'Cash',
+                        'status': 'Pending',
+                        'remark': remark
+                    }
+                )
+
+            user_student_pairs.append((user, student, course, row))
+
+            # Logging
+            logging.info(f"Student instance saved or updated for: {full_name}")
+            logging.info(f"StudentQuery for {full_name} updated successfully.")
 
         except KeyError as e:
             logging.error(f"KeyError: {e}")
@@ -148,54 +158,172 @@ def process_data(excel_file, selected_model):
             logging.error(f"Exception: {e}")
             continue
 
-    logging.info("User-student pairs processed: %s", user_student_pairs)
-
-    for user, student, course, row in user_student_pairs:
-        try:
-            remark = user.remark if student and student.admin else None
-            lesson_unit_price = row.get('课时单价', 0)
-            ls, created = LearningRecord.objects.get_or_create(
-                student=student,
-                course=course,
-                defaults={
-                    'date': user.date_joined,
-                }
-            )
-            PaymentRecord.objects.get_or_create(
-                student=student,
-                course=course,
-                defaults={
-                    'date': user.date_joined,
-                    'next_payment_date': get_value_from_row(row, '下次缴费时间\n（班级结束前1月）', fake_value=fake.date_this_year().isoformat()),
-                    'amount_paid': get_value_from_row(row, '缴费', fake_value=0),
-                    'payee': full_name,
-                    'status': 'Currently Learning',
-                    'lesson_hours': get_value_from_row(row, '总课次', fake_value=0),
-                    'lesson_unit_price': lesson_unit_price,
-                    'discounted_price': lesson_unit_price,
-                    'book_costs': 0,
-                    'other_fee': 0,
-                    'amount_due': 0,
-                    'remark': remark,
-                }
-            )
-            
-            StudentQuery.objects.get_or_create(
-                student_records=student,
-                registered_courses=course,
-                admin=user,
-                defaults={
-                    'paid_class_hours': get_value_from_row(row, '总课次', fake_value=0),
-                    'completed_hours': get_value_from_row(row, '已上课次', fake_value=0),
-                    'remaining_hours': get_value_from_row(row, '剩余课次', fake_value=0),
-                }
-            )
-            logging.info(f"StudentQuery created for student: {student}")
-        except Exception as e:
-            logging.error(f"Error creating LearningRecord: {e}")
-            continue
-
     return fake_data
 
-# Example usage
-# process_data('path_to_excel_file.xlsx', selected_model='Student')
+def process_course(excel_file):
+    try:
+        df = pd.read_excel(excel_file)
+        logging.info(f"Dataframe loaded successfully with {len(df)} rows.")
+    except Exception as e:
+        logging.error(f"Error reading Excel file: {e}")
+        return None
+
+    for index, row in df.iterrows():
+        try:
+            overview = row.get('班级概述', fake.text())
+            class_name = row.get('班级', 'Unknown Class')
+            course_name, grade_level = None, None
+            for chinese_grade, grade in grade_mapping.items():
+                if chinese_grade in class_name:
+                    course_name = class_name.replace(chinese_grade, '').strip()
+                    grade_level = grade
+                    break
+
+            if course_name:
+                course, created = Course.objects.get_or_create(name=course_name)
+                if created or course.level_end < grade_level:
+                    course.level_end = grade_level
+                    course.overview = overview
+                    course.save()
+                logging.info(f"Course retrieved or created: {course_name}")
+
+        except Exception as e:
+            logging.error(f"Exception: {e}")
+            continue
+
+def process_learning_record(excel_file):
+    try:
+        df = pd.read_excel(excel_file)
+        logging.info(f"Dataframe loaded successfully with {len(df)} rows.")
+    except Exception as e:
+        logging.error(f"Error reading Excel file: {e}")
+        return None
+
+    for index, row in df.iterrows():
+        try:
+            student_email = row.get('学生邮箱')
+            student = CustomUser.objects.get(email=student_email)
+            course_name = row.get('班级')
+            course = Course.objects.get(name=course_name)
+
+            LearningRecord.objects.update_or_create(
+                student=student.student,
+                course=course,
+                defaults={
+                    'date': row.get('日期'),
+                    'teacher': row.get('教师'),
+                    'schedule_record': row.get('班级安排'),
+                    'semester': row.get('学期'),
+                    'start_time': row.get('开始时间'),
+                    'end_time': row.get('结束时间'),
+                    'lesson_hours': row.get('课时'),
+                    'day': row.get('星期')
+                }
+            )
+
+            logging.info(f"LearningRecord instance saved or updated for student: {student_email}")
+
+        except CustomUser.DoesNotExist:
+            logging.error(f"Student with email {student_email} does not exist.")
+        except Course.DoesNotExist:
+            logging.error(f"Course {course_name} does not exist.")
+        except Exception as e:
+            logging.error(f"Exception: {e}")
+            continue
+
+def process_payment_record(excel_file):
+    try:
+        df = pd.read_excel(excel_file)
+        logging.info(f"Dataframe loaded successfully with {len(df)} rows.")
+    except Exception as e:
+        logging.error(f"Error reading Excel file: {e}")
+        return None
+
+    for index, row in df.iterrows():
+        try:
+            student_email = row.get('学生邮箱')
+            student = CustomUser.objects.get(email=student_email)
+            course_name = row.get('班级')
+            course = Course.objects.get(name=course_name)
+
+            PaymentRecord.objects.update_or_create(
+                student=student.student,
+                course=course,
+                defaults={
+                    'date': row.get('日期'),
+                    'next_payment_date': row.get('下次缴费时间\n（课程结束前1月）'),
+                    'amount_paid': row.get('缴费'),
+                    'payment_method': row.get('支付方式'),
+                    'status': row.get('状态'),
+                    'payee': row.get('缴费人'),
+                    'remark': row.get('备注'),
+                    'lesson_hours': row.get('课时'),
+                    'lesson_unit_price': row.get('课时单价'),
+                    'discounted_price': row.get('折后价格'),
+                    'book_costs': row.get('书本费'),
+                    'other_fee': row.get('其他费用'),
+                    'amount_due': row.get('应付金额')
+                }
+            )
+
+            logging.info(f"PaymentRecord instance saved or updated for student: {student_email}")
+
+        except CustomUser.DoesNotExist:
+            logging.error(f"Student with email {student_email} does not exist.")
+        except Course.DoesNotExist:
+            logging.error(f"Course {course_name} does not exist.")
+        except Exception as e:
+            logging.error(f"Exception: {e}")
+            continue
+
+def main(excel_file, selected_model, user_type=None, auto_create_learning_record=False, auto_create_payment_record=False):
+    if selected_model == 'CustomUser' and user_type in ['Student', 'Teacher']:
+        process_data(excel_file, auto_create_learning_record, auto_create_payment_record)
+    elif selected_model == 'Course':
+        process_course(excel_file)
+    elif selected_model == 'LearningRecord':
+        process_learning_record(excel_file)
+    elif selected_model == 'PaymentRecord':
+        process_payment_record(excel_file)
+    else:
+        sheets = read_excel_file(excel_file)
+        process_all_sheets(sheets, MODEL_COLUMN_MAPPING)
+
+def read_excel_file(excel_file):
+    sheets = pd.read_excel(excel_file, sheet_name=None)
+    return sheets
+
+def process_all_sheets(sheets, model_column_mapping):
+    for sheet_name, sheet_data in sheets.items():
+        if sheet_name in model_column_mapping:
+            process_sheet(sheet_name, sheet_data, model_column_mapping[sheet_name])
+        else:
+            logging.warning(f"No model mapping found for sheet: {sheet_name}")
+
+def process_sheet(sheet_name, sheet_data, model_info):
+    model = model_info['model']
+    field_mapping = model_info['fields']
+
+    for index, row in sheet_data.iterrows():
+        data = {}
+        for col, field in field_mapping.items():
+            data[field] = row[col]
+        
+        try:
+            model.objects.update_or_create(**data)
+            logging.info(f"{model.__name__} record processed: {data}")
+        except IntegrityError as e:
+            logging.error(f"IntegrityError for {model.__name__}: {e}")
+        except Exception as e:
+            logging.error(f"Error for {model.__name__}: {e}")
+
+def fake_value(column_name):
+    fake = Faker()
+    if column_name == '出生日期':
+        return fake.date_of_birth(minimum_age=10, maximum_age=18).isoformat()
+    elif column_name == '注册日期':
+        return fake.date_this_year().isoformat()
+    elif column_name == '状态':
+        return 'Active'
+    # Add more cases for other columns as needed
+    return fake.word()

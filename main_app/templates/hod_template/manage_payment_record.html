@@ -8,7 +8,42 @@
 
 {% block content %}
 <style>
-    /* Styles as provided in the question */
+    .responsive-buttons {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+    .btn-responsive {
+        flex: 1 1 auto;
+        margin: 2px;
+        min-width: 68px;
+        text-align: center;
+    }
+    @media (max-width: 576px) {
+        .btn-responsive {
+            flex-basis: 100%;
+        }
+    }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+    .pagination a, .pagination span {
+        margin: 0 5px;
+        padding: 8px 16px;
+        text-decoration: none;
+        color: #5FC032;
+        border: 1px solid #DEE2E600;
+        border-radius: 4px;
+    }
+    .pagination a:hover {
+        background-color: #e9ecef;
+    }
+    .pagination .current {
+        background-color: #5FC032;
+        color: white;
+    }
 </style>
 <section class="content">
     <div class="container-fluid">
@@ -87,7 +122,21 @@
                             </tbody>
                         </table>
                         <div class="pagination">
-                            <!-- Pagination code -->
+                            <span class="step-links">
+                                {% if payments.has_previous %}
+                                    <a href="?page=1">&laquo; first</a>
+                                    <a href="?page={{ payments.previous_page_number }}">previous</a>
+                                {% endif %}
+                                
+                                <span class="current">
+                                    Page {{ payments.number }} of {{ payments.paginator.num_pages }}.
+                                </span>
+                                
+                                {% if payments.has_next %}
+                                    <a href="?page={{ payments.next_page_number }}">next</a>
+                                    <a href="?page={{ payments.paginator.num_pages }}">last &raquo;</a>
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
                 </div>

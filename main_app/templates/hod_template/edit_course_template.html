@@ -4,7 +4,6 @@
 {% block page_title %}{% trans page_title %}{% endblock page_title %}
 
 {% block content %}
-
 <section class="content">
     <div class="container-fluid">
         <div id="messages">
@@ -25,7 +24,7 @@
                         <h3 class="card-title">{% trans page_title %}</h3>
                     </div>
 
-                    {% include "main_app/form_template.html" with messages=messages  form=form button_text=_("Edit Course")%}
+                    {% include "main_app/form_template.html" with messages=messages form=form button_text=_("Edit Course") %}
                 </div>
                 <!-- /.card -->
 
@@ -39,17 +38,20 @@
     $(document).ready(function(){
         $('form').on('submit', function(event) {
             event.preventDefault();
-            var courseId = {{ course_id}};
+            var formData = new FormData(this);  // Create FormData object
+            var courseId = {{ course_id }};
             $.ajax({
                 url: "{% url 'edit_course' course_id=course_id %}",
                 type: 'POST',
-                data: $(this).serialize(),
+                data: formData,
+                processData: false,  // Prevent jQuery from converting the data
+                contentType: false,  // Ensure multipart/form-data is used
                 success: function(response) {
                     $('#messages').html('<div class="alert alert-success">' + response.message + '</div>');
                     window.scrollTo(0, 0);
                     setTimeout(function() {
                         $('.alert').fadeOut('slow');
-                        window.location.href = "{% url 'manage_course' %}"; 
+                        window.location.href = "{% url 'manage_course' %}";
                     }, 3000);
                 },
                 error: function(response) {

@@ -207,8 +207,14 @@ def process_learning_record(excel_file):
         try:
             student_name = row.get('学生姓名')
             student_salesperson = row.get('销售人员')
-            course_name = row.get('班级')
+            class_name = row.get('班级', 'Unknown Class')
             teacher_name = row.get('教师')
+
+            course_name, _ = None, None
+            for chinese_grade, grade in grade_mapping.items():
+                if chinese_grade in class_name:
+                    course_name = class_name.replace(chinese_grade, '').strip()
+                    break
 
             student = Student.objects.get(admin__full_name=student_name, admin__remark__icontains=student_salesperson)
             course = Course.objects.get(name=course_name)
@@ -218,7 +224,7 @@ def process_learning_record(excel_file):
                 student=student,
                 course=course,
                 defaults={
-                    'date': row.get('日期'),
+                    'date': row.get('日期') or fake.date_this_year(),
                     'teacher': teacher,
                     'schedule_record': row.get('班级安排'),
                     'semester': row.get('学期'),
@@ -253,8 +259,14 @@ def process_payment_record(excel_file):
         try:
             student_name = row.get('学生姓名')
             student_salesperson = row.get('销售人员')
-            course_name = row.get('班级')
+            class_name = row.get('班级', 'Unknown Class')
             teacher_name = row.get('教师')
+
+            course_name, _ = None, None
+            for chinese_grade, grade in grade_mapping.items():
+                if chinese_grade in class_name:
+                    course_name = class_name.replace(chinese_grade, '').strip()
+                    break
 
             student = Student.objects.get(admin__full_name=student_name, admin__remark__icontains=student_salesperson)
             course = Course.objects.get(name=course_name)
@@ -264,19 +276,19 @@ def process_payment_record(excel_file):
                 student=student,
                 course=course,
                 defaults={
-                    'date': row.get('日期'),
-                    'next_payment_date': row.get('下次缴费时间\n（课程结束前1月）'),
-                    'amount_paid': row.get('缴费'),
-                    'payment_method': row.get('支付方式'),
-                    'status': row.get('状态'),
-                    'payee': row.get('缴费人'),
-                    'remark': row.get('备注'),
-                    'lesson_hours': row.get('课时'),
-                    'lesson_unit_price': row.get('课时单价'),
-                    'discounted_price': row.get('折后价格'),
-                    'book_costs': row.get('书本费'),
-                    'other_fee': row.get('其他费用'),
-                    'amount_due': row.get('应付金额')
+                    'date': row.get('日期') or fake.date_this_year(),
+                    'next_payment_date': row.get('下次缴费时间\n（课程结束前1月）') or fake.date_this_year(),
+                    'amount_paid': row.get('缴费') or 0,
+                    'payment_method': row.get('支付方式') or 'Unknown',
+                    'status': row.get('状态') or 'Pending',
+                    'payee': row.get('缴费人') or 'Unknown',
+                    'remark': row.get('备注') or '',
+                    'lesson_hours': row.get('课时') or 0,
+                    'lesson_unit_price': row.get('课时单价') or 0,
+                    'discounted_price': row.get('折后价格') or 0,
+                    'book_costs': row.get('书本费') or 0,
+                    'other_fee': row.get('其他费用') or 0,
+                    'amount_due': row.get('应付金额') or 0
                 }
             )
 
@@ -284,6 +296,111 @@ def process_payment_record(excel_file):
 
         except Student.DoesNotExist:
             logging.error(f"Student {student_name} with salesperson {student_salesperson} does not exist.")
+        except Course.DoesNotExist:
+            logging.error(f"Course {course_name} does not exist.")
+        except Teacher.DoesNotExist:
+            logging.error(f"Teacher {teacher_name} does not exist.")
+        except Exception as e:
+            logging.error(f"Exception: {e}")
+            continue
+
+def process_refund_record(excel_file):
+    try:
+        df = pd.read_excel(excel_file)
+        logging.info(f"Dataframe loaded successfully with {len(df)} rows.")
+    except Exception as e:
+        logging.error(f"Error reading Excel file: {e}")
+        return None
+
+    for index, row in df.iterrows():
+        try:
+            student_name = row.get('学生姓名')
+            student_salesperson = row.get('销售人员')
+            learning_record_date = row.get('学习记录日期')
+            payment_record_date = row.get('付款记录日期')
+
+            # Match student
+            student = Student.objects.get(admin__full_name=student_name, admin__remark__icontains=student_salesperson)
+
+            # Match learning record
+            learning_record = LearningRecord.objects.get(student=student, date=learning_record_date)
+
+            # Match payment record
+            payment_record = PaymentRecord.objects.get(student=student, date=payment_record_date)
+
+            # Process refund record
+            RefundRecord.objects.update_or_create(
+                student=student,
+                learning_records=learning_record,
+                payment_records=payment_record,
+                defaults={
+                    'refund_amount': row.get('退款金额'),
+                    'amount_refunded': row.get('已退款金额'),
+                    'refund_reason': row.get('退款原因')
+                }
+            )
+
+            logging.info(f"RefundRecord instance saved or updated for student: {student_name}")
+        
+        except Student.DoesNotExist:
+            logging.error(f"Student {student_name} with salesperson {student_salesperson} does not exist.")
+        except LearningRecord.DoesNotExist:
+            logging.error(f"LearningRecord with date {learning_record_date} for student {student_name} does not exist.")
+        except PaymentRecord.DoesNotExist:
+            logging.error(f"PaymentRecord with date {payment_record_date} for student {student_name} does not exist.")
+        except Exception as e:
+            logging.error(f"Exception: {e}")
+            continue
+
+def process_class_schedule(excel_file):
+    try:
+        df = pd.read_excel(excel_file)
+        logging.info(f"Dataframe loaded successfully with {len(df)} rows.")
+    except Exception as e:
+        logging.error(f"Error reading Excel file: {e}")
+        return None
+
+    for index, row in df.iterrows():
+        try:
+            class_name = row.get('班级', 'Unknown Class')
+            teacher_name = row.get('教师')
+
+            # Find or create course
+            course_name, grade_level = None, None
+            for chinese_grade, grade in grade_mapping.items():
+                if chinese_grade in class_name:
+                    course_name = class_name.replace(chinese_grade, '').strip()
+                    grade_level = grade
+                    break
+
+            if course_name:
+                course, created = Course.objects.get_or_create(name=course_name)
+                if created or course.level_end < grade_level:
+                    course.level_end = grade_level
+                    course.save()
+                logging.info(f"Course retrieved or created: {course_name}")
+
+            # Find or create teacher
+            teacher = None
+            if teacher_name:
+                teacher, _ = Teacher.objects.get_or_create(admin__full_name=teacher_name)
+
+            # Create or update ClassSchedule
+            ClassSchedule.objects.update_or_create(
+                course=course,
+                teacher=teacher,
+                defaults={
+                    'lesson_unit_price': row.get('课时单价') or 0,
+                    'grade': row.get('年级') or 'Unknown',
+                    'start_time': row.get('开始时间') or '00:00',
+                    'end_time': row.get('结束时间') or '00:00',
+                    'lesson_hours': row.get('课时') or 0,
+                    'remark': row.get('备注') or '',
+                }
+            )
+
+            logging.info(f"ClassSchedule instance saved or updated for course: {course_name}")
+
         except Course.DoesNotExist:
             logging.error(f"Course {course_name} does not exist.")
         except Teacher.DoesNotExist:
@@ -305,6 +422,10 @@ def main(excel_file, selected_model, user_type=None, auto_create_learning_record
         process_learning_record(excel_file)
     elif selected_model == 'PaymentRecord':
         process_payment_record(excel_file)
+    elif selected_model == 'RefundRecord':
+        process_refund_record(excel_file)
+    elif selected_model == 'ClassSchedule':
+        process_class_schedule(excel_file)
     else:
         sheets = read_excel_file(excel_file)
         process_all_sheets(sheets, MODEL_COLUMN_MAPPING)

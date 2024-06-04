@@ -327,52 +327,74 @@ def create_or_update_student_query(sender, instance, created, **kwargs):
     student = None
     if isinstance(instance, Student):
         student = instance
+        print(f"Student instance saved or updated: {student}")
     elif isinstance(instance, LearningRecord) or isinstance(instance, PaymentRecord):
         student = instance.student
+        print(f"LearningRecord/PaymentRecord instance saved or updated, associated with student: {student}")
 
     if student:
         # Ensure only one StudentQuery is associated with each student, handle creation or update
-        student_query, created = StudentQuery.objects.update_or_create(student_records=student)
+        student_query, created = StudentQuery.objects.get_or_create(student_records=student)
+        print(f"StudentQuery: {student_query}, Created: {created}")
 
-        if isinstance(instance, Student):
-            print("Student instance saved or updated.")
-        elif isinstance(instance, LearningRecord):
-            print("LearningRecord instance saved or updated, associated with student.")
-        elif isinstance(instance, PaymentRecord):
-            print("PaymentRecord instance saved or updated, associated with student.")
-
-        # Get related learning and payment records
-        related_learning_records = student.learningrecord_set.all()
-        related_payment_records = student.paymentrecord_set.all()
-
-        # Get the first instance safely
-        learning_record_instance = related_learning_records.first()
-        payment_record_instance = related_payment_records.first()
-
-        if learning_record_instance:
-            student_query.learning_records = learning_record_instance
-
-        if payment_record_instance:
-            student_query.payment_records = payment_record_instance
-            student_query.paid_class_hours = payment_record_instance.lesson_hours
-
-        # Retrieve the student's learning records as a queryset
-        learning_records_query = LearningRecord.objects.filter(student=student)
-
-        # Aggregate the total lesson hours
-        total_lesson_hours = learning_records_query.aggregate(Sum('lesson_hours'))['lesson_hours__sum'] or 0
-        total_lesson_hours = int(total_lesson_hours)  # Convert to int, truncating decimals
-
-        # Update completed hours and remaining hours
-        student_query.completed_hours = total_lesson_hours
-        student_query.remaining_hours = student_query.paid_class_hours - total_lesson_hours
-        
-        # Save the student_query after modifications
         try:
-            student_query.save()
-            print(f"StudentQuery for {student} updated successfully.")
-        except IntegrityError as e:
-            print(f"Error saving StudentQuery for {student}: {str(e)}")
+            # Get related learning and payment records
+            related_learning_records = student.learningrecord_set.all()
+            related_payment_records = student.paymentrecord_set.all()
+            print(f"Related Learning Records: {related_learning_records}")
+            print(f"Related Payment Records: {related_payment_records}")
+
+            # Get the first instance safely
+            learning_record_instance = related_learning_records.first()
+            payment_record_instance = related_payment_records.first()
+            print(f"Learning Record Instance: {learning_record_instance}")
+            print(f"Payment Record Instance: {payment_record_instance}")
+
+            if learning_record_instance:
+                student_query.learning_records = learning_record_instance
+
+            if payment_record_instance:
+                student_query.payment_records = payment_record_instance
+                student_query.paid_class_hours = payment_record_instance.lesson_hours
+            else:
+                student_query.paid_class_hours = 0  # Handle the case where there is no payment record
+            print(f"Paid Class Hours: {student_query.paid_class_hours}")
+
+            # Retrieve the student's learning records as a queryset
+            learning_records_query = LearningRecord.objects.filter(student=student)
+            print(f"Learning Records Query: {learning_records_query}")
+
+            # Aggregate the total lesson hours
+            total_lesson_hours = learning_records_query.aggregate(Sum('lesson_hours'))['lesson_hours__sum'] or 0
+            total_lesson_hours = int(total_lesson_hours)  # Convert to int, truncating decimals
+            print(f"Total Lesson Hours: {total_lesson_hours}")
+
+            # Use the aggregated hours in your calculation
+            attendance_count = AttendanceReport.objects.filter(student_id=student_query.pk).count()
+            print(f"Attendance Count: {attendance_count}")
+
+            # Calculate completed hours based on attendance count
+            completed_hours = total_lesson_hours * attendance_count
+            print(f"Completed Hours: {completed_hours}")
+
+            # Remaining hours should not be negative
+            remaining_hours = max(student_query.paid_class_hours - completed_hours, 0)
+            print(f"Remaining Hours: {remaining_hours}")
+
+            student_query.completed_hours = completed_hours
+            student_query.remaining_hours = remaining_hours
+
+            # Save the student_query after modifications
+            try:
+                student_query.save()
+                print(f"StudentQuery for {student} updated successfully.")
+            except IntegrityError as e:
+                print(f"Error saving StudentQuery for {student}: {str(e)}")
+        
+        except Exception as ex:
+            print(f"Error occurred while processing StudentQuery for {student}: {str(ex)}")
+
+
 
 # Register signal handlers
 post_save.connect(create_or_update_student_query, sender=Student)

@@ -1,3 +1,4 @@
+from decimal import Decimal
 import json
 import logging
 
@@ -325,7 +326,7 @@ def teacher_view_attendance(request):
             'absent_hours': absent_hours
         })
 
-    return JsonResponse({'success': True, 'attendance_details': attendance_details, 'total_absent_hours': total_absent_hours})
+    return JsonResponse({'success': True, 'attendance_details': attendance_details})
 
 @csrf_exempt
 def save_attendance(request):

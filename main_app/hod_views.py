@@ -389,25 +389,38 @@ def refund_records(request):
         # Fetch the teacher's name correctly
         teacher_name = learning_record.teacher.admin.full_name if learning_record and learning_record.teacher and learning_record.teacher.admin else 'Unknown'
 
+        hours_spent = student_query.completed_hours if student_query and student_query.completed_hours is not None else 'Unknown'
+        hours_remaining = student_query.remaining_hours if student_query and student_query.remaining_hours is not None else 'Unknown'
+        
+        if all([
+            payment_record.amount_paid is not None,
+            payment_record.lesson_unit_price is not None,
+            payment_record.lesson_hours is not None,
+            hours_remaining != 'Unknown'
+        ]):
+            amount_refunded = (payment_record.amount_paid - payment_record.lesson_unit_price) + (
+                (payment_record.lesson_unit_price / payment_record.lesson_hours) * hours_remaining
+            )
+        else:
+            amount_refunded = 'Unknown'
+
+        print(f"Payment Record ID: {payment_record.id}")
+        print(f"Student Name: {student_record.admin.full_name if student_record and student_record.admin else 'Unknown'}")
+        print(f"Hours Spent: {hours_spent}")
+        print(f"Hours Remaining: {hours_remaining}")
+        print(f"Amount Refunded: {amount_refunded}")
+
         payment_info = {
             'student_name': student_record.admin.full_name if student_record and student_record.admin else 'Unknown',
             'date_of_birth': student_record.date_of_birth if student_record else 'Unknown',
             'course': learning_record.course if learning_record else 'Unknown',
             'teacher_name': teacher_name,  # Include Teacher Name
             'total_hours': payment_record.lesson_hours if payment_record.lesson_hours is not None else 'Unknown',
-            'hours_spent': student_query.completed_hours if student_query and student_query.completed_hours is not None else 'Unknown',
-            'hours_remaining': student_query.remaining_hours if student_query and student_query.remaining_hours is not None else 'Unknown',
+            'hours_spent': hours_spent,
+            'hours_remaining': hours_remaining,
             'lesson_price': payment_record.lesson_unit_price if payment_record.lesson_unit_price is not None else 'Unknown',
             'refund_amount': payment_record.amount_paid if payment_record.amount_paid is not None else 'Unknown',
-            'amount_refunded': (
-                (payment_record.amount_paid - payment_record.lesson_unit_price) +
-                ((payment_record.lesson_unit_price / payment_record.lesson_hours) * student_query.remaining_hours)
-            ) if all([
-                payment_record.amount_paid is not None,
-                payment_record.lesson_unit_price is not None,
-                payment_record.lesson_hours is not None,
-                student_query and student_query.remaining_hours is not None
-            ]) else 'Unknown',
+            'amount_refunded': amount_refunded,
             'refund_reason': payment_record.remark if payment_record.remark else 'Unknown',
         }
         # Append payment record information to the list
@@ -424,6 +437,7 @@ def refund_records(request):
     }
 
     return render(request, 'hod_template/refund_records.html', context)
+
 
 
 #Admin
@@ -1025,6 +1039,10 @@ def manage_student(request):
     }
     return render(request, "hod_template/manage_student.html", context)
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 def manage_student_query(request):
     # Get all students
     students = CustomUser.objects.filter(user_type=3)
@@ -1103,7 +1121,7 @@ def manage_student_query(request):
                 })
 
         except Exception as e:
-            logging.error(f"Error retrieving student queries: {e}")
+            logger.error(f"Error retrieving student queries: {e}")
 
     context = {
         'students': students,
@@ -1112,6 +1130,7 @@ def manage_student_query(request):
     }
 
     return render(request, 'hod_template/manage_student_query.html', context)
+
 
 
 # def manage_student_query(request):

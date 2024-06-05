@@ -155,7 +155,7 @@ class LearningRecord(models.Model):
     start_time = models.TimeField(null=True)
     end_time = models.TimeField(null=True)
     lesson_hours = models.DecimalField(max_digits=5, decimal_places=1, null=True)  # Changed to DecimalField
-    day = models.CharField(max_length=20, null=True)  # New field for day of the week
+    day = models.CharField(max_length=20, null=True, default='星期一')  # New field for day of the week
 
     def __str__(self):
         return f'{self.student} - {self.course} - {self.date} - {self.day}'
@@ -242,8 +242,8 @@ class PaymentRecord(models.Model):
             learning_records=self.learning_record,
             payment_records=self,
             refund_amount=self.amount_paid,
-            amount_refunded=0,
-            refund_reason=self.remark or "Refund processed"
+            amount_refunded=self.amount_due,
+            refund_reason=self.remark or "Refund processing"
         )
         return refund_record
 
@@ -266,6 +266,19 @@ class NotificationTeacher(models.Model):
 
     def __str__(self):
           return self.message
+
+class TuitionReminder(models.Model):
+    date = models.DateField(default=timezone.now)
+    time = models.TimeField(default=timezone.now)
+    teacher = models.ForeignKey('Teacher', on_delete=models.CASCADE)
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
+    payment_record = models.ForeignKey('PaymentRecord', on_delete=models.CASCADE)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)  # Replaced is_sent with is_read
+    due_date = models.DateField(default=datetime.now)  # Add a default value for due date
+
+    def __str__(self):
+        return f"Reminder for {self.student.admin.full_name} on {self.date}"
 
 class RefundRecord(models.Model):
     # admin = models.OneToOneField(CustomUser, null=True, on_delete=models.CASCADE)
@@ -393,7 +406,6 @@ def create_or_update_student_query(sender, instance, created, **kwargs):
         
         except Exception as ex:
             print(f"Error occurred while processing StudentQuery for {student}: {str(ex)}")
-
 
 
 # Register signal handlers

@@ -61,7 +61,6 @@ MODEL_COLUMN_MAPPING = {
         'model': ClassSchedule,
         'fields': {
             '班级': 'course',
-            '课时单价': 'lesson_unit_price',
             '教师': 'teacher',
             '年级': 'grade',
             '开始时间': 'start_time',

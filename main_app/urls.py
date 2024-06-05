@@ -22,6 +22,8 @@ import generate
 
 urlpatterns = [
 #hodviews
+   
+    path('ajax/get-amount-due/', hod_views.get_amount_due, name='get_amount_due'), 
     path('ajax/get-lesson-hours/', hod_views.get_lesson_hours, name='get_lesson_hours'),
     path('process_data/', generate.process_data, name='process_data'),
     path('ajax/get-teachers/', hod_views.get_teachers, name='get_teachers'),
@@ -45,6 +47,7 @@ urlpatterns = [
     path("student/query", hod_views.manage_student_query, name='manage_student_query'),
     # path("send_student_notification/", hod_views.send_student_notification,name='send_student_notification'),
     path("send_teacher_notification/", hod_views.send_teacher_notification,name='send_teacher_notification'),
+    path("send_tuition_reminder/", hod_views.send_tuition_reminder,name='send_tuition_reminder'),
 
     path("add_session/", hod_views.add_session, name='add_session'),
     path("teacher/add", hod_views.add_teacher, name='add_teacher'),
@@ -59,6 +62,7 @@ urlpatterns = [
 
     path("admin_notify_student", hod_views.admin_notify_student,name='admin_notify_student'),
     path("admin_notify_teacher", hod_views.admin_notify_teacher,name='admin_notify_teacher'),
+    path("admin_send_tuition_reminder", hod_views.admin_send_tuition_reminder, name='admin_send_tuition_reminder'),
     path("admin_view_profile", hod_views.admin_view_profile,name='admin_view_profile'),
     path("check_email_availability", hod_views.check_email_availability,name="check_email_availability"),
     path("session/manage/", hod_views.manage_session, name='manage_session'),
@@ -132,6 +136,10 @@ urlpatterns = [
     path("teacher/view/notification/count/", teacher_views.teacher_view_notification_count, name="teacher_view_notification_count"),
     path('teacher/view/notification/read/<int:notification_id>/', teacher_views.mark_notification_as_read, name='mark_notification_as_read'),
     path('teacher/delete/notification/', teacher_views.teacher_delete_notification, name='teacher_delete_notification'),
+    path("teacher/view/reminder/", teacher_views.teacher_view_reminder, name="teacher_view_reminder"),
+    path("teacher/view/reminder/count/", teacher_views.teacher_view_reminder_count, name="teacher_view_reminder_count"),
+    path('teacher/view/reminder/read/<int:reminder_id>/', teacher_views.mark_reminder_as_read, name='mark_reminder_as_read'),
+    path('teacher/delete/reminder/', teacher_views.teacher_delete_reminder, name='teacher_delete_reminder'),
     path("teacher/write/summary/", teacher_views.teacher_write_summary, name='teacher_write_summary'),
     # path('teacher/delete/summary/', teacher_views.delete_summary, name='delete_summary'),
     # path("teacher/result/add/", teacher_views.teacher_add_result, name='teacher_add_result'),

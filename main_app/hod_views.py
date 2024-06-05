@@ -19,7 +19,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Sum, F
 # from django.contrib.auth.hashers import make_password
 from django.shortcuts import render
-from generate import  main, process_data
+from generate import  main, process_all_models, process_data
 from main_app.model_column_mapping import MODEL_COLUMN_MAPPING
 from .forms import *
 from .models import *
@@ -116,15 +116,20 @@ def check_columns(request):
             # Read the Excel file into a DataFrame
             df = pd.read_excel(excel_file)
 
-            # Adjust the model based on the user type
-            if selected_model == 'CustomUser' and user_type:
-                selected_model = user_type
-
             column_status = {}
 
+            # Determine the models to check
+            if selected_model == 'Mixed':
+                models_to_check = MODEL_COLUMN_MAPPING.keys()
+            elif selected_model == 'CustomUser' and user_type:
+                models_to_check = ['CustomUser', user_type]
+            else:
+                models_to_check = [selected_model]
+
             # Check each model's columns
-            for model_name, model_info in MODEL_COLUMN_MAPPING.items():
-                if model_name == 'CustomUser' or (selected_model == 'CustomUser' and model_name == user_type) or model_name == selected_model:
+            for model_name in models_to_check:
+                if model_name in MODEL_COLUMN_MAPPING:
+                    model_info = MODEL_COLUMN_MAPPING[model_name]
                     expected_columns = model_info['fields']
                     uploaded_columns = df.columns.tolist()
                     model_column_status = []
@@ -176,6 +181,8 @@ def check_columns(request):
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
+
+
 @csrf_exempt
 def get_upload(request):
     if request.method == 'POST':
@@ -187,54 +194,66 @@ def get_upload(request):
             auto_create_learning_record = 'auto_create_learning_record' in request.POST
             auto_create_payment_record = 'auto_create_payment_record' in request.POST
 
-            if selected_model == 'CustomUser' and user_type:
-                selected_model = user_type
-
             try:
                 df = pd.read_excel(excel_file)
                 print(f"Uploaded columns: {df.columns.tolist()}")
-                model_info = MODEL_COLUMN_MAPPING.get(selected_model)
-                if not model_info:
-                    raise ValueError(f"No model found for the selected type: {selected_model}")
 
-                expected_columns = set(model_info['fields'].keys())
-                actual_columns = set(df.columns)
+                if selected_model == 'Mixed':
+                    # Process all models for the "Mixed" option
+                    models_to_check = MODEL_COLUMN_MAPPING.keys()
+                else:
+                    if selected_model == 'CustomUser' and user_type:
+                        selected_model = user_type
+                    models_to_check = [selected_model]
+
+                column_status = {}
+                for model_name in models_to_check:
+                    model_info = MODEL_COLUMN_MAPPING.get(model_name)
+                    if not model_info:
+                        raise ValueError(f"No model found for the selected type: {model_name}")
+
+                    expected_columns = set(model_info['fields'].keys())
+                    actual_columns = set(df.columns)
                 
-                missing_columns = expected_columns - actual_columns
-                extra_columns = actual_columns - expected_columns
+                    missing_columns = expected_columns - actual_columns
+                    extra_columns = actual_columns - expected_columns
 
-                # Print columns in English for better debugging
-                print(f"Expected columns: {expected_columns}")
-                print(f"Actual columns: {actual_columns}")
-                print(f"Missing columns: {missing_columns}")
-                print(f"Extra columns: {extra_columns}")
+                    # Print columns in English for better debugging
+                    print(f"Model: {model_name}")
+                    print(f"Expected columns: {expected_columns}")
+                    print(f"Actual columns: {actual_columns}")
+                    print(f"Missing columns: {missing_columns}")
+                    print(f"Extra columns: {extra_columns}")
 
-                column_status = {col: 'missing' if col in missing_columns else 'extra' if col in extra_columns else 'match' for col in expected_columns}
+                    model_column_status = {col: 'missing' if col in missing_columns else 'extra' if col in extra_columns else 'match' for col in expected_columns}
 
-                # Check required fields
-                required_fields = REQUIRED_FIELDS.get(selected_model, [])
-                missing_required_fields = [field for field in required_fields if field not in actual_columns]
+                    # Check required fields
+                    required_fields = REQUIRED_FIELDS.get(model_name, [])
+                    missing_required_fields = [field for field in required_fields if field not in actual_columns]
 
-                for field in missing_required_fields:
-                    column_status[field] = 'missing (required)'
+                    for field in missing_required_fields:
+                        model_column_status[field] = 'missing (required)'
 
-                # Handle autofill suggestions
-                for col in missing_columns:
-                    specific_mapping = SPECIFIC_COLUMN_MAPPING.get(selected_model, {}).get(user_type, {})
-                    if col in specific_mapping and specific_mapping[col] in actual_columns:
-                        column_status[specific_mapping[col]] = 'autofill'
+                    # Handle autofill suggestions
+                    for col in missing_columns:
+                        specific_mapping = SPECIFIC_COLUMN_MAPPING.get(model_name, {}).get(user_type, {})
+                        if col in specific_mapping and specific_mapping[col] in actual_columns:
+                            model_column_status[specific_mapping[col]] = 'autofill'
+
+                    column_status[model_name] = model_column_status
 
                 # Color coding for columns
                 column_colors = {}
-                for col, status in column_status.items():
-                    if status == 'autofill':
-                        column_colors[col] = 'yellow'
-                    elif status == 'missing' or status == 'missing (required)':
-                        column_colors[col] = 'red'
-                    elif status == 'extra':
-                        column_colors[col] = 'blue'
-                    else:
-                        column_colors[col] = 'green'
+                for model_name, columns in column_status.items():
+                    for col, status in columns.items():
+                        if status == 'autofill':
+                            column_colors[col] = 'yellow'
+                        elif status == 'missing' or status == 'missing (required)':
+                            column_colors[col] = 'red'
+                        elif status == 'extra':
+                            column_colors[col] = 'blue'
+                        else:
+                            column_colors[col] = 'green'
 
                 context = {
                     'form': form,
@@ -243,7 +262,12 @@ def get_upload(request):
                     'selected_model': selected_model,
                     'df': df.to_html(index=False)
                 }
-                main(excel_file, selected_model, user_type, auto_create_learning_record, auto_create_payment_record)  # for uploading to db
+                
+                if selected_model == 'Mixed':
+                    process_all_models(excel_file, auto_create_learning_record, auto_create_payment_record)  # for uploading to db
+                else:
+                    main(excel_file, selected_model, user_type, auto_create_learning_record, auto_create_payment_record)  # for uploading to db
+                
                 print("Main Ran")
                 return render(request, 'hod_template/upload.html', context)
 
@@ -369,7 +393,22 @@ def get_classes_taken_by_teachers(request):
         'classes_taken': classes_taken
     }
     return JsonResponse(data)
-    
+
+def get_amount_due(request):
+    if request.method == 'GET' and request.is_ajax():
+        student_id = request.GET.get('student_id')
+        course_id = request.GET.get('course_id')
+        try:
+            payment_record = PaymentRecord.objects.get(student_id=student_id, course_id=course_id)
+            amount_due = payment_record.amount_due
+            return JsonResponse({'success': True, 'amount_due': amount_due})
+        except PaymentRecord.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Payment record does not exist'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request method or not an AJAX request'})
+
 #Refund
 def refund_records(request):
     # Fetch all payment records with status 'Refund'
@@ -437,7 +476,6 @@ def refund_records(request):
     }
 
     return render(request, 'hod_template/refund_records.html', context)
-
 
 
 #Admin
@@ -511,7 +549,7 @@ def admin_home(request):
         total_students_in_class = Attendance.objects.filter(classes=class_obj).count()
         total_attendance_in_class = AttendanceReport.objects.filter(attendance__classes=class_obj, status=True).count()
         if total_students_in_class > 0:
-            attendance_rate = (total_attendance_in_class / total_students_in_class) * 1
+            attendance_rate = (total_attendance_in_class / total_students_in_class) * 100  # Fixed the multiplication factor to 100 for percentage
         else:
             attendance_rate = 0
         class_schedule_names_list.append(class_obj.course.name)
@@ -585,7 +623,7 @@ def admin_home(request):
             for next_payment_date in next_payment_dates
         )
         student_renewals += total_semesters
-        if student.status == "Refund":
+        if student.status in ["Withdrawn", "Refund"]:  # Check for both Withdrawn and Refund statuses
             withdrawal_count += 1
 
     teachers = Teacher.objects.all()
@@ -679,6 +717,19 @@ def admin_notify_teacher(request):
         'students': students,
     }
     return render(request, "hod_template/teacher_notification.html", context)
+
+def admin_send_tuition_reminder(request):
+    students = Student.objects.select_related('admin').all()
+    teachers = Teacher.objects.select_related('admin').all()
+    courses = Course.objects.all()
+    context = {
+        'page_title': "Send Tuition Reminders",
+        'students': students,
+        'teachers': teachers,
+        'courses': courses
+    }
+    return render(request, "hod_template/send_tuition_reminder.html", context)
+
 
 def admin_notify_student(request):
     student = CustomUser.objects.filter(user_type=3)
@@ -1039,10 +1090,6 @@ def manage_student(request):
     }
     return render(request, "hod_template/manage_student.html", context)
 
-import logging
-
-logger = logging.getLogger(__name__)
-
 def manage_student_query(request):
     # Get all students
     students = CustomUser.objects.filter(user_type=3)
@@ -1353,6 +1400,7 @@ def manage_classes(request):
     }
     return render(request, "hod_template/manage_classes.html", context)
 
+
 #Campuses
 def add_campus(request):
     form = CampusForm(request.POST or None)
@@ -1430,6 +1478,7 @@ def manage_campus(request):
         'page_title': _('Manage Campuses')
     }
     return render(request, "hod_template/manage_campus.html", context)
+
 
 # Payments
 def get_lesson_hours(request):
@@ -1687,7 +1736,6 @@ def manage_learning_record(request):
     return render(request, 'hod_template/manage_learning_record.html', context)
 
 
-
 #Schedules
 def calculate_lesson_hours(start_time, end_time):
     start = datetime.combine(datetime.min, start_time)
@@ -1879,6 +1927,69 @@ def send_teacher_notification(request):
     except Exception as e:
         print(f"Error while sending notification: {e}")
         return HttpResponse("False")
+
+@csrf_exempt
+def send_tuition_reminder(request):
+    try:
+        student_id = request.POST.get('student_id')
+        teacher_id = request.POST.get('teacher_id')
+        due_date = request.POST.get('due_date')
+        amount_due = request.POST.get('amount_due')
+        course_ids = request.POST.getlist('courses')
+
+        student = get_object_or_404(Student, id=student_id)
+        teacher = get_object_or_404(Teacher, id=teacher_id)
+        courses = Course.objects.filter(id__in=course_ids)
+
+        # Create a reminder for each course
+        for course in courses:
+            payment_record, created = PaymentRecord.objects.get_or_create(
+                student=student,
+                due_date=due_date,
+                course=course,  # Assuming PaymentRecord has a course ForeignKey field
+                defaults={'amount_due': amount_due}
+            )
+
+            reminder_message = f"Dear {student.admin.full_name},\n\n" \
+                               f"This is a reminder that your tuition payment of {amount_due} is due on {due_date} for the course {course.name}. " \
+                               f"Please make the payment by the due date to avoid any late fees.\n\n" \
+                               f"Thank you."
+
+            china_tz = pytz.timezone('Asia/Shanghai')
+            now = timezone.now().astimezone(china_tz)
+
+            tuition_reminder = TuitionReminder()
+            tuition_reminder.student = student
+            tuition_reminder.teacher = teacher
+            tuition_reminder.payment_record = payment_record
+            tuition_reminder.message = reminder_message
+            tuition_reminder.date = now.date()
+            tuition_reminder.time = now.time()
+            tuition_reminder.save()
+
+            url = "https://fcm.googleapis.com/fcm/send"
+            body = {
+                'notification': {
+                    'title': "Tuition Payment Reminder",
+                    'body': reminder_message,
+                    'click_action': reverse('student_view_reminder'),
+                    'icon': static('dist/img/AdminLTELogo.png')
+                },
+                'to': student.admin.fcm_token
+            }
+            headers = {
+                'Authorization': 'key=YOUR_SERVER_KEY',
+                'Content-Type': 'application/json'
+            }
+            requests.post(url, data=json.dumps(body), headers=headers)
+
+        return HttpResponse("True")
+
+    except Exception as e:
+        print(f"Error while sending tuition reminder: {e}")
+        return HttpResponse("False")
+
+
 
 #Exempts
 @csrf_exempt

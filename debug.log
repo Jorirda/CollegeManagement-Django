@@ -26,3 +26,760 @@ INFO 2024-06-04 23:44:00,897 hod_views Attendance data: {'present': 1, 'absent':
 INFO 2024-06-04 23:49:32,325 hod_views Attendance data: {'present': 2, 'absent': 1, 'leave': 0, 'attendance_dates': ['2024-06-04', '2024-06-04', '2024-06-04'], 'leave_dates': []}
 INFO 2024-06-04 23:49:34,882 hod_views Attendance data: {'present': 0, 'absent': 0, 'leave': 0, 'attendance_dates': [], 'leave_dates': []}
 INFO 2024-06-04 23:49:36,772 hod_views Attendance data: {'present': 0, 'absent': 0, 'leave': 0, 'attendance_dates': [], 'leave_dates': []}
+INFO 2024-06-05 08:47:25,147 models Learning Record Created/Updated: 6
+INFO 2024-06-05 08:47:25,191 models Learning Record Created/Updated: 7
+INFO 2024-06-05 08:47:25,234 models Learning Record Created/Updated: 14
+INFO 2024-06-05 08:47:25,279 models Learning Record Created/Updated: 15
+INFO 2024-06-05 08:47:25,327 models Learning Record Created/Updated: 16
+INFO 2024-06-05 08:47:25,377 models Learning Record Created/Updated: 17
+ERROR 2024-06-05 08:47:44,910 generate Teacher None does not exist.
+ERROR 2024-06-05 08:47:44,913 generate Teacher None does not exist.
+INFO 2024-06-05 09:35:47,518 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 09:36:12,201 models Learning Record Created/Updated: 18
+INFO 2024-06-05 09:36:12,236 models Learning Record Created/Updated: 19
+INFO 2024-06-05 09:36:27,972 models Learning Record Created/Updated: 18
+INFO 2024-06-05 09:36:28,006 models Learning Record Created/Updated: 19
+INFO 2024-06-05 09:36:35,657 models Learning Record Created/Updated: 18
+INFO 2024-06-05 09:36:35,684 models Learning Record Created/Updated: 19
+INFO 2024-06-05 09:36:35,734 models Learning Record Created/Updated: 6
+INFO 2024-06-05 09:36:35,783 models Learning Record Created/Updated: 7
+INFO 2024-06-05 09:36:35,825 models Learning Record Created/Updated: 14
+INFO 2024-06-05 09:36:35,865 models Learning Record Created/Updated: 15
+INFO 2024-06-05 09:36:35,906 models Learning Record Created/Updated: 16
+INFO 2024-06-05 09:36:35,949 models Learning Record Created/Updated: 17
+INFO 2024-06-05 09:48:49,459 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+ERROR 2024-06-05 09:49:22,078 generate Exception: Cannot assign "'N/A'": "LearningRecord.schedule_record" must be a "ClassSchedule" instance.
+ERROR 2024-06-05 09:49:22,086 generate Exception: Cannot assign "'N/A'": "LearningRecord.schedule_record" must be a "ClassSchedule" instance.
+INFO 2024-06-05 09:50:08,521 models Learning Record Created/Updated: 18
+INFO 2024-06-05 09:50:08,550 models Learning Record Created/Updated: 19
+INFO 2024-06-05 09:50:08,601 models Learning Record Created/Updated: 6
+INFO 2024-06-05 09:50:08,653 models Learning Record Created/Updated: 7
+INFO 2024-06-05 09:50:08,704 models Learning Record Created/Updated: 14
+INFO 2024-06-05 09:50:08,752 models Learning Record Created/Updated: 15
+INFO 2024-06-05 09:50:08,803 models Learning Record Created/Updated: 16
+INFO 2024-06-05 09:50:08,846 models Learning Record Created/Updated: 17
+ERROR 2024-06-05 09:55:42,019 generate Exception: Cannot assign "'N/A'": "LearningRecord.schedule_record" must be a "ClassSchedule" instance.
+ERROR 2024-06-05 09:55:42,029 generate Exception: Cannot assign "'N/A'": "LearningRecord.schedule_record" must be a "ClassSchedule" instance.
+INFO 2024-06-05 09:57:03,609 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+ERROR 2024-06-05 09:57:17,004 generate Exception: Cannot assign "1": "LearningRecord.semester" must be a "Session" instance.
+ERROR 2024-06-05 09:57:17,012 generate Exception: Cannot assign "1": "LearningRecord.semester" must be a "Session" instance.
+INFO 2024-06-05 09:57:53,731 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 09:58:06,335 models Learning Record Created/Updated: 18
+INFO 2024-06-05 09:58:06,363 models Learning Record Created/Updated: 19
+INFO 2024-06-05 09:58:09,999 models Learning Record Created/Updated: 19
+INFO 2024-06-05 09:58:10,024 models Learning Record Created/Updated: 18
+INFO 2024-06-05 09:58:10,067 models Learning Record Created/Updated: 6
+INFO 2024-06-05 09:58:10,109 models Learning Record Created/Updated: 7
+INFO 2024-06-05 09:58:10,149 models Learning Record Created/Updated: 14
+INFO 2024-06-05 09:58:10,189 models Learning Record Created/Updated: 15
+INFO 2024-06-05 09:58:10,229 models Learning Record Created/Updated: 16
+INFO 2024-06-05 09:58:10,270 models Learning Record Created/Updated: 17
+INFO 2024-06-05 10:06:47,415 models Learning Record Created/Updated: 18
+INFO 2024-06-05 10:06:47,458 models Learning Record Created/Updated: 19
+INFO 2024-06-05 10:06:50,787 models Learning Record Created/Updated: 18
+INFO 2024-06-05 10:06:50,813 models Learning Record Created/Updated: 19
+INFO 2024-06-05 10:06:50,854 models Learning Record Created/Updated: 6
+INFO 2024-06-05 10:06:50,899 models Learning Record Created/Updated: 7
+INFO 2024-06-05 10:06:50,948 models Learning Record Created/Updated: 14
+INFO 2024-06-05 10:06:50,998 models Learning Record Created/Updated: 15
+INFO 2024-06-05 10:06:51,045 models Learning Record Created/Updated: 16
+INFO 2024-06-05 10:06:51,086 models Learning Record Created/Updated: 17
+INFO 2024-06-05 10:21:06,927 models Learning Record Created/Updated: 18
+INFO 2024-06-05 10:21:06,965 models Learning Record Created/Updated: 19
+INFO 2024-06-05 10:21:10,434 models Learning Record Created/Updated: 19
+INFO 2024-06-05 10:21:10,462 models Learning Record Created/Updated: 18
+INFO 2024-06-05 10:21:10,506 models Learning Record Created/Updated: 6
+INFO 2024-06-05 10:21:10,547 models Learning Record Created/Updated: 7
+INFO 2024-06-05 10:21:10,590 models Learning Record Created/Updated: 14
+INFO 2024-06-05 10:21:10,631 models Learning Record Created/Updated: 15
+INFO 2024-06-05 10:21:10,674 models Learning Record Created/Updated: 16
+INFO 2024-06-05 10:21:10,721 models Learning Record Created/Updated: 17
+INFO 2024-06-05 10:21:29,973 models Learning Record Created/Updated: 20
+INFO 2024-06-05 10:21:30,007 models Learning Record Created/Updated: 21
+INFO 2024-06-05 10:21:33,604 models Learning Record Created/Updated: 21
+INFO 2024-06-05 10:21:33,631 models Learning Record Created/Updated: 20
+INFO 2024-06-05 10:21:33,673 models Learning Record Created/Updated: 6
+INFO 2024-06-05 10:21:33,715 models Learning Record Created/Updated: 7
+INFO 2024-06-05 10:21:33,757 models Learning Record Created/Updated: 14
+INFO 2024-06-05 10:21:33,800 models Learning Record Created/Updated: 15
+INFO 2024-06-05 10:21:33,842 models Learning Record Created/Updated: 16
+INFO 2024-06-05 10:21:33,883 models Learning Record Created/Updated: 17
+ERROR 2024-06-05 10:22:31,081 generate Exception: Invalid field name(s) for model ClassSchedule: 'lesson_unit_price'.
+ERROR 2024-06-05 10:22:31,085 generate Exception: Invalid field name(s) for model ClassSchedule: 'lesson_unit_price'.
+INFO 2024-06-05 10:24:48,041 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 10:29:45,149 models Class Schedule Record Created/Updated: 11
+INFO 2024-06-05 10:29:45,163 models Class Schedule Record Created/Updated: 11
+INFO 2024-06-05 10:30:51,458 models Class Schedule Record Created/Updated: 11
+INFO 2024-06-05 10:30:51,470 models Class Schedule Record Created/Updated: 11
+INFO 2024-06-05 10:32:08,984 models Class Schedule Record Created/Updated: 11
+INFO 2024-06-05 10:32:08,998 models Class Schedule Record Created/Updated: 11
+ERROR 2024-06-05 10:34:37,529 log Internal Server Error: /en/teacher/view/reminder/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 638, in teacher_view_reminder
+    annotated_reminders = [
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 287, in __iter__
+    self._fetch_all()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 1303, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 53, in __iter__
+    results = compiler.execute_sql(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 1143, in execute_sql
+    sql, params = self.as_sql()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 498, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 55, in pre_sql_setup
+    self.setup_query()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 46, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 248, in get_select
+    related_klass_infos = self.get_related_selections(select)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 963, in get_related_selections
+    raise FieldError(
+django.core.exceptions.FieldError: Invalid field name(s) given in select_related: 'course'. Choices are: teacher, student, payment_record
+ERROR 2024-06-05 10:34:37,534 basehttp "GET /en/teacher/view/reminder/ HTTP/1.1" 500 129374
+WARNING 2024-06-05 10:34:37,872 log Not Found: /favicon.ico
+WARNING 2024-06-05 10:34:37,873 basehttp "GET /favicon.ico HTTP/1.1" 404 2709
+INFO 2024-06-05 10:56:16,878 models Class Schedule Record Created/Updated: 12
+INFO 2024-06-05 10:56:16,893 models Class Schedule Record Created/Updated: 13
+ERROR 2024-06-05 11:02:23,416 log Internal Server Error: /en/admin_send_tuition_reminder
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 693, in admin_send_tuition_reminder
+    return render(request, "hod_template/send_tuition_reminder.html", context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 170, in render
+    return self._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 150, in render
+    return compiled_parent._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 62, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 168, in render
+    len_values = len(values)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 269, in __len__
+    self._fetch_all()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 1303, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 53, in __iter__
+    results = compiler.execute_sql(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 1143, in execute_sql
+    sql, params = self.as_sql()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 498, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 55, in pre_sql_setup
+    self.setup_query()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 46, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 248, in get_select
+    related_klass_infos = self.get_related_selections(select)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 963, in get_related_selections
+    raise FieldError(
+django.core.exceptions.FieldError: Invalid field name(s) given in select_related: 'admin'. Choices are: (none)
+ERROR 2024-06-05 11:02:23,425 basehttp "GET /en/admin_send_tuition_reminder HTTP/1.1" 500 201263
+WARNING 2024-06-05 11:02:24,137 log Not Found: /favicon.ico
+WARNING 2024-06-05 11:02:24,138 basehttp "GET /favicon.ico HTTP/1.1" 404 2709
+ERROR 2024-06-05 11:03:04,812 log Internal Server Error: /en/admin_send_tuition_reminder
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 693, in admin_send_tuition_reminder
+    return render(request, "hod_template/send_tuition_reminder.html", context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 170, in render
+    return self._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 150, in render
+    return compiled_parent._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 62, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 168, in render
+    len_values = len(values)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 269, in __len__
+    self._fetch_all()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 1303, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 53, in __iter__
+    results = compiler.execute_sql(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 1143, in execute_sql
+    sql, params = self.as_sql()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 498, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 55, in pre_sql_setup
+    self.setup_query()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 46, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 248, in get_select
+    related_klass_infos = self.get_related_selections(select)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 963, in get_related_selections
+    raise FieldError(
+django.core.exceptions.FieldError: Invalid field name(s) given in select_related: 'admin'. Choices are: (none)
+ERROR 2024-06-05 11:03:04,829 basehttp "GET /en/admin_send_tuition_reminder HTTP/1.1" 500 201251
+ERROR 2024-06-05 11:04:37,617 log Internal Server Error: /en/admin_send_tuition_reminder
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 693, in admin_send_tuition_reminder
+    return render(request, "hod_template/send_tuition_reminder.html", context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 170, in render
+    return self._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 150, in render
+    return compiled_parent._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 62, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 168, in render
+    len_values = len(values)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 269, in __len__
+    self._fetch_all()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 1303, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 53, in __iter__
+    results = compiler.execute_sql(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 1143, in execute_sql
+    sql, params = self.as_sql()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 498, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 55, in pre_sql_setup
+    self.setup_query()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 46, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 248, in get_select
+    related_klass_infos = self.get_related_selections(select)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 963, in get_related_selections
+    raise FieldError(
+django.core.exceptions.FieldError: Invalid field name(s) given in select_related: 'admin'. Choices are: (none)
+ERROR 2024-06-05 11:04:37,624 basehttp "GET /en/admin_send_tuition_reminder HTTP/1.1" 500 201251
+ERROR 2024-06-05 11:04:50,532 log Internal Server Error: /en/admin_send_tuition_reminder
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 693, in admin_send_tuition_reminder
+    return render(request, "hod_template/send_tuition_reminder.html", context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 170, in render
+    return self._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 150, in render
+    return compiled_parent._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 62, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 168, in render
+    len_values = len(values)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 269, in __len__
+    self._fetch_all()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 1303, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 53, in __iter__
+    results = compiler.execute_sql(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 1143, in execute_sql
+    sql, params = self.as_sql()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 498, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 55, in pre_sql_setup
+    self.setup_query()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 46, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 248, in get_select
+    related_klass_infos = self.get_related_selections(select)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 963, in get_related_selections
+    raise FieldError(
+django.core.exceptions.FieldError: Invalid field name(s) given in select_related: 'admin'. Choices are: (none)
+ERROR 2024-06-05 11:04:50,541 basehttp "GET /en/admin_send_tuition_reminder HTTP/1.1" 500 201251
+ERROR 2024-06-05 11:05:18,604 log Internal Server Error: /en/admin_send_tuition_reminder
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\hod_views.py", line 693, in admin_send_tuition_reminder
+    return render(request, "hod_template/send_tuition_reminder.html", context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 170, in render
+    return self._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 150, in render
+    return compiled_parent._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 62, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 168, in render
+    len_values = len(values)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 269, in __len__
+    self._fetch_all()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 1303, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 53, in __iter__
+    results = compiler.execute_sql(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 1143, in execute_sql
+    sql, params = self.as_sql()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 498, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 55, in pre_sql_setup
+    self.setup_query()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 46, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 248, in get_select
+    related_klass_infos = self.get_related_selections(select)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 963, in get_related_selections
+    raise FieldError(
+django.core.exceptions.FieldError: Invalid field name(s) given in select_related: 'user'. Choices are: admin, campus
+ERROR 2024-06-05 11:05:18,613 basehttp "GET /en/admin_send_tuition_reminder HTTP/1.1" 500 202502
+INFO 2024-06-05 11:10:59,004 models Learning Record Created/Updated: 21
+INFO 2024-06-05 11:10:59,070 models Learning Record Created/Updated: 6
+INFO 2024-06-05 11:10:59,147 models Learning Record Created/Updated: 7
+INFO 2024-06-05 11:10:59,221 models Learning Record Created/Updated: 14
+INFO 2024-06-05 11:10:59,273 models Learning Record Created/Updated: 15
+INFO 2024-06-05 11:10:59,336 models Learning Record Created/Updated: 16
+INFO 2024-06-05 11:10:59,413 models Learning Record Created/Updated: 17
+INFO 2024-06-05 11:12:20,575 models Learning Record Created/Updated: 21
+INFO 2024-06-05 11:12:20,621 models Learning Record Created/Updated: 6
+INFO 2024-06-05 11:12:20,666 models Learning Record Created/Updated: 7
+INFO 2024-06-05 11:12:20,716 models Learning Record Created/Updated: 14
+INFO 2024-06-05 11:12:20,778 models Learning Record Created/Updated: 15
+INFO 2024-06-05 11:12:20,816 models Learning Record Created/Updated: 16
+INFO 2024-06-05 11:12:20,861 models Learning Record Created/Updated: 17
+INFO 2024-06-05 11:12:42,429 models Class Schedule Record Created/Updated: 14
+INFO 2024-06-05 11:12:48,386 models Learning Record Created/Updated: 6
+INFO 2024-06-05 11:12:48,433 models Learning Record Created/Updated: 7
+INFO 2024-06-05 11:12:48,477 models Learning Record Created/Updated: 14
+INFO 2024-06-05 11:12:48,518 models Learning Record Created/Updated: 15
+INFO 2024-06-05 11:12:48,562 models Learning Record Created/Updated: 16
+INFO 2024-06-05 11:12:48,613 models Learning Record Created/Updated: 17
+INFO 2024-06-05 11:18:34,283 models Class Schedule Record Created/Updated: 15
+INFO 2024-06-05 11:19:15,038 models Learning Record Created/Updated: 6
+INFO 2024-06-05 11:19:15,080 models Learning Record Created/Updated: 7
+INFO 2024-06-05 11:19:15,124 models Learning Record Created/Updated: 14
+INFO 2024-06-05 11:19:15,166 models Learning Record Created/Updated: 15
+INFO 2024-06-05 11:19:15,208 models Learning Record Created/Updated: 16
+INFO 2024-06-05 11:19:15,247 models Learning Record Created/Updated: 17
+INFO 2024-06-05 11:19:30,655 models Learning Record Created/Updated: 22
+INFO 2024-06-05 11:19:30,694 models Learning Record Created/Updated: 23
+INFO 2024-06-05 11:19:35,657 models Learning Record Created/Updated: 23
+INFO 2024-06-05 11:19:35,686 models Learning Record Created/Updated: 22
+INFO 2024-06-05 11:19:35,727 models Learning Record Created/Updated: 6
+INFO 2024-06-05 11:19:35,772 models Learning Record Created/Updated: 7
+INFO 2024-06-05 11:19:35,817 models Learning Record Created/Updated: 14
+INFO 2024-06-05 11:19:35,867 models Learning Record Created/Updated: 15
+INFO 2024-06-05 11:19:35,917 models Learning Record Created/Updated: 16
+INFO 2024-06-05 11:19:35,962 models Learning Record Created/Updated: 17
+ERROR 2024-06-05 11:28:44,853 log Internal Server Error: /en/teacher/view/reminder/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 638, in teacher_view_reminder
+    annotated_reminders = [
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 287, in __iter__
+    self._fetch_all()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 1303, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\query.py", line 53, in __iter__
+    results = compiler.execute_sql(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 1143, in execute_sql
+    sql, params = self.as_sql()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 498, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 55, in pre_sql_setup
+    self.setup_query()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 46, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select()
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 248, in get_select
+    related_klass_infos = self.get_related_selections(select)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\db\models\sql\compiler.py", line 963, in get_related_selections
+    raise FieldError(
+django.core.exceptions.FieldError: Invalid field name(s) given in select_related: 'course'. Choices are: teacher, student, payment_record
+ERROR 2024-06-05 11:28:44,858 basehttp "GET /en/teacher/view/reminder/ HTTP/1.1" 500 129470
+INFO 2024-06-05 11:33:37,475 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+ERROR 2024-06-05 11:40:40,258 generate Exception: name 'reg_date' is not defined
+ERROR 2024-06-05 11:40:40,260 generate Exception: name 'reg_date' is not defined
+ERROR 2024-06-05 12:02:55,152 log Internal Server Error: /en/teacher/view/reminder/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\contrib\auth\decorators.py", line 21, in _wrapped_view
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 671, in teacher_view_reminder
+    return render(request, "teacher_template/teacher_view_reminder.html", context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 170, in render
+    return self._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 150, in render
+    return compiled_parent._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 62, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 211, in render
+    nodelist.append(node.render_annotated(context))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 446, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\base.py", line 87, in reverse
+    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\resolvers.py", line 685, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'mark_reminder_as_read' not found. 'mark_reminder_as_read' is not a valid view function or pattern name.
+ERROR 2024-06-05 12:02:55,161 basehttp "GET /en/teacher/view/reminder/ HTTP/1.1" 500 191711
+INFO 2024-06-05 13:36:19,160 models Learning Record Created/Updated: 23
+INFO 2024-06-05 13:36:19,184 models Learning Record Created/Updated: 22
+INFO 2024-06-05 13:36:19,226 models Learning Record Created/Updated: 6
+INFO 2024-06-05 13:36:19,268 models Learning Record Created/Updated: 7
+INFO 2024-06-05 13:36:19,308 models Learning Record Created/Updated: 14
+INFO 2024-06-05 13:36:19,347 models Learning Record Created/Updated: 15
+INFO 2024-06-05 13:36:19,385 models Learning Record Created/Updated: 16
+INFO 2024-06-05 13:36:19,426 models Learning Record Created/Updated: 17
+INFO 2024-06-05 13:58:05,735 models Learning Record Created/Updated: 23
+INFO 2024-06-05 13:58:05,759 models Learning Record Created/Updated: 22
+INFO 2024-06-05 13:58:05,799 models Learning Record Created/Updated: 6
+INFO 2024-06-05 13:58:05,839 models Learning Record Created/Updated: 7
+INFO 2024-06-05 13:58:05,877 models Learning Record Created/Updated: 14
+INFO 2024-06-05 13:58:05,917 models Learning Record Created/Updated: 15
+INFO 2024-06-05 13:58:05,955 models Learning Record Created/Updated: 16
+INFO 2024-06-05 13:58:05,994 models Learning Record Created/Updated: 17
+INFO 2024-06-05 13:58:12,959 models Learning Record Created/Updated: 23
+INFO 2024-06-05 13:58:12,981 models Learning Record Created/Updated: 22
+INFO 2024-06-05 13:58:13,019 models Learning Record Created/Updated: 6
+INFO 2024-06-05 13:58:13,058 models Learning Record Created/Updated: 7
+INFO 2024-06-05 13:58:13,097 models Learning Record Created/Updated: 14
+INFO 2024-06-05 13:58:13,135 models Learning Record Created/Updated: 15
+INFO 2024-06-05 13:58:13,174 models Learning Record Created/Updated: 16
+INFO 2024-06-05 13:58:13,213 models Learning Record Created/Updated: 17
+INFO 2024-06-05 13:59:00,617 models Learning Record Created/Updated: 23
+INFO 2024-06-05 13:59:00,647 models Learning Record Created/Updated: 22
+INFO 2024-06-05 13:59:00,692 models Learning Record Created/Updated: 6
+INFO 2024-06-05 13:59:00,737 models Learning Record Created/Updated: 7
+INFO 2024-06-05 13:59:00,781 models Learning Record Created/Updated: 14
+INFO 2024-06-05 13:59:00,829 models Learning Record Created/Updated: 15
+INFO 2024-06-05 13:59:00,881 models Learning Record Created/Updated: 16
+INFO 2024-06-05 13:59:00,918 models Learning Record Created/Updated: 17
+INFO 2024-06-05 14:05:13,569 models Learning Record Created/Updated: 23
+INFO 2024-06-05 14:05:13,599 models Learning Record Created/Updated: 22
+INFO 2024-06-05 14:05:13,638 models Learning Record Created/Updated: 6
+INFO 2024-06-05 14:05:13,680 models Learning Record Created/Updated: 7
+INFO 2024-06-05 14:05:13,719 models Learning Record Created/Updated: 14
+INFO 2024-06-05 14:05:13,759 models Learning Record Created/Updated: 15
+INFO 2024-06-05 14:05:13,800 models Learning Record Created/Updated: 16
+INFO 2024-06-05 14:05:13,838 models Learning Record Created/Updated: 17
+INFO 2024-06-05 14:05:45,239 models Learning Record Created/Updated: 23
+INFO 2024-06-05 14:05:45,266 models Learning Record Created/Updated: 22
+INFO 2024-06-05 14:05:45,332 models Learning Record Created/Updated: 6
+INFO 2024-06-05 14:05:45,382 models Learning Record Created/Updated: 7
+INFO 2024-06-05 14:05:45,424 models Learning Record Created/Updated: 14
+INFO 2024-06-05 14:05:45,466 models Learning Record Created/Updated: 15
+INFO 2024-06-05 14:05:45,506 models Learning Record Created/Updated: 16
+INFO 2024-06-05 14:05:45,550 models Learning Record Created/Updated: 17
+INFO 2024-06-05 14:13:24,051 models Learning Record Created/Updated: 23
+INFO 2024-06-05 14:13:24,077 models Learning Record Created/Updated: 22
+INFO 2024-06-05 14:13:24,119 models Learning Record Created/Updated: 6
+INFO 2024-06-05 14:13:24,162 models Learning Record Created/Updated: 7
+INFO 2024-06-05 14:13:24,201 models Learning Record Created/Updated: 14
+INFO 2024-06-05 14:13:24,244 models Learning Record Created/Updated: 15
+INFO 2024-06-05 14:13:24,286 models Learning Record Created/Updated: 16
+INFO 2024-06-05 14:13:24,328 models Learning Record Created/Updated: 17
+INFO 2024-06-05 14:36:24,903 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 14:44:33,250 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 14:45:01,674 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 14:45:14,228 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 14:53:35,336 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 15:01:02,750 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 15:04:10,611 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 15:11:18,096 models Learning Record Created/Updated: 23
+INFO 2024-06-05 15:11:18,120 models Learning Record Created/Updated: 22
+INFO 2024-06-05 15:11:18,161 models Learning Record Created/Updated: 6
+INFO 2024-06-05 15:11:18,203 models Learning Record Created/Updated: 7
+INFO 2024-06-05 15:11:18,243 models Learning Record Created/Updated: 14
+INFO 2024-06-05 15:11:18,282 models Learning Record Created/Updated: 15
+INFO 2024-06-05 15:11:18,320 models Learning Record Created/Updated: 16
+INFO 2024-06-05 15:11:18,361 models Learning Record Created/Updated: 17
+INFO 2024-06-05 15:11:54,008 models Learning Record Created/Updated: 23
+INFO 2024-06-05 15:11:54,034 models Learning Record Created/Updated: 22
+INFO 2024-06-05 15:11:54,075 models Learning Record Created/Updated: 6
+INFO 2024-06-05 15:11:54,116 models Learning Record Created/Updated: 7
+INFO 2024-06-05 15:11:54,155 models Learning Record Created/Updated: 14
+INFO 2024-06-05 15:11:54,196 models Learning Record Created/Updated: 15
+INFO 2024-06-05 15:11:54,236 models Learning Record Created/Updated: 16
+INFO 2024-06-05 15:11:54,275 models Learning Record Created/Updated: 17
+WARNING 2024-06-05 15:12:12,752 basehttp "GET /static/js/moment.min.js HTTP/1.1" 404 1775
+WARNING 2024-06-05 15:12:12,752 basehttp "GET /static/js/bootstrap-datepicker.min.js HTTP/1.1" 404 1817
+INFO 2024-06-05 15:12:19,599 models Class Schedule Record Created/Updated: 16
+WARNING 2024-06-05 15:12:35,918 basehttp "GET /static/js/moment.min.js HTTP/1.1" 404 1775
+WARNING 2024-06-05 15:12:36,004 basehttp "GET /static/js/bootstrap-datepicker.min.js HTTP/1.1" 404 1817
+INFO 2024-06-05 15:12:46,503 models Class Schedule Record Created/Updated: 17
+INFO 2024-06-05 15:25:02,874 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 15:25:51,897 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 15:26:17,427 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+ERROR 2024-06-05 15:28:28,747 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+INFO 2024-06-05 15:28:40,834 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 15:37:34,072 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 15:37:44,400 hod_views Attendance data: {'present': 2, 'absent': 1, 'leave': 0, 'attendance_dates': ['2024-06-04', '2024-06-04', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 15:37:46,574 hod_views Attendance data: {'present': 0, 'absent': 0, 'leave': 0, 'attendance_dates': [], 'leave_dates': []}
+INFO 2024-06-05 15:37:49,110 hod_views Attendance data: {'present': 0, 'absent': 0, 'leave': 0, 'attendance_dates': [], 'leave_dates': []}
+INFO 2024-06-05 15:37:49,561 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+ERROR 2024-06-05 15:46:34,731 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+ERROR 2024-06-05 15:47:53,254 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+INFO 2024-06-05 15:47:58,693 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+ERROR 2024-06-05 15:54:44,376 basehttp "GET /static/https:/code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css HTTP/1.1" 500 59
+WARNING 2024-06-05 16:06:10,877 generate Missing '出生日期' column in row 0. Using fake data.
+WARNING 2024-06-05 16:06:11,077 generate Missing '出生日期' column in row 1. Using fake data.
+ERROR 2024-06-05 16:06:52,628 log Internal Server Error: /en/teacher/view/reminder/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\contrib\auth\decorators.py", line 21, in _wrapped_view
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 677, in teacher_view_reminder
+    return render(request, "teacher_template/teacher_view_reminder.html", context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 170, in render
+    return self._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 150, in render
+    return compiled_parent._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 62, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 446, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\base.py", line 87, in reverse
+    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\resolvers.py", line 685, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'mark_as_read' not found. 'mark_as_read' is not a valid view function or pattern name.
+ERROR 2024-06-05 16:06:52,635 basehttp "GET /en/teacher/view/reminder/ HTTP/1.1" 500 184492
+WARNING 2024-06-05 16:07:27,428 generate Missing '出生日期' column in row 0. Using fake data.
+WARNING 2024-06-05 16:07:27,609 generate Missing '出生日期' column in row 1. Using fake data.
+ERROR 2024-06-05 16:15:41,570 log Internal Server Error: /en/teacher/view/reminder/
+Traceback (most recent call last):
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\core\handlers\base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\contrib\auth\decorators.py", line 21, in _wrapped_view
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\main_app\teacher_views.py", line 676, in teacher_view_reminder
+    return render(request, "teacher_template/teacher_view_reminder.html", context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 170, in render
+    return self._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 150, in render
+    return compiled_parent._render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 162, in _render
+    return self.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\loader_tags.py", line 62, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 938, in render
+    bit = node.render_annotated(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\base.py", line 905, in render_annotated
+    return self.render(context)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\template\defaulttags.py", line 446, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\base.py", line 87, in reverse
+    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+  File "C:\Users\total\Documents\Work\Clones\CollegeManagement-Django\.venv\lib\site-packages\django\urls\resolvers.py", line 685, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'mark_as_read' not found. 'mark_as_read' is not a valid view function or pattern name.
+ERROR 2024-06-05 16:15:41,581 basehttp "GET /en/teacher/view/reminder/ HTTP/1.1" 500 184591
+WARNING 2024-06-05 16:16:58,491 generate Missing '出生日期' column in row 0. Using fake data.
+WARNING 2024-06-05 16:16:58,640 generate Missing '出生日期' column in row 1. Using fake data.
+WARNING 2024-06-05 16:20:21,895 basehttp "GET /static/css/customstyle.css HTTP/1.1" 404 1784
+WARNING 2024-06-05 16:30:26,476 generate Missing '出生日期' column in row 0. Using fake data.
+ERROR 2024-06-05 16:30:26,650 generate Exception: 'cp932' codec can't encode character '\u97e9' in position 6: illegal multibyte sequence
+WARNING 2024-06-05 16:30:26,651 generate Missing '出生日期' column in row 1. Using fake data.
+ERROR 2024-06-05 16:30:26,821 generate Exception: 'cp932' codec can't encode character '\u5415' in position 6: illegal multibyte sequence
+WARNING 2024-06-05 16:41:56,982 log Bad Request: /en/student/delete/42
+WARNING 2024-06-05 16:41:56,983 basehttp "POST /en/student/delete/42 HTTP/1.1" 400 276
+WARNING 2024-06-05 16:42:00,945 log Bad Request: /en/student/delete/43
+WARNING 2024-06-05 16:42:00,946 basehttp "POST /en/student/delete/43 HTTP/1.1" 400 276
+INFO 2024-06-05 16:42:11,418 models Learning Record Created/Updated: 23
+INFO 2024-06-05 16:42:11,449 models Learning Record Created/Updated: 22
+INFO 2024-06-05 16:42:11,503 models Learning Record Created/Updated: 6
+INFO 2024-06-05 16:42:11,559 models Learning Record Created/Updated: 7
+INFO 2024-06-05 16:42:11,609 models Learning Record Created/Updated: 14
+INFO 2024-06-05 16:42:11,652 models Learning Record Created/Updated: 15
+INFO 2024-06-05 16:42:11,704 models Learning Record Created/Updated: 16
+INFO 2024-06-05 16:42:11,755 models Learning Record Created/Updated: 17
+INFO 2024-06-05 16:45:27,742 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 16:50:28,426 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 17:00:40,489 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 17:01:25,308 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 17:01:43,701 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 17:02:16,506 models Learning Record Created/Updated: 6
+INFO 2024-06-05 17:02:16,549 models Learning Record Created/Updated: 7
+INFO 2024-06-05 17:02:16,594 models Learning Record Created/Updated: 14
+INFO 2024-06-05 17:02:16,636 models Learning Record Created/Updated: 15
+INFO 2024-06-05 17:02:16,680 models Learning Record Created/Updated: 16
+INFO 2024-06-05 17:02:16,721 models Learning Record Created/Updated: 17
+INFO 2024-06-05 17:21:26,928 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}
+INFO 2024-06-05 17:24:01,466 hod_views Attendance data: {'present': 1, 'absent': 2, 'leave': 0, 'attendance_dates': ['2024-06-03', '2024-06-03', '2024-06-04'], 'leave_dates': []}

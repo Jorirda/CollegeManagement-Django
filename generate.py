@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import os
 import random
 import django
@@ -49,7 +50,7 @@ REQUIRED_FIELDS = {
     'RefundRecord': ['学生', '学习记录', '付款记录', '退款金额', '已退款金额', '退款原因']
 }
 
-def process_data(excel_file, auto_create_learning_record=False, auto_create_payment_record=False):
+def process_data(excel_file, auto_create_learning_record=False, auto_create_payment_record=False, user_type='Student'):
     try:
         df = pd.read_excel(excel_file)
         logging.info(f"Dataframe loaded successfully with {len(df)} rows.")
@@ -106,56 +107,70 @@ def process_data(excel_file, auto_create_learning_record=False, auto_create_paym
                     'gender': gender,
                     'address': address,
                     'phone_number': phone_number,
-                    'user_type': 3,  # Assuming 3 is for students
+                    'user_type': 2 if user_type == 'Teacher' else 3,  # Assuming 2 is for teachers and 3 is for students
                     'remark': remark
                 }
             )
 
-            # Create or update Student
-            student, created = Student.objects.update_or_create(
-                admin=user,
-                defaults={
-                    'campus': campus,
-                    'date_of_birth': date_of_birth,
-                    'reg_date': reg_date,
-                    'status': status
-                }
-            )
-            # Add course to student_courses relationship
-            student.courses.add(course)
-            
-            if auto_create_learning_record:
-                LearningRecord.objects.get_or_create(
-                    student=student,
-                    course=course,
+            if user_type == 'Teacher':
+                teacher, created = Teacher.objects.update_or_create(
+                    admin=user,
                     defaults={
-                        'date': reg_date,
-                        'semester_id': 1,  # Example value
-                        'start_time': '08:00',
-                        'end_time': '10:00',
-                        'lesson_hours': 2,
-                        'day': 'Monday'
+                        'campus': campus,
+                        'work_type': row.get('工作类型', 'Full-Time')
                     }
                 )
+                teacher.courses.add(course)
+                logging.info(f"Teacher instance saved or updated for: {full_name}")
 
-            if auto_create_payment_record:
-                PaymentRecord.objects.get_or_create(
-                    student=student,
-                    course=course,
+                # Save teacher credentials to file
+                with open("teacher_credentials.txt", "a") as file:
+                    file.write(f"Name: {full_name}, Email: {email}, Password: password123\n")
+
+            elif user_type == 'Student':
+                # Create or update Student
+                student, created = Student.objects.update_or_create(
+                    admin=user,
                     defaults={
-                        'date': reg_date,
-                        'amount_paid': 1000,  # Example value
-                        'payment_method': 'Cash',
-                        'status': 'Pending',
-                        'remark': remark
+                        'campus': campus,
+                        'date_of_birth': date_of_birth,
+                        'reg_date': reg_date,
+                        'status': status
                     }
                 )
+                # Add course to student_courses relationship
+                student.courses.add(course)
+                
+                if auto_create_learning_record:
+                    LearningRecord.objects.get_or_create(
+                        student=student,
+                        course=course,
+                        defaults={
+                            'date': reg_date,
+                            'semester_id': 1,  # Example value
+                            'start_time': '08:00',
+                            'end_time': '10:00',
+                            'lesson_hours': 2,
+                            'day': 'Monday'
+                        }
+                    )
 
-            user_student_pairs.append((user, student, course, row))
+                if auto_create_payment_record:
+                    PaymentRecord.objects.get_or_create(
+                        student=student,
+                        course=course,
+                        defaults={
+                            'date': reg_date,
+                            'amount_paid': 1000,  # Example value
+                            'payment_method': 'Cash',
+                            'status': 'Pending',
+                            'remark': remark
+                        }
+                    )
 
-            # Logging
-            logging.info(f"Student instance saved or updated for: {full_name}")
-            logging.info(f"StudentQuery for {full_name} updated successfully.")
+                user_student_pairs.append((user, student, course, row))
+                logging.info(f"Student instance saved or updated for: {full_name}")
+                logging.info(f"StudentQuery for {full_name} updated successfully.")
 
         except KeyError as e:
             logging.error(f"KeyError: {e}")
@@ -218,7 +233,7 @@ def process_learning_record(excel_file):
 
             student = Student.objects.get(admin__full_name=student_name, admin__remark__icontains=student_salesperson)
             course = Course.objects.get(name=course_name)
-            teacher = Teacher.objects.get(admin__full_name=teacher_name)
+            teacher = Teacher.objects.filter(admin__full_name=teacher_name).first()
 
             LearningRecord.objects.update_or_create(
                 student=student,
@@ -226,12 +241,12 @@ def process_learning_record(excel_file):
                 defaults={
                     'date': row.get('日期') or fake.date_this_year(),
                     'teacher': teacher,
-                    'schedule_record': row.get('班级安排'),
-                    'semester': row.get('学期'),
-                    'start_time': row.get('开始时间'),
-                    'end_time': row.get('结束时间'),
-                    'lesson_hours': row.get('课时'),
-                    'day': row.get('星期')
+                    'schedule_record': row.get('班级安排') or None,
+                    'semester': row.get('学期') or None,
+                    'start_time': row.get('开始时间') or '08:00',
+                    'end_time': row.get('结束时间') or '10:00',
+                    'lesson_hours': row.get('课时') or 2,
+                    'day': row.get('星期') or 'Monday'
                 }
             )
 
@@ -241,8 +256,6 @@ def process_learning_record(excel_file):
             logging.error(f"Student {student_name} with salesperson {student_salesperson} does not exist.")
         except Course.DoesNotExist:
             logging.error(f"Course {course_name} does not exist.")
-        except Teacher.DoesNotExist:
-            logging.error(f"Teacher {teacher_name} does not exist.")
         except Exception as e:
             logging.error(f"Exception: {e}")
             continue
@@ -270,25 +283,36 @@ def process_payment_record(excel_file):
 
             student = Student.objects.get(admin__full_name=student_name, admin__remark__icontains=student_salesperson)
             course = Course.objects.get(name=course_name)
-            teacher = Teacher.objects.get(admin__full_name=teacher_name)
+            teacher = Teacher.objects.filter(admin__full_name=teacher_name).first()
+
+            # Calculate lesson_hours from amount_paid and lesson_unit_price if not provided
+            amount_paid = row.get('缴费') or 2180
+            lesson_unit_price = row.get('课时单价') or 2180
+            lesson_hours = 20
+
+            # Calculate amount_due
+            discounted_price = row.get('折后价格') or 2180
+            book_costs = row.get('书本费') or 0
+            other_fee = row.get('其他费用') or 0
+            amount_due = lesson_unit_price + book_costs + other_fee - amount_paid
 
             PaymentRecord.objects.update_or_create(
                 student=student,
                 course=course,
                 defaults={
-                    'date': row.get('日期') or fake.date_this_year(),
-                    'next_payment_date': row.get('下次缴费时间\n（课程结束前1月）') or fake.date_this_year(),
-                    'amount_paid': row.get('缴费') or 0,
-                    'payment_method': row.get('支付方式') or 'Unknown',
+                    'date': row.get('日期') or datetime.now().date(),
+                    'next_payment_date': row.get('下次缴费时间\n（课程结束前1月）') or (datetime.now() + timedelta(months=1)).date(),
+                    'amount_paid': amount_paid,
+                    'payment_method': row.get('支付方式') or 'Alipay',
                     'status': row.get('状态') or 'Pending',
-                    'payee': row.get('缴费人') or 'Unknown',
+                    'payee': row.get('缴费人') or 'Student',
                     'remark': row.get('备注') or '',
-                    'lesson_hours': row.get('课时') or 0,
-                    'lesson_unit_price': row.get('课时单价') or 0,
-                    'discounted_price': row.get('折后价格') or 0,
-                    'book_costs': row.get('书本费') or 0,
-                    'other_fee': row.get('其他费用') or 0,
-                    'amount_due': row.get('应付金额') or 0
+                    'lesson_hours': lesson_hours,
+                    'lesson_unit_price': lesson_unit_price,
+                    'discounted_price': discounted_price,
+                    'book_costs': book_costs,
+                    'other_fee': other_fee,
+                    'amount_due': amount_due
                 }
             )
 
@@ -298,8 +322,6 @@ def process_payment_record(excel_file):
             logging.error(f"Student {student_name} with salesperson {student_salesperson} does not exist.")
         except Course.DoesNotExist:
             logging.error(f"Course {course_name} does not exist.")
-        except Teacher.DoesNotExist:
-            logging.error(f"Teacher {teacher_name} does not exist.")
         except Exception as e:
             logging.error(f"Exception: {e}")
             continue
@@ -316,8 +338,8 @@ def process_refund_record(excel_file):
         try:
             student_name = row.get('学生姓名')
             student_salesperson = row.get('销售人员')
-            learning_record_date = row.get('学习记录日期')
-            payment_record_date = row.get('付款记录日期')
+            learning_record_date = row.get('学习记录日期') or datetime.now().date()
+            payment_record_date = row.get('付款记录日期') or datetime.now().date()
 
             # Match student
             student = Student.objects.get(admin__full_name=student_name, admin__remark__icontains=student_salesperson)
@@ -334,9 +356,9 @@ def process_refund_record(excel_file):
                 learning_records=learning_record,
                 payment_records=payment_record,
                 defaults={
-                    'refund_amount': row.get('退款金额'),
-                    'amount_refunded': row.get('已退款金额'),
-                    'refund_reason': row.get('退款原因')
+                    'refund_amount': row.get('退款金额') or 0,
+                    'amount_refunded': row.get('已退款金额') or 0,
+                    'refund_reason': row.get('退款原因') or 'N/A'
                 }
             )
 
@@ -386,15 +408,15 @@ def process_class_schedule(excel_file):
                 teacher, _ = Teacher.objects.get_or_create(admin__full_name=teacher_name)
 
             # Create or update ClassSchedule
-            ClassSchedule.objects.update_or_create(
+            ClassSchedule.objects.get_or_create(
                 course=course,
                 teacher=teacher,
+                day=row.get('星期') or 0,
+                start_time=row.get('开始时间') or '08:00',
                 defaults={
-                    'lesson_unit_price': row.get('课时单价') or 0,
-                    'grade': row.get('年级') or 'Unknown',
-                    'start_time': row.get('开始时间') or '00:00',
-                    'end_time': row.get('结束时间') or '00:00',
-                    'lesson_hours': row.get('课时') or 0,
+                    'grade': row.get('年级') or 1,
+                    'end_time': row.get('结束时间') or '10:00',
+                    'lesson_hours': row.get('课时') or 2,
                     'remark': row.get('备注') or '',
                 }
             )
@@ -403,17 +425,21 @@ def process_class_schedule(excel_file):
 
         except Course.DoesNotExist:
             logging.error(f"Course {course_name} does not exist.")
-        except Teacher.DoesNotExist:
-            logging.error(f"Teacher {teacher_name} does not exist.")
         except Exception as e:
             logging.error(f"Exception: {e}")
             continue
+def process_all_models(excel_file, auto_create_learning_record, auto_create_payment_record):
+    # Process each model
+    process_data(excel_file, auto_create_learning_record, auto_create_payment_record)
+    process_course(excel_file)
+    process_learning_record(excel_file)
+    process_payment_record(excel_file)
+    process_refund_record(excel_file)
+    process_class_schedule(excel_file)
 
 def main(excel_file, selected_model, user_type=None, auto_create_learning_record=False, auto_create_payment_record=False):
-    if selected_model == 'Student':
-        process_data(excel_file, auto_create_learning_record, auto_create_payment_record)
-    elif selected_model == 'Teacher':
-        process_data(excel_file, auto_create_learning_record, auto_create_payment_record)
+    if selected_model == 'Mixed':
+        process_all_models(excel_file, auto_create_learning_record, auto_create_payment_record)
     elif selected_model == 'CustomUser' and user_type in ['Student', 'Teacher']:
         process_data(excel_file, auto_create_learning_record, auto_create_payment_record)
     elif selected_model == 'Course':

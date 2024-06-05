@@ -75,53 +75,54 @@
                             <h3 class="card-title">{% blocktrans %}Total Payments: ¥{{ total_amount_paid }}{% endblocktrans %}</h3>
                         </div>
                     </div>          
-                    </div>
                     <div class="card-body table-container">
-                        <table id="example2" class="table table-bordered table-hover">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th>{% trans 'Index No.' %}</th>
-                                    <th>{% trans 'Date' %}</th>
-                                    <th>{% trans 'Student' %}</th>
-                                    <th>{% trans 'Course' %}</th>
-                                    <th>{% trans 'Class Unit Price' %}</th>
-                                    <th>{% trans 'Total Class Hours' %}</th>
-                                    <th>{% trans 'Discounted Price' %}</th>
-                                    <th>{% trans 'Book Costs' %}</th>
-                                    <th>{% trans 'Other Fee' %}</th>
-                                    <th>{% trans 'Amount Due' %}</th>
-                                    <th>{% trans 'Amount Paid' %}</th>
-                                    <th>{% trans 'Payment Method' %}</th>
-                                    <th>{% trans 'Payee' %}</th>
-                                    <th>{% trans 'Remark' %}</th>
-                                    <th>{% trans 'Actions' %}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for payment in payments %}
-                                <tr id="payment-record{{ payment.id }}">
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ payment.date }}</td>
-                                    <td>{{ payment.student }}</td>
-                                    <td>{{ payment.course }}</td>
-                                    <td>¥{{ payment.lesson_unit_price }}</td>
-                                    <td>{{ payment.lesson_hours }}</td>
-                                    <td>¥{{ payment.discounted_price }}</td>
-                                    <td>¥{{ payment.book_costs }}</td>
-                                    <td>¥{{ payment.other_fee }}</td>
-                                    <td>¥{{ payment.amount_due }}</td>
-                                    <td>¥{{ payment.amount_paid }}</td>
-                                    <td>{{ payment.payment_method }}</td>
-                                    <td>{{ payment.payee }}</td>
-                                    <td>{{ payment.remark }}</td>
-                                    <td class="responsive-buttons">
-                                        <a href="{% url 'edit_payment_record' payment.id %}" class="btn btn-info btn-responsive">{% trans "Edit" %}</a>
-                                        <a href="#" class="btn btn-danger btn-responsive" onclick="deletePayment('{{ payment.id }}')">{% trans "Delete" %}</a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table id="example2" class="table table-bordered table-hover">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>{% trans 'Index No.' %}</th>
+                                        <th>{% trans 'Date' %}</th>
+                                        <th>{% trans 'Student' %}</th>
+                                        <th>{% trans 'Course' %}</th>
+                                        <th>{% trans 'Class Unit Price' %}</th>
+                                        <th>{% trans 'Total Class Hours' %}</th>
+                                        <th>{% trans 'Discounted Price' %}</th>
+                                        <th>{% trans 'Book Costs' %}</th>
+                                        <th>{% trans 'Other Fee' %}</th>
+                                        <th>{% trans 'Amount Due' %}</th>
+                                        <th>{% trans 'Amount Paid' %}</th>
+                                        <th>{% trans 'Payment Method' %}</th>
+                                        <th>{% trans 'Payee' %}</th>
+                                        <th>{% trans 'Remark' %}</th>
+                                        <th>{% trans 'Actions' %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment in payments %}
+                                    <tr id="payment-record{{ payment.id }}">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ payment.date }}</td>
+                                        <td>{{ payment.student }}</td>
+                                        <td>{{ payment.course }}</td>
+                                        <td>¥{{ payment.lesson_unit_price }}</td>
+                                        <td>{{ payment.lesson_hours }}</td>
+                                        <td>¥{{ payment.discounted_price }}</td>
+                                        <td>¥{{ payment.book_costs }}</td>
+                                        <td>¥{{ payment.other_fee }}</td>
+                                        <td>¥{{ payment.amount_due }}</td>
+                                        <td>¥{{ payment.amount_paid }}</td>
+                                        <td>{{ payment.payment_method }}</td>
+                                        <td>{{ payment.payee }}</td>
+                                        <td>{{ payment.remark }}</td>
+                                        <td class="responsive-buttons">
+                                            <a href="{% url 'edit_payment_record' payment.id %}" class="btn btn-info btn-responsive">{% trans "Edit" %}</a>
+                                            <a href="#" class="btn btn-danger btn-responsive" onclick="deletePayment('{{ payment.id }}')">{% trans "Delete" %}</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                         <div class="pagination">
                             <span class="step-links">
                                 {% if payments.has_previous %}

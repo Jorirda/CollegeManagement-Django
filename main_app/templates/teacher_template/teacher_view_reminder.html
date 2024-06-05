@@ -1,0 +1,250 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block page_title %}
+    {% trans page_title %}
+{% endblock page_title %}
+
+{% block content %}
+<style>
+    .responsive-buttons {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+
+    .btn-responsive {
+        flex: 1 1 auto;
+        margin: 2px;
+        min-width: 68px;
+        text-align: center;
+    }
+
+    @media (max-width: 576px) {
+        .btn-responsive {
+            flex-basis: 100%;
+        }
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .td {
+        white-space: nowrap;
+    }
+
+    .bolded {
+        font-weight: bold;
+    }
+
+    .preformatted {
+        white-space: pre-line; /* Preserve line breaks */
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+    .pagination a, .pagination span {
+        margin: 0 5px;
+        padding: 8px 16px;
+        text-decoration: none;
+        color: #5FC032;
+        border: 1px solid #DEE2E600;
+        border-radius: 4px;
+    }
+    .pagination a:hover {
+        background-color: #e9ecef;
+    }
+    .pagination .current {
+        background-color: #5FC032;
+        color: white;
+    }
+</style>
+
+<section class="content">
+    <div class="container-fluid">
+        <div id="success-message" class="alert alert-success" style="display: none;"></div>
+
+        {% if messages %}
+        <div id="message-box">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} message-alert" id="message-{{ forloop.counter }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        <script>
+            setTimeout(function() {
+                var alerts = document.getElementsByClassName('message-alert');
+                for (var i = 0; i < alerts.length; i++) {
+                    console.log('Hiding message:', alerts[i].innerText);
+                    alerts[i].style.display = 'none';
+                }
+            }, 1000);
+        </script>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="d-flex align-items-center">
+                            <i class="nav-icon fas fa-bell" style="font-size: 24px; margin-right: 10px;"></i>
+                            <h3 class="card-title">{% trans page_title %}</h3>
+                        </div>
+                    </div>
+                    <div class="card-body table-container">
+                        <table id="example2" class="table table-bordered table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>{% trans 'Date' %}</th>
+                                    <th>{% trans 'Time' %}</th>
+                                    <th>{% trans 'Student' %}</th>
+                                    <th>{% trans 'Amount Due' %}</th>
+                                    <th>{% trans 'Due Date' %}</th> <!-- Added Due Date -->
+                                    <th>{% trans 'Course' %}</th>
+                                    <th>{% trans 'Actions' %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reminder in reminders %}
+                                <tr id="reminder-{{ reminder.id }}" {% if not reminder.is_read %}class="bolded"{% endif %}>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ reminder.date }}</td>
+                                    <td>{{ reminder.time }}</td>
+                                    <td>{{ reminder.student_name }}</td>
+                                    <td>{{ reminder.amount_due }}</td>
+                                    <td>{{ reminder.due_date }}</td> <!-- Added Due Date -->
+                                    <td>{{ reminder.student_courses }}</td> <!-- Display courses -->
+                                    <td class="responsive-buttons">
+                                        <a href="{% url 'mark_reminder_as_read' reminder.id %}" class="btn btn-success btn-responsive">{% trans 'Mark as Read' %}</a>
+                                        <button class="btn btn-danger btn-responsive delete-reminder" data-reminder-id="{{ reminder.id }}" onclick="deleteReminder({{ reminder.id }})">{% trans 'Delete' %}</button>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center">{% trans "No new reminders" %}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="pagination">
+                            <span class="step-links">
+                                {% if reminders.has_previous %}
+                                    <a href="?page=1">&laquo; first</a>
+                                    <a href="?page={{ reminders.previous_page_number }}">previous</a>
+                                {% endif %}
+                                
+                                <span class="current">
+                                    Page {{ reminders.number }} of {{ reminders.paginator.num_pages }}.
+                                </span>
+                                
+                                {% if reminders.has_next %}
+                                    <a href="?page={{ reminders.next_page_number }}">next</a>
+                                    <a href="?page={{ reminders.paginator.num_pages }}">last &raquo;</a>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    function deleteReminder(reminderId) {
+        if (confirm('{% trans 'Are you sure you want to delete this reminder?' %}')) {
+            $.ajax({
+                type: 'POST',
+                url: '{% url "teacher_delete_reminder" %}',
+                data: {
+                    'reminder_id': reminderId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(data) {
+                    if (data.success) {
+                        $('#reminder-' + reminderId).remove();
+                        $('#success-message').text('{% trans "Reminder Deleted Successfully!" %}');
+                        $('#success-message').addClass('alert-success').show();
+                        setTimeout(function() {
+                            $('#success-message').fadeOut().removeClass('alert-success');
+                        }, 3000);
+                    } 
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    $('#success-message').text('{% trans "An error occurred while deleting the reminder." %}');
+                    $('#success-message').addClass('alert-danger').show();
+                    setTimeout(function() {
+                        $('#success-message').fadeOut().removeClass('alert-danger');
+                    }, 3000);
+                }
+            });
+        }
+    }
+
+    // // Function to update the notification count badge
+    // function updateNotificationCount() {
+    //     $.ajax({
+    //         url: "{% url 'teacher_view_notification_count' %}",
+    //         type: 'GET',
+    //         success: function(data) {
+    //             const notificationCountElement = $('#notification-count');
+    //             if (data.count > 0) {
+    //                 // Display the count and make the badge visible
+    //                 notificationCountElement.text(data.count);
+    //                 notificationCountElement.show();
+    //             } else {
+    //                 // Hide the badge if there are no notifications
+    //                 notificationCountElement.hide();
+    //             }
+    //             console.log('Notification count updated:', data.count);
+    //         },
+    //         error: function(xhr, status, error) {
+    //             console.error('Error fetching notification count:', error);
+                
+    //             // Log the JavaScript error on the server-side
+    //             logError(error);
+    //         }
+    //     });
+    // }
+
+    // // Function to update the reminder count badge
+    // function updateReminderCount() {
+    //     $.ajax({
+    //         url: "{% url 'teacher_view_reminder_count' %}",
+    //         type: 'GET',
+    //         success: function(data) {
+    //             const reminderCountElement = $('#reminder-count');
+    //             if (data.count > 0) {
+    //                 // Display the count and make the badge visible
+    //                 reminderCountElement.text(data.count);
+    //                 reminderCountElement.show();
+    //             } else {
+    //                 // Hide the badge if there are no reminders
+    //                 reminderCountElement.hide();
+    //             }
+    //             console.log('Reminder count updated:', data.count);
+    //         },
+    //         error: function(xhr, status, error) {
+    //             console.error('Error fetching reminder count:', error);
+                
+    //             // Log the JavaScript error on the server-side
+    //             logError(error);
+    //         }
+    //     });
+    // }
+
+    // // Call the functions to update the counts when the page loads
+    // $(document).ready(function() {
+    //     console.log('Document loaded.');
+    //     updateNotificationCount();
+    //     updateReminderCount();
+    // });
+</script>
+{% endblock content %}

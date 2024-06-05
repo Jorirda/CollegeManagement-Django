@@ -80,6 +80,27 @@
         justify-content: center;
         transform: translate(50%, -50%);
     }
+
+    #reminder-icon{
+        font-size: 1.5rem;
+    }
+
+    #reminder-count{
+        font-size: 0.6rem; 
+        width: 1.2em;
+        height: 1.2em;
+        line-height: 1.2em;
+        padding: 0;
+        border-radius: 50%;
+        position: absolute;
+        top: -0.1em;
+        right: -0.1em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: translate(50%, -50%);
+    }
+
 </style>
 
 <!-- Admin Sidebar View -->
@@ -382,6 +403,7 @@
                 <li class="nav-item has-treeview">
                     {% url 'admin_notify_teacher' as admin_notify_teacher %}
                     {% url 'admin_notify_student' as admin_notify_student %}
+                    {% url 'admin_send_tuition_reminder' as admin_send_tuition_reminder %}
                     <a href="#" class="nav-link {% if request.path == admin_notify_teacher or request.path == admin_notify_student %}active{% endif %}">
                         <i class="nav-icon fas fa-bullhorn"></i>
                         <p>
@@ -394,6 +416,12 @@
                             <a href="{{ admin_notify_teacher }}" class="nav-link {% if request.path == admin_notify_teacher %}active{% endif %}">
                                 <i class="nav-icon fas fa-bullhorn"></i>
                                 <p>{% trans "Notify Teacher" %}</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ admin_send_tuition_reminder }}" class="nav-link {% if request.path == admin_send_tuition_reminder %}active{% endif %}">
+                                <i class="nav-icon fas fa-bullhorn"></i>
+                                <p>{% trans "Send Tuition Reminder" %}</p>
                             </a>
                         </li>
                         <!-- Uncomment if needed -->
@@ -588,6 +616,7 @@
                 </li>               
                 <li class="nav-item has-treeview">
                     {% url 'teacher_view_notification' as teacher_view_notification %}
+                    {% url 'teacher_view_reminder' as teacher_view_reminder %}
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-bullhorn"></i>
                         <p>
@@ -606,7 +635,17 @@
                                 </div>
                                 <p>{% trans "View Notifications" %}</p>
                             </a>
-                        </li>       
+                        </li> 
+                        <li class="nav-item">
+                            <a href="{{ teacher_view_reminder }}"
+                               class="nav-link {% if teacher_view_reminder == request.path %} active {% endif %}">
+                                <div style="position: relative; display: inline-block;">
+                                    <i id="reminder-icon" class="nav-icon fas fa-exclamation-circle" style="padding-left: 2px;"></i>
+                                    <span id="reminder-count" class="badge badge-danger">3</span> <!-- Example count -->
+                                </div>
+                                <p>{% trans "View Reminders" %}</p>
+                            </a>
+                        </li>             
                     </ul>                             
                 </li>
                 <li class="nav-item has-treeview">
@@ -774,6 +813,38 @@
     <!-- /.sidebar -->                  
 </aside>
 
+<!-- JavaScript code to update the reminder count -->
+<script>
+    // Function to update the reminder count badge
+    function updateReminderCount() {
+        $.ajax({
+            url: "{% url 'teacher_view_reminder_count' %}",
+            type: 'GET',
+            success: function(data) {
+                const reminderCountElement = $('#reminder-count');
+                if (data.count > 0) {
+                    // Display the count and make the badge visible
+                    reminderCountElement.text(data.count);
+                    reminderCountElement.show();
+                } else {
+                    // Hide the badge if there are no reminders
+                    reminderCountElement.hide();
+                }
+                console.log('Reminder count updated:', data.count);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching reminder count:', error);
+            }
+        });
+    }
+
+    // Call the function to update the reminder count when the page loads
+    $(document).ready(function() {
+        console.log('Document loaded.');
+        updateReminderCount();
+    });
+</script>
+
 <!-- JavaScript code to update the notification count -->
 <script>
     // Function to update the notification count badge
@@ -807,6 +878,5 @@
         console.log('Document loaded.');
         updateNotificationCount();
     });
-
-
 </script>
+

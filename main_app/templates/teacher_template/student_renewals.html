@@ -53,12 +53,17 @@
         background-color: #5FC032;
         color: white;
     }
+
+    .bolded {
+        font-weight: bold;
+    }
 </style>
 <section class="content">
     <div class="container-fluid">
         <div id="success-message" class="alert alert-success" style="display: none;"></div>
         <div id="error-message" class="alert alert-danger" style="display: none;"></div>
-        
+
+        <!-- Student Renewal -->
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -104,13 +109,97 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                        <div class="pagination">
+                            <span class="step-links">
+                                {% if reminders.has_previous %}
+                                    <a href="?page=1">&laquo; first</a>
+                                    <a href="?page={{ reminders.previous_page_number }}">previous</a>
+                                {% endif %}
+                                
+                                <span class="current">
+                                    Page {{ reminders.number }} of {{ reminders.paginator.num_pages }}.
+                                </span>
+                                
+                                {% if reminders.has_next %}
+                                    <a href="?page={{ reminders.next_page_number }}">next</a>
+                                    <a href="?page={{ reminders.paginator.num_pages }}">last &raquo;</a>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tuition Reminders -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="d-flex align-items-center">
+                            <i class="nav-icon fas fa-bell" style="font-size: 24px; margin-right: 10px;"></i>
+                            <h3 class="card-title">{% trans "Reminders" %}</h3>
+                        </div>
+                    </div>
+                    <div class="card-body table-container">
+                        <table id="example2" class="table table-bordered table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>{% trans 'Date' %}</th>
+                                    <th>{% trans 'Time' %}</th>
+                                    <th>{% trans 'Student' %}</th>
+                                    <th>{% trans 'Amount Due' %}</th>
+                                    <th>{% trans 'Due Date' %}</th> <!-- Added Due Date -->
+                                    <th>{% trans 'Course' %}</th>
+                                    <th>{% trans 'Actions' %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reminder in reminders %}
+                                <tr id="reminder-{{ reminder.id }}" {% if not reminder.is_read %}class="bolded"{% endif %}>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ reminder.date }}</td>
+                                    <td>{{ reminder.time }}</td>
+                                    <td>{{ reminder.student_name }}</td>
+                                    <td>{{ reminder.amount_due }}</td>
+                                    <td>{{ reminder.due_date }}</td> <!-- Added Due Date -->
+                                    <td>{{ reminder.course_name }}</td>
+                                    <td class="responsive-buttons">
+                                        <a href="{% url 'mark_reminder_as_read' reminder.id %}" class="btn btn-success btn-responsive">{% trans 'Mark as Read' %}</a>
+                                        <button class="btn btn-danger btn-responsive delete-reminder" data-reminder-id="{{ reminder.id }}" onclick="deleteReminder({{ reminder.id }})">{% trans 'Delete' %}</button>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center">{% trans "No new reminders" %}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="pagination">
+                            <span class="step-links">
+                                {% if reminders.has_previous %}
+                                    <a href="?page=1">&laquo; first</a>
+                                    <a href="?page={{ reminders.previous_page_number }}">previous</a>
+                                {% endif %}
+                                
+                                <span class="current">
+                                    Page {{ reminders.number }} of {{ reminders.paginator.num_pages }}.
+                                </span>
+                                
+                                {% if reminders.has_next %}
+                                    <a href="?page={{ reminders.next_page_number }}">next</a>
+                                    <a href="?page={{ reminders.paginator.num_pages }}">last &raquo;</a>
+                                {% endif %}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     // Handle renew form submission
@@ -186,5 +275,37 @@
             }
         });
     });
+
+    // Function to delete a reminder
+    function deleteReminder(reminderId) {
+        if (confirm('{% trans 'Are you sure you want to delete this reminder?' %}')) {
+            $.ajax({
+                type: 'POST',
+                url: '{% url "teacher_delete_reminder" %}',
+                data: {
+                    'reminder_id': reminderId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(data) {
+                    if (data.success) {
+                        $('#reminder-' + reminderId).remove();
+                        $('#success-message').text('{% trans "Reminder Deleted Successfully!" %}');
+                        $('#success-message').addClass('alert-success').show();
+                        setTimeout(function() {
+                            $('#success-message').fadeOut().removeClass('alert-success');
+                        }, 3000);
+                    } 
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    $('#success-message').text('{% trans "An error occurred while deleting the reminder." %}');
+                    $('#success-message').addClass('alert-danger').show();
+                    setTimeout(function() {
+                        $('#success-message').fadeOut().removeClass('alert-danger');
+                    }, 3000);
+                }
+            });
+        }
+    }
 </script>
 {% endblock content %}

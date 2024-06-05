@@ -1,0 +1,140 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block page_title %}
+  {{ page_title }}
+{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ page_title }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="sendReminderForm" method="post">
+                            <div class="form-group">
+                                <label for="student_id">{% trans 'Select Student' %}</label>
+                                <select class="form-control" id="student_id" name="student_id">
+                                    <option value="">{% trans '...........' %}</option>
+                                    {% for student in students %}
+                                    <option value="{{ student.id }}">{{ student.admin.full_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="teacher_id">{% trans 'Select Teacher' %}</label>
+                                <select class="form-control" id="teacher_id" name="teacher_id">
+                                    <option value="">{% trans '...........' %}</option>
+                                    {% for teacher in teachers %}
+                                    <option value="{{ teacher.id }}">{{ teacher.admin.full_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="course_id">{% trans 'Select Course' %}</label>
+                                <select class="form-control" id="course_id" name="course_id">
+                                    <option value="">{% trans '...........' %}</option>
+                                    {% for course in courses %}
+                                    <option value="{{ course.id }}">{{ course.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="due_date">{% trans 'Due Date' %}</label>
+                                <input type="date" class="form-control" id="due_date" name="due_date">
+                            </div>
+                            <div class="form-group">
+                                <label for="amount_due">{% trans 'Amount Due' %}</label>
+                                <input type="number" class="form-control" id="amount_due" name="amount_due" readonly>
+                            </div>
+                            <button type="button" class="btn btn-primary" id="sendReminderButton">{% trans 'Send Reminder' %}</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript">
+    function fetchAmountDue() {
+        var student_id = $("#student_id").val();
+        var course_id = $("#course_id").val();
+        if (student_id && course_id) {
+            $.ajax({
+                url: "{% url 'get_amount_due' %}",
+                type: 'GET',
+                data: {
+                    'student_id': student_id,
+                    'course_id': course_id
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $("#amount_due").val(response.amount_due);
+                    } else {
+                        console.error("Error fetching amount due: " + response.error);
+                        alert("{% trans 'Error fetching amount due. Please try again.' %}");
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.error("Error details: ", {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        responseText: xhr.responseText,
+                        textStatus: textStatus,
+                        errorThrown: errorThrown
+                    });
+                    alert("{% trans 'Error in fetching amount due' %}");
+                }
+            });
+        } else {
+            $("#amount_due").val(''); // Clear the amount due field if either student or course is not selected
+        }
+    }
+
+    $(document).ready(function() {
+        // Fetch amount due when student or course is changed
+        $("#student_id, #course_id").change(function() {
+            fetchAmountDue();
+        });
+
+        $("#sendReminderButton").click(function(){
+            var formData = $("#sendReminderForm").serialize();
+            $.ajax({
+                url: "{% url 'send_tuition_reminder' %}",
+                type: 'POST',
+                data: formData,
+                beforeSend: function(xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+                success: function(response) {
+                    console.log("Response from Server: " + response);
+                    if (response == 'True'){
+                        alert("{% trans 'Reminder Sent' %}");
+                    } else {
+                        console.error("Reminder could not be sent. Response: " + response);
+                        alert("{% trans 'Reminder could not be sent. Please try again.' %}");
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.error("Error details: ", {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        responseText: xhr.responseText,
+                        textStatus: textStatus,
+                        errorThrown: errorThrown
+                    });
+                    alert("{% trans 'Error in sending reminder' %}");
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock content %}

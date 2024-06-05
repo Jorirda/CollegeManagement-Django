@@ -56,7 +56,7 @@
                     <select class="form-control" id="modelSelect" name="model" required>
                         <option value="">{% trans 'Select Table Type' %}</option>
                         <option value="CustomUser">{% trans 'CustomUser' %}</option>
-                        <option value="Session">{% trans 'Session' %}</option>
+                        <option value="Session">{% trans 'Semester' %}</option>
                         <option value="Campus">{% trans 'Campus' %}</option>
                         <option value="Course">{% trans 'Course' %}</option>
                         <option value="ClassSchedule">{% trans 'ClassSchedule' %}</option>
@@ -175,20 +175,18 @@ document.getElementById('excelFile').addEventListener('change', function() {
           columnStatusDiv.innerHTML = '';
           if (data.success) {
               for (var model in data.columns) {
-                  if (document.getElementById('modelSelect').value === 'Mixed' || document.getElementById('modelSelect').value === model || (document.getElementById('modelSelect').value === 'CustomUser' && (model === 'CustomUser' || model === userType))) {
-                      var statusTable = '<h5>' + model + '</h5>';
-                      statusTable += '<table class="table table-bordered">';
-                      statusTable += '<thead><tr><th>{% trans "Column Name" %}</th><th>{% trans "Status" %}</th><th>{% trans "Can Autofill" %}</th><th>{% trans "Can Use Fake Data" %}</th></tr></thead>';
-                      statusTable += '<tbody>';
-                      data.columns[model].forEach(col => {
-                          var statusClass = col.status === 'exists' ? 'status-green' : (col.status === 'missing' ? 'status-red' : col.status === 'autofill' ? 'status-yellow' : 'status-blue');
-                          var canAutofill = col.can_autofill ? 'Yes' : 'No';
-                          var canUseFakeData = col.can_use_fake_data ? 'Yes' : 'No';
-                          statusTable += `<tr class="${statusClass}"><td>${col.name}</td><td>${col.status === 'exists' ? '{% trans "Exists" %}' : col.status === 'missing' ? '{% trans "Missing" %}' : '{% trans "Autofill" %}'}</td><td>${canAutofill}</td><td>${canUseFakeData}</td></tr>`;
-                      });
-                      statusTable += '</tbody></table>';
-                      columnStatusDiv.innerHTML += statusTable;
-                  }
+                  var statusTable = '<h5>' + model + '</h5>';
+                  statusTable += '<table class="table table-bordered">';
+                  statusTable += '<thead><tr><th>{% trans "Column Name" %}</th><th>{% trans "Status" %}</th><th>{% trans "Can Autofill" %}</th><th>{% trans "Can Use Fake Data" %}</th></tr></thead>';
+                  statusTable += '<tbody>';
+                  data.columns[model].forEach(col => {
+                      var statusClass = col.status === 'exists' ? 'status-green' : (col.status === 'missing' ? 'status-red' : col.status === 'autofill' ? 'status-yellow' : 'status-blue');
+                      var canAutofill = col.can_autofill ? 'Yes' : 'No';
+                      var canUseFakeData = col.can_use_fake_data ? 'Yes' : 'No';
+                      statusTable += `<tr class="${statusClass}"><td>${col.name}</td><td>${col.status === 'exists' ? '{% trans "Exists" %}' : col.status === 'missing' ? '{% trans "Missing" %}' : '{% trans "Autofill" %}'}</td><td>${canAutofill}</td><td>${canUseFakeData}</td></tr>`;
+                  });
+                  statusTable += '</tbody></table>';
+                  columnStatusDiv.innerHTML += statusTable;
               }
           } else {
               columnStatusDiv.innerHTML = '<p class="text-danger">{% trans "Error processing the file." %}</p>';

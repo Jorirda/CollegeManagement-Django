@@ -125,6 +125,7 @@
 
             if (!attendance_date) {
                 alert("Select date");
+                $('#save_attendance').attr("disabled", "disabled").text("Saving Attendance Data...");
                 return false;
             }
 
@@ -145,8 +146,10 @@
                 success: function(data) {
                     if (data.success) {
                         $('#success-message').removeClass('alert-danger').addClass('alert-success').text('{% trans "Attendance saved successfully" %}').show();
+                        console.log("Attendance saved successfully"); // Add console log here
+                        console.log("Attendance data:", data.attendanceData); // Output attendance data
                         setTimeout(function() {
-                            window.location.href = "{% url 'teacher_manage_attendance' %}";
+                            // window.location.href = "{% url 'teacher_manage_attendance' %}";
                             $('#success-message').fadeOut();
                         }, 3000);
                     } else {
@@ -168,9 +171,15 @@
             });
         }
 
+
         // Bind click events
         $("#fetch_student").click(fetchStudents);
         $(document).on('click', '#save_attendance', saveAttendance);
+
+        // Enable the save button when a date is selected
+        $(document).on('change', '#attendance_date', function () {
+            $('#save_attendance').removeAttr("disabled").text("Save Attendance");
+        });
     });
 </script>
 {% endblock custom_js %}

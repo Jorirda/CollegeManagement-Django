@@ -103,9 +103,9 @@
                                     <th>{% trans 'Date' %}</th>
                                     <th>{% trans 'Time' %}</th>
                                     <th>{% trans 'Student' %}</th>
+                                    <th>{% trans 'Course' %}</th> <!-- Added column for courses -->
                                     <th>{% trans 'Amount Due' %}</th>
                                     <th>{% trans 'Due Date' %}</th> <!-- Added Due Date -->
-                                    <th>{% trans 'Course' %}</th>
                                     <th>{% trans 'Actions' %}</th>
                                 </tr>
                             </thead>
@@ -116,9 +116,9 @@
                                     <td>{{ reminder.date }}</td>
                                     <td>{{ reminder.time }}</td>
                                     <td>{{ reminder.student_name }}</td>
+                                    <td>{{ reminder.course_name }}</td> <!-- Display course names -->
                                     <td>{{ reminder.amount_due }}</td>
                                     <td>{{ reminder.due_date }}</td> <!-- Added Due Date -->
-                                    <td>{{ reminder.student_courses }}</td> <!-- Display courses -->
                                     <td class="responsive-buttons">
                                         <a href="{% url 'mark_reminder_as_read' reminder.id %}" class="btn btn-success btn-responsive">{% trans 'Mark as Read' %}</a>
                                         <button class="btn btn-danger btn-responsive delete-reminder" data-reminder-id="{{ reminder.id }}" onclick="deleteReminder({{ reminder.id }})">{% trans 'Delete' %}</button>
@@ -126,7 +126,7 @@
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="8" class="text-center">{% trans "No new reminders" %}</td>
+                                    <td colspan="7" class="text-center">{% trans "No new reminders" %}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -187,64 +187,5 @@
             });
         }
     }
-
-    // // Function to update the notification count badge
-    // function updateNotificationCount() {
-    //     $.ajax({
-    //         url: "{% url 'teacher_view_notification_count' %}",
-    //         type: 'GET',
-    //         success: function(data) {
-    //             const notificationCountElement = $('#notification-count');
-    //             if (data.count > 0) {
-    //                 // Display the count and make the badge visible
-    //                 notificationCountElement.text(data.count);
-    //                 notificationCountElement.show();
-    //             } else {
-    //                 // Hide the badge if there are no notifications
-    //                 notificationCountElement.hide();
-    //             }
-    //             console.log('Notification count updated:', data.count);
-    //         },
-    //         error: function(xhr, status, error) {
-    //             console.error('Error fetching notification count:', error);
-                
-    //             // Log the JavaScript error on the server-side
-    //             logError(error);
-    //         }
-    //     });
-    // }
-
-    // // Function to update the reminder count badge
-    // function updateReminderCount() {
-    //     $.ajax({
-    //         url: "{% url 'teacher_view_reminder_count' %}",
-    //         type: 'GET',
-    //         success: function(data) {
-    //             const reminderCountElement = $('#reminder-count');
-    //             if (data.count > 0) {
-    //                 // Display the count and make the badge visible
-    //                 reminderCountElement.text(data.count);
-    //                 reminderCountElement.show();
-    //             } else {
-    //                 // Hide the badge if there are no reminders
-    //                 reminderCountElement.hide();
-    //             }
-    //             console.log('Reminder count updated:', data.count);
-    //         },
-    //         error: function(xhr, status, error) {
-    //             console.error('Error fetching reminder count:', error);
-                
-    //             // Log the JavaScript error on the server-side
-    //             logError(error);
-    //         }
-    //     });
-    // }
-
-    // // Call the functions to update the counts when the page loads
-    // $(document).ready(function() {
-    //     console.log('Document loaded.');
-    //     updateNotificationCount();
-    //     updateReminderCount();
-    // });
 </script>
 {% endblock content %}

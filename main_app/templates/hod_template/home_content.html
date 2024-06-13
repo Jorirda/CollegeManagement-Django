@@ -3,6 +3,38 @@
 {% load i18n %}
 {% block page_title %}{% trans page_title %}{% endblock page_title %}
 {% block content %}
+<style>
+    .uniform-height {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+    
+    .bg-info {
+        background-color: #17a2b8; /* Background color of the bg-info small-box */
+        color: white; /* Text color for contrast */
+    }
+    
+    .bg-info-select {
+        background-color: #17a2b8; /* Match the background color of the bg-info small-box */
+        color: white; /* Text color for contrast */
+        border: none; /* Remove default border */
+    }
+    
+    .bg-info-select:focus {
+        background-color: #17a2b8; /* Match the background color when select is focused */
+        color: white; /* Text color for contrast */
+        outline: none; /* Remove default focus outline if undesired */
+    }
+    
+    .bg-info-select option {
+        background-color: #17a2b8; /* Match the background color of the select */
+        color: white; /* Text color for contrast */
+    }
+</style>
+
+
 <section class="content">
     <div class="container-fluid">
         <!-- Tab Navigation -->
@@ -13,9 +45,13 @@
             <li class="nav-item">
                 <a class="nav-link" id="student-attendance-tab" data-toggle="tab" href="#student-attendance" role="tab" aria-controls="student-attendance" aria-selected="false">{% trans "Student Attendance" %}</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" id="student-timetable-tab" data-toggle="tab" href="#student-timetable" role="tab" aria-controls="student-timetable" aria-selected="false">{% trans "Student Timetable" %}</a>
+            </li>
         </ul>
 
         <div class="tab-content" id="statsTabContent">
+
             <!-- Overall Stats Tab -->
             <div class="tab-pane fade show active" id="overall-stats" role="tabpanel" aria-labelledby="overall-stats-tab">
                 <div class="row mt-3">
@@ -67,82 +103,79 @@
                             <a href="{% url 'manage_payment_record' %}" class="small-box-footer">{% trans "More info" %} <i class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
-                    
                 </div>
                 <div class="row">
-                  <div class="col-lg-3">
-                      <div class="small-box bg-orange">
-                          <div class="inner">
-                              <h3>{{ student_renewals }}</h3>
-                              <p>{% trans "Total Student Renewals" %}</p>
-                          </div>
-                          <div class="icon">
-                              <i class="fas fa-redo-alt"></i>
-                          </div>
-                      </div>
-                  </div>
-                     
-                  <div class="col-lg-3">
-                      <div class="small-box bg-purple">
-                          <div class="inner">
-                              <h3>{{ withdrawal_count }}</h3>
-                              <p>{% trans "Total Withdrawals" %}</p>
-                          </div>
-                          <div class="icon">
-                              <i class="fas fa-user-times"></i>
-                          </div>
-                      </div>
-                  </div>
-                  <!-- New small box for class schedules count -->
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-info">
-                        <div class="inner">
-                            <h3 id="class-schedules-count">0</h3>
-                            <p>{% trans "Class Schedules for Selected Teacher" %}</p>
-                        </div>
-                        <div class="icon">
-                            <i class="nav-icon fas fa-calendar-alt"></i>
-                        </div>
-                        <div class="small-box-footer">
-                            <select id="teacherSelect" class="form-control">
-                                {% for teacher in teachers %}
-                                    <option value="{{ teacher.id }}">{{ teacher.admin.full_name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-6">
-                    <div class="small-box bg-success">
-                        <div class="inner">
-                            <h3>{{ total_refunds }}</h3>
-                            <p>{% trans "¥ Total Refund Amount" %}</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-undo"></i>
-                        </div>
-                        <a href="{% url 'refund_records' %}" class="small-box-footer">{% trans "More info" %} <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-12">
-                    <div class="card card-dark">
-                        <div class="card-header">
-                            <h3 class="card-title">{% trans "Student's Attendance & Leave Overview" %}</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                                <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-orange uniform-height">
+                            <div class="inner">
+                                <h3>{{ student_renewals }}</h3>
+                                <p>{% trans "Total Student Renewals" %}</p>
                             </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart">
-                                <canvas id="barChart2" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                            <div class="icon">
+                                <i class="fas fa-redo-alt"></i>
                             </div>
                         </div>
                     </div>
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-purple uniform-height">
+                            <div class="inner">
+                                <h3>{{ withdrawal_count }}</h3>
+                                <p>{% trans "Total Withdrawals" %}</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-user-times"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-info uniform-height">
+                            <div class="inner">
+                                <h3 id="class-schedules-count">0</h3>
+                                <p>{% trans "Class Schedules for Selected Teacher" %}</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="small-box-footer">
+                                <select id="teacherSelect" class="form-control bg-info-select">
+                                    {% for teacher in teachers %}
+                                        <option value="{{ teacher.id }}">{{ teacher.admin.full_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>                        
+                    </div>                    
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-success uniform-height">
+                            <div class="inner">
+                                <h3>{{ total_refunds }}</h3>
+                                <p>{% trans "¥ Total Refund Amount" %}</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-undo"></i>
+                            </div>
+                            <a href="{% url 'refund_records' %}" class="small-box-footer">{% trans "More info" %} <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
                 </div>
-            </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card card-dark">
+                            <div class="card-header">
+                                <h3 class="card-title">{% trans "Student's Attendance & Leave Overview" %}</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart">
+                                    <canvas id="barChart2" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="card card-dark">
@@ -251,13 +284,12 @@
                         </div>
                     </div>
                 </div>
-                
             </div>
 
             <!-- Student Attendance Tab -->
             <div class="tab-pane fade" id="student-attendance" role="tabpanel" aria-labelledby="student-attendance-tab">
                 <div class="row mt-3">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <div class="card card-dark">
                             <div class="card-header">
                                 <h3 class="card-title">{% trans "Student Attendance Overview" %}</h3>
@@ -283,6 +315,36 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Student Timetable Tab -->
+            <div class="tab-pane fade" id="student-timetable" role="tabpanel" aria-labelledby="student-timetable-tab">
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="card card-dark">
+                            <div class="card-header">
+                                <h3 class="card-title">{% trans "Student Timetable" %}</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="teacherFilter">{% trans "Select Teacher" %}</label>
+                                    <select id="teacherFilter" class="form-control">
+                                        <option value="all">{% trans "All Teachers" %}</option>
+                                        {% for teacher in teachers %}
+                                            <option value="{{ teacher.id }}">{{ teacher.admin.full_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div id="calendar" style="min-height: 800px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div><!-- /.container-fluid -->
 </section>
@@ -290,8 +352,66 @@
 
 {% block custom_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/index.global.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css" rel="stylesheet"/>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var teacherFilter = document.getElementById('teacherFilter');
+    
+        function fetchEvents(teacherId) {
+            var events = [];
+            {% for class_schedule in classes %}
+                var teacherIdValue = '{{ class_schedule.teacher.id }}';
+                var classEvent = {
+                    title: '{{ class_schedule.course.name }} - {{ class_schedule.teacher.admin.full_name }}',
+                    startTime: '{{ class_schedule.start_time|time:"H:i:s" }}',
+                    endTime: '{{ class_schedule.end_time|time:"H:i:s" }}',
+                    daysOfWeek: [ {{ class_schedule.day }} ]
+                };
+                if (teacherId === 'all' || teacherId == teacherIdValue) {
+                    events.push(classEvent);
+                }
+            {% endfor %}
+            return events;
+        }
+    
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'timeGridWeek',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'timeGridWeek,timeGridDay'
+            },
+            allDaySlot: false,
+            height: 'auto',
+            events: fetchEvents('all')
+        });
+    
+        function renderCalendar() {
+            calendar.render();
+            calendar.updateSize(); // Ensure the calendar is fully rendered
+        }
+    
+        teacherFilter.addEventListener('change', function() {
+            var selectedTeacherId = this.value;
+            calendar.removeAllEvents();
+            calendar.addEventSource(fetchEvents(selectedTeacherId));
+        });
+    
+        // Render the calendar when the timetable tab is shown
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var target = $(e.target).attr("href"); // activated tab
+            if (target === '#student-timetable') {
+                renderCalendar();
+            }
+        });
+    
+        // Initial rendering
+        renderCalendar();
+    });
     $(document).ready(function() {
+        // Donut Chart Data
         var donutData = {
             labels: ['Student', 'Teacher'],
             datasets: [
@@ -300,57 +420,35 @@
                     backgroundColor: ['#0071A6', '#F31212'],
                 }
             ]
-        }
-        var pieChartCanvas = $('#pieChart').get(0).getContext('2d')
-        var pieData = donutData;
-        var pieOptions = {
-            maintainAspectRatio: false,
-            responsive: true,
-        }
+        };
+        var pieChartCanvas = $('#pieChart').get(0).getContext('2d');
         var pieChart = new Chart(pieChartCanvas, {
             type: 'pie',
-            data: pieData,
-            options: pieOptions
+            data: donutData,
+            options: { maintainAspectRatio: false, responsive: true }
         });
 
+        // Attendance Per Course Chart
         var classes_list = JSON.parse('{{ classes_list|escapejs }}');
         var attendance_list = JSON.parse('{{ attendance_list|escapejs }}');
-
         var barChartData = {
             labels: classes_list,
             datasets: [
                 {
                     label: '{% trans "Attendance Per Course" %}',
                     backgroundColor: '#17A2B8',
-                    borderColor: 'rgba(60,141,188,0.8)',
-                    pointRadius: false,
-                    pointColor: '#3b8bba',
-                    pointStrokeColor: 'rgba(60,141,188,1)',
-                    pointHighlightFill: '#fff',
-                    pointHighlightStroke: 'rgba(60,141,188,1)',
                     data: attendance_list
                 }
             ]
-        }
-        var barChartCanvas = $('#barChart').get(0).getContext('2d')
-        var stackedBarChartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                xAxes: [{
-                    stacked: true,
-                }],
-                yAxes: [{
-                    stacked: true
-                }]
-            }
-        }
+        };
+        var barChartCanvas = $('#barChart').get(0).getContext('2d');
         var barChart = new Chart(barChartCanvas, {
             type: 'bar',
             data: barChartData,
-            options: stackedBarChartOptions
-        })
+            options: { responsive: true, maintainAspectRatio: false, scales: { xAxes: [{ stacked: true }], yAxes: [{ stacked: true }] } }
+        });
 
+        // Attendance Rate Chart
         var attendance_rate_list = JSON.parse('{{ attendance_rate_list|escapejs }}');
         var class_schedule_names_list = JSON.parse('{{ class_schedule_names_list|escapejs }}');
         var pieData3 = {
@@ -361,18 +459,15 @@
                     backgroundColor: ['#FF6F22', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#894e9c', '#0b523a', '#a1156d', '#9e4603'],
                 }
             ]
-        }
-        var pieChartCanvas3 = $('#pieChart3').get(0).getContext('2d')
-        var pieOptions3 = {
-            maintainAspectRatio: false,
-            responsive: true,
-        }
+        };
+        var pieChartCanvas3 = $('#pieChart3').get(0).getContext('2d');
         var pieChart3 = new Chart(pieChartCanvas3, {
             type: 'pie',
             data: pieData3,
-            options: pieOptions3
-        })
+            options: { maintainAspectRatio: false, responsive: true }
+        });
 
+        // Student Attendance Overview Chart
         var student_attendance_present_list = JSON.parse('{{ student_attendance_present_list|escapejs }}');
         var student_attendance_leave_list = JSON.parse('{{ student_attendance_leave_list|escapejs }}');
         var student_name_list = JSON.parse('{{ student_name_list|escapejs }}');
@@ -382,46 +477,25 @@
                 {
                     label: '{% trans "Absent/Leave" %}',
                     backgroundColor: '#FFDF2E',
-                    borderColor: '#b50a04',
-                    pointRadius: false,
-                    pointColor: '#3b8bba',
-                    pointStrokeColor: 'rgba(60,141,188,1)',
-                    pointHighlightFill: '#fff',
-                    pointHighlightStroke: 'rgba(60,141,188,1)',
                     data: student_attendance_leave_list
                 },
                 {
                     label: '{% trans "Attendance" %}',
                     backgroundColor: '#2D8F49',
-                    borderColor: 'rgba(210, 214, 222, 1)',
-                    pointRadius: false,
-                    pointColor: 'rgba(210, 214, 222, 1)',
-                    pointStrokeColor: '#c1c7d1',
-                    pointHighlightFill: '#fff',
-                    pointHighlightStroke: 'rgba(220,220,220,1)',
                     data: student_attendance_present_list
                 }
             ]
-        }
-        var barChartCanvas2 = $('#barChart2').get(0).getContext('2d')
-        var barChartData2 = jQuery.extend(true, {}, areaChartData2)
-        var barChartOptions2 = {
-            responsive: true,
-            maintainAspectRatio: false,
-            datasetFill: false
-        }
+        };
+        var barChartCanvas2 = $('#barChart2').get(0).getContext('2d');
         var barChart2 = new Chart(barChartCanvas2, {
             type: 'bar',
-            data: barChartData2,
-            options: barChartOptions2
-        })
+            data: areaChartData2,
+            options: { responsive: true, maintainAspectRatio: false, datasetFill: false }
+        });
 
+        // Total Students in Each Course Chart
         var course_name_list = JSON.parse('{{ course_name_list|escapejs }}');
         var student_count_list_in_course = JSON.parse('{{ student_count_list_in_course|escapejs }}');
-
-        console.log("Course Names:", course_name_list);
-        console.log("Student Counts:", student_count_list_in_course);
-
         var pieData2 = {
             labels: course_name_list,
             datasets: [{
@@ -429,21 +503,14 @@
                 backgroundColor: ['#FF6F22', '#BF19D5', '#1255F3', '#65BD00', '#04048F', '#1EDEC2', '#EF2020', '#FF0D72'],
             }]
         };
-
         var pieChartCanvas2 = $('#pieChart2').get(0).getContext('2d');
-        var pieOptions2 = {
-            maintainAspectRatio: false,
-            responsive: true,
-        };
-
         var pieChart2 = new Chart(pieChartCanvas2, {
             type: 'pie',
             data: pieData2,
-            options: pieOptions2
+            options: { maintainAspectRatio: false, responsive: true }
         });
 
-
-
+        // Teachers' Lesson Hours Chart
         var teacher_names = JSON.parse('{{ teacher_names|escapejs }}');
         var lesson_hours = JSON.parse('{{ lesson_hours|escapejs }}');
         var lessonHoursChartData = {
@@ -452,28 +519,18 @@
                 {
                     label: '{% trans "Lesson Hours" %}',
                     backgroundColor: '#3c8dbc',
-                    borderColor: '#3c8dbc',
-                    pointRadius: false,
-                    pointColor: '#3c8dbc',
-                    pointStrokeColor: '#3c8dbc',
-                    pointHighlightFill: '#fff',
-                    pointHighlightStroke: '#3c8dbc',
                     data: lesson_hours
                 }
             ]
         };
         var lessonHoursChartCanvas = $('#lessonHoursChart').get(0).getContext('2d');
-        var lessonHoursChartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            datasetFill: false
-        };
         var lessonHoursChart = new Chart(lessonHoursChartCanvas, {
             type: 'bar',
             data: lessonHoursChartData,
-            options: lessonHoursChartOptions
+            options: { responsive: true, maintainAspectRatio: false, datasetFill: false }
         });
 
+        // Monthly Contributions Chart
         var all_months = JSON.parse('{{ all_months|escapejs }}');
         var all_incomes = JSON.parse('{{ all_incomes|escapejs }}');
         var monthlyContributionsData = {
@@ -482,41 +539,22 @@
                 {
                     label: '{% trans "Total Income" %}',
                     backgroundColor: '#FF2222',
-                    borderColor: '#B54E17',
-                    pointRadius: false,
-                    pointColor: '#3b8bba',
-                    pointStrokeColor: 'rgba(60,141,188,1)',
-                    pointHighlightFill: '#fff',
-                    pointHighlightStroke: 'rgba(60,141,188,1)',
-                    data: all_incomes.map(function(income) {
-                        return new Decimal(income).toNumber();
-                    })
+                    data: all_incomes.map(function(income) { return new Decimal(income).toNumber(); })
                 }
             ]
         };
         var monthlyContributionsChartCanvas = $('#monthlyContributionsChart').get(0).getContext('2d');
-        var monthlyContributionsChartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                xAxes: [{
-                    stacked: true,
-                }],
-                yAxes: [{
-                    stacked: true,
-                    ticks: {
-                        beginAtZero: true,
-                        callback: function(value) {
-                            return '¥ ' + value;
-                        }
-                    }
-                }]
-            }
-        };
         var monthlyContributionsChart = new Chart(monthlyContributionsChartCanvas, {
             type: 'bar',
             data: monthlyContributionsData,
-            options: monthlyContributionsChartOptions
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    xAxes: [{ stacked: true }],
+                    yAxes: [{ stacked: true, ticks: { beginAtZero: true, callback: function(value) { return '¥ ' + value; } } }]
+                }
+            }
         });
 
         $('#yearSelect').change(function() {
@@ -535,87 +573,77 @@
             monthlyContributionsChart.update();
         });
         $('#yearSelect').trigger('change');
-    });
 
-    $(document).ready(function() {
+        // Student Attendance Chart
         var studentAttendanceChart;
-
         function updateStudentAttendanceChart(studentId) {
-            console.log("Selected Student ID:", studentId); // Log student ID
-
             $.ajax({
                 url: '{% url "admin_get_student_attendance" %}',
                 data: { student_id: studentId },
                 success: function(response) {
-                    console.log("Response:", response); // Log the response
-
                     var ctx = $('#studentAttendanceChart').get(0).getContext('2d');
-                    if (studentAttendanceChart) {
-                        studentAttendanceChart.destroy();
-                    }
+                    if (studentAttendanceChart) studentAttendanceChart.destroy();
                     studentAttendanceChart = new Chart(ctx, {
                         type: 'bar',
-                        data: {
-                            labels: ['Present', 'Absent'],
-                            datasets: [{
-                                label: '{% trans "Attendance Status" %}',
-                                backgroundColor: ['#2D8F49', '#FFC300'],
-                                data: [response.present, response.absent]
-                            }]
-                        },
+                        data: { labels: ['Present', 'Absent'], datasets: [{ label: '{% trans "Attendance Status" %}', backgroundColor: ['#2D8F49', '#FFC300'], data: [response.present, response.absent] }] },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            scales: {
-                                yAxes: [{
-                                    ticks: {
-                                        beginAtZero: true,
-                                        callback: function(value) {
-                                            return value + ' days';
-                                        }
-                                    }
-                                }]
-                            }
+                            scales: { yAxes: [{ ticks: { beginAtZero: true, callback: function(value) { return value + ' days'; } } }] }
                         }
                     });
                 },
-                error: function(xhr, status, error) {
-                    console.error("Error fetching student attendance data:", error);
-                }
+                error: function(xhr, status, error) { console.error("Error fetching student attendance data:", error); }
             });
         }
-
-        $('#studentSelect').change(function() {
-            var studentId = $(this).val();
-            updateStudentAttendanceChart(studentId);
-        });
-
-        // Initialize with the first student
+        $('#studentSelect').change(function() { updateStudentAttendanceChart($(this).val()); });
         $('#studentSelect').trigger('change');
-    });
 
-    $(document).ready(function() {
-        // Function to update class schedules count
+        // Class Schedules Count
         function updateClassSchedulesCount(teacherId) {
             $.ajax({
                 url: '{% url "admin_get_teacher_class_schedules_count" %}',
                 data: { teacher_id: teacherId },
-                success: function(response) {
-                    $('#class-schedules-count').text(response.class_schedules_count);
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error fetching class schedules count:", error);
-                }
+                success: function(response) { $('#class-schedules-count').text(response.class_schedules_count); },
+                error: function(xhr, status, error) { console.error("Error fetching class schedules count:", error); }
             });
         }
+        $('#teacherSelect').change(function() { updateClassSchedulesCount($(this).val()); });
+        $('#teacherSelect').trigger('change');
+    });
 
-        $('#teacherSelect').change(function() {
-            var teacherId = $(this).val();
-            updateClassSchedulesCount(teacherId);
+    document.addEventListener('DOMContentLoaded', function () {
+        // Define the timetable data
+        const timeSlots = {{ time_slots|safe }};
+        const scheduleList = {{ schedule_list|safe }};
+
+        // Get references to the table body
+        const timetableBody = document.getElementById('timetable-body');
+
+        // Populate the table with the schedule data
+        scheduleList.forEach(row => {
+            const tableRow = document.createElement('tr');
+            row.forEach(cell => {
+                const tableCell = document.createElement('td');
+                tableCell.textContent = cell;
+                tableRow.appendChild(tableCell);
+            });
+            timetableBody.appendChild(tableRow);
+        });
+    });
+    document.addEventListener("DOMContentLoaded", function() {
+        let boxes = document.querySelectorAll('.uniform-height');
+        let maxHeight = 0;
+
+        boxes.forEach(box => {
+            if (box.offsetHeight > maxHeight) {
+                maxHeight = box.offsetHeight;
+            }
         });
 
-        // Initialize with the first teacher
-        $('#teacherSelect').trigger('change');
+        boxes.forEach(box => {
+            box.style.height = maxHeight + 'px';
+        });
     });
 </script>
 {% endblock custom_js %}

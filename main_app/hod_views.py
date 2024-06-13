@@ -36,6 +36,7 @@ from django.db.models import Sum, Count
 from django.utils import timezone
 from collections import defaultdict
 from django.shortcuts import render
+from django.utils.dateformat import time_format
 
 
 import logging
@@ -180,8 +181,6 @@ def check_columns(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
-
-
 
 @csrf_exempt
 def get_upload(request):
@@ -394,20 +393,10 @@ def get_classes_taken_by_teachers(request):
     }
     return JsonResponse(data)
 
-def get_amount_due(request):
-    if request.method == 'GET' and request.is_ajax():
-        student_id = request.GET.get('student_id')
-        course_id = request.GET.get('course_id')
-        try:
-            payment_record = PaymentRecord.objects.get(student_id=student_id, course_id=course_id)
-            amount_due = payment_record.amount_due
-            return JsonResponse({'success': True, 'amount_due': amount_due})
-        except PaymentRecord.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Payment record does not exist'})
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
-    else:
-        return JsonResponse({'success': False, 'error': 'Invalid request method or not an AJAX request'})
+def get_campuses(request):
+    campuses = Campus.objects.all().values('id', 'name')  # Fetch all campuses and select specific fields
+    return JsonResponse(list(campuses), safe=False)
+
 
 #Refund
 def refund_records(request):
@@ -477,7 +466,6 @@ def refund_records(request):
 
     return render(request, 'hod_template/refund_records.html', context)
 
-
 #Admin
 def admin_get_student_attendance(request):
     student_id = request.GET.get('student_id')
@@ -516,6 +504,8 @@ def admin_get_teacher_class_schedules_count(request):
     return JsonResponse({'class_schedules_count': class_schedules_count})
 
 def admin_home(request):
+    logger.info("Fetching dashboard data")
+
     # Aggregate counts
     total_teacher = Teacher.objects.count()
     total_students = Student.objects.count()
@@ -627,9 +617,38 @@ def admin_home(request):
             withdrawal_count += 1
 
     teachers = Teacher.objects.all()
+    days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+    time_slots = [
+        ('08:00 AM', '09:00 AM'),
+        ('09:00 AM', '10:00 AM'),
+        ('10:10 AM', '11:10 AM'),
+        ('11:00 AM', '12:00 PM'),
+        ('12:00 PM', '01:00 PM'),
+        ('01:00 PM', '02:00 PM'),
+        ('02:00 PM', '03:00 PM'),
+        ('03:00 PM', '04:00 PM'),
+    ]
+    
+    # Initialize schedule list
+    schedule_list = [['' for _ in range(len(days_of_week) + 1)] for _ in range(len(time_slots))]
+
+    # Set the first column to time slots
+    for i, time_slot in enumerate(time_slots):
+        schedule_list[i][0] = f'{time_slot[0]} - {time_slot[1]}'
+
+
+    for class_schedule in classes:
+        start_time = class_schedule.start_time.strftime('%I:%M %p')
+        end_time = class_schedule.end_time.strftime('%I:%M %p')
+        time_slot = f'{start_time} - {end_time}'
+
+        for i, slot in enumerate(time_slots):
+            if time_slot == f'{slot[0]} - {slot[1]}':
+                schedule_list[i][class_schedule.day + 1] = f'{class_schedule.course.name} - {class_schedule.teacher.admin.full_name}'
 
     context = {
         'page_title': _("Administrative Dashboard"),
+        # Existing context variables
         'total_students': total_students,
         'total_teacher': total_teacher,
         'total_course': total_course,
@@ -654,45 +673,47 @@ def admin_home(request):
         'student_renewals': student_renewals,
         'withdrawal_count': withdrawal_count,
         'students': students,  # Add students to the context
-        'teachers': teachers  # Add teachers to the context
+        'teachers': teachers,  # Add teachers to the context
+        'classes': classes,  # Add class schedules to the context s
+        'time_slots': time_slots,  # Add time slots to the context
+        'days_of_week': days_of_week,
+        'schedule_list': schedule_list,
     }
+
+    logger.info(f"Context Data: {context}")  # Log the context data
 
     return render(request, 'hod_template/home_content.html', context)
 
 def admin_view_profile(request):
     admin = get_object_or_404(Admin, admin=request.user)
-    form = AdminForm(request.POST or None, request.FILES or None,
-                     instance=admin)
-    context = {'form': form,
-               'page_title': _('View/Edit Profile')
-               }
+    form = AdminForm(request.POST or None, request.FILES or None, instance=admin)
+    context = {
+        'form': form,
+        'page_title': _('View/Edit Profile')
+    }
+
     if request.method == 'POST':
         try:
             if form.is_valid():
                 full_name = form.cleaned_data.get('full_name')
-                # first_name = form.cleaned_data.get('first_name')
-                # last_name = form.cleaned_data.get('last_name')
                 password = form.cleaned_data.get('password') or None
                 passport = request.FILES.get('profile_pic') or None
                 custom_user = admin.admin
-                if password != None:
+                if password is not None:
                     custom_user.set_password(password)
-                if passport != None:
+                if passport is not None:
                     fs = FileSystemStorage()
                     filename = fs.save(passport.name, passport)
                     passport_url = fs.url(filename)
                     custom_user.profile_pic = passport_url
                 custom_user.full_name = full_name
-                # custom_user.first_name = first_name
-                # custom_user.last_name = last_name
                 custom_user.save()
-                messages.success(request, _("Profile Updated!"))
-                return redirect(reverse('admin_view_profile'))
+                return JsonResponse({'message': _("Profile Updated!")})
             else:
-                messages.error(request, "Invalid Data Provided")
+                return JsonResponse({'message': _("Invalid Data Provided")}, status=400)
         except Exception as e:
-            messages.error(
-                request, "Error Occured While Updating Profile " + str(e))
+            return JsonResponse({'message': _("Error Occurred While Updating Profile: ") + str(e)}, status=500)
+    
     return render(request, "hod_template/admin_view_profile.html", context)
 
 def admin_view_attendance(request):
@@ -718,19 +739,6 @@ def admin_notify_teacher(request):
     }
     return render(request, "hod_template/teacher_notification.html", context)
 
-def admin_send_tuition_reminder(request):
-    students = Student.objects.select_related('admin').all()
-    teachers = Teacher.objects.select_related('admin').all()
-    courses = Course.objects.all()
-    context = {
-        'page_title': "Send Tuition Reminders",
-        'students': students,
-        'teachers': teachers,
-        'courses': courses
-    }
-    return render(request, "hod_template/send_tuition_reminder.html", context)
-
-
 def admin_notify_student(request):
     student = CustomUser.objects.filter(user_type=3)
     context = {
@@ -738,6 +746,7 @@ def admin_notify_student(request):
         'students': student
     }
     return render(request, "hod_template/student_notification.html", context)
+
 
 #Sessions
 def add_session(request):
@@ -792,6 +801,7 @@ def manage_session(request):
     sessions = Session.objects.all()
     context = {'sessions': sessions, 'page_title': _('Manage Sessions')}
     return render(request, "hod_template/manage_session.html", context)
+
 
 #Teachers
 def add_teacher(request):
@@ -1471,6 +1481,29 @@ def delete_campus(request, campus_id):
     else:
         return JsonResponse({'success': False, 'message': 'Invalid request method or not an AJAX request'}, status=400)
 
+# def switch_campus_view(request, campus_id):
+#     try:
+#         campus = Campus.objects.get(id=campus_id)
+#     except Campus.DoesNotExist:
+#         return HttpResponseNotFound('Campus not found')
+
+#     # Perform any actions related to switching campus here
+#     # For example, setting session variables or updating user preferences
+
+#     # Return a JSON response indicating success
+#     return JsonResponse({'message': 'Campus switched successfully', 'campus_name': campus.name})
+def switch_campus(request, campus_id):
+    campus = get_object_or_404(Campus, id=campus_id)
+    
+    # Perform any actions related to switching campus here
+    # For example, setting session variables or updating user preferences
+    
+    # Return a JSON response indicating success
+    return JsonResponse({
+        'message': 'Switch campus successful',
+        'campus_name': campus.name,
+    })
+
 def manage_campus(request):
     campuses = Campus.objects.all()
     context = {
@@ -1743,7 +1776,8 @@ def calculate_lesson_hours(start_time, end_time):
     if start >= end:
         raise ValueError("End time must be after start time.")
     duration = end - start
-    return duration.total_seconds() / 3600  # Convert to hours and return as a decimal value
+    lesson_hours = duration.total_seconds() / 3600  # Convert to hours
+    return round(lesson_hours, 1)  # Round to 1 decimal place
 
 def add_class_schedule(request):
     form = ClassScheduleForm(request.POST or None)
@@ -1760,18 +1794,19 @@ def add_class_schedule(request):
             start_time = form.cleaned_data.get('start_time')
             end_time = form.cleaned_data.get('end_time')
             remark = form.cleaned_data.get('remark')
+            
+            if start_time and end_time:
+                try:
+                    lesson_hours = calculate_lesson_hours(start_time, end_time)
+                    form.instance.lesson_hours = lesson_hours
+                except ValueError as e:
+                    form.add_error('end_time', str(e))
+                    errors = form.errors.as_json()
+                    print(f"Form errors: {errors}")
+                    return JsonResponse({'success': False, 'message': 'Please fulfill all requirements', 'errors': errors}, status=400)
+
             try:
-                lesson_hours = calculate_lesson_hours(start_time, end_time)
-                class_schedule = ClassSchedule(
-                    course=course,
-                    teacher=teacher,
-                    grade=grade,
-                    day=day,
-                    start_time=start_time,
-                    end_time=end_time,
-                    lesson_hours=lesson_hours,
-                    remark=remark,
-                )
+                class_schedule = form.save(commit=False)
                 class_schedule.save()
                 return JsonResponse({'success': True, 'message': 'Class Schedule Added Successfully'})
             except Exception as e:
@@ -1790,33 +1825,39 @@ def edit_class_schedule(request, schedule_id):
         'page_title': _('Edit Class Schedule')
     }
     if request.method == 'POST':
+        print("Received POST request")
         if form.is_valid():
-            course = form.cleaned_data.get('course')
-            teacher = form.cleaned_data.get('teacher')
-            grade = form.cleaned_data.get('grade')
-            day = form.cleaned_data.get('day')
-            start_time = form.cleaned_data.get('start_time')
-            end_time = form.cleaned_data.get('end_time')
-            remark = form.cleaned_data.get('remark')
+            print("Form is valid")
+            cleaned_data = form.cleaned_data
+            start_time = cleaned_data.get("start_time")
+            end_time = cleaned_data.get("end_time")
+            print(f"Start Time: {start_time}, End Time: {end_time}")
+
+            if start_time and end_time:
+                try:
+                    lesson_hours = calculate_lesson_hours(start_time, end_time)
+                    form.instance.lesson_hours = lesson_hours
+                    print(f"Calculated Lesson Hours: {lesson_hours}")
+                except ValueError as e:
+                    print(f"Error calculating lesson hours: {e}")
+                    form.add_error('end_time', str(e))
+                    errors = form.errors.as_json()
+                    print(f"Form errors: {errors}")
+                    return JsonResponse({'success': False, 'message': 'Please fulfill all requirements', 'errors': errors}, status=400)
+
             try:
-                lesson_hours = calculate_lesson_hours(start_time, end_time)
-                class_schedule = ClassSchedule(
-                    course=course,
-                    teacher=teacher,
-                    grade=grade,
-                    day=day,
-                    start_time=start_time,
-                    end_time=end_time,
-                    lesson_hours=lesson_hours,
-                    remark=remark,
-                )
-                class_schedule.save()
+                form.save()
+                print("Form saved successfully")
                 return JsonResponse({'success': True, 'message': 'Class Schedule Updated Successfully'})
             except Exception as e:
+                print(f"Error saving form: {e}")
                 return JsonResponse({'success': False, 'message': 'Could Not Update: ' + str(e)}, status=400)
         else:
             errors = form.errors.as_json()
+            print(f"Form is not valid: {errors}")
             return JsonResponse({'success': False, 'message': 'Please fulfill all requirements', 'errors': errors}, status=400)
+    else:
+        print("GET request")
     return render(request, 'hod_template/edit_class_schedule_template.html', context)
 
 def delete_class_schedule(request, schedule_id):
@@ -1928,6 +1969,63 @@ def send_teacher_notification(request):
         print(f"Error while sending notification: {e}")
         return HttpResponse("False")
 
+def get_student_courses_teachers(request):
+    student_id = request.GET.get('student_id')
+    print(f"Received student_id: {student_id}")
+
+    if student_id:
+        try:
+            student = Student.objects.get(id=student_id)
+            courses = student.courses.all()
+            courses_data = []
+            teachers_data = []
+
+            for course in courses:
+                course_data = {'id': course.id, 'name': course.name}
+                courses_data.append(course_data)
+                teachers = Teacher.objects.filter(courses=course)
+                for teacher in teachers:
+                    teacher_data = {
+                        'course_id': course.id,
+                        'teacher_id': teacher.id,
+                        'teacher_name': teacher.admin.full_name
+                    }
+                    teachers_data.append(teacher_data)
+
+            print(f"Found courses for student {student_id}: {courses_data}")
+            print(f"Found teachers for student {student_id}: {teachers_data}")
+
+            return JsonResponse({'courses': courses_data, 'teachers': teachers_data})
+        except Student.DoesNotExist:
+            print(f"Student with id {student_id} not found")
+            return JsonResponse({'error': 'Student not found'}, status=404)
+    
+    print('Invalid request: student_id is missing')
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def get_student_amount_due(request):
+    student_id = request.GET.get('student_id')
+    course_id = request.GET.get('course_id')
+    if student_id and course_id:
+        try:
+            payment_record = PaymentRecord.objects.get(student_id=student_id, course_id=course_id)
+            return JsonResponse({'amount_due': payment_record.amount_due})
+        except PaymentRecord.DoesNotExist:
+            return JsonResponse({'amount_due': None})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def admin_send_tuition_reminder(request):
+    students = Student.objects.select_related('admin').all()
+    teachers = Teacher.objects.select_related('admin').all()
+    courses = Course.objects.all()  # Query all courses directly
+    context = {
+        'page_title': "Send Tuition Reminders",
+        'students': students,
+        'teachers': teachers,
+        'courses': courses  # Pass courses to context
+    }
+    return render(request, "hod_template/send_tuition_reminder.html", context)
+
 @csrf_exempt
 def send_tuition_reminder(request):
     try:
@@ -1935,60 +2033,49 @@ def send_tuition_reminder(request):
         teacher_id = request.POST.get('teacher_id')
         due_date = request.POST.get('due_date')
         amount_due = request.POST.get('amount_due')
-        course_ids = request.POST.getlist('courses')
+        course_id = request.POST.get('course_id')  # Added line to get the selected course ID
 
         student = get_object_or_404(Student, id=student_id)
         teacher = get_object_or_404(Teacher, id=teacher_id)
-        courses = Course.objects.filter(id__in=course_ids)
 
-        # Create a reminder for each course
-        for course in courses:
-            payment_record, created = PaymentRecord.objects.get_or_create(
-                student=student,
-                due_date=due_date,
-                course=course,  # Assuming PaymentRecord has a course ForeignKey field
-                defaults={'amount_due': amount_due}
-            )
+        reminder_message = f"Dear {student.admin.full_name},\n\n" \
+                           f"This is a reminder that your tuition payment of {amount_due} for {course_id} is due on {due_date}. " \
+                           f"Please make the payment by the due date to avoid any late fees.\n\n" \
+                           f"Thank you."
 
-            reminder_message = f"Dear {student.admin.full_name},\n\n" \
-                               f"This is a reminder that your tuition payment of {amount_due} is due on {due_date} for the course {course.name}. " \
-                               f"Please make the payment by the due date to avoid any late fees.\n\n" \
-                               f"Thank you."
+        china_tz = pytz.timezone('Asia/Shanghai')
+        now = timezone.now().astimezone(china_tz)
 
-            china_tz = pytz.timezone('Asia/Shanghai')
-            now = timezone.now().astimezone(china_tz)
+        tuition_reminder = TuitionReminder()
+        tuition_reminder.student = student
+        tuition_reminder.teacher = teacher
+        tuition_reminder.message = reminder_message
+        tuition_reminder.date = now.date()
+        tuition_reminder.time = now.time()
+        tuition_reminder.due_date = due_date
+        tuition_reminder.save()
 
-            tuition_reminder = TuitionReminder()
-            tuition_reminder.student = student
-            tuition_reminder.teacher = teacher
-            tuition_reminder.payment_record = payment_record
-            tuition_reminder.message = reminder_message
-            tuition_reminder.date = now.date()
-            tuition_reminder.time = now.time()
-            tuition_reminder.save()
-
-            url = "https://fcm.googleapis.com/fcm/send"
-            body = {
-                'notification': {
-                    'title': "Tuition Payment Reminder",
-                    'body': reminder_message,
-                    'click_action': reverse('student_view_reminder'),
-                    'icon': static('dist/img/AdminLTELogo.png')
-                },
-                'to': student.admin.fcm_token
-            }
-            headers = {
-                'Authorization': 'key=YOUR_SERVER_KEY',
-                'Content-Type': 'application/json'
-            }
-            requests.post(url, data=json.dumps(body), headers=headers)
+        url = "https://fcm.googleapis.com/fcm/send"
+        body = {
+            'notification': {
+                'title': "Tuition Payment Reminder",
+                'body': reminder_message,
+                'click_action': reverse('teacher_view_reminder'),
+                'icon': static('dist/img/AdminLTELogo.png')
+            },
+            'to': teacher.admin.fcm_token
+        }
+        headers = {
+            'Authorization': 'key=YOUR_SERVER_KEY',
+            'Content-Type': 'application/json'
+        }
+        requests.post(url, data=json.dumps(body), headers=headers)
 
         return HttpResponse("True")
 
     except Exception as e:
         print(f"Error while sending tuition reminder: {e}")
         return HttpResponse("False")
-
 
 
 #Exempts

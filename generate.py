@@ -3,13 +3,13 @@ import os
 import random
 import django
 import pandas as pd
-import logging
 from faker import Faker
 from django.contrib.auth.hashers import make_password
 from django.utils.crypto import get_random_string
 from django.db import IntegrityError
 from main_app.models import CustomUser, Campus, Course, LearningRecord, Student, Teacher, PaymentRecord, StudentQuery, Session, ClassSchedule, RefundRecord
 from main_app.model_column_mapping import MODEL_COLUMN_MAPPING
+from django.utils.translation import gettext_lazy as _
 
 # Set up Django settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'college_management_system.settings')
@@ -18,16 +18,6 @@ django.setup()
 # Create a Faker generator
 fake = Faker()
 random_number = random.randint(1, 7)
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("data_processing.log"),
-        logging.StreamHandler()
-    ]
-)
 
 # Mapping Chinese ordinal numbers to grades
 grade_mapping = {
@@ -50,13 +40,17 @@ REQUIRED_FIELDS = {
     'RefundRecord': ['学生', '学习记录', '付款记录', '退款金额', '已退款金额', '退款原因']
 }
 
+def safe_get(row, key, default=None):
+    """ Helper function to safely get a value from a row """
+    return row.get(key) if pd.notna(row.get(key)) else default
+
 def process_data(excel_file, auto_create_learning_record=False, auto_create_payment_record=False, user_type='Student'):
     try:
         df = pd.read_excel(excel_file)
-        logging.info(f"Dataframe loaded successfully with {len(df)} rows.")
-        logging.info(f"Columns in dataframe: {df.columns.tolist()}")
+        print(f"Dataframe loaded successfully with {len(df)} rows.")
+        print(f"Columns in dataframe: {df.columns.tolist()}")
     except Exception as e:
-        logging.error(f"Error reading Excel file: {e}")
+        print(f"Error reading Excel file: {e}")
         return None  # Return early if the file cannot be processed
 
     fake_data = []
@@ -64,24 +58,19 @@ def process_data(excel_file, auto_create_learning_record=False, auto_create_paym
 
     for index, row in df.iterrows():
         try:
-            if '出生日期' not in row:
-                logging.warning(f"Missing '出生日期' column in row {index}. Using fake data.")
-                date_of_birth = fake.date_of_birth(minimum_age=10, maximum_age=18)
-            else:
-                date_of_birth = row.get('出生日期')
+            date_of_birth = safe_get(row, '出生日期', fake.date_of_birth(minimum_age=10, maximum_age=18))
+            full_name = safe_get(row, '学生姓名', fake.name())
+            email = safe_get(row, '邮箱', fake.email())
+            gender = safe_get(row, '性别', fake.random_element(elements=('男', '女')))
+            address = safe_get(row, '地址', fake.address().replace('\n', ', '))
+            phone_number = safe_get(row, '电话号码', fake.phone_number())
+            reg_date = safe_get(row, '注册日期', fake.date_this_year())
+            status = safe_get(row, '状态', 'active')
 
-            full_name = row.get('学生姓名', fake.name())
-            email = row.get('邮箱', fake.email())
-            gender = row.get('性别', fake.random_element(elements=('男', '女')))
-            address = row.get('地址', fake.address().replace('\n', ', '))
-            phone_number = row.get('电话号码', fake.phone_number())
-            reg_date = row.get('注册日期', fake.date_this_year())
-            status = row.get('状态', 'active')
-
-            campus_name = row.get('校区', 'Unknown Campus')
+            campus_name = safe_get(row, '校区', 'Unknown Campus')
             campus, _ = Campus.objects.get_or_create(name=campus_name)
 
-            class_name = row.get('班级', 'Unknown Class')
+            class_name = safe_get(row, '班级', 'Unknown Class')
             course_name, grade_level = None, None
             for chinese_grade, grade in grade_mapping.items():
                 if chinese_grade in class_name:
@@ -94,9 +83,9 @@ def process_data(excel_file, auto_create_learning_record=False, auto_create_paym
                 if created or course.level_end < grade_level:
                     course.level_end = grade_level
                     course.save()
-                logging.info(f"Course retrieved or created: {course_name}")
+                print(f"Course retrieved or created: {course_name}")
 
-            remark = "销售人员: " + row.get('销售人员', 'Unknown')
+            remark = "销售人员: " + safe_get(row, '销售人员', 'Unknown')
 
             # Create or update CustomUser
             user, created = CustomUser.objects.update_or_create(
@@ -117,11 +106,11 @@ def process_data(excel_file, auto_create_learning_record=False, auto_create_paym
                     admin=user,
                     defaults={
                         'campus': campus,
-                        'work_type': row.get('工作类型', 'Full-Time')
+                        'work_type': safe_get(row, '工作类型', 'Full-Time')
                     }
                 )
                 teacher.courses.add(course)
-                logging.info(f"Teacher instance saved or updated for: {full_name}")
+                print(f"Teacher instance saved or updated for: {full_name}")
 
                 # Save teacher credentials to file
                 with open("teacher_credentials.txt", "a") as file:
@@ -161,22 +150,22 @@ def process_data(excel_file, auto_create_learning_record=False, auto_create_paym
                         course=course,
                         defaults={
                             'date': reg_date,
-                            'amount_paid': 1000,  # Example value
-                            'payment_method': 'Cash',
+                            'amount_paid': 2180,  # Example value
+                            'payment_method': 'Alipay',
                             'status': 'Pending',
                             'remark': remark
                         }
                     )
 
                 user_student_pairs.append((user, student, course, row))
-                logging.info(f"Student instance saved or updated for: {full_name}")
-                logging.info(f"StudentQuery for {full_name} updated successfully.")
+                print(f"Student instance saved or updated for: {full_name}")
+                print(f"StudentQuery for {full_name} updated successfully.")
 
         except KeyError as e:
-            logging.error(f"KeyError: {e}")
+            print(f"KeyError: {e}")
             continue
         except Exception as e:
-            logging.error(f"Exception: {e}")
+            print(f"Exception: {e}")
             continue
 
     return fake_data
@@ -184,14 +173,14 @@ def process_data(excel_file, auto_create_learning_record=False, auto_create_paym
 def process_course(excel_file):
     try:
         df = pd.read_excel(excel_file)
-        logging.info(f"Dataframe loaded successfully with {len(df)} rows.")
+        print(f"Dataframe loaded successfully with {len(df)} rows.")
     except Exception as e:
-        logging.error(f"Error reading Excel file: {e}")
+        print(f"Error reading Excel file: {e}")
         return None
 
     for index, row in df.iterrows():
         try:
-            class_name = row.get('班级', 'Unknown Class')
+            class_name = safe_get(row, '班级', 'Unknown Class')
             course_name, grade_level = None, None
             for chinese_grade, grade in grade_mapping.items():
                 if chinese_grade in class_name:
@@ -204,26 +193,26 @@ def process_course(excel_file):
                 if created or course.level_end < grade_level:
                     course.level_end = grade_level
                     course.save()
-                logging.info(f"Course retrieved or created: {course_name}")
+                print(f"Course retrieved or created: {course_name}")
 
         except Exception as e:
-            logging.error(f"Exception: {e}")
+            print(f"Exception: {e}")
             continue
 
 def process_learning_record(excel_file):
     try:
         df = pd.read_excel(excel_file)
-        logging.info(f"Dataframe loaded successfully with {len(df)} rows.")
+        print(f"Dataframe loaded successfully with {len(df)} rows.")
     except Exception as e:
-        logging.error(f"Error reading Excel file: {e}")
+        print(f"Error reading Excel file: {e}")
         return None
 
     for index, row in df.iterrows():
         try:
-            student_name = row.get('学生姓名')
-            student_salesperson = row.get('销售人员')
-            class_name = row.get('班级', 'Unknown Class')
-            teacher_name = row.get('教师')
+            student_name = safe_get(row, '学生姓名')
+            student_salesperson = safe_get(row, '销售人员')
+            class_name = safe_get(row, '班级', 'Unknown Class')
+            teacher_name = safe_get(row, '教师')
 
             course_name, _ = None, None
             for chinese_grade, grade in grade_mapping.items():
@@ -239,41 +228,41 @@ def process_learning_record(excel_file):
                 student=student,
                 course=course,
                 defaults={
-                    'date': row.get('日期') or fake.date_this_year(),
+                    'date': safe_get(row, '日期', pd.Timestamp.now().strftime('%Y-%m-%d')),
                     'teacher': teacher,
-                    'schedule_record': row.get('班级安排') or None,
-                    'semester': row.get('学期') or None,
-                    'start_time': row.get('开始时间') or '08:00',
-                    'end_time': row.get('结束时间') or '10:00',
-                    'lesson_hours': row.get('课时') or 2,
-                    'day': row.get('星期') or 'Monday'
+                    'schedule_record': safe_get(row, '班级安排'),
+                    'semester_id': safe_get(row, '学期', 1),
+                    'start_time': safe_get(row, '开始时间', '08:00'),
+                    'end_time': safe_get(row, '结束时间', '10:00'),
+                    'lesson_hours': safe_get(row, '课时', 2),
+                    'day': safe_get(row, '星期', 'Monday')
                 }
             )
 
-            logging.info(f"LearningRecord instance saved or updated for student: {student_name}")
+            print(f"LearningRecord instance saved or updated for student: {student_name}")
 
         except Student.DoesNotExist:
-            logging.error(f"Student {student_name} with salesperson {student_salesperson} does not exist.")
+            print(f"Student {student_name} with salesperson {student_salesperson} does not exist.")
         except Course.DoesNotExist:
-            logging.error(f"Course {course_name} does not exist.")
+            print(f"Course {course_name} does not exist.")
         except Exception as e:
-            logging.error(f"Exception: {e}")
+            print(f"Exception: {e}")
             continue
 
 def process_payment_record(excel_file):
     try:
         df = pd.read_excel(excel_file)
-        logging.info(f"Dataframe loaded successfully with {len(df)} rows.")
+        print(f"Dataframe loaded successfully with {len(df)} rows.")
     except Exception as e:
-        logging.error(f"Error reading Excel file: {e}")
+        print(f"Error reading Excel file: {e}")
         return None
 
     for index, row in df.iterrows():
         try:
-            student_name = row.get('学生姓名')
-            student_salesperson = row.get('销售人员')
-            class_name = row.get('班级', 'Unknown Class')
-            teacher_name = row.get('教师')
+            student_name = safe_get(row, '学生姓名')
+            student_salesperson = safe_get(row, '销售人员')
+            class_name = safe_get(row, '班级', 'Unknown Class')
+            teacher_name = safe_get(row, '教师')
 
             course_name, _ = None, None
             for chinese_grade, grade in grade_mapping.items():
@@ -286,60 +275,60 @@ def process_payment_record(excel_file):
             teacher = Teacher.objects.filter(admin__full_name=teacher_name).first()
 
             # Calculate lesson_hours from amount_paid and lesson_unit_price if not provided
-            amount_paid = row.get('缴费') or 2180
-            lesson_unit_price = row.get('课时单价') or 2180
+            amount_paid = safe_get(row, '缴费', 2180)
+            lesson_unit_price = safe_get(row, '课时单价', 2180)
             lesson_hours = 20
 
             # Calculate amount_due
-            discounted_price = row.get('折后价格') or 2180
-            book_costs = row.get('书本费') or 0
-            other_fee = row.get('其他费用') or 0
+            discounted_price = safe_get(row, '折后价格', 2180)
+            book_costs = safe_get(row, '书本费', 0)
+            other_fee = safe_get(row, '其他费用', 0)
             amount_due = lesson_unit_price + book_costs + other_fee - amount_paid
 
             PaymentRecord.objects.update_or_create(
                 student=student,
                 course=course,
                 defaults={
-                    'date': row.get('日期') or datetime.now().date(),
-                    'next_payment_date': row.get('下次缴费时间\n（课程结束前1月）') or (datetime.now() + timedelta(months=1)).date(),
-                    'amount_paid': amount_paid,
-                    'payment_method': row.get('支付方式') or 'Alipay',
-                    'status': row.get('状态') or 'Pending',
-                    'payee': row.get('缴费人') or 'Student',
-                    'remark': row.get('备注') or '',
-                    'lesson_hours': lesson_hours,
+                    'date': safe_get(row, '日期', pd.Timestamp.now().strftime('%Y-%m-%d')),
+                    'next_payment_date': safe_get(row, '下次缴费时间\n（课程结束前1月）', (pd.Timestamp.now() + pd.DateOffset(months=1)).strftime('%Y-%m-%d')),
+                    'amount_paid': amount_paid,  # Example value
+                    'payment_method': safe_get(row, '支付方式', 'Alipay'),
+                    'status': safe_get(row, '状态', 'Pending'),
+                    'payee': safe_get(row, '缴费人', 'Student'),
+                    'remark': safe_get(row, '备注', ''),
+                    'lesson_hours': safe_get(row, '课时', lesson_hours),
                     'lesson_unit_price': lesson_unit_price,
                     'discounted_price': discounted_price,
                     'book_costs': book_costs,
                     'other_fee': other_fee,
-                    'amount_due': amount_due
+                    'amount_due': safe_get(row, '应付金额', amount_due)  # Example calculation
                 }
             )
 
-            logging.info(f"PaymentRecord instance saved or updated for student: {student_name}")
+            print(f"PaymentRecord instance saved or updated for student: {student_name}")
 
         except Student.DoesNotExist:
-            logging.error(f"Student {student_name} with salesperson {student_salesperson} does not exist.")
+            print(f"Student {student_name} with salesperson {student_salesperson} does not exist.")
         except Course.DoesNotExist:
-            logging.error(f"Course {course_name} does not exist.")
+            print(f"Course {course_name} does not exist.")
         except Exception as e:
-            logging.error(f"Exception: {e}")
+            print(f"Exception: {e}")
             continue
 
 def process_refund_record(excel_file):
     try:
         df = pd.read_excel(excel_file)
-        logging.info(f"Dataframe loaded successfully with {len(df)} rows.")
+        print(f"Dataframe loaded successfully with {len(df)} rows.")
     except Exception as e:
-        logging.error(f"Error reading Excel file: {e}")
+        print(f"Error reading Excel file: {e}")
         return None
 
     for index, row in df.iterrows():
         try:
-            student_name = row.get('学生姓名')
-            student_salesperson = row.get('销售人员')
-            learning_record_date = row.get('学习记录日期') or datetime.now().date()
-            payment_record_date = row.get('付款记录日期') or datetime.now().date()
+            student_name = safe_get(row, '学生姓名')
+            student_salesperson = safe_get(row, '销售人员')
+            learning_record_date = safe_get(row, '学习记录日期', datetime.now().date())
+            payment_record_date = safe_get(row, '付款记录日期', datetime.now().date())
 
             # Match student
             student = Student.objects.get(admin__full_name=student_name, admin__remark__icontains=student_salesperson)
@@ -356,36 +345,36 @@ def process_refund_record(excel_file):
                 learning_records=learning_record,
                 payment_records=payment_record,
                 defaults={
-                    'refund_amount': row.get('退款金额') or 0,
-                    'amount_refunded': row.get('已退款金额') or 0,
-                    'refund_reason': row.get('退款原因') or 'N/A'
+                    'refund_amount': safe_get(row, '退款金额', 0),
+                    'amount_refunded': safe_get(row, '已退款金额', 0),
+                    'refund_reason': safe_get(row, '退款原因', 'N/A')
                 }
             )
 
-            logging.info(f"RefundRecord instance saved or updated for student: {student_name}")
+            print(f"RefundRecord instance saved or updated for student: {student_name}")
         
         except Student.DoesNotExist:
-            logging.error(f"Student {student_name} with salesperson {student_salesperson} does not exist.")
+            print(f"Student {student_name} with salesperson {student_salesperson} does not exist.")
         except LearningRecord.DoesNotExist:
-            logging.error(f"LearningRecord with date {learning_record_date} for student {student_name} does not exist.")
+            print(f"LearningRecord with date {learning_record_date} for student {student_name} does not exist.")
         except PaymentRecord.DoesNotExist:
-            logging.error(f"PaymentRecord with date {payment_record_date} for student {student_name} does not exist.")
+            print(f"PaymentRecord with date {payment_record_date} for student {student_name} does not exist.")
         except Exception as e:
-            logging.error(f"Exception: {e}")
+            print(f"Exception: {e}")
             continue
 
 def process_class_schedule(excel_file):
     try:
         df = pd.read_excel(excel_file)
-        logging.info(f"Dataframe loaded successfully with {len(df)} rows.")
+        print(f"Dataframe loaded successfully with {len(df)} rows.")
     except Exception as e:
-        logging.error(f"Error reading Excel file: {e}")
+        print(f"Error reading Excel file: {e}")
         return None
 
     for index, row in df.iterrows():
         try:
-            class_name = row.get('班级', 'Unknown Class')
-            teacher_name = row.get('教师')
+            class_name = safe_get(row, '班级', 'Unknown Class')
+            teacher_name = safe_get(row, '教师')
 
             # Find or create course
             course_name, grade_level = None, None
@@ -400,7 +389,7 @@ def process_class_schedule(excel_file):
                 if created or course.level_end < grade_level:
                     course.level_end = grade_level
                     course.save()
-                logging.info(f"Course retrieved or created: {course_name}")
+                print(f"Course retrieved or created: {course_name}")
 
             # Find or create teacher
             teacher = None
@@ -411,37 +400,39 @@ def process_class_schedule(excel_file):
             ClassSchedule.objects.get_or_create(
                 course=course,
                 teacher=teacher,
-                day=row.get('星期') or 0,
-                start_time=row.get('开始时间') or '08:00',
+                day=safe_get(row, '星期', 0),
+                start_time=safe_get(row, '开始时间', '08:00'),
                 defaults={
-                    'grade': row.get('年级') or 1,
-                    'end_time': row.get('结束时间') or '10:00',
-                    'lesson_hours': row.get('课时') or 2,
-                    'remark': row.get('备注') or '',
+                    'grade': safe_get(row, '年级', 1),
+                    'end_time': safe_get(row, '结束时间', '10:00'),
+                    'lesson_hours': safe_get(row, '课时', 2),
+                    'remark': safe_get(row, '备注', ''),
                 }
             )
 
-            logging.info(f"ClassSchedule instance saved or updated for course: {course_name}")
+            print(f"ClassSchedule instance saved or updated for course: {course_name}")
 
         except Course.DoesNotExist:
-            logging.error(f"Course {course_name} does not exist.")
+            print(f"Course {course_name} does not exist.")
         except Exception as e:
-            logging.error(f"Exception: {e}")
+            print(f"Exception: {e}")
             continue
+
 def process_all_models(excel_file, auto_create_learning_record, auto_create_payment_record):
     # Process each model
     process_data(excel_file, auto_create_learning_record, auto_create_payment_record)
     process_course(excel_file)
+    process_class_schedule(excel_file)
     process_learning_record(excel_file)
     process_payment_record(excel_file)
     process_refund_record(excel_file)
-    process_class_schedule(excel_file)
+
 
 def main(excel_file, selected_model, user_type=None, auto_create_learning_record=False, auto_create_payment_record=False):
     if selected_model == 'Mixed':
         process_all_models(excel_file, auto_create_learning_record, auto_create_payment_record)
     elif selected_model == 'CustomUser' and user_type in ['Student', 'Teacher']:
-        process_data(excel_file, auto_create_learning_record, auto_create_payment_record)
+        process_data(excel_file, auto_create_learning_record, auto_create_payment_record, user_type=user_type)
     elif selected_model == 'Course':
         process_course(excel_file)
     elif selected_model == 'LearningRecord':
@@ -465,7 +456,7 @@ def process_all_sheets(sheets, model_column_mapping):
         if sheet_name in model_column_mapping:
             process_sheet(sheet_name, sheet_data, model_column_mapping[sheet_name])
         else:
-            logging.warning(f"No model mapping found for sheet: {sheet_name}")
+            print(f"No model mapping found for sheet: {sheet_name}")
 
 def process_sheet(sheet_name, sheet_data, model_info):
     model = model_info['model']
@@ -474,15 +465,15 @@ def process_sheet(sheet_name, sheet_data, model_info):
     for index, row in sheet_data.iterrows():
         data = {}
         for col, field in field_mapping.items():
-            data[field] = row[col]
+            data[field] = safe_get(row, col)
         
         try:
             model.objects.update_or_create(**data)
-            logging.info(f"{model.__name__} record processed: {data}")
+            print(f"{model.__name__} record processed: {data}")
         except IntegrityError as e:
-            logging.error(f"IntegrityError for {model.__name__}: {e}")
+            print(f"IntegrityError for {model.__name__}: {e}")
         except Exception as e:
-            logging.error(f"Error for {model.__name__}: {e}")
+            print(f"Error for {model.__name__}: {e}")
 
 def fake_value(column_name):
     fake = Faker()
@@ -491,6 +482,6 @@ def fake_value(column_name):
     elif column_name == '注册日期':
         return fake.date_this_year().isoformat()
     elif column_name == '状态':
-        return 'Active'
+        return 'Currently Learning'
     # Add more cases for other columns as needed
     return fake.word()

@@ -31,12 +31,8 @@
         </div>
     </div>
 </section>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="{% static 'js/moment.min.js' %}"></script>
-<script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
-
-<script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript">
     $(document).ready(function () {
         $('.timepicker').datetimepicker({
             format: 'HH:mm'
@@ -45,6 +41,8 @@
         $('#id_start_time, #id_end_time').on('change', function () {
             var startTime = $('#id_start_time').val();
             var endTime = $('#id_end_time').val();
+            console.log("Start Time Changed: ", startTime);
+            console.log("End Time Changed: ", endTime);
             calculateLessonHours(startTime, endTime);
         });
 
@@ -61,36 +59,39 @@
             var hours = Math.floor(duration.asHours());
             var minutes = Math.floor(duration.asMinutes()) % 60;
 
+            var lessonHours = hours + (minutes / 60);
+            lessonHours = lessonHours.toFixed(1); // Round to 1 decimal places
+
             var lessonHoursField = $('#id_lesson_hours');
-            if (minutes === 0) {
-                lessonHoursField.val(hours);
-            } else {
-                lessonHoursField.val(hours + minutes / 60); // Convert minutes to fraction of an hour
-            }
+            lessonHoursField.val(lessonHours);
+
+            console.log("Calculated Lesson Hours: ", lessonHours);
         }
-    });
 
-    document.getElementById('id_course').addEventListener('change', function() {
-        var courseId = this.value;
-        fetch(`/get-grade-choices/?course_id=${courseId}`)
-            .then(response => response.json())
-            .then(data => {
-                var select = document.getElementById('id_grade');
-                select.innerHTML = '';
-                data.choices.forEach(function(choice) {
-                    var option = new Option(choice[1], choice[0]);
-                    select.add(option);
+        $('#id_course').on('change', function() {
+            var courseId = $(this).val();
+            console.log("Course Changed: ", courseId);
+            fetch(`/get-grade-choices/?course_id=${courseId}`)
+                .then(response => response.json())
+                .then(data => {
+                    var select = $('#id_grade');
+                    select.empty();
+                    data.choices.forEach(function(choice) {
+                        var option = new Option(choice[1], choice[0]);
+                        select.append(option);
+                    });
                 });
-            });
-    });
+        });
 
-    $('form').on('submit', function(event) {
+        $('form').on('submit', function(event) {
             event.preventDefault();
+            console.log("Form submitted");
             $.ajax({
-                url: "{% url 'edit_class_schedule' schedule_id%}",
+                url: "{% url 'edit_class_schedule' schedule_id %}",
                 type: 'POST',
                 data: $(this).serialize(),
                 success: function(response) {
+                    console.log("Form submission successful: ", response);
                     $('#messages').html('<div class="alert alert-success">' + response.message + '</div>');
                     window.scrollTo(0, 0);
                     setTimeout(function() {
@@ -100,6 +101,7 @@
                 },
                 error: function(response) {
                     var errors = response.responseJSON.errors;
+                    console.log("Form submission error: ", response);
                     $('#messages').html('<div class="alert alert-danger">' + response.responseJSON.message + '</div>');
                     window.scrollTo(0, 0);
                     setTimeout(function() {
@@ -108,5 +110,6 @@
                 }
             });
         });
+    });
 </script>
 {% endblock content %}

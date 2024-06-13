@@ -272,7 +272,7 @@ class TuitionReminder(models.Model):
     time = models.TimeField(default=timezone.now)
     teacher = models.ForeignKey('Teacher', on_delete=models.CASCADE)
     student = models.ForeignKey('Student', on_delete=models.CASCADE)
-    payment_record = models.ForeignKey('PaymentRecord', on_delete=models.CASCADE)
+
     message = models.TextField()
     is_read = models.BooleanField(default=False)  # Replaced is_sent with is_read
     due_date = models.DateField(default=datetime.now)  # Add a default value for due date

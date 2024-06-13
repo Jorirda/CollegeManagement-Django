@@ -20,28 +20,22 @@
                             <div class="form-group">
                                 <label for="student_id">{% trans 'Select Student' %}</label>
                                 <select class="form-control" id="student_id" name="student_id">
-                                    <option value="">{% trans '...........' %}</option>
+                                    <option value="">{% trans 'Select a student' %}</option>
                                     {% for student in students %}
                                     <option value="{{ student.id }}">{{ student.admin.full_name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="teacher_id">{% trans 'Select Teacher' %}</label>
-                                <select class="form-control" id="teacher_id" name="teacher_id">
-                                    <option value="">{% trans '...........' %}</option>
-                                    {% for teacher in teachers %}
-                                    <option value="{{ teacher.id }}">{{ teacher.admin.full_name }}</option>
-                                    {% endfor %}
+                                <label for="course_id">{% trans 'Select Course' %}</label>
+                                <select class="form-control" id="course_id" name="course_id">
+                                    <option value="">{% trans 'Select a course' %}</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="course_id">{% trans 'Select Course' %}</label>
-                                <select class="form-control" id="course_id" name="course_id">
-                                    <option value="">{% trans '...........' %}</option>
-                                    {% for course in courses %}
-                                    <option value="{{ course.id }}">{{ course.name }}</option>
-                                    {% endfor %}
+                                <label for="teacher_id">{% trans 'Select Teacher' %}</label>
+                                <select class="form-control" id="teacher_id" name="teacher_id">
+                                    <option value="">{% trans 'Select a teacher' %}</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -50,9 +44,9 @@
                             </div>
                             <div class="form-group">
                                 <label for="amount_due">{% trans 'Amount Due' %}</label>
-                                <input type="number" class="form-control" id="amount_due" name="amount_due" readonly>
-                            </div>
-                            <button type="button" class="btn btn-primary" id="sendReminderButton">{% trans 'Send Reminder' %}</button>
+                                <input type="number" class="form-control" id="amount_due" name="amount_due" disabled>
+                            </div>                            
+                            <button type="button" class="btn btn-success" id="sendReminderButton">{% trans 'Send Reminder' %}</button>
                         </form>
                     </div>
                 </div>
@@ -63,49 +57,90 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script type="text/javascript">
-    function fetchAmountDue() {
-        var student_id = $("#student_id").val();
-        var course_id = $("#course_id").val();
-        if (student_id && course_id) {
-            $.ajax({
-                url: "{% url 'get_amount_due' %}",
-                type: 'GET',
-                data: {
-                    'student_id': student_id,
-                    'course_id': course_id
-                },
-                success: function(response) {
-                    if (response.success) {
-                        $("#amount_due").val(response.amount_due);
-                    } else {
-                        console.error("Error fetching amount due: " + response.error);
-                        alert("{% trans 'Error fetching amount due. Please try again.' %}");
+    $(document).ready(function() {
+        console.log("Document is ready.");
+
+        $("#student_id").change(function() {
+            var studentId = $(this).val();
+            console.log("Selected student ID:", studentId);
+            if (studentId) {
+                $.ajax({
+                    url: "{% url 'get_student_courses_teachers' %}",
+                    type: 'GET',
+                    data: {
+                        'student_id': studentId
+                    },
+                    success: function(data) {
+                        var courseSelect = $("#course_id");
+                        var teacherSelect = $("#teacher_id");
+                        courseSelect.empty();
+                        teacherSelect.empty();
+                        console.log("Courses and teachers data received:", data);
+
+                        if (data.courses) {
+                            $.each(data.courses, function(index, course) {
+                                courseSelect.append(
+                                    $("<option></option>").val(course.id).text(course.name)
+                                );
+                            });
+                        } else {
+                            courseSelect.append(
+                                $("<option></option>").val("").text("{% trans 'No courses found' %}")
+                            );
+                        }
+
+                        if (data.teachers) {
+                            $.each(data.teachers, function(index, teacher) {
+                                teacherSelect.append(
+                                    $("<option></option>").val(teacher.teacher_id).text(teacher.teacher_name).data('course-id', teacher.course_id)
+                                );
+                            });
+                        } else {
+                            teacherSelect.append(
+                                $("<option></option>").val("").text("{% trans 'No teachers found' %}")
+                            );
+                        }
+
+                        // Check for payment records
+                        checkPaymentRecords(studentId);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error fetching courses and teachers:", error);
+                        alert("{% trans 'Error fetching courses and teachers' %}");
                     }
-                },
-                error: function(xhr, textStatus, errorThrown) {
-                    console.error("Error details: ", {
-                        status: xhr.status,
-                        statusText: xhr.statusText,
-                        responseText: xhr.responseText,
-                        textStatus: textStatus,
-                        errorThrown: errorThrown
-                    });
-                    alert("{% trans 'Error in fetching amount due' %}");
+                });
+            } else {
+                $("#course_id").empty().append(
+                    $("<option></option>").val("").text("{% trans 'Select a course' %}")
+                );
+                $("#teacher_id").empty().append(
+                    $("<option></option>").val("").text("{% trans 'Select a teacher' %}")
+                );
+            }
+        });
+
+        $("#course_id").change(function() {
+            var selectedCourseId = $(this).val();
+            console.log("Selected course ID:", selectedCourseId);
+
+            var teacherOptions = $("#teacher_id option");
+            teacherOptions.each(function() {
+                var optionCourseId = $(this).data('course-id');
+                if (optionCourseId === selectedCourseId) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
                 }
             });
-        } else {
-            $("#amount_due").val(''); // Clear the amount due field if either student or course is not selected
-        }
-    }
 
-    $(document).ready(function() {
-        // Fetch amount due when student or course is changed
-        $("#student_id, #course_id").change(function() {
-            fetchAmountDue();
+            if (!selectedCourseId) {
+                teacherOptions.show();
+            }
         });
 
         $("#sendReminderButton").click(function(){
             var formData = $("#sendReminderForm").serialize();
+            console.log("Form data to be sent:", formData);
             $.ajax({
                 url: "{% url 'send_tuition_reminder' %}",
                 type: 'POST',
@@ -114,16 +149,16 @@
                     xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
                 },
                 success: function(response) {
-                    console.log("Response from Server: " + response);
+                    console.log("Response from server:", response);
                     if (response == 'True'){
                         alert("{% trans 'Reminder Sent' %}");
                     } else {
-                        console.error("Reminder could not be sent. Response: " + response);
+                        console.error("Reminder could not be sent. Response:", response);
                         alert("{% trans 'Reminder could not be sent. Please try again.' %}");
                     }
                 },
                 error: function(xhr, textStatus, errorThrown) {
-                    console.error("Error details: ", {
+                    console.error("Error in sending reminder:", {
                         status: xhr.status,
                         statusText: xhr.statusText,
                         responseText: xhr.responseText,
@@ -134,7 +169,33 @@
                 }
             });
         });
+        
+        // Function to fetch amount due
+        function checkPaymentRecords(studentId) {
+            var courseId = $("#course_id").val();
+            $.ajax({
+                url: "{% url 'get_student_amount_due' %}",
+                type: 'GET',
+                data: {
+                    'student_id': studentId,
+                    'course_id': courseId
+                },
+                success: function(data) {
+                    console.log("Amount due data received:", data);
+                    if (data.amount_due !== null) {
+                        $("#amount_due").val(data.amount_due);
+                    } else {
+                        $("#amount_due").val("").attr("placeholder", "{% trans 'Amount due not available' %}");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching amount due:", error);
+                    alert("{% trans 'Error fetching amount due' %}");
+                }
+            });
+        }
     });
 </script>
+
 
 {% endblock content %}

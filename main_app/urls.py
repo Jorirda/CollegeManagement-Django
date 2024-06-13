@@ -22,8 +22,10 @@ import generate
 
 urlpatterns = [
 #hodviews
-   
-    path('ajax/get-amount-due/', hod_views.get_amount_due, name='get_amount_due'), 
+    path('switch_campus/<int:campus_id>/', hod_views.switch_campus, name='switch_campus'),
+    path('get_campuses/', hod_views.get_campuses, name='get_campuses'),
+    path('get_student_amount_due/', hod_views.get_student_amount_due, name='get_student_amount_due'),
+    path('get_student_courses_teachers/', hod_views.get_student_courses_teachers, name='get_student_courses_teachers'),
     path('ajax/get-lesson-hours/', hod_views.get_lesson_hours, name='get_lesson_hours'),
     path('process_data/', generate.process_data, name='process_data'),
     path('ajax/get-teachers/', hod_views.get_teachers, name='get_teachers'),

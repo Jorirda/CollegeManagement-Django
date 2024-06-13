@@ -120,7 +120,7 @@ class AdminForm(FormSettings):
     email = forms.EmailField(required=False, label=_('Email'))
     gender = forms.ChoiceField(choices=[('male', _('Male')), ('female', _('Female'))], label=_('Gender'))
     password = forms.CharField(widget=forms.PasswordInput, label=_('Password'), required=False)
-    profile_pic = forms.ImageField(label=_('Profile Picture'))
+    profile_pic = forms.ImageField(label=_('Profile Picture'), required=False)
 
     def __init__(self, *args, **kwargs):
         super(AdminForm, self).__init__(*args, **kwargs)

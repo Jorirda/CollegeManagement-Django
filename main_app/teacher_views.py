@@ -625,47 +625,80 @@ def teacher_delete_notification(request):
     else:
         return JsonResponse({'success': False, 'error': 'Invalid request method or not an AJAX request'})
     
+# @login_required
+# def teacher_view_reminder(request):
+#     teacher = get_object_or_404(Teacher, admin=request.user)
+
+#     # Fetch reminders and related objects in fewer queries
+#     reminders = TuitionReminder.objects.filter(teacher=teacher).select_related('student__admin')
+
+#     # Annotate reminders with required data
+#     annotated_reminders = []
+#     for reminder in reminders:
+#         student_name = reminder.student.admin.full_name if reminder.student and reminder.student.admin else 'N/A'
+#         amount_due = reminder.student.paymentrecord_set.first().amount_due if reminder.student and reminder.student.paymentrecord_set.exists() else 'N/A'
+        
+#         # Get the courses for the student
+#         courses = reminder.student.courses.all()
+#         course_names = ', '.join([course.name for course in courses])
+
+#         annotated_reminders.append({
+#             'id': reminder.id,
+#             'date': reminder.date,
+#             'time': reminder.time,
+#             'message': reminder.message,
+#             'student_name': student_name,
+#             'amount_due': amount_due,
+#             'due_date': reminder.due_date,
+#             'course_names': course_names,  # Added course names to the context
+#             'is_read': reminder.is_read,
+#         })
+
+#     # Pagination logic
+#     paginator = Paginator(annotated_reminders, 10)  # Show 10 reminders per page
+#     page_number = request.GET.get('page')
+#     paginated_reminders = paginator.get_page(page_number)
+
+#     context = {
+#         'reminders': paginated_reminders,
+#         'page_title': "View Reminders"
+#     }
+#     return render(request, "teacher_template/teacher_view_reminder.html", context)
+
 @login_required
 def teacher_view_reminder(request):
     teacher = get_object_or_404(Teacher, admin=request.user)
+    reminders = TuitionReminder.objects.filter(teacher=teacher).select_related('student__admin')
 
-    # Fetch reminders and related objects in fewer queries
-    reminders = TuitionReminder.objects.filter(teacher=teacher).select_related(
-        'payment_record__learning_record__course', 'student__admin'
-    )
-
-    # Annotate reminders with required data
     annotated_reminders = []
+    selected_course_id = request.GET.get('course_id')
+
     for reminder in reminders:
         student_name = reminder.student.admin.full_name if reminder.student and reminder.student.admin else 'N/A'
-        amount_due = reminder.payment_record.amount_due if reminder.payment_record else 'N/A'
-
-        # Ensuring course_name always has a value
-        course_name = (
-            reminder.payment_record.learning_record.course.name
-            if reminder.payment_record and reminder.payment_record.learning_record and reminder.payment_record.learning_record.course
-            else 'Unknown Course'
-        )
-
-        # Get the list of courses for the student
-        student_courses = reminder.student.courses.all() if reminder.student else []
-        courses_list = ', '.join([course.name for course in student_courses]) if student_courses else 'No Courses'
-
+        amount_due = reminder.student.paymentrecord_set.first().amount_due if reminder.student and reminder.student.paymentrecord_set.exists() else 'N/A'
+        courses = reminder.student.courses.all()
+        matched_course_name = 'N/A'
+        if selected_course_id:
+            for course in courses:
+                if str(course.id) == selected_course_id:
+                    matched_course_name = course.name
+                    break
+        else:
+            matched_course_name = ', '.join([course.name for course in courses])
+        
         annotated_reminders.append({
             'id': reminder.id,
-            'date': reminder.date,
+            'date': reminder.date,  # Date is correctly assigned
             'time': reminder.time,
             'message': reminder.message,
             'student_name': student_name,
             'amount_due': amount_due,
-            'due_date': reminder.due_date,
-            'course_name': course_name,
+            'due_date': reminder.due_date,  # Due date is correctly assigned
+            'course_name': matched_course_name,
             'is_read': reminder.is_read,
-            'student_courses': courses_list,  # Add courses to the context
         })
 
-    # Pagination logic
-    paginator = Paginator(annotated_reminders, 10)  # Show 10 reminders per page
+    paginator = Paginator(annotated_reminders, 10)
     page_number = request.GET.get('page')
     paginated_reminders = paginator.get_page(page_number)
 
@@ -674,6 +707,7 @@ def teacher_view_reminder(request):
         'page_title': "View Reminders"
     }
     return render(request, "teacher_template/teacher_view_reminder.html", context)
+
 
 
 
@@ -813,30 +847,34 @@ def student_renewals(request):
             })
 
     # Fetch reminders and related objects in fewer queries
-    reminders = TuitionReminder.objects.filter(teacher=teacher).select_related(
-        'payment_record__learning_record__course', 'student__admin'
-    )
+    reminders = TuitionReminder.objects.filter(teacher=teacher).select_related('student__admin')
 
     # Annotate reminders with required data
     annotated_reminders = []
+    selected_course_id = request.GET.get('course_id')
+
     for reminder in reminders:
         student_name = reminder.student.admin.full_name if reminder.student and reminder.student.admin else 'N/A'
-        amount_due = reminder.payment_record.amount_due if reminder.payment_record else 'N/A'
-        course_name = (
-            reminder.payment_record.learning_record.course.name
-            if reminder.payment_record and reminder.payment_record.learning_record and reminder.payment_record.learning_record.course
-            else 'N/A'
-        )
-
+        amount_due = reminder.student.paymentrecord_set.first().amount_due if reminder.student and reminder.student.paymentrecord_set.exists() else 'N/A'
+        courses = reminder.student.courses.all()
+        matched_course_name = 'N/A'
+        if selected_course_id:
+            for course in courses:
+                if str(course.id) == selected_course_id:
+                    matched_course_name = course.name
+                    break
+        else:
+            matched_course_name = ', '.join([course.name for course in courses])
+        
         annotated_reminders.append({
             'id': reminder.id,
-            'date': reminder.date,
+            'date': reminder.date,  # Date is correctly assigned
             'time': reminder.time,
             'message': reminder.message,
             'student_name': student_name,
             'amount_due': amount_due,
-            'due_date': reminder.due_date,
-            'course_name': course_name,
+            'due_date': reminder.due_date,  # Due date is correctly assigned
+            'course_name': matched_course_name,
             'is_read': reminder.is_read,
         })
 
@@ -851,7 +889,6 @@ def student_renewals(request):
         'page_title': 'Student Renewals'
     }
     return render(request, 'teacher_template/student_renewals.html', context)
-
 
 
 @login_required

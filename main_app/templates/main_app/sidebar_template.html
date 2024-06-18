@@ -221,7 +221,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ manage_payment_record }}" class="nav-link {% if request.path == manage_payment_record %}active{% endif %}">
+                            <a href="{% url 'manage_payment_record' %}?campus_id={{ campus_id }}" class="nav-link {% if request.path == manage_payment_record %}active{% endif %}">
                                 <i class="nav-icon fas fa-receipt"></i>
                                 <p>{% trans "Manage Payment" %}</p>
                             </a>
@@ -246,7 +246,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ manage_learning_record }}" class="nav-link {% if request.path == manage_learning_record %}active{% endif %}">
+                            <a href="{{ manage_learning_record }}?campus_id={{ campus_id }}" class="nav-link {% if request.path == manage_learning_record %}active{% endif %}">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>{% trans "Manage Learning Record" %}</p>
                             </a>

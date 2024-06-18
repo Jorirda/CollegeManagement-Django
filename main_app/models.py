@@ -73,6 +73,10 @@ class Campus(models.Model):
 
     def __str__(self):
         return self.name
+    def calculate_total_income(self):
+        from .models import PaymentRecord  # Importing here to avoid circular import issues
+        total_income = PaymentRecord.objects.filter(student__campus=self).aggregate(total=Sum('amount_paid'))['total']
+        return total_income or 0  # Return 0 if total_income is None
 
 class Admin(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE) #DONT CHANGE THIS, THANKS
@@ -87,6 +91,7 @@ class Course(models.Model):
     level_start = models.IntegerField(default=1)
     level_end = models.IntegerField(default=4)
     image = models.ImageField(upload_to='course_images/', blank=True, null=True) 
+    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, related_name='courses', null = True)  # Add this line
     # hourly_rate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, default=0.00)  # New field for hourly rate
 
     def __str__(self):
@@ -94,7 +99,7 @@ class Course(models.Model):
 
 class Student(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)
+    campus = models.ForeignKey(Campus, related_name='students', on_delete=models.CASCADE, null=True)
     # course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True)  
     courses = models.ManyToManyField(Course)  # Changed to ManyToManyField
     date_of_birth = models.DateField(blank=True, null=True)
@@ -108,7 +113,7 @@ class Teacher(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     # course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     courses = models.ManyToManyField(Course)
-    campus = models.ForeignKey(Campus, on_delete=models.CASCADE, null=True)  
+    campus = models.ForeignKey(Campus, related_name='teachers', on_delete=models.CASCADE, null=True)  
     work_type = models.CharField(max_length=30, blank=True)  # Special/Temporary
 
     def __str__(self):
@@ -218,8 +223,8 @@ class PaymentRecord(models.Model):
     
     date = models.DateField(default=timezone.now)
     next_payment_date = models.DateField(null=True, blank=True)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)  # Links to Student, which links to Campus
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)  # Links to Course, which also links to Campus
     lesson_unit_price = models.DecimalField(max_digits=10, decimal_places=2, default=2180)
     discounted_price = models.DecimalField(max_digits=10, decimal_places=2, default=2180)
     book_costs = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -230,7 +235,7 @@ class PaymentRecord(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
     payee = models.CharField(max_length=100)
     remark = models.TextField(null=True, blank=True)
-    lesson_hours = models.DecimalField(max_digits=5, decimal_places=1, default=0)  # Changed to DecimalField
+    lesson_hours = models.DecimalField(max_digits=5, decimal_places=1, default=0)
     learning_record = models.ForeignKey('LearningRecord', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
@@ -251,6 +256,7 @@ class PaymentRecord(models.Model):
         if self.status == 'Refund':
             self.convert_to_refund()
         super().save(*args, **kwargs)
+
 
 class NotificationTeacher(models.Model):
     date = models.DateField(default=timezone.now)

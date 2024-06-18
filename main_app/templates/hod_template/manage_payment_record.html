@@ -115,7 +115,7 @@
                                         <td>{{ payment.payee }}</td>
                                         <td>{{ payment.remark }}</td>
                                         <td class="responsive-buttons">
-                                            <a href="{% url 'edit_payment_record' payment.id %}" class="btn btn-info btn-responsive">{% trans "Edit" %}</a>
+                                            <a href="{% url 'edit_payment_record' payment.id %}?campus_id={{ campus_id }}" class="btn btn-info btn-responsive">{% trans "Edit" %}</a>
                                             <a href="#" class="btn btn-danger btn-responsive" onclick="deletePayment('{{ payment.id }}')">{% trans "Delete" %}</a>
                                         </td>
                                     </tr>
@@ -126,8 +126,8 @@
                         <div class="pagination">
                             <span class="step-links">
                                 {% if payments.has_previous %}
-                                    <a href="?page=1">&laquo; first</a>
-                                    <a href="?page={{ payments.previous_page_number }}">previous</a>
+                                    <a href="?page=1{% if campus_id %}&campus_id={{ campus_id }}{% endif %}">&laquo; first</a>
+                                    <a href="?page={{ payments.previous_page_number }}{% if campus_id %}&campus_id={{ campus_id }}{% endif %}">previous</a>
                                 {% endif %}
                                 
                                 <span class="current">
@@ -135,8 +135,8 @@
                                 </span>
                                 
                                 {% if payments.has_next %}
-                                    <a href="?page={{ payments.next_page_number }}">next</a>
-                                    <a href="?page={{ payments.paginator.num_pages }}">last &raquo;</a>
+                                    <a href="?page={{ payments.next_page_number }}{% if campus_id %}&campus_id={{ campus_id }}{% endif %}">next</a>
+                                    <a href="?page={{ payments.paginator.num_pages }}{% if campus_id %}&campus_id={{ campus_id }}{% endif %}">last &raquo;</a>
                                 {% endif %}
                             </span>
                         </div>
@@ -155,7 +155,8 @@
                 type: 'POST',
                 url: '{% url "delete_payment_record" 0 %}'.replace('0', paymentID),
                 data: {
-                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'campus_id': '{{ campus_id }}'
                 },
                 success: function(data) {
                     if (data.success) {

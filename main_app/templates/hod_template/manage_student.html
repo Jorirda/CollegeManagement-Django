@@ -83,6 +83,7 @@
                                     <th>{% trans "Date of Birth" %}</th>
                                     <th>{% trans "Address" %}</th>
                                     <th>{% trans "Phone Number" %}</th>
+                                    <th>{% trans "Campus" %}</th>
                                     <th>{% trans "Courses" %}</th>
                                     <th>{% trans "Enrolment Date" %}</th>
                                     <th>{% trans "Status" %}</th>
@@ -99,6 +100,7 @@
                                     <td>{{ student.date_of_birth }}</td>
                                     <td>{{ student.address }}</td>
                                     <td>{{ student.phone_number }}</td>
+                                    <td>{{ student.campus }}</td>
                                     <td>
                                         {% if student.courses %}
                                             {% for course in student.courses %}

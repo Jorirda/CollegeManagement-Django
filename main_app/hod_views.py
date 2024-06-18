@@ -9,7 +9,7 @@ from fuzzywuzzy import fuzz, process
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 from django.shortcuts import (HttpResponse, HttpResponseRedirect,
                               get_object_or_404, redirect, render)
 from django.templatetags.static import static
@@ -67,15 +67,6 @@ class SidebarView(TemplateView):
             context['first_name'] = 'Guest'
             context['last_name'] = ''
         return context
-
-#Get Functions
-def get_grade_choices(request):
-    course_id = request.GET.get('course_id')
-    if course_id:
-        choices = ClassScheduleForm().get_level_grade_choices(course_id)
-    else:
-        choices = []
-    return JsonResponse({'choices': choices})
 
 # Specific column mapping rules for autofill based on model and user type
 SPECIFIC_COLUMN_MAPPING = {
@@ -181,6 +172,17 @@ def check_columns(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+
+#Get Functions
+def get_grade_choices(request):
+    course_id = request.GET.get('course_id')
+    if course_id:
+        choices = ClassScheduleForm().get_level_grade_choices(course_id)
+    else:
+        choices = []
+    return JsonResponse({'choices': choices})
 
 @csrf_exempt
 def get_upload(request):
@@ -394,8 +396,9 @@ def get_classes_taken_by_teachers(request):
     return JsonResponse(data)
 
 def get_campuses(request):
-    campuses = Campus.objects.all().values('id', 'name')  # Fetch all campuses and select specific fields
-    return JsonResponse(list(campuses), safe=False)
+    campuses = list(Campus.objects.values('id', 'name'))
+    return JsonResponse(campuses, safe=False)
+
 
 
 #Refund
@@ -506,16 +509,38 @@ def admin_get_teacher_class_schedules_count(request):
 def admin_home(request):
     logger.info("Fetching dashboard data")
 
-    # Aggregate counts
-    total_teacher = Teacher.objects.count()
-    total_students = Student.objects.count()
-    total_classes = ClassSchedule.objects.count()
-    total_course = Course.objects.count()
-    total_income = PaymentRecord.objects.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
-    total_refunds = PaymentRecord.objects.filter(status='Refund').aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+    # Get the campus_id from the request, default to session's campus_id if not provided
+    campus_id = request.GET.get('campus_id', request.session.get('campus_id'))
+    logger.info(f"Selected campus ID: {campus_id}")
+
+    # Save the campus_id in the session
+    request.session['campus_id'] = campus_id
+
+    # Filter by campus if campus_id is provided
+    if campus_id:
+        total_teacher = Teacher.objects.filter(campus_id=campus_id).count()
+        total_students = Student.objects.filter(campus_id=campus_id).count()
+        total_classes = ClassSchedule.objects.filter(course__campus_id=campus_id).count()
+        total_course = Course.objects.filter(campus_id=campus_id).count()
+        total_income = PaymentRecord.objects.filter(student__campus_id=campus_id).aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+        total_refunds = PaymentRecord.objects.filter(student__campus_id=campus_id, status='Refund').aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+        classes = ClassSchedule.objects.filter(course__campus_id=campus_id)
+        course_all = Course.objects.filter(campus_id=campus_id)
+        students = Student.objects.filter(campus_id=campus_id)
+        teachers = Teacher.objects.filter(campus_id=campus_id)
+    else:
+        total_teacher = Teacher.objects.count()
+        total_students = Student.objects.count()
+        total_classes = ClassSchedule.objects.count()
+        total_course = Course.objects.count()
+        total_income = PaymentRecord.objects.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+        total_refunds = PaymentRecord.objects.filter(status='Refund').aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+        classes = ClassSchedule.objects.all()
+        course_all = Course.objects.all()
+        students = Student.objects.all()
+        teachers = Teacher.objects.all()
 
     # Attendance per class
-    classes = ClassSchedule.objects.all()
     attendance_list = []
     classes_list = []
     for class_schedule in classes:
@@ -524,11 +549,10 @@ def admin_home(request):
         attendance_list.append(attendance_count)
 
     # Students in each course
-    course_all = Course.objects.all()
     course_name_list = []
     student_count_list_in_course = []
     for course in course_all:
-        students_count = Student.objects.filter(courses=course).count()
+        students_count = students.filter(courses=course).count()
         course_name_list.append(course.name)
         student_count_list_in_course.append(students_count)
 
@@ -539,7 +563,7 @@ def admin_home(request):
         total_students_in_class = Attendance.objects.filter(classes=class_obj).count()
         total_attendance_in_class = AttendanceReport.objects.filter(attendance__classes=class_obj, status=True).count()
         if total_students_in_class > 0:
-            attendance_rate = (total_attendance_in_class / total_students_in_class) * 100  # Fixed the multiplication factor to 100 for percentage
+            attendance_rate = (total_attendance_in_class / total_students_in_class) * 100
         else:
             attendance_rate = 0
         class_schedule_names_list.append(class_obj.course.name)
@@ -550,7 +574,6 @@ def admin_home(request):
     student_attendance_leave_list = []
     student_name_list = []
     student_attendance_rate_list = []
-    students = Student.objects.all()
     for student in students:
         attendance = AttendanceReport.objects.filter(student_id=student.id, status=True).count()
         absent = AttendanceReport.objects.filter(student_id=student.id, status=False).count()
@@ -565,10 +588,10 @@ def admin_home(request):
     # Teacher lesson hours
     teacher_names = []
     lesson_hours = []
-    for teacher in Teacher.objects.all():
+    for teacher in teachers:
         teacher_names.append(teacher.admin.full_name)
         total_hours = LearningRecord.objects.filter(teacher=teacher).aggregate(Sum('lesson_hours'))['lesson_hours__sum'] or 0
-        lesson_hours.append(float(total_hours))  # Convert Decimal to float
+        lesson_hours.append(float(total_hours))
 
     # Monthly income breakdown
     month_dict = {
@@ -596,7 +619,7 @@ def admin_home(request):
         for month_year, income in monthly_income.items():
             if month_year not in income_by_months:
                 income_by_months[month_year] = 0
-            income_by_months[month_year] += float(income)  # Convert Decimal to float
+            income_by_months[month_year] += float(income)
 
     sorted_income_by_months = {k: income_by_months[k] for k in sorted(income_by_months, key=lambda x: (int(x.split()[1]), month_dict[x.split()[0]]))}
     all_months = list(sorted_income_by_months.keys())
@@ -613,10 +636,10 @@ def admin_home(request):
             for next_payment_date in next_payment_dates
         )
         student_renewals += total_semesters
-        if student.status in ["Withdrawn", "Refund"]:  # Check for both Withdrawn and Refund statuses
+        if student.status in ["Withdrawn", "Refund"]:
             withdrawal_count += 1
 
-    teachers = Teacher.objects.all()
+    # Timetable schedule
     days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
     time_slots = [
         ('08:00 AM', '09:00 AM'),
@@ -629,13 +652,9 @@ def admin_home(request):
         ('03:00 PM', '04:00 PM'),
     ]
     
-    # Initialize schedule list
     schedule_list = [['' for _ in range(len(days_of_week) + 1)] for _ in range(len(time_slots))]
-
-    # Set the first column to time slots
     for i, time_slot in enumerate(time_slots):
         schedule_list[i][0] = f'{time_slot[0]} - {time_slot[1]}'
-
 
     for class_schedule in classes:
         start_time = class_schedule.start_time.strftime('%I:%M %p')
@@ -648,7 +667,6 @@ def admin_home(request):
 
     context = {
         'page_title': _("Administrative Dashboard"),
-        # Existing context variables
         'total_students': total_students,
         'total_teacher': total_teacher,
         'total_course': total_course,
@@ -665,22 +683,23 @@ def admin_home(request):
         'course_name_list': json.dumps(course_name_list),
         'teacher_names': json.dumps(teacher_names),
         'lesson_hours': json.dumps(lesson_hours),
-        'total_income': float(total_income),  # Convert Decimal to float
-        'total_refunds': float(total_refunds),  # Convert Decimal to float
+        'total_income': float(total_income),
+        'total_refunds': float(total_refunds),
         'all_months': json.dumps(all_months),
         'all_incomes': json.dumps(all_incomes),
         'available_years': sorted(available_years),
         'student_renewals': student_renewals,
         'withdrawal_count': withdrawal_count,
-        'students': students,  # Add students to the context
-        'teachers': teachers,  # Add teachers to the context
-        'classes': classes,  # Add class schedules to the context s
-        'time_slots': time_slots,  # Add time slots to the context
+        'students': students,
+        'teachers': teachers,
+        'classes': classes,
+        'time_slots': time_slots,
         'days_of_week': days_of_week,
         'schedule_list': schedule_list,
+        'campus_id': campus_id,  # Pass the selected campus_id to the context
     }
 
-    logger.info(f"Context Data: {context}")  # Log the context data
+    logger.info(f"Context Data: {context}")
 
     return render(request, 'hod_template/home_content.html', context)
 
@@ -844,18 +863,43 @@ def add_teacher(request):
     return render(request, 'hod_template/add_teacher_template.html', context)
 
 def edit_teacher(request, teacher_id):
-    teacher = get_object_or_404(Teacher, id=teacher_id)
-    form = TeacherForm(request.POST or None, instance=teacher)
+    teacher = get_object_or_404(Teacher, admin_id=teacher_id)
+    form = TeacherForm(request.POST or None, request.FILES or None, instance=teacher)
     context = {
         'form': form,
         'teacher_id': teacher_id,
-        'page_title': _('Edit teacher')
+        'page_title': _('Edit Teacher')
     }
 
-    if request.method == 'POST' and request.is_ajax():
+    if request.method == 'POST':
         if form.is_valid():
             try:
-                form.save()
+                full_name = form.cleaned_data.get('full_name')
+                address = form.cleaned_data.get('address')
+                phone_number = form.cleaned_data.get('phone_number')
+                campus = form.cleaned_data.get('campus')
+                remark = form.cleaned_data.get('remark')
+                email = form.cleaned_data.get('email')
+                gender = form.cleaned_data.get('gender')
+                password = form.cleaned_data.get('password')
+                courses = form.cleaned_data.get('courses')  # Get courses from form
+                work_type = form.cleaned_data.get('work_type')
+
+                user = teacher.admin
+                user.full_name = full_name
+                user.gender = gender
+                user.address = address
+                user.phone_number = phone_number
+                user.remark = remark
+                user.save()
+
+                teacher.campus = campus
+                teacher.work_type = work_type
+                teacher.save()
+
+                # Set the many-to-many relationship
+                teacher.courses.set(courses)
+
                 return JsonResponse({'success': True, 'message': 'Teacher Updated Successfully'})
             except Exception as e:
                 return JsonResponse({'success': False, 'message': 'Could Not Update: ' + str(e)}, status=400)
@@ -863,7 +907,7 @@ def edit_teacher(request, teacher_id):
             errors = form.errors.as_json()
             return JsonResponse({'success': False, 'message': 'Please fill the form properly', 'errors': errors}, status=400)
 
-    return render(request, "hod_template/edit_teacher_template.html", context)
+    return render(request, 'hod_template/edit_teacher_template.html', context)
 
 def delete_teacher(request, teacher_id):
     if request.method == 'POST' and request.is_ajax():
@@ -1040,13 +1084,42 @@ def add_student(request):
 
 def edit_student(request, student_id):
     student = get_object_or_404(Student, admin_id=student_id)
-    form = StudentForm(request.POST or None, instance=student)
+    form = StudentForm(request.POST or None, request.FILES or None, instance=student)
     context = {'form': form, 'student_id': student_id, 'page_title': _('Edit Student')}
 
-    if request.method == 'POST' and request.is_ajax():
+    if request.method == 'POST':
         if form.is_valid():
             try:
-                form.save()
+                full_name = form.cleaned_data.get('full_name')
+                gender = form.cleaned_data.get('gender')
+                date_of_birth = form.cleaned_data.get('date_of_birth')
+                address = form.cleaned_data.get('address')
+                phone_number = form.cleaned_data.get('phone_number')
+                grade = form.cleaned_data.get('grade')
+                reg_date = form.cleaned_data.get('reg_date')
+                status = form.cleaned_data.get('status')
+                remark = form.cleaned_data.get('remark')
+                campus = form.cleaned_data.get('campus')
+                courses = form.cleaned_data.get('courses')  # Get courses from form
+
+                user = student.admin
+                user.full_name = full_name
+                user.gender = gender
+                user.address = address
+                user.phone_number = phone_number
+                user.remark = remark
+                user.save()
+
+                student.date_of_birth = date_of_birth
+                student.grade = grade
+                student.reg_date = reg_date
+                student.status = status
+                student.campus = campus
+                student.save()
+
+                # Set the many-to-many relationship
+                student.courses.set(courses)
+
                 return JsonResponse({'success': True, 'message': 'Student Updated Successfully'})
             except Exception as e:
                 return JsonResponse({'success': False, 'message': 'Could Not Update: ' + str(e)}, status=400)
@@ -1077,7 +1150,7 @@ def manage_student(request):
     for student in students:
         student_extra = studentextra.filter(admin=student).first()
         combined_students.append({
-            'id': student.id ,
+            'id': student.id,
             'full_name': student.full_name,
             'gender': student.gender,
             'date_of_birth': student_extra.date_of_birth if student_extra else None,
@@ -1086,6 +1159,7 @@ def manage_student(request):
             'reg_date': student_extra.reg_date if student_extra else None,
             'status': student_extra.status if student_extra else None,
             'remark': student.remark if student_extra else None,
+            'campus': student_extra.campus.name if student_extra and student_extra.campus else None,  # Include campus
             'courses': student_extra.courses.all() if student_extra else None,  # Include courses
         })
 
@@ -1187,8 +1261,6 @@ def manage_student_query(request):
     }
 
     return render(request, 'hod_template/manage_student_query.html', context)
-
-
 
 # def manage_student_query(request):
 #     # Get all students
@@ -1481,29 +1553,27 @@ def delete_campus(request, campus_id):
     else:
         return JsonResponse({'success': False, 'message': 'Invalid request method or not an AJAX request'}, status=400)
 
-# def switch_campus_view(request, campus_id):
-#     try:
-#         campus = Campus.objects.get(id=campus_id)
-#     except Campus.DoesNotExist:
-#         return HttpResponseNotFound('Campus not found')
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 
-#     # Perform any actions related to switching campus here
-#     # For example, setting session variables or updating user preferences
+def switch_campus_view(request, campus_id):
+    try:
+        campus = Campus.objects.get(id=campus_id)
+    except Campus.DoesNotExist:
+        return JsonResponse({'error': 'Campus not found'}, status=404)
 
-#     # Return a JSON response indicating success
-#     return JsonResponse({'message': 'Campus switched successfully', 'campus_name': campus.name})
+    # Here you can set session variables or perform any other actions related to switching campus
+
+    return JsonResponse({'message': 'Campus switched successfully', 'campus_name': campus.name})
+
+
 def switch_campus(request, campus_id):
-    campus = get_object_or_404(Campus, id=campus_id)
+    try:
+        request.session['campus_id'] = campus_id
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
     
-    # Perform any actions related to switching campus here
-    # For example, setting session variables or updating user preferences
-    
-    # Return a JSON response indicating success
-    return JsonResponse({
-        'message': 'Switch campus successful',
-        'campus_name': campus.name,
-    })
-
 def manage_campus(request):
     campuses = Campus.objects.all()
     context = {
@@ -1512,7 +1582,13 @@ def manage_campus(request):
     }
     return render(request, "hod_template/manage_campus.html", context)
 
-
+def fetch_campuses(request):
+    try:
+        campuses = Campus.objects.all()
+        campus_list = [{'id': campus.id, 'name': campus.name} for campus in campuses]
+        return JsonResponse({'status': 'success', 'campuses': campus_list})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
 # Payments
 def get_lesson_hours(request):
     student_id = request.GET.get('student_id')
@@ -1651,7 +1727,13 @@ def delete_payment_record(request, payment_id):
         return JsonResponse({'success': False, 'message': 'Invalid request method or not an AJAX request'}, status=400)
 
 def manage_payment_record(request):
-    payments = PaymentRecord.objects.all().select_related('learning_record', 'student').order_by('id')
+    campus_id = request.GET.get('campus_id')
+    
+    # Filter payments by campus_id if provided
+    if campus_id:
+        payments = PaymentRecord.objects.filter(student__campus_id=campus_id).select_related('learning_record', 'student').order_by('id')
+    else:
+        payments = PaymentRecord.objects.all().select_related('learning_record', 'student').order_by('id')
     
     # Calculate total amount paid
     total_amount_paid = payments.aggregate(Sum('amount_paid'))['amount_paid__sum']
@@ -1663,7 +1745,8 @@ def manage_payment_record(request):
     context = {
         'payments': paginated_payments,
         'total_amount_paid': total_amount_paid if total_amount_paid else 0,
-        'page_title': _('Manage Payment Records')
+        'page_title': _('Manage Payment Records'),
+        'campus_id': campus_id,  # Include campus_id in context to maintain state in templates
     }
 
     return render(request, 'hod_template/manage_payment_record.html', context)
@@ -1718,12 +1801,23 @@ def delete_learning_record(request, learn_id):
     else:
         return JsonResponse({'success': False, 'message': 'Invalid request method or not an AJAX request'}, status=400)
     
+
 def manage_learning_record(request):
-    # Fetch learning records, teachers, courses, and filter them
-    learningrecords = LearningRecord.objects.all().order_by('date', 'student__admin__id')  # Ensure consistent ordering
+    # Fetch the campus of the currently logged-in user
+    user = request.user
+    if hasattr(user, 'admin') and hasattr(user.admin, 'campus'):
+        campus = user.admin.campus
+    else:
+        # Handle the case where the user does not have an associated campus
+        # You may want to redirect or show an error message
+        campus = None
+
+    # Fetch learning records, teachers, courses, and filter them by campus
+    learningrecords = LearningRecord.objects.filter(student__campus=campus).order_by('date', 'student__admin__id') if campus else LearningRecord.objects.none()
     teachers = Teacher.objects.all()
     courses = Course.objects.all()
-    
+    campuses = Campus.objects.all()
+
     selected_teacher = request.GET.get('teacher_name', '')
     selected_grade = request.GET.get('grade', '')
 
@@ -1760,6 +1854,7 @@ def manage_learning_record(request):
         'learningrecords': paginated_learningrecords,
         'teachers': teachers,
         'grades': [(str(i), chr(64 + i)) for i in range(1, 8)],  # Assuming grades are from 1 to 7
+        'campuses': campuses,
         'selected_teacher': selected_teacher,
         'selected_grade': selected_grade,
         'total_lesson_hours': total_lesson_hours,

@@ -85,10 +85,6 @@ class StudentForm(CustomUserForm):
         label=_("Courses")
     )
 
-    class Meta:
-        model = Student
-        fields = ['full_name', 'gender', 'address', 'date_of_birth', 'reg_date', 'status', 'phone_number', 'remark', 'campus', 'courses']
-
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
         if self.instance.pk:  # if the instance exists (editing case)
@@ -114,6 +110,10 @@ class StudentForm(CustomUserForm):
             instance.save()
             instance.courses.set(self.cleaned_data['courses'])
         return instance
+    
+        class Meta:
+            model = Student
+            fields = ['full_name', 'gender', 'address', 'date_of_birth', 'reg_date', 'status', 'phone_number', 'remark', 'campus', 'courses']
 
 class AdminForm(FormSettings):
     full_name = forms.CharField(required=False, label=_('Full Name'))

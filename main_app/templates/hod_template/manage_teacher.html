@@ -83,6 +83,7 @@
                                     <th>{% trans "Email" %}</th>
                                     <th>{% trans "Address" %}</th>
                                     <th>{% trans "Phone Number" %}</th>
+                                    <th>{% trans "Campus" %}</th>
                                     <th>{% trans "Teaching Courses" %}</th>
                                     <th>{% trans "Contract" %}</th>
                                     <th>{% trans "Remark" %}</th>
@@ -98,6 +99,7 @@
                                     <td>{{ teacher.email }}</td>
                                     <td>{{ teacher.address }}</td>
                                     <td>{{ teacher.phone_number }}</td>
+                                    <td>{{ teacher.teacher.campus.name }}</td>
                                     <td>{% for course in teacher.teacher.courses.all %}{{ course.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
                                     <td>{{ teacher.teacher.work_type }}</td>
                                     <td>{{ teacher.remark }}</td>
@@ -170,3 +172,7 @@
     }
 </script>
 {% endblock content %}
+
+
+
+

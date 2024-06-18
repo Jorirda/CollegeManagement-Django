@@ -23,6 +23,8 @@ import generate
 urlpatterns = [
 #hodviews
     path('switch_campus/<int:campus_id>/', hod_views.switch_campus, name='switch_campus'),
+    path('api/campuses/', hod_views.fetch_campuses, name='fetch_campuses'),
+    # path('switch_campus/<int:campus_id>/', hod_views.switch_campus_view, name='switch_campus'),
     path('get_campuses/', hod_views.get_campuses, name='get_campuses'),
     path('get_student_amount_due/', hod_views.get_student_amount_due, name='get_student_amount_due'),
     path('get_student_courses_teachers/', hod_views.get_student_courses_teachers, name='get_student_courses_teachers'),
